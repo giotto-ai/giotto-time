@@ -1,10 +1,13 @@
-def smape(pred, ground_truth):
-    assest len(pred) == len(ground_truth)
-    tot = 0
-    for f, a in zip(pred, ground_truth):
-        tot += abs( f-a )/( abs(a) - abs(f) )
+import numpy as np
 
-    return (s/len(pred))*tot
+
+def smape(y_true, y_pred):
+    if len(y_pred) != len(y_true):
+        raise ValueError('{len_pred} != {len_true}'.format(len_pred=len(y_pred),
+                                                           len_true=len(y_true)))
+
+    non_normalized_smape = sum(np.abs(y_pred - y_true) / np.abs(y_pred) - np.abs(y_true))
+    return (2 / len(y_pred)) * non_normalized_smape
 
 
 #
