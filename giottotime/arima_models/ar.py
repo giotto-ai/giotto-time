@@ -23,7 +23,9 @@ class AR:
     def predict(self, X):
         predictions = pd.DataFrame(index=X.index)
         for k, model in enumerate(self.model_per_timestep):
-            predictions[f'{model.__class__.__name__}_{k}'] = model.predict(X)
+            col_name = "{model_name}_{index}".format(model_name=model.__class__.__name__,
+                                                     index=k)
+            predictions[col_name] = model.predict(X)
         return predictions
 
 

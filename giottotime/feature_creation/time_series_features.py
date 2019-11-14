@@ -33,7 +33,8 @@ class ExogenousFeature(TimeSeriesFeature):
         self.name = name
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.name})"
+        return "{class_name}({name})".format(class_name=self.__class__.__name__,
+                                             name=self.name)
 
     def fit_transform(self, time_series):
         return self.exogenous_time_series.reindex(index=time_series.index)
@@ -45,7 +46,8 @@ class CustomFeature(TimeSeriesFeature):
         self.kwargs = kwargs
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.custom_feature_function.__name__})"
+        return "{class_name}({function_name})".format(class_name=self.__class__.__name__,
+                                                      function_name=self.custom_feature_function.__name__)
 
     def fit_transform(self, time_series):
         return self.custom_feature_function(time_series, **self.kwargs)
