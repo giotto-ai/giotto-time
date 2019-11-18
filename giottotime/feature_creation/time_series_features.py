@@ -3,6 +3,25 @@ import pandas as pd
 from .base import TimeSeriesFeature
 
 
+class TimeSeriesFeature(ABCMeta):
+
+    def __init__(self, polinomial_features):
+        self.polinomial_features = polinomial_features
+
+    def fit_transform(self, time_series):
+        transformed_time_series = self._fit_transform(time_series)
+        time_series_with_polinomial_features = self.add_polinomial_features_to(transformed_time_series)
+        return time_series_with_polinomial_features
+
+    @abstractmethod
+    def _fit_transform(self, time_series):
+        pass
+
+    def add_polinomial_features_to(self, time_series):
+        # do something ..
+        return time_series
+
+
 class ShiftFeature(TimeSeriesFeature):
     def __init__(self, shift):
         self.shift = shift
@@ -51,3 +70,25 @@ class CustomFeature(TimeSeriesFeature):
 
     def fit_transform(self, time_series):
         return self.custom_feature_function(time_series, **self.kwargs)
+
+
+polinomial_features = PolynomialFeatures(first_order_features=[ShiftFeature(-1), ShiftFeature(-2), MovingAverageFeature(10)],
+                                         order=2,
+                                         interaction_only=True)
+
+feature_combination = PipelineFeature(feature=[ShiftFeature(-1), CustomFeature(lambda x: np.atan(x))])
+
+raw_time_series = ...
+time_series_preparation = TimeSeriesPreparation()
+time_series = time_series_preparation.fit_transform(raw_time_series)
+
+shift_feature = ShiftFeature(-1)
+custom_feature = CustomFeature(lambda_function)
+
+feature_creation = FeaturesCreation(horizon=3, time_series_features=[shift_feature, custom_feature])
+X, y = feature_creation.fit_transform(time_series)
+
+X_train, y_train, X_test, y_test = split_train_test(X, y)
+
+model = RegressorChain()
+model.fit(X_train, y_train)
