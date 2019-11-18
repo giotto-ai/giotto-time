@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def smape(y_true, y_pred):
     if len(y_pred) != len(y_true):
         raise ValueError('{len_pred} != {len_true}'.format(len_pred=len(y_pred), len_true=len(y_true)))
@@ -11,7 +10,7 @@ def smape(y_true, y_pred):
 def max_error(y_true, y_pred):
     if len(y_pred) != len(y_true):
         raise ValueError('{len_pred} != {len_true}'.format(len_pred=len(y_pred), len_true=len(y_true)))
-    
+
     return np.amax( np.absolute(np.subtract(y_true, y_pred)) )
 
 
