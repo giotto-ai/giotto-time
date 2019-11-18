@@ -75,6 +75,7 @@ class CustomFeature(TimeSeriesFeature):
 polinomial_features = PolynomialFeatures(first_order_features=[ShiftFeature(-1), ShiftFeature(-2), MovingAverageFeature(10)],
                                          order=2,
                                          interaction_only=True)
+
 feature_combination = PipelineFeature(feature=[ShiftFeature(-1), CustomFeature(lambda x: np.atan(x))])
 
 raw_time_series = ...
