@@ -13,10 +13,19 @@ from giottotime.feature_creation.time_series_features import ExogenousFeature, M
 from giottotime.feature_creation.utils import split_train_test
 
 
-def sliding_window_cv(time_series, train_size, test_size, random_index=True):
+def sliding_window_cv(X, y, train_size=15, test_size=10, n_splits=5):
+    for split in range(n_splits):
+        start_train_index = random.randint(0, len(X) - (train_size + test_size))
+        start_test_index = start_train_index + train_size
+        
+        X_train_window = X.iloc[start_train_index: start_test_index, :]
+        y_train_window = y.iloc[start_train_index: start_test_index]
 
-    random.randint(0, len(time_series))
-    return []
+        X_test_window = X.iloc[start_test_index: start_test_index + test_size, :]
+        y_test_window = y.iloc[start_test_index: start_test_index + test_size]
+
+        yield X_train_window, y_train_window, X_test_window, y_test_window
+        
 
 def shuffle_cv():
     return []
@@ -24,7 +33,6 @@ def shuffle_cv():
 
 split_functions = {"sliding": sliding_window_cv,
                    "shuffle": shuffle_cv}
-
 
 
 def _powerset(iterable):
@@ -55,6 +63,32 @@ def _check_no_repetitions(tuple_list):
     return len(np.unique(elems)) == len(tuple_list)
 
 
+def create_model_name_from_dict(base_model, dictionary):
+    model_name = base_model().__class__.__name__
+    parameter_strings = model_name + "-" + "-".join(["_".join([str(key), str(dictionary[key])])
+                                                     for key in dictionary.keys()])
+    return parameter_strings
+
+
+def extract_mean_std(cv_dataframe, pred_step):
+    cv_dataframe_at_pred_step = cv_dataframe[cv_dataframe["pred_step"] == pred_step]
+    grouped_by_model_name = cv_dataframe_at_pred_step.groupby("model_name")\
+        .agg({'score': ['mean', 'std']})\
+        .sort_values(by=[('score', 'mean')], ascending=False)
+
+    return grouped_by_model_name
+
+
+def extract_best_model_from_cv(dataframe_with_mean_std, model_names):
+    best_model_name = dataframe_with_mean_std.index[0]
+    best_model_configuration = model_names[best_model_name]
+
+    best_model = best_model_configuration[0]
+    best_model_params = best_model_configuration[1]
+
+    return best_model, best_model_params
+
+
 class AutoRegressorChain:
     def __init__(self, feed_forward=False):
         self.feed_forward = feed_forward
@@ -65,37 +99,46 @@ class AutoRegressorChain:
 
         best_models = []
         best_dictionaries = []
-        results = []
+        all_results = []
 
         for pred_step in range(pred_steps):
             print("Prediction step {} of {}".format(pred_step + 1, pred_steps))
             target_y = y.iloc[:, pred_step]
 
             cv_index = 0
-            for x_train_cv, y_train_cv, x_test_cv, y_test_cv in split_functions[split_type](features, target_y):
+            model_names = {}
+            results_per_pred_step = []
+            for x_train_cv, y_train_cv, x_test_cv, y_test_cv in sliding_window_cv(features, target_y):
                 for model_dict in model_dictionary:
                     base_model = model_dict["model"]
                     model_params = model_dict["params"]
                     valid_combinations = construct_model_param_dictionary(model_params)
                     for combination in valid_combinations:
                         dictionary = {key: value for key, value in combination}
+                        model_name = create_model_name_from_dict(base_model, dictionary)
+                        model_names[model_name] = [base_model, dictionary]
                         model = base_model(**dictionary)
                         model.fit(x_train_cv, y_train_cv, **kwargs)
                         model_score = model.score(x_test_cv, y_test_cv)
-                        results.append({"score": model_score,
-                                        "model_name": model.__class__.__name__,
-                                        "n_split": cv_index,
-                                        "params": dictionary})
+                        results_per_pred_step.append({"score": model_score,
+                                                      "model_name": model_name,
+                                                      "n_split": cv_index,
+                                                      "pred_step": pred_step})
                 cv_index += 1
-            dataframe_with_result = pd.DataFrame(results)
-            print(dataframe_with_result)
+            dataframe_with_result = pd.DataFrame(results_per_pred_step)
+            results_with_mean_std = extract_mean_std(dataframe_with_result, pred_step)
+            all_results.append(results_with_mean_std)
+            best_model, best_model_params = extract_best_model_from_cv(results_with_mean_std, model_names)
+            print(best_model, best_model_params)
 
+
+            """
             if self.feed_forward:
                 predictions = best_model_per_step.predict(features)
                 dataframe_pred = pd.DataFrame(index=features.index)
                 dataframe_pred["y_pred_" + str(pred_step)] = predictions
                 features = pd.concat([features, dataframe_pred], axis=1)
-
+            """
 
         self.best_models = best_models
         print(best_dictionaries)
@@ -125,5 +168,5 @@ if __name__ == "__main__":
                                                                     "max_features": [1/3, 1/2]}}
                         ]
 
-    a_chain = AutoRegressorChain(model_dictionary, feed_forward=False)
-    a_chain.cv_model_selection(X_t, y_t)
+    a_chain = AutoRegressorChain(feed_forward=False)
+    a_chain.cv_model_selection(X_t, y_t, model_dictionary)
