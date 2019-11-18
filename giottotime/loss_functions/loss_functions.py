@@ -14,5 +14,4 @@ def max_error(y_true, y_pred):
     return np.amax( np.absolute(np.subtract(y_true, y_pred)) )
 
 
-
 #
