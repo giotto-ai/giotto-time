@@ -1,9 +1,8 @@
 from sklearn.metrics import mean_squared_error
 from scipy.optimize import minimize
 
-import pandas.util.testing as testing
-
 import numpy as np
+import pandas as pd
 
 class Polynomial_ts:
     def __init__(self, order, loss=mean_squared_error):
@@ -27,8 +26,15 @@ class Polynomial_ts:
         #predictions = pd.DataFrame(index=X.index, data=[ p(t) for t in range( 0, X.shape[0] )   ])
         return p(t)
 
+    def de_trend(self, time_series):
+        #check fit run
+        p = np.poly1d( self.model_weights )
+        predictions = pd.DataFrame( index=time_series.index, data=[ p(t) for t in range( 0, time_series.shape[0] ) ] )
+        return time_series - predictions[0]
+
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
+    import pandas.util.testing as testing
 
     pts = Polynomial_ts(5)
     testing.N, testing.K = 200, 1
@@ -51,11 +57,11 @@ if __name__ == "__main__":
 
     ts['preds'] = [ pts.predict(t) for t in range(len(ts)) ]
 
+    #print( ts['A'] )
+
+    ts['de_trend'] = pts.de_trend( ts['A'] )
+
     ts.plot()
     plt.show()
-
-
-
-
 
 #

@@ -5,46 +5,54 @@ import pandas.util.testing as testing
 
 import numpy as np
 
-class Exponential_ts:
-    def __init__(self, loss=mean_squared_error):
+class CustomTrendForm_ts:
+    def __init__(self, model_form, inital_params, loss=mean_squared_error):
         self.loss = loss
+        self.model_form = model_form
+        self.inital_params = inital_params
 
     def fit(self, time_series):
-        def prediction_error(model_exponent):
-
-            predictions = [ np.exp(t*model_exponent) for t in range( 0, time_series.shape[0] ) ]
+        def prediction_error(model_params):
+            predictions = [ self.model_form( t, model_params ) for t in range( 0, time_series.shape[0] ) ]
             return self.loss(time_series.values, predictions)
 
-        model_exponent = 0
-        res = minimize(prediction_error, np.array([model_exponent]), method='BFGS', options={'disp': False})
-        self.model_exponent = res['x'][0]
+        res = minimize(prediction_error, self.inital_params, method='Powell', options={'disp': False})
+        self.model_params = res['x']
         return self
 
     def predict(self, t):
         #check fit run
         #predictions = pd.DataFrame(index=X.index, data=[ p(t) for t in range( 0, X.shape[0] )   ])
-        return np.exp(t*self.model_exponent)
+        return self.model_form( t, self.model_params )
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    pts = Exponential_ts()
+    pts = CustomTrendForm_ts( lambda t, L : L[0] + L[1]*t + L[2]*np.sin(L[3]*t), [1, 1, 300, 0.25] )
     testing.N, testing.K = 200, 1
 
     ts = testing.makeTimeDataFrame(freq='MS')
 
-    ts['A'] *= 500000
+    #ts['A'] *= 0
 
     ts['B'] = 1
     ts['B'] = ts['B'].cumsum()
-    ts['A'] = ts['A'] + 10*ts['B'] + 10*ts['B'].pow(2) + 0.001*np.exp(ts['B']/9)
+
+    ts['A'] = 300*ts['A'] + 10*ts['B'] + ts['B'].apply( lambda t : 500*np.sin(0.25*t) )
 
     ts = ts.drop('B', axis=1)
 
     pts.fit(ts)
 
-    print(pts.model_exponent)
+    print(pts.model_params)
 
     #print(pts.predict(100))
 
