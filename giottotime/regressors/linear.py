@@ -4,7 +4,6 @@ import numpy as np
 
 
 class LinearModel:
-
     def __init__(self, loss=mean_squared_error):
         self.loss = loss
         self.model_weights = None

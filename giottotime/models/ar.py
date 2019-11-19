@@ -13,16 +13,16 @@ class AR:
     def __init__(self, horizon, base_model):
         self.horizon = horizon
         self.base_model = base_model
-        self.model_per_timestep = [deepcopy(base_model) for _ in range(horizon)]
+        self.model_per_predstep = [deepcopy(base_model) for _ in range(horizon)]
 
     def fit(self, X, y, **kwargs):
-        self.model_per_timestep = [self.model_per_timestep[k].fit(X.values, y.iloc[:, k].values, **kwargs)
+        self.model_per_predstep = [self.model_per_predstep[k].cv_model_selection(X.values, y.iloc[:, k].values, **kwargs)
                                    for k in range(self.horizon)]
         return self
 
     def predict(self, X):
         predictions = pd.DataFrame(index=X.index)
-        for k, model in enumerate(self.model_per_timestep):
+        for k, model in enumerate(self.model_per_predstep):
             col_name = "{model_name}_{index}".format(model_name=model.__class__.__name__,
                                                      index=k)
             predictions[col_name] = model.predict(X)
@@ -58,3 +58,4 @@ if __name__ == "__main__":
 
     predictions = ar.predict(X_test)
     print(predictions)
+
