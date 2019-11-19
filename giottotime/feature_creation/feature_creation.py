@@ -27,6 +27,7 @@ class FeaturesCreation:
     def _create_x_features(self, time_series):
         x = pd.DataFrame(index=time_series.index)
         for time_series_feature in self.time_series_features:
-            x[str(time_series_feature)] = time_series_feature.fit_transform(time_series)
+            x_trasformed = time_series_feature.fit_transform(time_series)
+            x = pd.concat([x, x_trasformed], axis=1)
 
         return x
