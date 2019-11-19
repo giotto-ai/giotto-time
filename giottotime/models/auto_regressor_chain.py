@@ -1,12 +1,11 @@
+import random
 from itertools import chain, combinations
 
 import numpy as np
-
 import pandas as pd
 import pandas.util.testing as testing
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
-import random
 
 from giottotime.feature_creation.feature_creation import FeaturesCreation
 from giottotime.feature_creation.time_series_features import ExogenousFeature, MovingAverageFeature, ShiftFeature
@@ -75,6 +74,7 @@ def extract_mean_std(cv_dataframe, pred_step):
     grouped_by_model_name = cv_dataframe_at_pred_step.groupby("model_name")\
         .agg({'score': ['mean', 'std']})\
         .sort_values(by=[('score', 'mean')], ascending=False)
+    grouped_by_model_name["pred_step"] = pred_step
 
     return grouped_by_model_name
 
@@ -92,13 +92,24 @@ def extract_best_model_from_cv(dataframe_with_mean_std, model_names):
 class AutoRegressorChain:
     def __init__(self, feed_forward=False):
         self.feed_forward = feed_forward
+        self.cv_matrix = None
+
+    @property
+    def cv_matrix(self):
+        if self.__cv_matrix is None:
+            raise ValueError("Not set")
+        return self.__cv_matrix
+
+    @cv_matrix.setter
+    def cv_matrix(self, cv_matrix):
+        self.__cv_matrix = cv_matrix
 
     def cv_model_selection(self, X, y, model_dictionary, split_type='sliding', n_splits=5, **kwargs):
         features = X
         pred_steps = y.shape[1]
-
+        print(self.cv_matrix)
         best_models = []
-        best_dictionaries = []
+        best_dictionaries = {}
         all_results = []
 
         for pred_step in range(pred_steps):
@@ -129,8 +140,9 @@ class AutoRegressorChain:
             results_with_mean_std = extract_mean_std(dataframe_with_result, pred_step)
             all_results.append(results_with_mean_std)
             best_model, best_model_params = extract_best_model_from_cv(results_with_mean_std, model_names)
-            print(best_model, best_model_params)
-
+            print(results_with_mean_std)
+            # best_model_fit = best_model(**best_model_params)
+            best_dictionaries[pred_step] = (best_model, best_model_params)
 
             """
             if self.feed_forward:
@@ -139,7 +151,8 @@ class AutoRegressorChain:
                 dataframe_pred["y_pred_" + str(pred_step)] = predictions
                 features = pd.concat([features, dataframe_pred], axis=1)
             """
-
+        self.cv_matrix = pd.concat(all_results, axis=0)
+        print(self.cv_matrix)
         self.best_models = best_models
         print(best_dictionaries)
 
@@ -165,7 +178,11 @@ if __name__ == "__main__":
 
     model_dictionary = [{"model": RandomForestRegressor, "params": {"n_estimators": [1000],
                                                                     "max_depth": [None, 10],
-                                                                    "max_features": [1/3, 1/2]}}
+                                                                    "max_features": [1/3, 1/2]}
+                         },
+                        {"model": SVR, "params": {"kernel": ["linear", "poly", "rbf"],
+                                                  "gamma": ["auto"]}
+                         }
                         ]
 
     a_chain = AutoRegressorChain(feed_forward=False)
