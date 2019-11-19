@@ -24,14 +24,13 @@ class FeaturesCreation:
         y = pd.DataFrame(index=time_series.index)
         for k in range(self.horizon):
             shift_feature = ShiftFeature(-k)
-            y[str(shift_feature)] = shift_feature.fit_transform(time_series)
+            y[f"y_{k}"] = shift_feature.fit_transform(time_series)
 
         return y
 
     def _create_x_features(self, time_series):
         x = pd.DataFrame(index=time_series.index)
         for time_series_feature in self.time_series_features:
-            x_trasformed = time_series_feature.fit_transform(time_series)
-            x = pd.concat([x, x_trasformed], axis=1)
+            x[str(time_series_feature)] = time_series_feature.fit_transform(time_series)
 
         return x
