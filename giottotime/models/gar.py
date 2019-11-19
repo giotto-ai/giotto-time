@@ -8,7 +8,7 @@ from sklearn.linear_model import LinearRegression
 from giottotime.feature_creation.feature_creation import FeaturesCreation
 from giottotime.feature_creation.time_series_features import \
     MovingAverageFeature, ExogenousFeature, ShiftFeature
-from giottotime.feature_creation.utils import split_train_test
+from giottotime.models.utils import check_is_fitted
 
 
 def check_x(X):
@@ -38,8 +38,10 @@ class GAR:
     def __init__(self, feature_creator: FeaturesCreation, base_model: object,
                  horizon: int, feed_forward: bool = False):
 
-        assert callable(getattr(base_model, "fit"))
-        assert callable(getattr(base_model, "predict"))
+        if not hasattr(base_model, 'fit') or \
+                not hasattr(base_model, 'predict'):
+            raise TypeError(f"{base_model} must implement both 'fit' "
+                            f"and 'predict' methods")
 
         if horizon <= 0:
             raise ValueError("The horizon should be greater than 0, but "
@@ -81,6 +83,8 @@ class GAR:
                 predictions = model_for_pred_step.predict(features)
                 features = pd.concat([features, predictions], axis=1)
 
+        self.x_features_ = features
+
         return self
 
     def predict(self, ts: Optional[Union[pd.DataFrame, pd.Series]] = None,
@@ -112,6 +116,8 @@ class GAR:
         """
 
         check_x(ts)
+        check_is_fitted(self)
+
         features, _ = self._feature_creator.fit_transform(ts)
 
         # TODO: check this if is correct
