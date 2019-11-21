@@ -1,3 +1,6 @@
+from sklearn.exceptions import NotFittedError
+
+
 def check_is_fitted(estimator: object):
     """
     Checks if the estimator is fitted by verifying the presence of
@@ -27,4 +30,4 @@ def check_is_fitted(estimator: object):
              if v.endswith("_")]
 
     if not attrs:
-        raise ValueError("Not fitted")
+        raise NotFittedError("Not fitted")

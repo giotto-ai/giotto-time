@@ -46,7 +46,8 @@ if __name__ == "__main__":
                             ShiftFeature(-1),
                             CustomFeature(my_custom_function, window_size=4),
                             ExogenousFeature(x_exogenous_1, "test_ex1"),
-                            ExogenousFeature(x_exogenous_2, "test_ex2")]
+                            ExogenousFeature(x_exogenous_2, "test_ex2"),
+                            ]
 
     horizon = 4
     feature_creation = FeaturesCreation(horizon, time_series_features)
