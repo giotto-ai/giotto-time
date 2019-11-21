@@ -30,6 +30,14 @@ class ConstantFeature(TimeSeriesFeature):
         return pd.Series(data=self.constant, index=time_series.index)
 
 
+class PolynomialFeature(TimeSeriesFeature):
+    def __init__(self, degree=2):
+        self.degree = degree
+
+    def fit_transform(self, time_series):
+        pass
+
+
 class ExogenousFeature(TimeSeriesFeature):
     def __init__(self, exogenous_time_series, name):
         self.exogenous_time_series = exogenous_time_series

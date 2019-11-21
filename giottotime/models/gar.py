@@ -11,7 +11,7 @@ from giottotime.feature_creation.time_series_features import \
 from giottotime.models.utils import check_is_fitted
 
 
-def check_x(X):
+def check_input(X, y=None):
     # TODO: Call Stefano's function to check whether X is a valid input or not
     pass
 
@@ -22,46 +22,41 @@ class GAR:
 
     Parameters
     ----------
-    feature_creator: FeaturesCreation
-        This object is responsible for the creation of the features
     base_model: object
         The model used to make the predictions step by step. This class must
         have a ``fit``and ``predict`` method.
-    horizon: int
-        The horizon represents how many steps into the future to predict
     feed_forward: bool
         If true, feed-forward the predictions of the models at training and
         prediction time
 
     """
 
-    def __init__(self, feature_creator: FeaturesCreation, base_model: object,
-                 horizon: int, feed_forward: bool = False):
+    def __init__(self,
+                 base_model: object,
+                 feed_forward: bool = False):
 
         if not hasattr(base_model, 'fit') or \
                 not hasattr(base_model, 'predict'):
             raise TypeError(f"{base_model} must implement both 'fit' "
                             f"and 'predict' methods")
 
-        if horizon <= 0:
-            raise ValueError("The horizon should be greater than 0, but "
-                             f"has value {horizon}.")
-
-        self._feature_creator = feature_creator
         self._base_model = base_model
-        self._models_per_predstep = [deepcopy(base_model)
-                                     for _ in range(horizon)]
         self._feed_forward = feed_forward
 
-    def fit(self, ts: Union[pd.DataFrame, pd.Series],
+    # TODO: change from time-series to features as input
+    def fit(self, X: Union[pd.DataFrame, pd.Series],
+            y: Union[pd.DataFrame, pd.Series, str],
             **kwargs: Dict[str, object]) -> object:
         """
         Fit the GAR model according to the training data.
 
         Parameters
         ----------
-        ts: Union[pd.DataFrame, pd.Series]
-            Time series of shape (n_samples, 1) on which to fit the model
+        X: Union[pd.DataFrame, pd.Series]
+            Features used to fit the model
+        y: Union[pd.DataFrame, pd.Series, str]
+            If a DataFrame or a Series, target values to fit on. If a string,
+            the y represent the name of the target column contained in the X
         kwargs: Dict[str, object]
             Optional parameters to be passed to the base model during the
             fit procedure
@@ -72,22 +67,30 @@ class GAR:
 
         """
 
-        check_x(ts)
-        features, y = self._feature_creator.fit_transform(ts)
+        check_input(X, y)
 
-        for pred_step in range(len(self._models_per_predstep)):
-            model_for_pred_step = self._models_per_predstep[pred_step]
-            model_for_pred_step.fit(features, y, **kwargs)
+        if isinstance(y, str):
+            y = X[y]
+
+        features = deepcopy(X)
+        self.models_per_predstep_ = [deepcopy(self._base_model)
+                                     for _ in range(y.shape[1])]
+
+        for pred_step in range(len(self.models_per_predstep_)):
+            model_for_pred_step = self.models_per_predstep_[pred_step]
+            target_y = y[f"y_{pred_step}"]
+            model_for_pred_step.fit(features, target_y, **kwargs)
 
             if self._feed_forward:
                 predictions = model_for_pred_step.predict(features)
-                features = pd.concat([features, predictions], axis=1)
+                features[f"preds_{pred_step}"] = predictions
 
-        self.x_features_ = features
+        self.train_features_ = X
 
         return self
 
-    def predict(self, ts: Optional[Union[pd.DataFrame, pd.Series]] = None,
+    # TODO: change from time-series to features as input
+    def predict(self, X: Union[pd.DataFrame, pd.Series],
                 start_date: Optional[Union[pd.Timestamp, str]] = None)\
             -> pd.DataFrame:
         """
@@ -95,8 +98,8 @@ class GAR:
 
         Parameters
         ----------
-        ts: Union[pd.DataFrame, pd.Series], optional
-            Time series of shape (n_samples, 1) from which to start to predict
+        X: Union[pd.DataFrame, pd.Series]
+            Features used to predict
         start_date: Union[pd.Timestamp, str], optional
             If provided, start predicting from this date.
 
@@ -104,6 +107,11 @@ class GAR:
         -------
         predictions: pd.DataFrame
             The predictions of the model.
+
+        Raises
+        ------
+        NotFittedError
+            Thrown if the model has not been previously fitted
 
         Notes
         -----
@@ -115,24 +123,22 @@ class GAR:
 
         """
 
-        check_x(ts)
         check_is_fitted(self)
 
-        features, _ = self._feature_creator.fit_transform(ts)
-
+        test_features = deepcopy(X)
         # TODO: check this if is correct
         if start_date is not None:
-            features = features[features.index >= start_date]
+            test_features = X[X.index >= start_date]
 
-        predictions = pd.DataFrame(index=features.index)
+        predictions = pd.DataFrame(index=test_features.index)
 
-        for pred_step in range(len(self._models_per_predstep)):
-            model_for_pred_step = self._models_per_predstep[pred_step]
-            model_predictions = model_for_pred_step.predict(features)
+        for pred_step in range(len(self.models_per_predstep_)):
+            model_for_pred_step = self.models_per_predstep_[pred_step]
+            model_predictions = model_for_pred_step.predict(test_features)
             predictions[f"y_{pred_step}"] = model_predictions
 
             if self._feed_forward:
-                features = pd.concat([features, model_predictions], axis=1)
+                test_features.loc[:, f"preds_{pred_step}"] = model_predictions
 
         return predictions
 
@@ -154,8 +160,10 @@ if __name__ == "__main__":
     h = 4
     feature_creation = FeaturesCreation(h, time_series_features)
 
-    ar = GAR(feature_creation, base_m, h)
-    ar.fit(t[: 100])
+    x_train, y_train, x_test = feature_creation.fit_transform(t)
 
-    preds = ar.predict(t[100:])
+    ar = GAR(base_m, feed_forward=False)
+    ar.fit(x_train, y_train)
+
+    preds = ar.predict(x_test)
     print(preds)
