@@ -2,3 +2,4 @@ scipy
 scikit-learn
 numpy
 pandas
+hypothesis
