@@ -17,12 +17,21 @@ sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
 
+<<<<<<< HEAD
 project = 'giotto-time'
 copyright = '2019, L2F'
 author = 'List of authors'
 
 # The full version, including alpha/beta/rc tags
 from giottotime import __version__
+=======
+project = 'giotto'
+copyright = '2019, L2F'
+author = 'Guillaume Tauzin, Umberto Lupo, Matteo Caorsi, Anibal Medina'
+
+# The full version, including alpha/beta/rc tags
+from giotto import __version__
+>>>>>>> First template docs
 release = __version__
 
 # -- General configuration ---------------------------------------------------
