@@ -1,12 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 .. giottotime documentation master file, created by
 =======
 .. giotto documentation master file, created by
 >>>>>>> First template docs
+=======
+.. giottotime documentation master file, created by
+>>>>>>> First working version of the docs
    sphinx-quickstart on Mon Jun  3 11:56:46 2019.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 Welcome to giottotime's API reference!
 ======================================
@@ -76,162 +81,31 @@ Welcome to giotto's API reference!
 
 
 :mod:`giotto.time_series`: Time series
+=======
+Welcome to giottotime's API reference!
+>>>>>>> First working version of the docs
 ======================================
 
-.. automodule:: giotto.time_series
-   :no-members:
-   :no-inherited-members:
 
-.. currentmodule:: giotto
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   time_series.Resampler
-   time_series.Stationarizer
-   time_series.TakensEmbedding
-   time_series.SlidingWindow
-   time_series.PermutationEntropy
-   time_series.PearsonDissimilarity
-   time_series.Labeller
-
-
-:mod:`giotto.graphs`: Graphs
-============================
-
-.. automodule:: giotto.graphs
-   :no-members:
-   :no-inherited-members:
-
-.. currentmodule:: giotto
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   graphs.TransitionGraph
-   graphs.KNeighborsGraph
-   graphs.GraphGeodesicDistance
-   
-
-:mod:`giotto.base`: Base
-========================
-
-.. automodule:: giotto.base
-   :no-members:
-   :no-inherited-members:
-
-.. currentmodule:: giotto
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   base.TransformerResamplerMixin
-
-
-:mod:`giotto.pipeline`: Pipeline
-================================
-
-.. automodule:: giotto.pipeline
-   :no-members:
-   :no-inherited-members:
-
-.. currentmodule:: giotto
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   pipeline.Pipeline
-
-.. autosummary::
-   :toctree: generated/
-   :template: function.rst
-
-   pipeline.make_pipeline
-
-
-:mod:`giotto.meta_transformers`: Convenience pipelines
+:mod:`giottotime.feature_creation`: Features Creation
 ======================================================
 
-.. automodule:: giotto.meta_transformers
+.. automodule:: giottotime.feature_creation
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giotto
+.. currentmodule:: giottotime
 
 .. autosummary::
    :toctree: generated/
    :template: class.rst
 
-   meta_transformers.EntropyGenerator
-   meta_transformers.BettiCurveGenerator
-   meta_transformers.LandscapeGenerator
-
-
-:mod:`giotto.utils`: Validation
-===============================
-
-.. automodule:: giotto.utils
-   :no-members:
-   :no-inherited-members:
-
-.. currentmodule:: giotto
-
-.. autosummary::
-   :toctree: generated/
-   :template: function.rst
-
-   utils.check_diagram
-   utils.validate_params
-   utils.validate_metric_params
-
-..
-   :mod:`giotto.images`: Images
-   ============================
-
-..
-   automodule:: giotto.images
-   :no-members:
-   :no-inherited-members:
-
-..
-   currentmodule:: giotto
-
-..
-   autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   images.ImageInverter
-   images.HeightFiltration
-   images.RadialFiltration
-   images.DilationFiltration
-   images.ErosionFiltration
-   images.SignedDistanceFiltration
-   images.DensityFiltration
-
-
-..
-   :mod:`giotto.manifold`: Manifold learning
-   =========================================
-
-..
-   automodule:: giotto.manifold
-   :no-members:
-   :no-inherited-members:
-
-..
-   currentmodule:: giotto
-
-..
-   autosummary::
-   :toctree: generated/
-   :template: class.rst
-
+<<<<<<< HEAD
    manifold.StatefulMDS
 
    manifold.Kinematics
 >>>>>>> First template docs
+=======
+   feature_creation.FeaturesCreation
+   feature_creation.ShiftFeature
+>>>>>>> First working version of the docs
