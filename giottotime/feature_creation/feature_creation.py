@@ -5,6 +5,10 @@ from giottotime.feature_creation.utils import get_non_nan_values
 
 
 class FeaturesCreation:
+    """
+    Tentative docstring
+
+    """
     def __init__(self, horizon, time_series_features):
         self.time_series_features = time_series_features
         self.horizon = horizon
