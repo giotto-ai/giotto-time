@@ -16,7 +16,10 @@ class TestInputs:
     @pytest.mark.parametrize("base_model", [None, FeaturesCreation(1, [])])
     def test_invalid_base_model(self, base_model):
         with pytest.raises(TypeError):
-            GAR(base_model=base_model)
+            GAR(base_model=base_model, feed_forward=False)
+
+        with pytest.raises(TypeError):
+            GAR(base_model=base_model, feed_forward=True)
 
 
 @pytest.fixture
@@ -45,10 +48,15 @@ class TestFitPredict:
     def test_predict_with_no_fit(self, time_series):
         base_model = LinearRegression()
 
-        gar = GAR(base_model=base_model)
+        gar_no_feedforward = GAR(base_model=base_model, feed_forward=False)
 
         with pytest.raises(NotFittedError):
-            gar.predict(time_series)
+            gar_no_feedforward.predict(time_series)
+
+        gar_feedforward = GAR(base_model=base_model, feed_forward=True)
+
+        with pytest.raises(NotFittedError):
+            gar_feedforward.predict(time_series)
 
     @settings(suppress_health_check=(HealthCheck.filter_too_much,))
     @given(st.builds(
@@ -61,10 +69,15 @@ class TestFitPredict:
 
         x, y, _ = feature_creation.fit_transform(time_series)
 
-        gar = GAR(base_model=base_model)
+        gar_no_feedforward = GAR(base_model=base_model, feed_forward=False)
 
-        gar.fit(x, y)
-        assert gar.train_features_.shape[1] == len(features)
+        gar_no_feedforward.fit(x, y)
+        assert gar_no_feedforward.train_features_.shape[1] == len(features)
+
+        gar_feedforward = GAR(base_model=base_model, feed_forward=True)
+
+        gar_feedforward.fit(x, y)
+        assert gar_feedforward.train_features_.shape[1] == len(features)
 
     @settings(suppress_health_check=(HealthCheck.filter_too_much,))
     @given(st.builds(
@@ -77,12 +90,20 @@ class TestFitPredict:
 
         x_train, y_train, x_test = feature_creation.fit_transform(time_series)
 
-        gar = GAR(base_model=base_model)
+        gar_no_feedforward = GAR(base_model=base_model, feed_forward=False)
 
-        gar.fit(x_train, y_train)
+        gar_no_feedforward.fit(x_train, y_train)
 
-        predictions = gar.predict(x_test)
+        predictions = gar_no_feedforward.predict(x_test)
 
         assert len(predictions) == len(x_test)
         assert (predictions.index == x_test.index).all()
 
+        gar_with_feedforward = GAR(base_model=base_model, feed_forward=True)
+
+        gar_with_feedforward.fit(x_train, y_train)
+
+        predictions = gar_with_feedforward.predict(x_test)
+
+        assert len(predictions) == len(x_test)
+        assert (predictions.index == x_test.index).all()

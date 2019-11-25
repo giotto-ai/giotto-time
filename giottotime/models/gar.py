@@ -43,9 +43,8 @@ class GAR:
         self._base_model = base_model
         self._feed_forward = feed_forward
 
-    # TODO: change from time-series to features as input
     def fit(self, X: Union[pd.DataFrame, pd.Series],
-            y: Union[pd.DataFrame, pd.Series, str],
+            y: Union[pd.DataFrame, pd.Series],
             **kwargs: Dict[str, object]) -> object:
         """
         Fit the GAR model according to the training data.
@@ -55,8 +54,7 @@ class GAR:
         X: Union[pd.DataFrame, pd.Series]
             Features used to fit the model
         y: Union[pd.DataFrame, pd.Series, str]
-            If a DataFrame or a Series, target values to fit on. If a string,
-            the y represent the name of the target column contained in the X
+            If a DataFrame or a Series, target values to fit on
         kwargs: Dict[str, object]
             Optional parameters to be passed to the base model during the
             fit procedure
@@ -68,9 +66,6 @@ class GAR:
         """
 
         check_input(X, y)
-
-        if isinstance(y, str):
-            y = X[y]
 
         features = deepcopy(X)
         self.models_per_predstep_ = [deepcopy(self._base_model)
@@ -89,7 +84,6 @@ class GAR:
 
         return self
 
-    # TODO: change from time-series to features as input
     def predict(self, X: Union[pd.DataFrame, pd.Series],
                 start_date: Optional[Union[pd.Timestamp, str]] = None)\
             -> pd.DataFrame:
@@ -126,7 +120,7 @@ class GAR:
         check_is_fitted(self)
 
         test_features = deepcopy(X)
-        # TODO: check this if is correct
+
         if start_date is not None:
             test_features = X[X.index >= start_date]
 
