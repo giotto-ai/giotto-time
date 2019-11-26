@@ -97,7 +97,6 @@ class GrangerTest():
         q = lf.coef_.max(), np.argmax(lf.coef_)
         return q
 
-
 #
 
 if __name__ == "__main__":
