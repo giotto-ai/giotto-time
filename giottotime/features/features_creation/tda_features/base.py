@@ -1,16 +1,25 @@
+<<<<<<< HEAD
 from abc import ABCMeta, abstractmethod
 from collections import Iterable
 from typing import Union, List
+=======
+from abc import ABCMeta
+from collections import Iterable
+>>>>>>> First draft of feature creation
 
 import numpy as np
 from giotto.time_series import TakensEmbedding, SlidingWindow
 import giotto.diagrams as diag
 import giotto.homology as hl
+<<<<<<< HEAD
 import pandas as pd
+=======
+>>>>>>> First draft of feature creation
 
 from giottotime.features.features_creation.base import TimeSeriesFeature
 
 
+<<<<<<< HEAD
 def _align_indices(X: pd.DataFrame, n_points: int,
                    tda_feature_values: Union[List, np.ndarray]) -> pd.DataFrame:
     """Given ``X`` of length ``n_samples``, set the first
@@ -55,6 +64,9 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
     Parameter documentation is in the derived classes.
     """
     @abstractmethod
+=======
+class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
+>>>>>>> First draft of feature creation
     def __init__(self,
                  output_name: str,
                  takens_parameters_type: str = 'search',
@@ -65,7 +77,10 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
                  sliding_window_width: int = 10,
                  sliding_stride: int = 1,
                  diags_metric: str = 'euclidean',
+<<<<<<< HEAD
                  diags_coeff: int = 2,
+=======
+>>>>>>> First draft of feature creation
                  diags_max_edge_length: float = np.inf,
                  diags_homology_dimensions: Iterable = (0, 1, 2),
                  diags_infinity_values: float = None,
@@ -94,7 +109,10 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
 
         self._vietoris_rips_persistence = hl.VietorisRipsPersistence(
             metric=diags_metric,
+<<<<<<< HEAD
             coeff=diags_coeff,
+=======
+>>>>>>> First draft of feature creation
             max_edge_length=diags_max_edge_length,
             homology_dimensions=diags_homology_dimensions,
             infinity_values=diags_infinity_values,
@@ -104,6 +122,7 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
     def fit(self, X, y=None):
         return self
 
+<<<<<<< HEAD
     def _compute_n_points(self, n_windows: int) -> int:
         """Given the initial parameters used in the TakensEmbedding and
         SlidingWindow steps, compute the total number of points that have been
@@ -145,6 +164,18 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
             The scaled persistence diagrams.
 
         """
+=======
+    def _compute_indices(self, windows_points):
+        windows_points = self.sliding_stride * (windows_points - 1) + \
+                         self.sliding_window_width
+
+        original_points = self.takens_stride * (windows_points - 1) + \
+                          (self.takens_dimension * self.takens_time_delay)
+
+        return original_points
+
+    def _compute_persistence_diagrams(self, X):
+>>>>>>> First draft of feature creation
         X_embedded = self._takens_embedding.fit_transform(X)
         self.X_embedded_dims_ = X_embedded.shape
 
@@ -154,5 +185,9 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
         diagram_scaler = diag.Scaler()
         diagram_scaler.fit(X_diagrams)
 
+<<<<<<< HEAD
         return diagram_scaler.transform(X_diagrams)
 
+=======
+        return diagram_scaler.transform(X_diagrams)
+>>>>>>> First draft of feature creation
