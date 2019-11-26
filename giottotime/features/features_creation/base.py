@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 
 
 class TimeSeriesFeature(metaclass=ABCMeta):
+    @abstractmethod
     def __init__(self, output_name):
         self.output_name = output_name
 
