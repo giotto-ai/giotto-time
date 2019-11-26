@@ -25,9 +25,10 @@ class CustomTrendForm_ts:
         #predictions = pd.DataFrame(index=X.index, data=[ p(t) for t in range( 0, X.shape[0] )   ])
         return self.model_form( t, self.model_params )
 
-
-
-
+    def de_trend(self, time_series):
+        #check fit run
+        predictions = pd.DataFrame( index=time_series.index, data=blasdfasdfasdfa )
+        return time_series - predictions[0]
 
 
 

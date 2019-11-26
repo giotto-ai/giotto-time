@@ -25,6 +25,10 @@ class Exponential_ts:
         #predictions = pd.DataFrame(index=X.index, data=[ p(t) for t in range( 0, X.shape[0] )   ])
         return np.exp(t*self.model_exponent)
 
+    def de_trend(self, time_series):
+        #check fit run
+        predictions = pd.DataFrame( index=time_series.index, data=[ np.exp(t*self.model_exponent) for t in range( 0, time_series.shape[0] ) ] )
+        return time_series - predictions[0]
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt

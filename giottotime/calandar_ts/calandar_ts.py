@@ -54,7 +54,7 @@ def holiday_ts(region="america", country="Brazil", start_date='01/01/2018', end_
                 return 0
 
         events['status'] = events['status'].rolling(klen, center=True).apply( ip )
-
+        
         return events
 
 ###########################################################################
@@ -63,9 +63,9 @@ if __name__ == "__main__":
 
     #kernel = list( range(1,11) ) + list( range(-10,1) )
 
-    kernel = list( range(1,11) ) + list( range(-10,1) ) #signal.nuttall(12) #list( range(1, 11) )
+    kernel = signal.parzen(20) #list( range(1, 11) )
 
-    e = holiday_ts(region="europe", country="Iceland", kernel="kernel" )
+    e = holiday_ts(region="asia", country="Qatar", kernel=kernel )
     print(e)
 
     e.plot()
