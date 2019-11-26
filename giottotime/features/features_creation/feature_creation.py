@@ -20,8 +20,8 @@ class FeaturesCreation:
     def _create_y_shifts(self, time_series):
         y = pd.DataFrame(index=time_series.index)
         for k in range(self.horizon):
-            shift_feature = ShiftFeature(-k)
-            y[f"y_{k}"] = shift_feature.fit_transform(time_series)
+            shift_feature = ShiftFeature(-k, f'shift_{k}')
+            y[f'shift_{k}'] = shift_feature.fit_transform(time_series)
 
         return y
 

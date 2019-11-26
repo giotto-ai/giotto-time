@@ -4,10 +4,8 @@ from giottotime.features.features_creation.base import TimeSeriesFeature
 
 
 class ShiftFeature(TimeSeriesFeature):
-    """
-    Tentative Docstring
-    """
-    def __init__(self, shift):
+    def __init__(self, shift, output_name):
+        super().__init__(output_name)
         self.shift = shift
 
     def transform(self, time_series):
@@ -15,7 +13,8 @@ class ShiftFeature(TimeSeriesFeature):
 
 
 class MovingAverageFeature(TimeSeriesFeature):
-    def __init__(self, window_size):
+    def __init__(self, window_size, output_name):
+        super().__init__(output_name)
         self.window_size = window_size
 
     def transform(self, time_series):
@@ -23,7 +22,8 @@ class MovingAverageFeature(TimeSeriesFeature):
 
 
 class ConstantFeature(TimeSeriesFeature):
-    def __init__(self, constant=1):
+    def __init__(self, output_name, constant=1):
+        super().__init__(output_name)
         self.constant = constant
 
     def transform(self, time_series):
@@ -39,7 +39,8 @@ class PolynomialFeature(TimeSeriesFeature):
 
 
 class ExogenousFeature(TimeSeriesFeature):
-    def __init__(self, exogenous_time_series, name):
+    def __init__(self, exogenous_time_series, name, output_name):
+        super().__init__(output_name)
         self.exogenous_time_series = exogenous_time_series
         self.name = name
 
@@ -51,7 +52,8 @@ class ExogenousFeature(TimeSeriesFeature):
 
 
 class CustomFeature(TimeSeriesFeature):
-    def __init__(self, custom_feature_function, **kwargs):
+    def __init__(self, custom_feature_function, output_name, **kwargs):
+        super().__init__(output_name)
         self.custom_feature_function = custom_feature_function
         self.kwargs = kwargs
 

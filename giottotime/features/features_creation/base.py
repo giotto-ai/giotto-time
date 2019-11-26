@@ -3,6 +3,8 @@ from abc import ABCMeta, abstractmethod
 
 
 class TimeSeriesFeature(metaclass=ABCMeta):
+    def __init__(self, output_name):
+        self.output_name = output_name
 
     def fit(self, X, y=None):
         return self
@@ -18,4 +20,6 @@ class TimeSeriesFeature(metaclass=ABCMeta):
         return "{class_name}({attributes})".format(class_name=self.__class__.__name__,
                                                    attributes=", ".join(attributes_to_print))
 
-
+    def fit_transform(self, X, y=None):
+        self.fit(X, y)
+        return self.transform(X)
