@@ -14,7 +14,7 @@ class PeriodicSeasonalFeature:
         self.period = pd.Timedelta(period)
         self.amplitude = amplitude
 
-    def fit(self, X: pd.Series, y=None):
+    def transform(self, X: pd.Series):
         datetime_index = self._convert_index_to_datetime(X.index)
         periodic_feature_values = self._compute_periodic_feature_of(datetime_index)
         periodic_feature_series = pd.Series(index=X.index,
