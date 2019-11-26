@@ -1,8 +1,6 @@
 from typing import Callable
 
 import pandas as pd
-from giotto.time_series import TakensEmbedding, SlidingWindow
-import giotto.homology as hl
 
 from giottotime.features.features_creation.base import TimeSeriesFeature
 
