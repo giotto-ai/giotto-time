@@ -13,12 +13,20 @@ class FeaturesCreation:
 
     Parameters
     ----------
+<<<<<<< HEAD
     horizon : ``int``, required.
+=======
+    horizon: int
+>>>>>>> Added docstrings
         It represents how much into the future is necessary to predict. This
         corresponds to the number of shifts that are going to be performed
         on y.
 
+<<<<<<< HEAD
     time_series_features : ``List[TimeSeriesFeature]``, required.
+=======
+    time_series_features: List[TimeSeriesFeature]
+>>>>>>> Added docstrings
         The list of ``TimeSeriesFeature`` from which to compute the features.
 
     """
@@ -40,6 +48,7 @@ class FeaturesCreation:
 
         Parameters
         ----------
+<<<<<<< HEAD
         time_series : ``pd.DataFrame``, required.
             The time-series on which to compute the ``X`` and ``y`` matrices.
 
@@ -48,6 +57,16 @@ class FeaturesCreation:
         x_non_nans, y_non_nans : ``(pd.DataFrame, pd.DataFrame)``
             A tuple containing the ``X`` and ``y`` matrices.
 
+=======
+        time_series: pd.DataFrame
+            The time-series on which to compute the ``X`` and ``y`` matrices.
+
+        Returns
+        -------
+        x_non_nans, y_non_nans: (pd.DataFrame, pd.DataFrame)
+            A tuple containing the ``X`` and ``y`` matrices.
+
+>>>>>>> Added docstrings
         """
         x = self._create_x_features(time_series)
         y = self._create_y_shifts(time_series)

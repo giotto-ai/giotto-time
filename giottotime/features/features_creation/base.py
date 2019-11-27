@@ -7,7 +7,11 @@ import pandas as pd
 class TimeSeriesFeature(metaclass=ABCMeta):
     """Base class for all the feature classes in this package.
 
+<<<<<<< HEAD
     Parameters documentation is in the derived classes.
+=======
+    Parameter documentation is in the derived classes.
+>>>>>>> Added docstrings
     """
     @abstractmethod
     def __init__(self, output_name):

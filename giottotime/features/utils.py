@@ -46,16 +46,26 @@ def get_non_nan_values(X: pd.DataFrame, y: pd.DataFrame) \
 
     Parameters
     ----------
+<<<<<<< HEAD
     X : ``pd.DataFrame``, required.
         The DataFrame in which to look and remove for ``Nan`` values.
 
     y : ``pd.DataFrame``, required.
+=======
+    X: pd.DataFrame
+        The DataFrame in which to look and remove for ``Nan`` values.
+    y: pd.DataFrame
+>>>>>>> Added docstrings
         The DataFrame in which to remove the rows that correspond to a row of
         X that contain at least a ``Nan`` value.
 
     Returns
     -------
+<<<<<<< HEAD
     X_non_nans, y_non_nans : ``(pd.DataFrame, pd.DataFrame)``
+=======
+    X_non_nans, y_non_nans: (pd.DataFrame, pd.DataFrame)
+>>>>>>> Added docstrings
         A tuple containing the two DataFrame.
 
     """
