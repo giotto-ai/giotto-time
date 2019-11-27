@@ -1,68 +1,35 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 from abc import ABCMeta, abstractmethod
 from collections import Iterable
 from typing import Union, List
-=======
-from abc import ABCMeta
-from collections import Iterable
->>>>>>> First draft of feature creation
-=======
-from abc import ABCMeta, abstractmethod
-from collections import Iterable
-<<<<<<< HEAD
-from typing import Union
->>>>>>> Some docstrings for TDA features added
-=======
-from typing import Union, List
->>>>>>> TDA features added
 
 import numpy as np
 from giotto.time_series import TakensEmbedding, SlidingWindow
 import giotto.diagrams as diag
 import giotto.homology as hl
-<<<<<<< HEAD
-<<<<<<< HEAD
 import pandas as pd
-=======
->>>>>>> First draft of feature creation
-=======
-import pandas as pd
->>>>>>> Some docstrings for TDA features added
 
 from giottotime.features.features_creation.base import TimeSeriesFeature
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 def _align_indices(X: pd.DataFrame, n_points: int,
                    tda_feature_values: Union[List, np.ndarray]) -> pd.DataFrame:
-=======
-def align_indices(X: pd.DataFrame, n_points: int,
-                  tda_feature_values: Union[List, np.ndarray]) -> pd.DataFrame:
->>>>>>> TDA features added
     """Given ``X`` of length ``n_samples``, set the first
     ``n_samples - n_points`` to ``np.nan``. Then, split the remaining points in
     ``len(tda_feature_values)`` chunks and, to each data-point in a chunk, set
     its value to the corresponding value in ``tda_feature_values``.
-
     Parameters
     ----------
     X : ``pd.DataFrame``, required.
         The input DataFrame. Only the indices of the DataFrame are used
-
     n_points : ``int``, required.
         The number of points on which to apply the values
-
     tda_feature_values : ``Union[List, np.ndarray]``, required.
         The List or np.ndarray containing the values to put in ``output_X``.
-
     Returns
     -------
     output_X : ``pd.DataFrame``
         A ``pd.DataFrame`` with the same index as ``X`` and with the values
         set according to ``n_points`` and ``tda_feature_values``.
-
     """
     output_X = X.copy()
 
@@ -79,16 +46,9 @@ def align_indices(X: pd.DataFrame, n_points: int,
 
 class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
     """Base class for all the TDA features contained in the package.
-
     Parameter documentation is in the derived classes.
     """
     @abstractmethod
-<<<<<<< HEAD
-=======
-class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
->>>>>>> First draft of feature creation
-=======
->>>>>>> Some docstrings for TDA features added
     def __init__(self,
                  output_name: str,
                  takens_parameters_type: str = 'search',
@@ -99,14 +59,7 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
                  sliding_window_width: int = 10,
                  sliding_stride: int = 1,
                  diags_metric: str = 'euclidean',
-<<<<<<< HEAD
-<<<<<<< HEAD
                  diags_coeff: int = 2,
-=======
->>>>>>> First draft of feature creation
-=======
-                 diags_coeff: int = 2,
->>>>>>> Some docstrings for TDA features added
                  diags_max_edge_length: float = np.inf,
                  diags_homology_dimensions: Iterable = (0, 1, 2),
                  diags_infinity_values: float = None,
@@ -135,14 +88,7 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
 
         self._vietoris_rips_persistence = hl.VietorisRipsPersistence(
             metric=diags_metric,
-<<<<<<< HEAD
-<<<<<<< HEAD
             coeff=diags_coeff,
-=======
->>>>>>> First draft of feature creation
-=======
-            coeff=diags_coeff,
->>>>>>> Some docstrings for TDA features added
             max_edge_length=diags_max_edge_length,
             homology_dimensions=diags_homology_dimensions,
             infinity_values=diags_infinity_values,
@@ -152,27 +98,19 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
     def fit(self, X, y=None):
         return self
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> TDA features added
     def _compute_n_points(self, n_windows: int) -> int:
         """Given the initial parameters used in the TakensEmbedding and
         SlidingWindow steps, compute the total number of points that have been
         used during the computation.
-
         Parameters
         ----------
         n_windows : ``int``, required.
             The number of windows after the SlidingWindow step.
-
         Returns
         -------
         n_used_points : ``int``
             The total number of points that have been used in the
             TakensEmbedding and SlidingWindow steps.
-<<<<<<< HEAD
-
         """
         embedder_length = self.sliding_stride * (n_windows-1) + \
                           self.sliding_window_width
@@ -186,55 +124,15 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
             -> np.ndarray:
         """Compute the persistence diagrams starting from a time-series using
         the Vietoris Rips algorithm. The resulting diagrams are then scaled.
-
         Parameters
         ----------
         X : ``Union[pd.DataFrame, pd.Series]``, required.
             The time-series on which to compute the persistence diagrams.
-
         Returns
         -------
         X_scaled : ``np.ndarray``
             The scaled persistence diagrams.
-
         """
-=======
-    def _compute_indices(self, windows_points):
-        windows_points = self.sliding_stride * (windows_points - 1) + \
-                         self.sliding_window_width
-=======
->>>>>>> TDA features added
-
-        """
-        embedder_length = self.sliding_stride * (n_windows-1) + \
-                          self.sliding_window_width
-
-        n_used_points = self.takens_stride * (embedder_length-1) + \
-                          self.takens_dimension*self.takens_time_delay
-
-        return n_used_points
-
-<<<<<<< HEAD
-    def _compute_persistence_diagrams(self, X):
->>>>>>> First draft of feature creation
-=======
-    def _compute_persistence_diagrams(self, X: Union[pd.DataFrame, pd.Series])\
-            -> np.ndarray:
-        """Compute the persistence diagrams starting from a time-series using
-        the Vietoris Rips algorithm. The resulting diagrams are then scaled.
-
-        Parameters
-        ----------
-        X : ``Union[pd.DataFrame, pd.Series``, required.
-            The time-series on which to compute the persistence diagrams.
-
-        Returns
-        -------
-        X_scaled : ``np.ndarray``
-            The scaled persistence diagrams.
-
-        """
->>>>>>> Some docstrings for TDA features added
         X_embedded = self._takens_embedding.fit_transform(X)
         self.X_embedded_dims_ = X_embedded.shape
 
@@ -244,14 +142,4 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
         diagram_scaler = diag.Scaler()
         diagram_scaler.fit(X_diagrams)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         return diagram_scaler.transform(X_diagrams)
-
-=======
-        return diagram_scaler.transform(X_diagrams)
->>>>>>> First draft of feature creation
-=======
-        return diagram_scaler.transform(X_diagrams)
-
->>>>>>> TDA features added
