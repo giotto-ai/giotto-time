@@ -2,12 +2,7 @@ from copy import deepcopy
 from typing import Union, Dict, Optional
 
 import pandas as pd
-import pandas.util.testing as testing
-from sklearn.linear_model import LinearRegression
 
-from giottotime.feature_creation.feature_creation import FeaturesCreation
-from giottotime.feature_creation.time_series_features import \
-    MovingAverageFeature, ExogenousFeature, ShiftFeature
 from giottotime.models.utils import check_is_fitted
 
 
@@ -26,10 +21,9 @@ class GAR:
         have a ``fit``and ``predict`` method.
     feed_forward: bool
         If true, feed-forward the predictions of the models at training and
-        prediction time
+        prediction time.
 
     """
-
     def __init__(self, base_model: object, feed_forward: bool = False):
         if not hasattr(base_model, 'fit') or \
                 not hasattr(base_model, 'predict'):
@@ -46,19 +40,20 @@ class GAR:
         Parameters
         ----------
         X: pd.DataFrame
-            Features used to fit the model
+            Features used to fit the model.
+
         y: pd.DataFrame
-            Target values to fit on
+            Target values to fit on.
+
         kwargs: Dict[str, object]
             Optional parameters to be passed to the base model during the fit
-            procedure
+            procedure.
 
         Returns
         -------
         self: object
 
         """
-
         check_input(X, y)
 
         features = X.copy()
@@ -85,7 +80,8 @@ class GAR:
         Parameters
         ----------
         X: pd.DataFrame
-            Features used to predict
+            Features used to predict.
+
         start_date: Union[pd.Timestamp, str], optional
             If provided, start predicting from this date.
 
@@ -97,7 +93,7 @@ class GAR:
         Raises
         ------
         NotFittedError
-            Thrown if the model has not been previously fitted
+            Thrown if the model has not been previously fitted.
 
         Notes
         -----
@@ -108,7 +104,6 @@ class GAR:
         length ``ts``.
 
         """
-
         check_is_fitted(self)
 
         test_features = X.copy()
@@ -126,29 +121,3 @@ class GAR:
                 test_features.loc[:, f'preds_{pred_step}'] = model_predictions
 
         return predictions
-
-
-if __name__ == "__main__":
-    base_m = LinearRegression()
-    testing.N, testing.K = 200, 1
-
-    t = testing.makeTimeDataFrame(freq='MS')
-    x_exogenous_1 = testing.makeTimeDataFrame(freq='MS')
-    x_exogenous_2 = testing.makeTimeDataFrame(freq='MS')
-
-    time_series_features = [MovingAverageFeature(2),
-                            MovingAverageFeature(4),
-                            ShiftFeature(-1),
-                            ExogenousFeature(x_exogenous_1, "test_ex1"),
-                            ExogenousFeature(x_exogenous_2, "test_ex2")]
-
-    h = 4
-    feature_creation = FeaturesCreation(h, time_series_features)
-
-    x_train, y_train, x_test = feature_creation.fit_transform(t)
-
-    ar = GAR(base_m, feed_forward=False)
-    ar.fit(x_train, y_train)
-
-    preds = ar.predict(x_test)
-    print(preds)
