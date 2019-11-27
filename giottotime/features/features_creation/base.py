@@ -32,21 +32,21 @@ class TimeSeriesFeature(metaclass=ABCMeta):
 
         Parameters
         ----------
-        X: ``pd.DataFrame``, required.
+        X : ``pd.DataFrame``, required.
             The DataFrame to be renamed.
 
         Returns
         -------
-        X: ``pd.DataFrame``
+        X_renamed : ``pd.DataFrame``
             The original DataFrame ``X``, with the columns renamed.
 
         """
         suffix = ""
 
-        X_new = X.T.reset_index(drop=True).T
-        for index, col in enumerate(X_new.columns):
+        X_renamed = X.T.reset_index(drop=True).T
+        for index, col in enumerate(X_renamed.columns):
             if len(X.columns) > 1:
                 suffix = "_" + str(index)
-            X_new.rename(columns={col: self.output_name + str(suffix)}, inplace=True)
+            X_renamed.rename(columns={col: self.output_name + str(suffix)}, inplace=True)
 
-        return X_new
+        return X_renamed

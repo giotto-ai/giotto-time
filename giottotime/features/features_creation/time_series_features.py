@@ -10,10 +10,10 @@ class ShiftFeature(TimeSeriesFeature):
 
     Parameters
     ----------
-    shift: int
+    shift : ``int``, required.
         How much to shift.
 
-    output_name: str
+    output_name : ``str``, required.
         The name of the output column.
 
     """
@@ -26,12 +26,12 @@ class ShiftFeature(TimeSeriesFeature):
 
         Parameters
         ----------
-        X: pd.DataFrame
+        X : ``pd.DataFrame``, required.
             The DataFrame to shift.
 
         Returns
         -------
-        X_shifted_renamed: pd.DataFrame
+        X_shifted_renamed : ``pd.DataFrame``
             The shifted version of the original ``X``.
 
         """
@@ -46,10 +46,10 @@ class MovingAverageFeature(TimeSeriesFeature):
 
     Parameters
     ----------
-    window_size: int
+    window_size : ``int``, required.
         The number of previous points on which to compute the moving average
 
-    output_name: str
+    output_name : ``str``, required.
         The name of the output column.
 
     """
@@ -63,12 +63,12 @@ class MovingAverageFeature(TimeSeriesFeature):
 
         Parameters
         ----------
-        X: pd.DataFrame
+        X :``pd.DataFrame``, required.
             The DataFrame on which to compute the rolling moving average
 
         Returns
         -------
-        X_mov_avg_renamed: pd.DataFrame
+        X_mov_avg_renamed :``pd.DataFrame``
             A DataFrame, with the same length as ``X``, containing the rolling
             moving average for each element.
 
@@ -84,10 +84,10 @@ class ConstantFeature(TimeSeriesFeature):
 
     Parameters
     ----------
-    constant: int
+    constant : ``int``, required.
         The value to use to generate the Series.
 
-    output_name: str
+    output_name : ``str``, required.
         The name of the output column.
 
     """
@@ -101,12 +101,12 @@ class ConstantFeature(TimeSeriesFeature):
 
         Parameters
         ----------
-        X: pd.DataFrame
+        X : ``pd.DataFrame``, required.
             The input DataFrame. It is used only for its index.
 
         Returns
         -------
-        constant_series_renamed: pd.DataFrame
+        constant_series_renamed : ``pd.DataFrame``
             A constant series, with the same length of ``X`` and with the same
             index.
 
@@ -130,10 +130,10 @@ class ExogenousFeature(TimeSeriesFeature):
 
     Parameters
     ----------
-    exogenous_time_series: pd.DataFrame
+    exogenous_time_series : ``pd.DataFrame``, required.
         The time-series to reindex
 
-    output_name: str
+    output_name : ``str`, required.
         The name of the output column.
 
     """
@@ -146,12 +146,12 @@ class ExogenousFeature(TimeSeriesFeature):
 
         Parameters
         ----------
-        X: pd.DataFrame
+        X : ``pd.DataFrame``, required.
             The input DataFrame. Used only for its index.
 
         Returns
         -------
-        exog_feature_renamed: pd.DataFrame
+        exog_feature_renamed : ``pd.DataFrame`
             The original ``exogenous_time_series``, re-indexed with the index
             of ``X``.
 
@@ -166,18 +166,18 @@ class CustomFeature(TimeSeriesFeature):
 
     Parameters
     ----------
-    `custom_feature_function`: Callable
+    custom_feature_function`: ``Callable`, required.
         The function to use to generate the Series containing the feature
 
-    output_name: str
+    output_name: ``str``, required.
         The name of the output column.
 
-    kwargs:
+    kwargs : ``object``, optional.
         Optional arguments to pass to the function.
 
     """
     def __init__(self, custom_feature_function: Callable, output_name: str,
-                 **kwargs):
+                 **kwargs: object):
         super().__init__(output_name)
         self.custom_feature_function = custom_feature_function
         self.kwargs = kwargs
@@ -188,12 +188,12 @@ class CustomFeature(TimeSeriesFeature):
 
         Parameters
         ----------
-        X: pd.DataFrame
+        X : ``pd.DataFrame``, required.
             The DataFrame from which to generate the features
 
         Returns
         -------
-        custom_feature_renamed: pd.DataFrame
+        custom_feature_renamed : ``pd.DataFrame``
             A DataFrame containing the generated features.
 
         """
