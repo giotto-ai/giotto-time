@@ -136,7 +136,7 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
 
         Parameters
         ----------
-        X : ``Union[pd.DataFrame, pd.Series``, required.
+        X : ``Union[pd.DataFrame, pd.Series]``, required.
             The time-series on which to compute the persistence diagrams.
 
         Returns

@@ -63,12 +63,12 @@ class MovingAverageFeature(TimeSeriesFeature):
 
         Parameters
         ----------
-        X :``pd.DataFrame``, required.
+        X : ``pd.DataFrame``, required.
             The DataFrame on which to compute the rolling moving average
 
         Returns
         -------
-        X_mov_avg_renamed :``pd.DataFrame``
+        X_mov_avg_renamed : ``pd.DataFrame``
             A DataFrame, with the same length as ``X``, containing the rolling
             moving average for each element.
 
@@ -118,10 +118,37 @@ class ConstantFeature(TimeSeriesFeature):
 
 
 class PolynomialFeature(TimeSeriesFeature):
-    def __init__(self, degree=2):
-        self.degree = degree
+    """Compute the polynomial features, of a degree equal to the input
+    ``degree``.
 
-    def fit_transform(self, time_series):
+    Parameters
+    ----------
+    degree: ``int``, required.
+        The degree of the polynomial features.
+
+    output_name : ``str`, required.
+        The name of the output column.
+    """
+    def __init__(self, degree: int, output_name: str):
+        super().__init__(output_name)
+        self._degree = degree
+
+    # TODO: finish the polynomial features
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Compute the polynomial features of ``X``, up to a degree equal to
+        ``self._degree``.
+
+        Parameters
+        ----------
+        X : ``pd.DataFrame``, required.
+            The input DataFrame. Used only for its index.
+
+        Returns
+        -------
+        polynomial_features : ``pd.DataFrame``
+            The computed polynomial features.
+
+        """
         pass
 
 

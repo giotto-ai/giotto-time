@@ -45,7 +45,7 @@ class FeaturesCreation:
 
         Returns
         -------
-        x_non_nans, y_non_nans : ``(``pd.DataFrame``, ``pd.DataFrame``)``
+        x_non_nans, y_non_nans : ``(pd.DataFrame, pd.DataFrame)``
             A tuple containing the ``X`` and ``y`` matrices.
 
         """

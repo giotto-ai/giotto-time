@@ -14,7 +14,7 @@ from giottotime.features.features_creation.tda_features.relevant_holes_feature i
     NumberOfRelevantHolesFeature
 
 
-def find_mean_nonzero(g):
+def _find_mean_nonzero(g):
     if g.to_numpy().nonzero()[1].any():
         return g.to_numpy().nonzero()[1].mean()
     else:
@@ -197,7 +197,7 @@ class BettiCurvesFeature(TDAFeatures):
         betti_means = []
         for betti_surface in betti_surfaces:
             betti_means.append(betti_surface.groupby(betti_surface.index)
-                               .apply(lambda g: find_mean_nonzero(g))
+                               .apply(lambda g: _find_mean_nonzero(g))
                                .rolling(self._betti_rolling).mean().values)
 
         return betti_means
