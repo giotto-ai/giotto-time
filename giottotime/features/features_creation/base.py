@@ -42,9 +42,10 @@ class TimeSeriesFeature(metaclass=ABCMeta):
 
         """
         suffix = ""
-        for index, col in enumerate(X.columns):
+        X_new = X.T.reset_index(drop=True).T
+        for index, col in enumerate(X_new.columns):
             if len(X.columns) > 1:
                 suffix = "_" + str(index)
-            X.rename(columns={col: self.output_name + str(suffix)}, inplace=True)
+            X_new.rename(columns={col: self.output_name + str(suffix)}, inplace=True)
 
-        return X
+        return X_new
