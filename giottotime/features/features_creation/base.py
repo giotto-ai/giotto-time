@@ -1,8 +1,14 @@
 import inspect
 from abc import ABCMeta, abstractmethod
 
+import pandas as pd
+
 
 class TimeSeriesFeature(metaclass=ABCMeta):
+    """Base class for all the feature classes in this package.
+
+    Parameter documentation is in the derived classes.
+    """
     @abstractmethod
     def __init__(self, output_name):
         self.output_name = output_name
@@ -11,15 +17,8 @@ class TimeSeriesFeature(metaclass=ABCMeta):
         return self
 
     @abstractmethod
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.Series:
         pass
-
-    def __repr__(self):
-        constructor_attributes = inspect.getfullargspec(self.__init__).args
-        attributes_to_print = [str(getattr(self, attribute)) for attribute in constructor_attributes
-                               if attribute in self.__dict__]
-        return "{class_name}({attributes})".format(class_name=self.__class__.__name__,
-                                                   attributes=", ".join(attributes_to_print))
 
     def fit_transform(self, X, y=None):
         self.fit(X, y)
