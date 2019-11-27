@@ -52,7 +52,6 @@ class FeaturesCreation:
         x = self._create_x_features(time_series)
         y = self._create_y_shifts(time_series)
         x_non_nans, y_non_nans = get_non_nan_values(x, y)
-
         return x_non_nans, y_non_nans
 
     def _create_y_shifts(self, time_series: pd.DataFrame) -> pd.DataFrame:

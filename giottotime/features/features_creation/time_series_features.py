@@ -21,7 +21,7 @@ class ShiftFeature(TimeSeriesFeature):
         super().__init__(output_name)
         self.shift = shift
 
-    def transform(self, X: pd.DataFrame) -> pd.Series:
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Create a shifted version of ``X``.
 
         Parameters
@@ -31,11 +31,13 @@ class ShiftFeature(TimeSeriesFeature):
 
         Returns
         -------
-        X_shifted: pd.DataFrame
+        X_shifted_renamed: pd.DataFrame
             The shifted version of the original ``X``.
 
         """
-        return X.shift(self.shift)
+        X_shifted = X.shift(self.shift)
+        X_shifted_renamed = self._rename_columns(X_shifted)
+        return X_shifted_renamed
 
 
 class MovingAverageFeature(TimeSeriesFeature):
@@ -55,7 +57,7 @@ class MovingAverageFeature(TimeSeriesFeature):
         super().__init__(output_name)
         self.window_size = window_size
 
-    def transform(self, X: pd.DataFrame) -> pd.Series:
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Compute the moving average, for every row of ``X``, of the previous
         ``window_size`` elements.
 
@@ -66,14 +68,14 @@ class MovingAverageFeature(TimeSeriesFeature):
 
         Returns
         -------
-        X_mov_avg: pd.Series
-            A Series, with the same length as ``X``, containing the rolling
+        X_mov_avg_renamed: pd.DataFrame
+            A DataFrame, with the same length as ``X``, containing the rolling
             moving average for each element.
 
         """
         X_mov_avg = X.rolling(self.window_size).mean().shift(1)
-        X_mov_avg.name = self.output_name
-        return X_mov_avg
+        X_mov_avg_renamed = self._rename_columns(X_mov_avg)
+        return X_mov_avg_renamed
 
 
 class ConstantFeature(TimeSeriesFeature):
@@ -93,7 +95,7 @@ class ConstantFeature(TimeSeriesFeature):
         super().__init__(output_name)
         self.constant = constant
 
-    def transform(self, X: pd.DataFrame) -> pd.Series:
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Generate a constant Series, with the same length as ``X`` and with
         the same index.
 
@@ -104,14 +106,15 @@ class ConstantFeature(TimeSeriesFeature):
 
         Returns
         -------
-        constant_series: pd.Series
+        constant_series_renamed: pd.DataFrame
             A constant series, with the same length of ``X`` and with the same
             index.
 
         """
-        constant_series = pd.Series(data=self.constant, index=X.index)
-        constant_series.name = self.output_name
-        return constant_series
+        constant_series = pd.Series(data=self.constant, index=X.index)\
+            .to_frame()
+        constant_series_renamed = self._rename_columns(constant_series)
+        return constant_series_renamed
 
 
 class PolynomialFeature(TimeSeriesFeature):
@@ -138,7 +141,7 @@ class ExogenousFeature(TimeSeriesFeature):
         super().__init__(output_name)
         self.exogenous_time_series = exogenous_time_series
 
-    def transform(self, X: pd.DataFrame) -> pd.Series:
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Reindex the ``exogenous_time_series`` with the index of ``X``.
 
         Parameters
@@ -148,14 +151,14 @@ class ExogenousFeature(TimeSeriesFeature):
 
         Returns
         -------
-        exog_feature: pd.Series
+        exog_feature_renamed: pd.DataFrame
             The original ``exogenous_time_series``, re-indexed with the index
             of ``X``.
 
         """
         exog_feature = self.exogenous_time_series.reindex(index=X.index)
-        exog_feature.name = self.output_name
-        return exog_feature
+        exog_feature_renamed = self._rename_columns(exog_feature)
+        return exog_feature_renamed
 
 
 class CustomFeature(TimeSeriesFeature):
@@ -169,7 +172,7 @@ class CustomFeature(TimeSeriesFeature):
     output_name: str
         The name of the output column.
 
-    kwargs: dict
+    kwargs:
         Optional arguments to pass to the function.
 
     """
@@ -179,7 +182,7 @@ class CustomFeature(TimeSeriesFeature):
         self.custom_feature_function = custom_feature_function
         self.kwargs = kwargs
 
-    def transform(self, X: pd.DataFrame) -> pd.Series:
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Generate a Series, given ``X`` as input to the
         ``custom_feature_function``, as well as other optional arguments.
 
@@ -190,10 +193,10 @@ class CustomFeature(TimeSeriesFeature):
 
         Returns
         -------
-        custom_feature: pd.Series
-            A Series containing the generated features.
+        custom_feature_renamed: pd.DataFrame
+            A DataFrame containing the generated features.
 
         """
         custom_feature = self.custom_feature_function(X, **self.kwargs)
-        custom_feature.name = self.output_name
-        return custom_feature
+        custom_feature_renamed = self._rename_columns(custom_feature)
+        return custom_feature_renamed
