@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from collections import Iterable
-from typing import Union
+from typing import Union, List
 
 import numpy as np
 from giotto.time_series import TakensEmbedding, SlidingWindow
@@ -9,6 +9,44 @@ import giotto.homology as hl
 import pandas as pd
 
 from giottotime.features.features_creation.base import TimeSeriesFeature
+
+
+def align_indices(X: pd.DataFrame, n_points: int,
+                  tda_feature_values: Union[List, np.ndarray]) -> pd.DataFrame:
+    """Given ``X`` of length ``n_samples``, set the first
+    ``n_samples - n_points`` to ``np.nan``. Then, split the remaining points in
+    ``len(tda_feature_values)`` chunks and, to each data-point in a chunk, set
+    its value to the corresponding value in ``tda_feature_values``.
+
+    Parameters
+    ----------
+    X : ``pd.DataFrame``, required.
+        The input DataFrame. Only the indices of the DataFrame are used
+
+    n_points : ``int``, required.
+        The number of points on which to apply the values
+
+    tda_feature_values : ``Union[List, np.ndarray]``, required.
+        The List or np.ndarray containing the values to put in ``output_X``.
+
+    Returns
+    -------
+    output_X : ``pd.DataFrame``
+        A ``pd.DataFrame`` with the same index as ``X`` and with the values
+        set according to ``n_points`` and ``tda_feature_values``.
+
+    """
+    output_X = X.copy()
+
+    output_X.iloc[:-n_points] = np.nan
+
+    splits = np.array_split(output_X.iloc[-n_points:].index,
+                            len(tda_feature_values))
+
+    for index, split in enumerate(splits):
+        output_X.loc[split] = tda_feature_values[index]
+
+    return output_X
 
 
 class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
@@ -66,14 +104,30 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
     def fit(self, X, y=None):
         return self
 
-    def _compute_indices(self, windows_points):
-        windows_points = self.sliding_stride * (windows_points - 1) + \
-                         self.sliding_window_width
+    def _compute_n_points(self, n_windows: int) -> int:
+        """Given the initial parameters used in the TakensEmbedding and
+        SlidingWindow steps, compute the total number of points that have been
+        used during the computation.
 
-        original_points = self.takens_stride * (windows_points - 1) + \
-                          (self.takens_dimension * self.takens_time_delay)
+        Parameters
+        ----------
+        n_windows : ``int``, required.
+            The number of windows after the SlidingWindow step.
 
-        return original_points
+        Returns
+        -------
+        n_used_points : ``int``
+            The total number of points that have been used in the
+            TakensEmbedding and SlidingWindow steps.
+
+        """
+        embedder_length = self.sliding_stride * (n_windows-1) + \
+                          self.sliding_window_width
+
+        n_used_points = self.takens_stride * (embedder_length-1) + \
+                          self.takens_dimension*self.takens_time_delay
+
+        return n_used_points
 
     def _compute_persistence_diagrams(self, X: Union[pd.DataFrame, pd.Series])\
             -> np.ndarray:
@@ -82,12 +136,12 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
 
         Parameters
         ----------
-        X: Union[pd.DataFrame, pd.Series
+        X : ``Union[pd.DataFrame, pd.Series``, required.
             The time-series on which to compute the persistence diagrams.
 
         Returns
         -------
-        X_scaled: np.ndarray
+        X_scaled : ``np.ndarray``
             The scaled persistence diagrams.
 
         """
@@ -101,3 +155,4 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
         diagram_scaler.fit(X_diagrams)
 
         return diagram_scaler.transform(X_diagrams)
+

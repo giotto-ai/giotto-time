@@ -7,7 +7,7 @@ import pandas as pd
 class TimeSeriesFeature(metaclass=ABCMeta):
     """Base class for all the feature classes in this package.
 
-    Parameter documentation is in the derived classes.
+    Parameters documentation is in the derived classes.
     """
     @abstractmethod
     def __init__(self, output_name):
@@ -17,7 +17,7 @@ class TimeSeriesFeature(metaclass=ABCMeta):
         return self
 
     @abstractmethod
-    def transform(self, X: pd.DataFrame) -> pd.Series:
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         pass
 
     def fit_transform(self, X, y=None):
@@ -32,16 +32,17 @@ class TimeSeriesFeature(metaclass=ABCMeta):
 
         Parameters
         ----------
-        X: pd.DataFrame
+        X: ``pd.DataFrame``, required.
             The DataFrame to be renamed.
 
         Returns
         -------
-        X: pd.DataFrame
+        X: ``pd.DataFrame``
             The original DataFrame ``X``, with the columns renamed.
 
         """
         suffix = ""
+
         X_new = X.T.reset_index(drop=True).T
         for index, col in enumerate(X_new.columns):
             if len(X.columns) > 1:
