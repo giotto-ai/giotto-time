@@ -1,7 +1,11 @@
 from typing import Iterable, List, Optional, Callable, Union
 
 from giottotime.features.features_creation.tda_features.base import \
+<<<<<<< HEAD
     TDAFeatures, _align_indices
+=======
+    TDAFeatures, align_indices
+>>>>>>> TDA features added
 
 import pandas as pd
 import numpy as np
@@ -120,6 +124,7 @@ class AvgLifeTimeFeature(TDAFeatures):
                  diags_infinity_values: Optional[float] = None,
                  diags_n_jobs: Optional[int] = 1
                  ):
+<<<<<<< HEAD
         super().__init__(output_name=output_name,
                          takens_parameters_type=takens_parameters_type,
                          takens_dimension=takens_dimension,
@@ -134,10 +139,59 @@ class AvgLifeTimeFeature(TDAFeatures):
                          diags_homology_dimensions=diags_homology_dimensions,
                          diags_infinity_values=diags_infinity_values,
                          diags_n_jobs=diags_n_jobs
+=======
+        super().__init__(output_name,
+                         takens_parameters_type,
+                         takens_dimension,
+                         takens_stride,
+                         takens_time_delay,
+                         takens_n_jobs,
+                         sliding_window_width,
+                         sliding_stride,
+                         diags_metric,
+                         diags_coeff,
+                         diags_max_edge_length,
+                         diags_homology_dimensions,
+                         diags_infinity_values,
+                         diags_n_jobs
+>>>>>>> TDA features added
                          )
         self._h_dim = h_dim
         self._interpolation_strategy = interpolation_strategy
 
+<<<<<<< HEAD
+=======
+    def _average_lifetime(self, X_scaled: np.ndarray) -> List:
+        """Compute the average lifetime of a given homology dimension in the
+        point cloud.
+
+        Parameters
+        ----------
+        X_scaled : ``np.ndarray``, required.
+            The array containing the scaled persistent diagrams.
+
+        Returns
+        -------
+        avg_lifetime : ``List``
+            For each diagram present in ``X_scaled``, return the average
+            lifetime of a given homology dimension.
+
+        """
+        avg_lifetime = []
+
+        for i in range(X_scaled.shape[0]):
+            persistence_table = pd.DataFrame(X_scaled[i],
+                                             columns=['birth', 'death',
+                                                      'homology'])
+            persistence_table['lifetime'] = persistence_table['death'] - \
+                                            persistence_table['birth']
+            avg_lifetime.append(
+                persistence_table[persistence_table['homology']
+                                  == self._h_dim]['lifetime'].mean())
+
+        return avg_lifetime
+
+>>>>>>> TDA features added
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
         and detect the average lifetime for a given homology dimension.
@@ -158,6 +212,7 @@ class AvgLifeTimeFeature(TDAFeatures):
             ``Nan``.
 
         """
+<<<<<<< HEAD
         persistence_diagrams = self._compute_persistence_diagrams(X)
         avg_lifetime = self._average_lifetime(persistence_diagrams)
         original_points = self._compute_n_points(len(avg_lifetime))
@@ -196,3 +251,13 @@ class AvgLifeTimeFeature(TDAFeatures):
                                   == self._h_dim]['lifetime'].mean())
 
         return avg_lifetime
+=======
+        X_scaled = self._compute_persistence_diagrams(X)
+        avg_lifetime = self._average_lifetime(X_scaled)
+        original_points = self._compute_n_points(len(avg_lifetime))
+
+        X_aligned = align_indices(X, original_points, avg_lifetime)
+        X_renamed = self._rename_columns(X_aligned)
+
+        return X_renamed
+>>>>>>> TDA features added

@@ -1,7 +1,11 @@
 from typing import Iterable, List, Dict, Optional, Union, Callable
 
 from giottotime.features.features_creation.tda_features.base import \
+<<<<<<< HEAD
     TDAFeatures, _align_indices
+=======
+    TDAFeatures, align_indices
+>>>>>>> TDA features added
 
 import pandas as pd
 import numpy as np
@@ -158,6 +162,7 @@ class AmplitudeFeature(TDAFeatures):
                  diags_infinity_values: Optional[float] = None,
                  diags_n_jobs: Optional[int] = 1
                  ):
+<<<<<<< HEAD
         super().__init__(output_name=output_name,
                          takens_parameters_type=takens_parameters_type,
                          takens_dimension=takens_dimension,
@@ -172,6 +177,22 @@ class AmplitudeFeature(TDAFeatures):
                          diags_homology_dimensions=diags_homology_dimensions,
                          diags_infinity_values=diags_infinity_values,
                          diags_n_jobs=diags_n_jobs
+=======
+        super().__init__(output_name,
+                         takens_parameters_type,
+                         takens_dimension,
+                         takens_stride,
+                         takens_time_delay,
+                         takens_n_jobs,
+                         sliding_window_width,
+                         sliding_stride,
+                         diags_metric,
+                         diags_coeff,
+                         diags_max_edge_length,
+                         diags_homology_dimensions,
+                         diags_infinity_values,
+                         diags_n_jobs
+>>>>>>> TDA features added
                          )
         self._metric = metric
         self._amplitude_metric_params = amplitude_metric_params
@@ -179,6 +200,31 @@ class AmplitudeFeature(TDAFeatures):
         self._amplitude_n_jobs = amplitude_n_jobs
         self._interpolation_strategy = interpolation_strategy
 
+<<<<<<< HEAD
+=======
+    def _calculate_amplitude_feature(self, diagrams: np.ndarray) -> np.ndarray:
+        """Calculate the amplitude of the persistence diagrams
+
+        Parameters
+        ----------
+        diagrams : ``np.ndarray``, required.
+            Array containing the persistence diagrams.
+
+        Returns
+        -------
+        amplitudes : ``np.ndarray``
+            Array containing, for each diagrams, the corresponding amplitude,
+            calculated with with the given ``metric`` and ``amplitude_order``.
+
+        """
+
+        amplitude = diag.Amplitude(metric=self._metric,
+                                   order=self._amplitude_order,
+                                   metric_params=self._amplitude_metric_params,
+                                   n_jobs=self._amplitude_n_jobs)
+        return amplitude.fit_transform(diagrams)
+
+>>>>>>> TDA features added
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
         and detect the average lifetime for a given homology dimension.
@@ -199,6 +245,7 @@ class AmplitudeFeature(TDAFeatures):
             ``Nan``.
 
         """
+<<<<<<< HEAD
         persistence_diagrams = self._compute_persistence_diagrams(X)
         amplitudes = self._calculate_amplitude_feature(persistence_diagrams)
         original_points = self._compute_n_points(len(amplitudes))
@@ -229,3 +276,13 @@ class AmplitudeFeature(TDAFeatures):
                                    metric_params=self._amplitude_metric_params,
                                    n_jobs=self._amplitude_n_jobs)
         return amplitude.fit_transform(diagrams)
+=======
+        X_scaled = self._compute_persistence_diagrams(X)
+        amplitudes = self._calculate_amplitude_feature(X_scaled)
+        original_points = self._compute_n_points(len(amplitudes))
+
+        X_aligned = align_indices(X, original_points, amplitudes)
+        X_renamed = self._rename_columns(X_aligned)
+
+        return X_renamed
+>>>>>>> TDA features added
