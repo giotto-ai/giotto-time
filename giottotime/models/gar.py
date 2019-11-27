@@ -16,10 +16,11 @@ class GAR:
 
     Parameters
     ----------
-    base_model: object
+    base_model: ``object``, required.
         The model used to make the predictions step by step. This class must
         have a ``fit``and ``predict`` method.
-    feed_forward: bool
+
+    feed_forward: ``bool``, optional, (default=``False``).
         If true, feed-forward the predictions of the models at training and
         prediction time.
 
@@ -34,24 +35,25 @@ class GAR:
         self._feed_forward = feed_forward
 
     def fit(self, X: pd.DataFrame, y: pd.DataFrame,
-            **kwargs: Dict[str, object]) -> object:
+            **kwargs: object) -> object:
         """Fit the GAR model according to the training data.
 
         Parameters
         ----------
-        X: pd.DataFrame
+        X: ``pd.DataFrame``, required.
             Features used to fit the model.
 
-        y: pd.DataFrame
+        y: ``pd.DataFrame``, required.
             Target values to fit on.
 
-        kwargs: Dict[str, object]
+        kwargs: ``object``, optional.
             Optional parameters to be passed to the base model during the fit
             procedure.
 
         Returns
         -------
-        self: object
+        self: ``object``
+            The fitted GAR object.
 
         """
         check_input(X, y)
@@ -75,19 +77,19 @@ class GAR:
     def predict(self, X: pd.DataFrame,
                 start_date: Optional[Union[pd.Timestamp, str]] = None) \
             -> pd.DataFrame:
-        """Make predictions for each sample and for each prediction step
+        """Make predictions for each sample and for each prediction step.
 
         Parameters
         ----------
-        X: pd.DataFrame
+        X: ``pd.DataFrame``, required.
             Features used to predict.
 
-        start_date: Union[pd.Timestamp, str], optional
-            If provided, start predicting from this date.
+        start_date: ``Union[pd.Timestamp, str]``, optional, (default=``None``).
+            If provided, start predicting from this date on.
 
         Returns
         -------
-        predictions: pd.DataFrame
+        predictions: ``pd.DataFrame``
             The predictions of the model.
 
         Raises
