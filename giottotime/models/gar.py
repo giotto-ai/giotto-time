@@ -120,6 +120,6 @@ class GAR:
             predictions[f'y_{pred_step}'] = model_predictions
 
             if self._feed_forward:
-                test_features.loc[:, f'preds_{pred_step}'] = model_predictions
+                test_features[f'preds_{pred_step}'] = model_predictions
 
         return predictions

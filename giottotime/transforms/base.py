@@ -7,8 +7,7 @@ class TimeSeriesTransform(metaclass=ABCMeta):
         constructor_attributes = inspect.getfullargspec(self.__init__).args
         attributes_to_print = [str(getattr(self, attribute)) for attribute in constructor_attributes
                                if attribute in self.__dict__]
-        return "{class_name}({attributes})".format(class_name=self.__class__.__name__,
-                                                   attributes=", ".join(attributes_to_print))
+        return f"{self.__class__.__name__}{',' .join(attributes_to_print)})"
 
     @abstractmethod
     def transform(self, time_series):
