@@ -3,12 +3,12 @@ from typing import Union
 import numpy as np
 import pandas as pd
 
-Timedelta = Union[pd.Timedelta, str]
-
 
 class PeriodicSeasonalFeature:
 
-    def __init__(self, start_date: pd.Timestamp, period: Timedelta,
+    def __init__(self,
+                 start_date: pd.Timestamp,
+                 period: Union[pd.Timedelta, str],
                  amplitude: float):
         self.start_date = start_date
         self.period = pd.Timedelta(period)
