@@ -3,11 +3,13 @@ from typing import Tuple
 import pandas as pd
 
 
-def split_train_test(X: pd.DataFrame, y: pd.DataFrame,
-                     split_percentage: float = 0.6) \
+def split_train_test(X: pd.DataFrame, y: pd.DataFrame) \
         -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Split the ``X`` and ``y`` in train and test set. The ratio of the
-    training set is set with ``split_percentage``.
+    """Split the ``X`` and ``y`` in train and test set. First, the rows of
+    ``X`` that contain a ``Nan`` value are dropped, as well as the
+    corresponding rows of ``y``. Then, the training set is composed of all the
+    rows that don't have any ``Nan`` values in the ``y``, while the remaining
+    rows are used as test set.
 
     Parameters
     ----------
@@ -17,9 +19,6 @@ def split_train_test(X: pd.DataFrame, y: pd.DataFrame,
     y : ``pd.DataFrame``, required.
      The ``pd.DataFrame`` containing ``y``.
 
-    split_percentage : ``float``, optional, (default=``0.6``).
-        The percentage of the training set with respect to the original ``X``.
-
     Returns
     -------
     X_train, y_train, X_test, y_test : ``Tuple[pd.DataFrame, pd.DataFrame,
@@ -28,18 +27,19 @@ def split_train_test(X: pd.DataFrame, y: pd.DataFrame,
         ``split_percentage``.
 
     """
-    train_index = int(split_percentage * len(X))
+    X_non_nans, y_non_nans = _get_non_nan_values(X, y)
+    last_valid_y_index = y.iloc[:, -1].last_valid_index()
 
-    X_train = X.iloc[:train_index]
-    y_train = y.iloc[:train_index]
+    X_train = X_non_nans.loc[:last_valid_y_index]
+    y_train = y_non_nans.loc[:last_valid_y_index]
 
-    X_test = X.iloc[train_index:]
-    y_test = y.iloc[train_index:]
+    X_test = X_non_nans.loc[last_valid_y_index:]
+    y_test = y_non_nans.loc[last_valid_y_index:]
 
     return X_train, y_train, X_test, y_test
 
 
-def get_non_nan_values(X: pd.DataFrame, y: pd.DataFrame) \
+def _get_non_nan_values(X: pd.DataFrame, y: pd.DataFrame) \
         -> (pd.DataFrame, pd.DataFrame):
     """Find all rows of X that have at least a ``Nan``value and drop them. Drop
     also the corresponding rows of y.
