@@ -6,7 +6,14 @@ import pandas as pd
 
 class PolynomialTrend(TrendModel):
     """
-    Tentative Docstring
+    A model for fitting, predicting and removing an polynomial trend from a time series.
+
+    Parameters
+    ----------
+
+    loss: Callable, default: mean_squared_error
+    must accept y_true, y_pred and return a single real number.
+
     """
     def __init__(self, order, loss=mean_squared_error):
         self.order = order

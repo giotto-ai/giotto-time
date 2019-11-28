@@ -6,9 +6,17 @@ import pandas as pd
 
 class FunctionTrend(TrendModel):
     """
-    Tentative Docstring
-    """
+    A model for fitting, predicting and removing an custom functional trend from a time series.
+    The transformed time series created will be trend stationary with respect to the specific function.
+    See https://en.wikipedia.org/wiki/Trend_stationary for illustration of this concept.
 
+    Parameters
+    ----------
+
+    loss: Callable, default: mean_squared_error
+    must accept y_true, y_pred and return a single real number.
+
+    """
     def __init__(self, order, loss=mean_squared_error):
         self.order = order
         self.loss = loss
