@@ -4,6 +4,9 @@ from giottotime.feature_creation.base import TimeSeriesFeature
 
 
 class ShiftFeature(TimeSeriesFeature):
+    """
+    Tentative Docstring
+    """
     def __init__(self, shift):
         self.shift = shift
 
