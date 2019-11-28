@@ -3,18 +3,15 @@ from abc import ABCMeta, abstractmethod
 from typing import List, Union
 
 
-StringOrList = Union[List[str], str]
-
-
-def convert_to_list(variable: StringOrList) -> List[str]:
+def convert_to_list(variable: Union[List[str], str]) -> List[str]:
     return variable if isinstance(variable, list) else [variable]
 
 
 class TimeSeriesTransformer(metaclass=ABCMeta):
     def __init__(
             self,
-            input_columns: StringOrList,
-            output_columns: StringOrList,
+            input_columns: Union[List[str], str],
+            output_columns: Union[List[str], str],
             drop_input_columns: bool = False
     ):
         self.input_columns = convert_to_list(input_columns)
@@ -37,5 +34,4 @@ class TimeSeriesTransformer(metaclass=ABCMeta):
         attributes_to_print = [str(getattr(self, attribute))
                                for attribute in constructor_attributes
                                if attribute in self.__dict__]
-        return "{class_name}({attributes})".format(class_name=self.__class__.__name__,
-                                                   attributes=", ".join(attributes_to_print))
+        return f'{self.__class__.__name__}({", ".join(attributes_to_print)})'
