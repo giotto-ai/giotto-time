@@ -1,13 +1,63 @@
-import random
-from typing import Optional, Tuple, Iterable
+from typing import Optional
 
-import pandas as pd
 import hypothesis.strategies as st
+import numpy as np
+import pandas as pd
 from hypothesis import assume
 from hypothesis._strategies import defines_strategy
+from hypothesis.extra.numpy import arrays
+
 
 available_freq = ['B', 'D', 'W', 'M', 'Q', 'A', 'Y', 'H', 'T', 'S']
 _pandas_range_params = ['start', 'end', 'periods', 'freq']
+
+
+@defines_strategy
+@st.composite
+def series_with_period_index(draw,
+                             start_date: Optional[pd.Timestamp] = None,
+                             end_date: Optional[pd.Timestamp] = None,
+                             max_length: int = 1000):
+    """ Returns a strategy to generate a Pandas Series with PeriodIndex
+
+    Parameters
+    ----------
+    draw
+    start_date: ``pd.Timestamp``, optional, (default=None)
+    end_date: ``pd.Timestamp``, optional, (default=None)
+    max_length: int, optional, (default=None)
+
+    Returns
+    -------
+    pd.Series with PeriodIndex
+    """
+    index = draw(period_indexes(start_date, end_date, max_length))
+    values = arrays(dtype=np.float64, shape=index.shape[0])
+    return pd.Series(index=index, data=values)
+
+
+@defines_strategy
+@st.composite
+def series_with_datetime_index(draw,
+                               start_date: Optional[pd.Timestamp] = None,
+                               end_date: Optional[pd.Timestamp] = None,
+                               max_length: int = 1000):
+    """ Returns a strategy to generate a Pandas Series with DatetimeIndex
+
+    Parameters
+    ----------
+    draw
+    start_date: ``pd.Timestamp``, optional, (default=None)
+    end_date: ``pd.Timestamp``, optional, (default=None)
+    max_length: int, optional, (default=None)
+
+    Returns
+    -------
+    pd.Series with DatetimeIndex
+    """
+    index = draw(datetime_indexes(start_date, end_date, max_length))
+    values = arrays(dtype=np.float64, shape=index.shape[0])
+    return pd.Series(index=index, data=values)
 
 
 @defines_strategy
@@ -75,7 +125,8 @@ def datetime_indexes(draw,
                                    end_date,
                                    periods,
                                    freq,
-                                   element_to_exclude)
+                                   element_to_exclude,
+                                   max_length)
     return index
 
 
@@ -131,10 +182,10 @@ def _build_period_range_from(start_date: pd.Timestamp,
                              element_to_exclude: str,
                              max_length: int = 1000):
     period_range_kwargs = _get_pandas_range_kwargs_from(start_date,
-                                                      end_date,
-                                                      periods,
-                                                      freq,
-                                                      element_to_exclude)
+                                                        end_date,
+                                                        periods,
+                                                        freq,
+                                                        element_to_exclude)
     if 'periods' not in period_range_kwargs:
         assume(_expected_index_length_from(**period_range_kwargs) < max_length)
     return pd.period_range(**period_range_kwargs)
@@ -144,16 +195,23 @@ def _build_date_range_from(start_date: pd.Timestamp,
                            end_date: pd.Timestamp,
                            periods: int,
                            freq: str,
-                           element_to_exclude: str):
+                           element_to_exclude: str,
+                           max_length: int = 1000):
     date_range_kwargs = _get_pandas_range_kwargs_from(start_date,
                                                       end_date,
                                                       periods,
                                                       freq,
                                                       element_to_exclude)
     try:
-        return pd.date_range(**date_range_kwargs)
-    except ValueError:
+        if 'periods' not in date_range_kwargs:
+            assume(_expected_index_length_from(**date_range_kwargs) < max_length)
+        elif 'start' not in date_range_kwargs:
+            assume(_expected_start_date_from(**date_range_kwargs) >= start_date)
+        elif 'end' not in date_range_kwargs:
+            assume(_expected_end_date_from(**date_range_kwargs) <= end_date)
+    except OverflowError:
         _reject_test_case()
+    return pd.date_range(**date_range_kwargs)
 
 
 def _get_pandas_range_kwargs_from(start_date: pd.Timestamp,
@@ -184,6 +242,14 @@ def _compute_ordered_date_pair_strategy_from(start_dates: st.datetimes,
     return st.builds(lambda start, end: (start, end),
                      start=start_dates,
                      end=end_dates).filter(lambda x: x[0] < x[1])
+
+
+def _expected_start_date_from(end: pd.Timestamp, periods: int, freq: str):
+    return end - periods*_freq_to_timedelta(freq)
+
+
+def _expected_end_date_from(start: pd.Timestamp, periods: int, freq: str):
+    return start + periods*_freq_to_timedelta(freq)
 
 
 def _expected_index_length_from(start: pd.Timestamp,
