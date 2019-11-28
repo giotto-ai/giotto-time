@@ -7,14 +7,20 @@ import numpy as np
 
 class Exponential_ts(TrendModel):
     """
-    Tentative Docstring
+    A model for fitting, predicting and removing an exponential trend from a time series.
+
+    Parameters
+    ----------
+
+    loss: Callable, default: mean_squared_error
+    must accept y_true, y_pred and return a single real number.
+
     """
     def __init__(self, loss=mean_squared_error):
         self.loss = loss
 
     def fit(self, time_series, method="BFGS"):
         def prediction_error(model_exponent):
-
             predictions = [ np.exp(t*model_exponent) for t in range( 0, time_series.shape[0] ) ]
             return self.loss(time_series.values, predictions)
 
