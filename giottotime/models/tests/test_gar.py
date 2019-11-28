@@ -6,9 +6,11 @@ from hypothesis import given, strategies as st, settings, HealthCheck
 from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression
 
-from giottotime.feature_creation.feature_creation import FeaturesCreation
 from giottotime.feature_creation.time_series_features import \
     MovingAverageFeature, ConstantFeature, ShiftFeature
+
+from giottotime.features.features_creation.feature_creation import \
+    FeaturesCreation
 from giottotime.models.gar import GAR
 
 
