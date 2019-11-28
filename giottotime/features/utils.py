@@ -1,9 +1,11 @@
+from typing import Tuple
+
 import pandas as pd
 
 
 def split_train_test(X: pd.DataFrame, y: pd.DataFrame,
                      split_percentage: float = 0.6) \
-        -> (pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame):
+        -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Split the ``X`` and ``y`` in train and test set. The ratio of the
     training set is set with ``split_percentage``.
 
@@ -20,8 +22,8 @@ def split_train_test(X: pd.DataFrame, y: pd.DataFrame,
 
     Returns
     -------
-    X_train, y_train, X_test, y_test : ``(pd.DataFrame, pd.DataFrame,
-    pd.DataFrame, pd.DataFrame)``
+    X_train, y_train, X_test, y_test : ``Tuple[pd.DataFrame, pd.DataFrame,
+    pd.DataFrame, pd.DataFrame]``
         The ``X`` and ``y``, split in train and test set according to the
         ``split_percentage``.
 

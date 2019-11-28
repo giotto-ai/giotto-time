@@ -158,26 +158,55 @@ class AmplitudeFeature(TDAFeatures):
                  diags_infinity_values: Optional[float] = None,
                  diags_n_jobs: Optional[int] = 1
                  ):
-        super().__init__(output_name,
-                         takens_parameters_type,
-                         takens_dimension,
-                         takens_stride,
-                         takens_time_delay,
-                         takens_n_jobs,
-                         sliding_window_width,
-                         sliding_stride,
-                         diags_metric,
-                         diags_coeff,
-                         diags_max_edge_length,
-                         diags_homology_dimensions,
-                         diags_infinity_values,
-                         diags_n_jobs
+        super().__init__(output_name=output_name,
+                         takens_parameters_type=takens_parameters_type,
+                         takens_dimension=takens_dimension,
+                         takens_stride=takens_stride,
+                         takens_time_delay=takens_time_delay,
+                         takens_n_jobs=takens_n_jobs,
+                         sliding_window_width=sliding_window_width,
+                         sliding_stride=sliding_stride,
+                         diags_metric=diags_metric,
+                         diags_coeff=diags_coeff,
+                         diags_max_edge_length=diags_max_edge_length,
+                         diags_homology_dimensions=diags_homology_dimensions,
+                         diags_infinity_values=diags_infinity_values,
+                         diags_n_jobs=diags_n_jobs
                          )
         self._metric = metric
         self._amplitude_metric_params = amplitude_metric_params
         self._amplitude_order = amplitude_order
         self._amplitude_n_jobs = amplitude_n_jobs
         self._interpolation_strategy = interpolation_strategy
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """From the initial DataFrame ``X``, compute the persistence diagrams
+        and detect the average lifetime for a given homology dimension.
+        Then, assign a value to each initial data points, according to the
+        chosen ``interpolation_strategy``.
+
+        Parameters
+        ----------
+        X : ``pd.DataFrame``, required.
+            The DataFrame on which to compute the features.
+
+        Returns
+        -------
+        X_renamed : ``pd.DataFrame``
+            A DataFrame containing, for each original data-point, the average
+            lifetime associated to it. If, given the initial parameters, a
+            point was excluded from the computation, its value is set to
+            ``Nan``.
+
+        """
+        persistence_diagrams = self._compute_persistence_diagrams(X)
+        amplitudes = self._calculate_amplitude_feature(persistence_diagrams)
+        original_points = self._compute_n_points(len(amplitudes))
+
+        X_aligned = _align_indices(X, original_points, amplitudes)
+        X_renamed = self._rename_columns(X_aligned)
+
+        return X_renamed
 
     def _calculate_amplitude_feature(self, diagrams: np.ndarray) -> np.ndarray:
         """Calculate the amplitude of the persistence diagrams
@@ -200,32 +229,3 @@ class AmplitudeFeature(TDAFeatures):
                                    metric_params=self._amplitude_metric_params,
                                    n_jobs=self._amplitude_n_jobs)
         return amplitude.fit_transform(diagrams)
-
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """From the initial DataFrame ``X``, compute the persistence diagrams
-        and detect the average lifetime for a given homology dimension.
-        Then, assign a value to each initial data points, according to the
-        chosen ``interpolation_strategy``.
-
-        Parameters
-        ----------
-        X : ``pd.DataFrame``, required.
-            The DataFrame on which to compute the features.
-
-        Returns
-        -------
-        X_renamed : ``pd.DataFrame``
-            A DataFrame containing, for each original data-point, the average
-            lifetime associated to it. If, given the initial parameters, a
-            point was excluded from the computation, its value is set to
-            ``Nan``.
-
-        """
-        X_scaled = self._compute_persistence_diagrams(X)
-        amplitudes = self._calculate_amplitude_feature(X_scaled)
-        original_points = self._compute_n_points(len(amplitudes))
-
-        X_aligned = _align_indices(X, original_points, amplitudes)
-        X_renamed = self._rename_columns(X_aligned)
-
-        return X_renamed

@@ -120,53 +120,23 @@ class AvgLifeTimeFeature(TDAFeatures):
                  diags_infinity_values: Optional[float] = None,
                  diags_n_jobs: Optional[int] = 1
                  ):
-        super().__init__(output_name,
-                         takens_parameters_type,
-                         takens_dimension,
-                         takens_stride,
-                         takens_time_delay,
-                         takens_n_jobs,
-                         sliding_window_width,
-                         sliding_stride,
-                         diags_metric,
-                         diags_coeff,
-                         diags_max_edge_length,
-                         diags_homology_dimensions,
-                         diags_infinity_values,
-                         diags_n_jobs
+        super().__init__(output_name=output_name,
+                         takens_parameters_type=takens_parameters_type,
+                         takens_dimension=takens_dimension,
+                         takens_stride=takens_stride,
+                         takens_time_delay=takens_time_delay,
+                         takens_n_jobs=takens_n_jobs,
+                         sliding_window_width=sliding_window_width,
+                         sliding_stride=sliding_stride,
+                         diags_metric=diags_metric,
+                         diags_coeff=diags_coeff,
+                         diags_max_edge_length=diags_max_edge_length,
+                         diags_homology_dimensions=diags_homology_dimensions,
+                         diags_infinity_values=diags_infinity_values,
+                         diags_n_jobs=diags_n_jobs
                          )
         self._h_dim = h_dim
         self._interpolation_strategy = interpolation_strategy
-
-    def _average_lifetime(self, X_scaled: np.ndarray) -> List:
-        """Compute the average lifetime of a given homology dimension in the
-        point cloud.
-
-        Parameters
-        ----------
-        X_scaled : ``np.ndarray``, required.
-            The array containing the scaled persistent diagrams.
-
-        Returns
-        -------
-        avg_lifetime : ``List``
-            For each diagram present in ``X_scaled``, return the average
-            lifetime of a given homology dimension.
-
-        """
-        avg_lifetime = []
-
-        for i in range(X_scaled.shape[0]):
-            persistence_table = pd.DataFrame(X_scaled[i],
-                                             columns=['birth', 'death',
-                                                      'homology'])
-            persistence_table['lifetime'] = persistence_table['death'] - \
-                                            persistence_table['birth']
-            avg_lifetime.append(
-                persistence_table[persistence_table['homology']
-                                  == self._h_dim]['lifetime'].mean())
-
-        return avg_lifetime
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
@@ -188,11 +158,41 @@ class AvgLifeTimeFeature(TDAFeatures):
             ``Nan``.
 
         """
-        X_scaled = self._compute_persistence_diagrams(X)
-        avg_lifetime = self._average_lifetime(X_scaled)
+        persistence_diagrams = self._compute_persistence_diagrams(X)
+        avg_lifetime = self._average_lifetime(persistence_diagrams)
         original_points = self._compute_n_points(len(avg_lifetime))
 
         X_aligned = _align_indices(X, original_points, avg_lifetime)
         X_renamed = self._rename_columns(X_aligned)
 
         return X_renamed
+
+    def _average_lifetime(self, persistence_diagrams: np.ndarray) -> List:
+        """Compute the average lifetime of a given homology dimension in the
+        point cloud.
+
+        Parameters
+        ----------
+        persistence_diagrams : ``np.ndarray``, required.
+            The array containing the scaled persistent diagrams.
+
+        Returns
+        -------
+        avg_lifetime : ``List``
+            For each diagram present in ``persistence_diagrams``, return the
+            average lifetime of a given homology dimension.
+
+        """
+        avg_lifetime = []
+
+        for i in range(persistence_diagrams.shape[0]):
+            persistence_table = pd.DataFrame(persistence_diagrams[i],
+                                             columns=['birth', 'death',
+                                                      'homology'])
+            persistence_table['lifetime'] = persistence_table['death'] - \
+                                            persistence_table['birth']
+            avg_lifetime.append(
+                persistence_table[persistence_table['homology']
+                                  == self._h_dim]['lifetime'].mean())
+
+        return avg_lifetime

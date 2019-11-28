@@ -72,7 +72,7 @@ class FeaturesCreation:
         y = pd.DataFrame(index=time_series.index)
         for k in range(self.horizon):
             shift_feature = ShiftFeature(-k, f'shift_{k}')
-            y[f'shift_{k}'] = shift_feature.fit_transform(time_series)
+            y[f'y_{k}'] = shift_feature.fit_transform(time_series)
 
         return y
 

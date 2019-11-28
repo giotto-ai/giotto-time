@@ -124,56 +124,25 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
                  diags_infinity_values: Optional[float] = None,
                  diags_n_jobs: Optional[int] = 1
                  ):
-        super().__init__(output_name,
-                         takens_parameters_type,
-                         takens_dimension,
-                         takens_stride,
-                         takens_time_delay,
-                         takens_n_jobs,
-                         sliding_window_width,
-                         sliding_stride,
-                         diags_metric,
-                         diags_coeff,
-                         diags_max_edge_length,
-                         diags_homology_dimensions,
-                         diags_infinity_values,
-                         diags_n_jobs
+        super().__init__(output_name=output_name,
+                         takens_parameters_type=takens_parameters_type,
+                         takens_dimension=takens_dimension,
+                         takens_stride=takens_stride,
+                         takens_time_delay=takens_time_delay,
+                         takens_n_jobs=takens_n_jobs,
+                         sliding_window_width=sliding_window_width,
+                         sliding_stride=sliding_stride,
+                         diags_metric=diags_metric,
+                         diags_coeff=diags_coeff,
+                         diags_max_edge_length=diags_max_edge_length,
+                         diags_homology_dimensions=diags_homology_dimensions,
+                         diags_infinity_values=diags_infinity_values,
+                         diags_n_jobs=diags_n_jobs
                          )
 
         self._h_dim = h_dim
         self._theta = theta
         self._interpolation_strategy = interpolation_strategy
-
-    def _compute_num_relevant_holes(self, X_scaled: np.ndarray) -> List:
-        """Compute the number of relevant holes in the point cloud.
-
-        Parameters
-        ----------
-        X_scaled : ``np.ndarray``, required.
-            The array containing the scaled persistent diagrams.
-
-        Returns
-        -------
-        n_rel_holes : ``List``
-            For each diagram present in ``X_scaled``, return the number of
-            relevant holes that have been found.
-
-        """
-        n_rel_holes = []
-        for i in range(X_scaled.shape[0]):
-            pers_table = pd.DataFrame(X_scaled[i], columns=['birth',
-                                                            'death',
-                                                            'homology'])
-
-            pers_table['lifetime'] = pers_table['death'] - pers_table['birth']
-            threshold = pers_table[pers_table['homology'] == self._h_dim][
-                            'lifetime'].max() * self._theta
-            n_rel_holes.append(pers_table[
-                                   (pers_table['lifetime'] > threshold) & (
-                                           pers_table[
-                                               'homology'] == self._h_dim)].shape[0])
-
-        return n_rel_holes
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
@@ -194,11 +163,42 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
             ``Nan``.
 
         """
-        X_scaled = self._compute_persistence_diagrams(X)
-        n_holes = self._compute_num_relevant_holes(X_scaled)
+        persistence_diagrams = self._compute_persistence_diagrams(X)
+        n_holes = self._compute_num_relevant_holes(persistence_diagrams)
         n_points = self._compute_n_points(len(n_holes))
 
         X_aligned = _align_indices(X, n_points, n_holes)
         X_renamed = self._rename_columns(X_aligned)
 
         return X_renamed
+
+    def _compute_num_relevant_holes(self, persistence_diagrams: np.ndarray)\
+            -> List:
+        """Compute the number of relevant holes in the point cloud.
+
+        Parameters
+        ----------
+        persistence_diagrams : ``np.ndarray``, required.
+            The array containing the scaled persistent diagrams.
+
+        Returns
+        -------
+        n_rel_holes : ``List``
+            For each diagram present in ``persistence_diagrams``, return the
+            number of relevant holes that have been found.
+
+        """
+        n_rel_holes = []
+        for i in range(persistence_diagrams.shape[0]):
+            pers_table = pd.DataFrame(persistence_diagrams[i],
+                                      columns=['birth', 'death', 'homology'])
+
+            pers_table['lifetime'] = pers_table['death'] - pers_table['birth']
+            threshold = pers_table[pers_table['homology'] == self._h_dim][
+                            'lifetime'].max() * self._theta
+            n_rel_holes.append(pers_table[
+                                   (pers_table['lifetime'] > threshold) & (
+                                           pers_table[
+                                               'homology'] == self._h_dim)].shape[0])
+
+        return n_rel_holes

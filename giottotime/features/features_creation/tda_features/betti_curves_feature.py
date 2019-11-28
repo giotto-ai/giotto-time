@@ -155,20 +155,20 @@ class BettiCurvesFeature(TDAFeatures):
                  diags_infinity_values: Optional[float] = None,
                  diags_n_jobs: Optional[int] = 1
                  ):
-        super().__init__(output_name,
-                         takens_parameters_type,
-                         takens_dimension,
-                         takens_stride,
-                         takens_time_delay,
-                         takens_n_jobs,
-                         sliding_window_width,
-                         sliding_stride,
-                         diags_metric,
-                         diags_coeff,
-                         diags_max_edge_length,
-                         diags_homology_dimensions,
-                         diags_infinity_values,
-                         diags_n_jobs
+        super().__init__(output_name=output_name,
+                         takens_parameters_type=takens_parameters_type,
+                         takens_dimension=takens_dimension,
+                         takens_stride=takens_stride,
+                         takens_time_delay=takens_time_delay,
+                         takens_n_jobs=takens_n_jobs,
+                         sliding_window_width=sliding_window_width,
+                         sliding_stride=sliding_stride,
+                         diags_metric=diags_metric,
+                         diags_coeff=diags_coeff,
+                         diags_max_edge_length=diags_max_edge_length,
+                         diags_homology_dimensions=diags_homology_dimensions,
+                         diags_infinity_values=diags_infinity_values,
+                         diags_n_jobs=diags_n_jobs
                          )
         self._betti_mode = betti_mode
         self._betti_homology_dimensions = betti_homology_dimensions
@@ -176,6 +176,104 @@ class BettiCurvesFeature(TDAFeatures):
         self._betti_n_jobs = betti_n_jobs
         self._interpolation_strategy = interpolation_strategy
         self._betti_rolling = betti_rolling
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """From the initial DataFrame ``X``, compute the persistence diagrams
+        and detect the average lifetime for a given homology dimension.
+        Then, assign a value to each initial data points, according to the
+        chosen ``interpolation_strategy``.
+
+        Parameters
+        ----------
+        X : ``pd.DataFrame``, required.
+            The DataFrame on which to compute the features.
+
+        Returns
+        -------
+        X_renamed : ``pd.DataFrame``
+            A DataFrame containing, for each original data-point, the average
+            lifetime associated to it. If, given the initial parameters, a
+            point was excluded from the computation, its value is set to
+            ``Nan``.
+
+        """
+        persistence_diagrams = self._compute_persistence_diagrams(X)
+        betti_curves = self._compute_betti_curves(persistence_diagrams)
+
+        betti_features = self._compute_betti_features(betti_curves)
+
+        output_dfs = []
+        for betti_feature in betti_features:
+            original_points = self._compute_n_points(len(betti_feature))
+
+            output_dfs.append(_align_indices(X, original_points, betti_feature))
+
+        X_aligned = pd.concat(output_dfs, axis=1)
+        X_renamed = self._rename_columns(X_aligned)
+
+        return X_renamed
+
+    def _compute_betti_curves(self, diagrams: np.ndarray) -> List:
+        """Given a list of diagrams, compute the betti curves for each of them.
+
+        Parameters
+        ----------
+        diagrams : ``np.ndarray``, required.
+            Compute the betti curves of the diagrams.
+
+        Returns
+        -------
+        betti_curves : ``List``
+            The ``List`` containing the Betti curves.
+
+        """
+        betti_curves = diag.BettiCurve()
+        betti_curves.fit(diagrams)
+        X_betti_curves = betti_curves.transform(diagrams)
+
+        betti_curves = []
+        for h_dim in self._betti_homology_dimensions:
+            betti_curves.append(pd.DataFrame(X_betti_curves[:, h_dim, :]))
+
+        return betti_curves
+
+    def _compute_betti_features(self, betti_curves: List[pd.DataFrame]) \
+            -> List[np.ndarray]:
+        """Compute the betti features, depending on the values of
+        ``self._betti_mode``. If the value is set to ``mean`` compute the
+        rolling mean, if set to ``arg_max`` compute the argmax along the
+        epsilon axis.
+
+        Parameters
+        ----------
+        betti_curves : ``List[pd.DataFrame]``, required.
+            A list containing the betti surfaces, one for each homology
+            dimension.
+
+        Returns
+        -------
+        betti_features : ``List[np.ndarray]``
+            The features extracted from the betti curves.
+
+        Raises
+        ------
+        ValueError
+            Thrown if a ``self._betti_mode`` has a value which is different
+            from ``mean`` or ``arg_max``.
+
+        """
+        if self._betti_mode == 'mean':
+            betti_features = self._compute_betti_mean(betti_curves)
+
+        elif self._betti_mode == 'arg_max':
+            betti_features = self._compute_arg_max_by_time(betti_curves)
+
+        else:
+            raise ValueError(f"The valid values for 'betti_mode' are 'mean' "
+                             f"or 'arg_max', instead has value "
+                             f"{self._betti_mode}.")
+
+        return betti_features
 
     def _compute_betti_mean(self, betti_surfaces: List[pd.DataFrame]) \
             -> List[pd.DataFrame]:
@@ -225,145 +323,3 @@ class BettiCurvesFeature(TDAFeatures):
             betti_arg_maxes.append(arg_max)
 
         return betti_arg_maxes
-
-    def _compute_betti_features(self, betti_curves: List[pd.DataFrame]) \
-            -> List[np.ndarray]:
-        """Compute the betti features, depending on the values of
-        ``self._betti_mode``. If the value is set to ``mean`` compute the
-        rolling mean, if set to ``arg_max`` compute the argmax along the
-        epsilon axis.
-
-        Parameters
-        ----------
-        betti_curves : ``List[pd.DataFrame]``, required.
-            A list containing the betti surfaces, one for each homology
-            dimension.
-
-        Returns
-        -------
-        betti_features : ``List[np.ndarray]``
-            The features extracted from the betti curves.
-
-        Raises
-        ------
-        ValueError
-            Thrown if a ``self._betti_mode`` has a value which is different
-            from ``mean`` or ``arg_max``.
-
-        """
-        if self._betti_mode == 'mean':
-            betti_features = self._compute_betti_mean(betti_curves)
-
-        elif self._betti_mode == 'arg_max':
-            betti_features = self._compute_arg_max_by_time(betti_curves)
-
-        else:
-            raise ValueError(f"The valid values for 'betti_mode' are 'mean' "
-                             f"or 'arg_max', instead has value "
-                             f"{self._betti_mode}.")
-
-        return betti_features
-
-    def _compute_betti_curves(self, diagrams: np.ndarray) -> List:
-        """Given a list of diagrams, compute the betti curves for each of them.
-
-        Parameters
-        ----------
-        diagrams : ``np.ndarray``, required.
-            Compute the betti curves of the diagrams.
-
-        Returns
-        -------
-        betti_curves : ``List``
-            The ``List`` containing the Betti curves.
-
-        """
-        betti_curves = diag.BettiCurve()
-        betti_curves.fit(diagrams)
-        X_betti_curves = betti_curves.transform(diagrams)
-
-        betti_curves = []
-        for h_dim in self._betti_homology_dimensions:
-            betti_curves.append(pd.DataFrame(X_betti_curves[:, h_dim, :]))
-
-        return betti_curves
-
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """From the initial DataFrame ``X``, compute the persistence diagrams
-        and detect the average lifetime for a given homology dimension.
-        Then, assign a value to each initial data points, according to the
-        chosen ``interpolation_strategy``.
-
-        Parameters
-        ----------
-        X : ``pd.DataFrame``, required.
-            The DataFrame on which to compute the features.
-
-        Returns
-        -------
-        X_renamed : ``pd.DataFrame``
-            A DataFrame containing, for each original data-point, the average
-            lifetime associated to it. If, given the initial parameters, a
-            point was excluded from the computation, its value is set to
-            ``Nan``.
-
-        """
-        X_scaled = self._compute_persistence_diagrams(X)
-        betti_curves = self._compute_betti_curves(X_scaled)
-
-        betti_features = self._compute_betti_features(betti_curves)
-
-        output_dfs = []
-        for betti_feature in betti_features:
-            original_points = self._compute_n_points(len(betti_feature))
-
-            output_dfs.append(_align_indices(X, original_points, betti_feature))
-
-        X_aligned = pd.concat(output_dfs, axis=1)
-        X_renamed = self._rename_columns(X_aligned)
-
-        return X_renamed
-
-
-if __name__ == "__main__":
-    import pandas.util.testing as testing
-    df = pd.read_pickle(
-        "/Users/alessiobaccelli/PycharmProjects/giotto-time/giotto-time-notebooks/tda_feature/duffing_0.0.pickle")
-    df.rename({'label': 'y', 'coord_0': 'x'}, axis='columns', inplace=True)
-    df['idx'] = np.arange(len(df))
-
-    #ts = df['x'].iloc[:100]
-
-    testing.N, testing.K = 200, 1
-
-    ts = testing.makeTimeDataFrame(freq='MS')
-
-    time_series_features = [BettiCurvesFeature(betti_mode='mean',
-                                               takens_dimension=4,
-                                               takens_stride=10,
-                                               takens_time_delay=3,
-                                               sliding_window_width=7,
-                                               diags_max_edge_length=100,
-                                               sliding_stride=4,
-                                               output_name="betti_mean"),
-                            NumberOfRelevantHolesFeature(takens_dimension=4,
-                                               takens_stride=10,
-                                               takens_time_delay=3,
-                                               sliding_window_width=7,
-                                               diags_max_edge_length=100,
-                                               sliding_stride=4,
-                                               output_name="num_holes"),
-                            AvgLifeTimeFeature(takens_dimension=4,
-                                                         takens_stride=10,
-                                                         takens_time_delay=3,
-                                                         sliding_window_width=7,
-                                                         diags_max_edge_length=100,
-                                                         sliding_stride=4,
-                                                         output_name="avg_time")
-
-                            ]
-
-    horizon_main = 4
-    feature_creation = FeaturesCreation(horizon_main, time_series_features)
-    X, y = feature_creation.fit_transform(ts)
-    print(X)
