@@ -1,6 +1,10 @@
 import pandas as pd
 
+from sklearn.metrics import mean_squared_error
+
 from .base import TimeSeriesTransform
+from ..trend_model.polynomial_trend import PolynomialTrend
+from ..trend_model.polynomial_trend import ExponentialTrend
 
 class TimeSeriesTransform(ABCMeta):
 
@@ -16,26 +20,27 @@ class TimeSeriesTransform(ABCMeta):
 
 #
 
-class RemoveLinearTrend(TimeSeriesFeature):
-    def __init__(self, a, b):
-        pass
+class DetrendedFeature(TimeSeriesFeature):
+    def __init__(self, trend_model):
+        self.trend_model = trend_model
 
     def transform(self, time_series):
-        return time_series
+        self.trend_model.fit(time_series)
+        return self.trend_model.transform(time_series)
 
-class RemovePolynomialTrend(TimeSeriesFeature):
-    def __init__(self, coeffs=[]):
-        pass
+class RemovePolynomialTrend(DetrendedFeature):
+    def __init__( self, polynomial_order=1, loss=mean_squared_error ):
+        self.trend_model = PolynomialTrend(order=polynomial_order, loss=loss)
+        super().__init__(trend_model=trend_model)
 
-    def transform(self, time_series):
-        return time_series
+class RemoveExponentialTrend(DetrendedFeature):
+    def __init__( self, loss=mean_squared_error ):
+        self.trend_model = ExponentialTrend(loss=loss)
+        super().__init__(trend_model=trend_model)
 
-class RemoveExponentialTrend(TimeSeriesFeature):
-    def __init__(self, exponent):
-        pass
-
-    def transform(self, time_series):
-        return time_series
-
+class RemoveFunctionTrend(DetrendedFeature):
+    def __init__( self, loss=mean_squared_error ):
+        self.trend_model = ExponentialTrend(loss=loss)
+        super().__init__(trend_model=trend_model)
 
 #

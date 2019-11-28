@@ -5,7 +5,7 @@ import pandas.util.testing as testing
 
 import numpy as np
 
-class Exponential_ts(TrendModel):
+class ExponentialTrend(TrendModel):
     """
     A model for fitting, predicting and removing an exponential trend from a time series.
 
