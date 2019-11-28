@@ -1,7 +1,7 @@
 from typing import Iterable, List, Dict, Optional, Union, Callable
 
 from giottotime.features.features_creation.tda_features.base import \
-    TDAFeatures, align_indices
+    TDAFeatures, _align_indices
 
 import pandas as pd
 import numpy as np
@@ -225,7 +225,7 @@ class AmplitudeFeature(TDAFeatures):
         amplitudes = self._calculate_amplitude_feature(X_scaled)
         original_points = self._compute_n_points(len(amplitudes))
 
-        X_aligned = align_indices(X, original_points, amplitudes)
+        X_aligned = _align_indices(X, original_points, amplitudes)
         X_renamed = self._rename_columns(X_aligned)
 
         return X_renamed

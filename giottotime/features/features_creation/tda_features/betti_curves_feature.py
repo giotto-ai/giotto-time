@@ -9,7 +9,7 @@ from giottotime.features.features_creation.feature_creation import \
 from giottotime.features.features_creation.tda_features.average_lifetime_feature import \
     AvgLifeTimeFeature
 from giottotime.features.features_creation.tda_features.base import \
-    TDAFeatures, align_indices
+    TDAFeatures, _align_indices
 from giottotime.features.features_creation.tda_features.relevant_holes_feature import \
     NumberOfRelevantHolesFeature
 
@@ -317,7 +317,7 @@ class BettiCurvesFeature(TDAFeatures):
         for betti_feature in betti_features:
             original_points = self._compute_n_points(len(betti_feature))
 
-            output_dfs.append(align_indices(X, original_points, betti_feature))
+            output_dfs.append(_align_indices(X, original_points, betti_feature))
 
         X_aligned = pd.concat(output_dfs, axis=1)
         X_renamed = self._rename_columns(X_aligned)

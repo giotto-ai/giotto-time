@@ -5,6 +5,7 @@ import pandas.util.testing as testing
 
 import numpy as np
 
+
 class CustomTrendForm_ts:
     def __init__(self, model_form, inital_params, loss=mean_squared_error):
         self.loss = loss

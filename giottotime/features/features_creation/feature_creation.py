@@ -87,13 +87,13 @@ class FeaturesCreation:
 
         Returns
         -------
-        X : ``pd.DataFrame``
+        features : ``pd.DataFrame``
             The DataFrame containing the features.
 
         """
-        X = pd.DataFrame(index=time_series.index)
+        features = pd.DataFrame(index=time_series.index)
         for time_series_feature in self.time_series_features:
             x_trasformed = time_series_feature.fit_transform(time_series)
-            X = pd.concat([X, x_trasformed], axis=1)
+            features = pd.concat([features, x_trasformed], axis=1)
 
-        return X
+        return features

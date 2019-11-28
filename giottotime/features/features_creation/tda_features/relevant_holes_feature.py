@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from giottotime.features.features_creation.tda_features.base import \
-    TDAFeatures, align_indices
+    TDAFeatures, _align_indices
 
 
 class NumberOfRelevantHolesFeature(TDAFeatures):
@@ -198,7 +198,7 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         n_holes = self._compute_num_relevant_holes(X_scaled)
         n_points = self._compute_n_points(len(n_holes))
 
-        X_aligned = align_indices(X, n_points, n_holes)
+        X_aligned = _align_indices(X, n_points, n_holes)
         X_renamed = self._rename_columns(X_aligned)
 
         return X_renamed

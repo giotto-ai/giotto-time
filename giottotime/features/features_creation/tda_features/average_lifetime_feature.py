@@ -1,7 +1,7 @@
 from typing import Iterable, List, Optional, Callable, Union
 
 from giottotime.features.features_creation.tda_features.base import \
-    TDAFeatures, align_indices
+    TDAFeatures, _align_indices
 
 import pandas as pd
 import numpy as np
@@ -192,7 +192,7 @@ class AvgLifeTimeFeature(TDAFeatures):
         avg_lifetime = self._average_lifetime(X_scaled)
         original_points = self._compute_n_points(len(avg_lifetime))
 
-        X_aligned = align_indices(X, original_points, avg_lifetime)
+        X_aligned = _align_indices(X, original_points, avg_lifetime)
         X_renamed = self._rename_columns(X_aligned)
 
         return X_renamed

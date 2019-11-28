@@ -11,8 +11,8 @@ import pandas as pd
 from giottotime.features.features_creation.base import TimeSeriesFeature
 
 
-def align_indices(X: pd.DataFrame, n_points: int,
-                  tda_feature_values: Union[List, np.ndarray]) -> pd.DataFrame:
+def _align_indices(X: pd.DataFrame, n_points: int,
+                   tda_feature_values: Union[List, np.ndarray]) -> pd.DataFrame:
     """Given ``X`` of length ``n_samples``, set the first
     ``n_samples - n_points`` to ``np.nan``. Then, split the remaining points in
     ``len(tda_feature_values)`` chunks and, to each data-point in a chunk, set
