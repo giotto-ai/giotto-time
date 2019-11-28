@@ -5,6 +5,10 @@ from giottotime.feature_creation.utils import get_train_test_features
 
 
 class FeaturesCreation:
+    """
+    Tentative docstring
+
+    """
     def __init__(self, horizon, time_series_features):
         if horizon <= 0 or not isinstance(horizon, int):
             raise ValueError("The horizon should be an int greater than 0, "
