@@ -41,5 +41,9 @@ class PolynomialTrend(TrendModel):
         return time_series - predictions[0]
 
 
+class LinearTrend(PolynomialTrend):
+
+    def __init__(self, loss=mean_squared_error):
+        super.__init__()
 
 #
