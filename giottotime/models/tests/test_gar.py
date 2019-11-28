@@ -3,14 +3,16 @@ import random
 import pandas.util.testing as testing
 import pytest
 from hypothesis import given, strategies as st, settings, HealthCheck
+from hypothesis._settings import duration
 from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression
 
-from giottotime.feature_creation.time_series_features import \
-    MovingAverageFeature, ConstantFeature, ShiftFeature
 
 from giottotime.features.features_creation.feature_creation import \
     FeaturesCreation
+from giottotime.features.features_creation.time_series_features import \
+    MovingAverageFeature, ConstantFeature, ShiftFeature
+from giottotime.features.utils import split_train_test
 from giottotime.models.gar import GAR
 
 
@@ -41,7 +43,8 @@ def arbitrary_features(feature_length):
 
     for random_param in random_params:
         random_feature = random.sample(possible_features, 1)[0]
-        random_features.append(random_feature(random_param))
+        random_features.append(random_feature(random_param,
+                                              output_name=str(random_feature)))
 
     return random_features
 
@@ -60,7 +63,8 @@ class TestFitPredict:
         with pytest.raises(NotFittedError):
             gar_feedforward.predict(time_series)
 
-    @settings(suppress_health_check=(HealthCheck.filter_too_much,))
+    @settings(suppress_health_check=(HealthCheck.filter_too_much,),
+              deadline=duration(milliseconds=500))
     @given(st.builds(
         arbitrary_features,
         st.integers().filter(lambda x: 1 <= x <= 50)))
@@ -69,19 +73,22 @@ class TestFitPredict:
         feature_creation = FeaturesCreation(horizon, features)
         base_model = LinearRegression()
 
-        x, y, _ = feature_creation.fit_transform(time_series)
+        x, y = feature_creation.fit_transform(time_series)
+
+        x_train, y_train, x_test, y_test = split_train_test(x, y)
 
         gar_no_feedforward = GAR(base_model=base_model, feed_forward=False)
 
-        gar_no_feedforward.fit(x, y)
+        gar_no_feedforward.fit(x_train, y_train)
         assert gar_no_feedforward.train_features_.shape[1] == len(features)
 
         gar_feedforward = GAR(base_model=base_model, feed_forward=True)
 
-        gar_feedforward.fit(x, y)
+        gar_feedforward.fit(x_train, y_train)
         assert gar_feedforward.train_features_.shape[1] == len(features)
 
-    @settings(suppress_health_check=(HealthCheck.filter_too_much,))
+    @settings(suppress_health_check=(HealthCheck.filter_too_much,),
+              deadline=duration(milliseconds=500))
     @given(st.builds(
         arbitrary_features,
         st.integers().filter(lambda x: 1 <= x <= 50)))
@@ -90,7 +97,9 @@ class TestFitPredict:
         feature_creation = FeaturesCreation(horizon, features)
         base_model = LinearRegression()
 
-        x_train, y_train, x_test = feature_creation.fit_transform(time_series)
+        x, y = feature_creation.fit_transform(time_series)
+
+        x_train, y_train, x_test, y_test = split_train_test(x, y)
 
         gar_no_feedforward = GAR(base_model=base_model, feed_forward=False)
 

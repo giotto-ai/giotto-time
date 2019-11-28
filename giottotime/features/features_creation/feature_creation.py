@@ -4,7 +4,7 @@ import pandas as pd
 
 from giottotime.features.features_creation.base import TimeSeriesFeature
 from giottotime.features.features_creation.time_series_features import ShiftFeature
-from giottotime.features.utils import get_non_nan_values
+from giottotime.features.utils import _get_non_nan_values
 
 
 class FeaturesCreation:
@@ -33,10 +33,6 @@ class FeaturesCreation:
         original ``time_series`` and using the list of ``time_series_features``.
         Also create the y matrix, by generating ``horizon`` number of shifts
         of the ``time_series``.
-        Rows of ``X`` that contain at least a ``Nan`` value are
-        dropped, as well as the corresponding rows of ``y``.
-        Rows of ``y`` that contain a Nan are instead keep, since are going to
-        be used in later steps as prediction time.
 
         Parameters
         ----------
@@ -45,14 +41,13 @@ class FeaturesCreation:
 
         Returns
         -------
-        x_non_nans, y_non_nans : ``(pd.DataFrame, pd.DataFrame)``
+        x, y: ``(pd.DataFrame, pd.DataFrame)``
             A tuple containing the ``X`` and ``y`` matrices.
 
         """
         x = self._create_x_features(time_series)
         y = self._create_y_shifts(time_series)
-        x_non_nans, y_non_nans = get_non_nan_values(x, y)
-        return x_non_nans, y_non_nans
+        return x, y
 
     def _create_y_shifts(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """Generate ``n`` shifts of ``time_series``, where ``n`` is equal to
