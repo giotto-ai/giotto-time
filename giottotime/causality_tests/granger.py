@@ -11,7 +11,7 @@ from math import sqrt
 
 from sklearn.linear_model import LinearRegression
 
-#
+################################################################################################
 
 class GrangerTest():
     def __init__(self, data):
@@ -97,7 +97,7 @@ class GrangerTest():
         q = lf.coef_.max(), np.argmax(lf.coef_)
         return q
 
-#
+################################################################################################
 
 if __name__ == "__main__":
     import pandas.util.testing as testing
