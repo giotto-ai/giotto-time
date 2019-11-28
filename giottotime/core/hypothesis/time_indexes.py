@@ -164,6 +164,11 @@ def samples_from(iterable):
                      st.integers(0, len(iterable) - 1))
 
 
+@defines_strategy
+def available_freqs():
+    return samples_from(available_freq)
+
+
 @st.composite
 def _start_dates_end_dates_periods_freqs(draw,
                                          start_date: pd.Timestamp = None,
