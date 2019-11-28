@@ -161,10 +161,12 @@ class BettiCurvesFeature(TDAFeatures):
         and detect the average lifetime for a given homology dimension.
         Then, assign a value to each initial data points, according to the
         chosen ``interpolation_strategy``.
+
         Parameters
         ----------
         X : ``pd.DataFrame``, required.
             The DataFrame on which to compute the features.
+
         Returns
         -------
         X_renamed : ``pd.DataFrame``
@@ -172,6 +174,7 @@ class BettiCurvesFeature(TDAFeatures):
             lifetime associated to it. If, given the initial parameters, a
             point was excluded from the computation, its value is set to
             ``Nan``.
+
         """
         persistence_diagrams = self._compute_persistence_diagrams(X)
         betti_curves = self._compute_betti_curves(persistence_diagrams)
@@ -195,10 +198,12 @@ class BettiCurvesFeature(TDAFeatures):
         ----------
         diagrams : ``np.ndarray``, required.
             Compute the betti curves of the diagrams.
+
         Returns
         -------
         betti_curves : ``List``
             The ``List`` containing the Betti curves.
+
         """
         betti_curves = diag.BettiCurve()
         betti_curves.fit(diagrams)
@@ -248,15 +253,18 @@ class BettiCurvesFeature(TDAFeatures):
             -> List[pd.DataFrame]:
         """Compute the mean along the epsilon axis of the non-zero elements of
         the betti surface.
+
         Parameters
         ----------
         betti_surfaces : ``List[pd.DataFrame]``, required.
             A list containing the betti surfaces, one for each homology
             dimension.
+
         Returns
         -------
         betti_means : ``List[np.ndarray]``
             The mean of each betti surfaces.
+
         """
         betti_means = []
         for betti_surface in betti_surfaces:
@@ -275,10 +283,12 @@ class BettiCurvesFeature(TDAFeatures):
         betti_surfaces : ``List[pd.DataFrame]``, required.
             A list containing the betti surfaces, one for each homology
             dimension.
+
         Returns
         -------
         betti_arg_maxes : ``List[np.ndarray]``
             The argmax of each betti surfaces.
+
         """
         betti_arg_maxes = []
         for betti_surface in betti_surfaces:
