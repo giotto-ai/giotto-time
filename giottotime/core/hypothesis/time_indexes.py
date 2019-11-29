@@ -62,6 +62,30 @@ def series_with_datetime_index(draw,
 
 @defines_strategy
 @st.composite
+def series_with_timedelta_index(draw,
+                                start: Optional[pd.Timedelta] = None,
+                                end: Optional[pd.Timedelta] = None,
+                                max_length: int = 1000):
+    """ Returns a strategy to generate a Pandas Series with DatetimeIndex
+
+    Parameters
+    ----------
+    draw
+    start : ``pd.datetime``, optional, (default=None)
+    end : ``pd.datetime``, optional, (default=None)
+    max_length : int, optional, (default=None)
+
+    Returns
+    -------
+    pd.Series with DatetimeIndex
+    """
+    index = draw(timedelta_indexes(start, end, max_length))
+    values = draw(arrays(dtype=np.float64, shape=index.shape[0]))
+    return pd.Series(index=index, data=values)
+
+
+@defines_strategy
+@st.composite
 def period_indexes(draw,
                    start: Optional[pd.datetime] = None,
                    end: Optional[pd.datetime] = None,
