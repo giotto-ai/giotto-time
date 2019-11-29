@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Dict, Union
+from typing import Optional, Dict, Union, Iterable, Generic
 
 import hypothesis.strategies as st
 import numpy as np
@@ -31,7 +31,7 @@ def series_with_period_index(draw,
     draw
     start : ``pd.datetime``, optional, (default=None)
     end : ``pd.datetime``, optional, (default=None)
-    max_length : int, optional, (default=None)
+    max_length : ``int``, optional, (default=None)
 
     Returns
     -------
@@ -55,7 +55,7 @@ def series_with_datetime_index(draw,
     draw
     start : ``pd.datetime``, optional, (default=None)
     end : ``pd.datetime``, optional, (default=None)
-    max_length : int, optional, (default=None)
+    max_length : ``int``, optional, (default=None)
 
     Returns
     -------
@@ -79,7 +79,7 @@ def series_with_timedelta_index(draw,
     draw
     start : ``pd.Timedelta``, optional, (default=None)
     end : ``pd.Timedelta``, optional, (default=None)
-    max_length : int, optional, (default=None)
+    max_length : ``int``, optional, (default=None)
 
     Returns
     -------
@@ -103,7 +103,7 @@ def period_indexes(draw,
     draw
     start : ``pd.datetime``, optional, (default=None)
     end : ``pd.datetime``, optional, (default=None)
-    max_length : int, optional, (default=1000)
+    max_length : ``int``, optional, (default=1000)
 
     Returns
     -------
@@ -127,7 +127,7 @@ def datetime_indexes(draw,
     draw
     start : ``pd.datetime``, optional, (default=None)
     end : ``pd.datetime``, optional, (default=None)
-    max_length : int, default: ``1000``
+    max_length : ``int``, default: ``1000``
 
     Returns
     -------
@@ -151,7 +151,7 @@ def timedelta_indexes(draw,
     draw
     start : ``pd.Timedelta``, optional, (default=None)
     end : ``pd.Timedelta``, optional, (default=None)
-    max_length : int, (default=1000)
+    max_length : ``int``, (default=1000)
 
     Returns
     -------
@@ -209,19 +209,51 @@ def pair_of_ordered_timedeltas(start: Optional[pd.Timedelta] = None,
 
 
 @defines_strategy
-def positive_bounded_integers(max_length):
-    return st.integers(min_value=0, max_value=max_length)
+def positive_bounded_integers(max_value):
+    """ Returns a strategy that generates a positive bounded integer
+
+    Parameters
+    ----------
+    max_value : ``int``, required
+        maximum value of the integer
+
+    Returns
+    -------
+    LazyStrategy
+    """
+    return st.integers(min_value=0, max_value=max_value)
 
 
 @defines_strategy
-def samples_from(iterable):
+def samples_from(iterable: Iterable[Generic]):
+    """ Strategy that samples from an iterable.
+
+    Parameters
+    ----------
+    iterable : ``Iterable[Generic]``, required
+
+    Returns
+    -------
+    LazyStrategy
+    """
     return st.builds(lambda index: iterable[index],
                      st.integers(0, len(iterable) - 1))
 
 
 @defines_strategy
 @st.composite
-def available_freqs(draw):
+def available_freqs(draw) -> pd.Timedelta:
+    """ Strategy that samples from the available frequencies and returns a
+    corresponding pd.Timedelta
+
+    Parameters
+    ----------
+    draw
+
+    Returns
+    -------
+    pd.Timedelta
+    """
     return freq_to_timedelta(draw(samples_from(string_freqs)))
 
 
@@ -232,6 +264,26 @@ def period_range_args_from(draw,
                            end: pd.datetime,
                            max_length: int,
                            arg_to_remove: Optional[str] = None) -> IndexRangeArgs:
+    """ Strategy that computes arguments to call pd.period_range() from
+    start, end and max length of the resulting period
+    It returns a dictionary with 3 out of the 3 keys 'start', 'end', 'periods'
+    and 'freq'. One of them is automatically removed since pd.period_range()
+    accepts only 3 of the 4 inputs.
+
+    Parameters
+    ----------
+    draw
+    start : ``pd.datetime``, required
+    end : ``pd.datetime``, required
+    max_length : ``int``, required
+    arg_to_remove : ``str``, optional, (default=None)
+
+    Returns
+    -------
+    IndexRangeArgs
+        dictionary with 3 out of the 4 keys 'start', 'end', 'periods' and
+        'freq'.
+    """
     start, end = draw(pair_of_ordered_dates(start, end))
     periods = draw(positive_bounded_integers(max_length))
     freq = draw(available_freqs())
@@ -247,13 +299,39 @@ def period_range_args_from(draw,
 
 def period_range_args_are_correct(period_range_args: IndexRangeArgs,
                                   max_length: int = 1000) -> bool:
+    """ Returns True if the period range arguments are correct. i.e. if
+    'periods' is not a key it checks that the length of the resulting period
+    index is below ``max_length``.
+
+    Parameters
+    ----------
+    period_range_args : ``IndexRangeArgs``, required
+        dictionary with 3 out of the 4 keys 'start', 'end', 'periods' and
+        'freq'.
+
+    max_length : ``int``, optional, (default=1000)
+
+    Returns
+    -------
+    bool
+    """
     if 'periods' not in period_range_args:
         return expected_index_length_from(**period_range_args) < max_length
     else:
         return True
 
 
-def compute_period_range(period_range_args: IndexRangeArgs):
+def compute_period_range(period_range_args: IndexRangeArgs) -> pd.PeriodIndex:
+    """ Returns a Pandas PeriodIndex from the given ``period_range_args``.
+
+    Parameters
+    ----------
+    period_range_args : ``IndexRangeArgs``, required
+
+    Returns
+    -------
+    pd.PeriodIndex
+    """
     return pd.period_range(**period_range_args)
 
 
@@ -264,6 +342,26 @@ def date_range_args_from(draw,
                          end: pd.datetime,
                          max_length: int,
                          arg_to_remove: Optional[str] = None) -> IndexRangeArgs:
+    """ Strategy that computes arguments to call pd.date_range() from
+    start, end and max length of the resulting period
+    It returns a dictionary with 3 out of the 3 keys 'start', 'end', 'periods'
+    and 'freq'. One of them is automatically removed since pd.date_range()
+    accepts only 3 of the 4 inputs.
+
+    Parameters
+    ----------
+    draw
+    start : ``pd.datetime``, required
+    end : ``pd.datetime``, required
+    max_length : ``int``, required
+    arg_to_remove: ``str``, optional, (default=None)
+
+    Returns
+    -------
+    IndexRangeArgs
+        dictionary with 3 out of the 4 keys 'start', 'end', 'periods' and
+        'freq'.
+    """
     start, end = draw(pair_of_ordered_dates(start, end))
     periods = draw(positive_bounded_integers(max_length))
     freq = draw(available_freqs())
@@ -280,6 +378,30 @@ def date_range_args_are_correct(date_range_args: IndexRangeArgs,
                                 max_length: int = 1000,
                                 min_start: pd.Timestamp = None,
                                 max_end: pd.Timestamp = None, ) -> bool:
+    """ Returns True if the date range arguments are correct.
+    It checks 3 things:
+
+    - if 'periods' is not a key it checks that the length of the resulting
+    period index is below ``max_length``.
+    - if 'start' is not a keyword it checks that the expected start date is
+    after ``min_start``
+    - if 'end' is not a keyword it checks that the expected end date is
+    before ``max_end``
+
+    Parameters
+    ----------
+    date_range_args : ``IndexRangeArgs``, required
+        dictionary with 3 out of the 4 keys 'start', 'end', 'periods' and
+        'freq'.
+
+    max_length : ``int``, optional, (default=1000)
+    min_start : ``pd.Timestamp``, optional, (default=None)
+    max_end : ``pd.Timestamp``, optional, (default=None)
+
+    Returns
+    -------
+    bool
+    """
     min_start = min_start if min_start is not None else pd.Timestamp('1980-01-01')
     max_end = max_end if max_end is not None else pd.Timestamp('2020-01-01')
     try:
@@ -295,7 +417,17 @@ def date_range_args_are_correct(date_range_args: IndexRangeArgs,
         return False
 
 
-def compute_date_range(date_range_args: IndexRangeArgs):
+def compute_date_range(date_range_args: IndexRangeArgs) -> pd.DatetimeIndex:
+    """ Returns a Pandas DatetimeIndex from the given ``date_range_args``.
+
+    Parameters
+    ----------
+    date_range_args: ``IndexRangeArgs``, required
+
+    Returns
+    -------
+    pd.DatetimeIndex
+    """
     return pd.date_range(**date_range_args)
 
 
@@ -306,6 +438,26 @@ def timedelta_range_args_from(draw,
                               end: pd.Timedelta,
                               max_length: int,
                               arg_to_remove: Optional[str] = None) -> IndexRangeArgs:
+    """ Strategy that computes arguments to call pd.timedelta_range() from
+    start, end and max length of the resulting period
+    It returns a dictionary with 3 out of the 3 keys 'start', 'end', 'periods'
+    and 'freq'. One of them is automatically removed since pd.timedelta_range()
+    accepts only 3 of the 4 inputs.
+
+    Parameters
+    ----------
+    draw
+    start : pd.datetime, required
+    end : pd.datetime, required
+    max_length : int, required
+    arg_to_remove: str, optional, (default=None)
+
+    Returns
+    -------
+    IndexRangeArgs
+        dictionary with 3 out of the 4 keys 'start', 'end', 'periods' and
+        'freq'.
+    """
     start, end = draw(pair_of_ordered_timedeltas(start, end))
     periods = draw(positive_bounded_integers(max_length))
     freq = draw(available_freqs())
@@ -322,6 +474,30 @@ def timedelta_range_args_are_correct(timedelta_range_args: IndexRangeArgs,
                                      max_length: int = 1000,
                                      min_start: pd.Timedelta = None,
                                      max_end: pd.Timedelta = None) -> bool:
+    """ Returns True if the timedelta range arguments are correct.
+    It checks 3 things:
+
+    - if 'periods' is not a key it checks that the length of the resulting
+    period index is below ``max_length``.
+    - if 'start' is not a keyword it checks that the expected start timedelta
+    is after ``min_start``
+    - if 'end' is not a keyword it checks that the expected end timedelta is
+    before ``max_end``
+
+    Parameters
+    ----------
+    timedelta_range_args : ``IndexRangeArgs``, required
+        dictionary with 3 out of the 4 keys 'start', 'end', 'periods' and
+        'freq'.
+
+    max_length : ``int``, optional, (default=1000)
+    min_start : ``pd.Timestamp``, optional, (default=None)
+    max_end : ``pd.Timestamp``, optional, (default=None)
+
+    Returns
+    -------
+    bool
+    """
     min_start = min_start if min_start is not None else pd.Timedelta(0)
     max_end = max_end if max_end is not None else pd.Timedelta('40Y')
     try:
@@ -337,5 +513,16 @@ def timedelta_range_args_are_correct(timedelta_range_args: IndexRangeArgs,
         return False
 
 
-def compute_timedelta_range(date_range_args: IndexRangeArgs):
-    return pd.timedelta_range(**date_range_args)
+def compute_timedelta_range(timedelta_range_args: IndexRangeArgs):
+    """ Returns a Pandas TimedeltaIndex from the given 
+    ``timedelta_range_args``.
+
+    Parameters
+    ----------
+    timedelta_range_args: ``IndexRangeArgs``, required
+
+    Returns
+    -------
+    pd.DatetimeIndex
+    """
+    return pd.timedelta_range(**timedelta_range_args)
