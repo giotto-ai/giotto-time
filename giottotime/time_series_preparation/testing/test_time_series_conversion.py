@@ -10,7 +10,7 @@ from hypothesis.extra.numpy import arrays
 from hypothesis.extra.pandas import series as pd_series
 from giottotime.core.hypothesis.time_indexes import available_freq, \
     samples_from, pair_of_ordered_dates, series_with_datetime_index, \
-    available_freqs
+    available_freqs, series_with_period_index
 
 
 from ..time_series_conversion import SequenceToPandasTimeSeries, \
@@ -127,7 +127,7 @@ class TestPandasSeriesToPandasTimeSeries:
     @given(pd_series(dtype=float),
            datetimes(min_date, max_date),
            available_freqs())
-    def test_array_start_date_freq_as_input(
+    def test_series_start_date_freq_as_input(
             self,
             series: pd.Series,
             start_date: pd.Timestamp,
@@ -140,7 +140,7 @@ class TestPandasSeriesToPandasTimeSeries:
     @given(pd_series(dtype=float),
            datetimes(min_date, max_date),
            available_freqs())
-    def test_array_end_date_freq_as_input(
+    def test_series_end_date_freq_as_input(
             self,
             series: pd.Series,
             end_date: pd.Timestamp,
@@ -173,126 +173,17 @@ class TestPandasSeriesToPandasTimeSeries:
                 series, *start_end_dates, freq=freq,
             )
 
-#
-# class TestSequenceToPandasTimeSeries:
-#
-#     @pytest.mark.parametrize('length, start_date, end_date, freq',
-#                              BAD_LENGTH_START_DATE_END_DATE_FREQ_PARAMETRIZATION)
-#     def test_wrong_parameters_with_list_as_input(
-#             self,
-#             length: int,
-#             start_date: str,
-#             end_date: str,
-#             freq: str
-#     ):
-#         input_list = random_list_of_length(length)
-#         with pytest.raises(ValueError):
-#             compare_input_sequence_to_expected_one(
-#                 input_list, start_date, end_date, freq
-#             )
-#
-#     @pytest.mark.parametrize('length, start_date, end_date, freq',
-#                              LENGTH_START_DATE_END_DATE_FREQ_PARAMETRIZATION)
-#     def test_np_array_as_input(
-#             self,
-#             length: int,
-#             start_date: str,
-#             end_date: str,
-#             freq: str
-#     ):
-#         input_array = random_array_of_length(length)
-#         compare_input_sequence_to_expected_one(
-#             input_array, start_date, end_date, freq
-#         )
-#
-#     @pytest.mark.parametrize('length, start_date, end_date, freq',
-#                              BAD_LENGTH_START_DATE_END_DATE_FREQ_PARAMETRIZATION)
-#     def test_wrong_parameters_with_np_array_as_input(
-#             self,
-#             length: int,
-#             start_date: str,
-#             end_date: str,
-#             freq: str
-#     ):
-#         input_array = random_array_of_length(length)
-#         with pytest.raises(ValueError):
-#             compare_input_sequence_to_expected_one(
-#                 input_array, start_date, end_date, freq
-#             )
-#
-#
-# class TestPandasToPandasTimeSeries:
-#
-#     @pytest.mark.parametrize('length, start_date, end_date, freq',
-#                              LENGTH_START_DATE_END_DATE_FREQ_PARAMETRIZATION)
-#     def test_non_time_index_as_input(
-#             self,
-#             length: int,
-#             start_date: str,
-#             end_date: str,
-#             freq: str,
-#     ):
-#         time_series = non_time_index_series(length)
-#         computed_pandas_series = transform_sequence_into_time_series(
-#             time_series, start_date, end_date, freq
-#         )
-#         expected_pandas_series_index = pd.period_range(
-#             start=start_date,
-#             end=end_date,
-#             freq=freq,
-#             periods=time_series.shape[0]
-#         )
-#         expected_pandas_series = pd.Series(data=time_series.values,
-#                                            index=expected_pandas_series_index)
-#         assert_series_equal(computed_pandas_series, expected_pandas_series)
-#
-#     @pytest.mark.parametrize('length, start_date, end_date, freq',
-#                              BAD_LENGTH_START_DATE_END_DATE_FREQ_PARAMETRIZATION)
-#     def test_wrong_parameters_non_time_index_as_input(
-#             self,
-#             length: int,
-#             start_date: str,
-#             end_date: str,
-#             freq: str,
-#     ):
-#         time_series = non_time_index_series(length)
-#         with pytest.raises(ValueError):
-#             transform_sequence_into_time_series(
-#                 time_series, start_date, end_date, freq
-#             )
-#
-#     @pytest.mark.parametrize('length, start_date, end_date, freq',
-#                              LENGTH_START_DATE_END_DATE_FREQ_PARAMETRIZATION)
-#     def test_datetime_index_series_as_input(
-#             self,
-#             length: int,
-#             start_date: str,
-#             end_date: str,
-#             freq: str,
-#     ):
-#         time_series = datetime_index_series(length, start_date, end_date, freq)
-#         computed_pandas_series = transform_pandas_series_into_pandas_time_series(
-#             time_series
-#         )
-#         assert_series_equal(computed_pandas_series, time_series)
-#
-#     @pytest.mark.parametrize('length, start_date, end_date, freq',
-#                              LENGTH_START_DATE_END_DATE_FREQ_PARAMETRIZATION)
-#     def test_period_index_series_as_input(
-#             self,
-#             length: int,
-#             start_date: str,
-#             end_date: str,
-#             freq: str,
-#     ):
-#         time_series = period_index_series(length, start_date, end_date, freq)
-#         computed_pandas_series = transform_pandas_series_into_pandas_time_series(
-#             time_series
-#         )
-#         assert_series_equal(computed_pandas_series, time_series)
-#
-#     def test_timedelta_index_series_as_input(self):
-#         pass
+    @given(series_with_datetime_index())
+    def test_datetime_index_as_input(self, datetime_index_series: pd.Series):
+        computed_series = transform_pandas_series_into_pandas_time_series(datetime_index_series)
+        expected_series = datetime_index_series
+        assert_series_equal(computed_series, expected_series)
+
+    @given(series_with_period_index())
+    def test_period_index_as_input(self, period_index_series: pd.Series):
+        computed_series = transform_pandas_series_into_pandas_time_series(period_index_series)
+        expected_series = period_index_series
+        assert_series_equal(computed_series, expected_series)
 
 
 def compare_input_sequence_to_expected_one(
