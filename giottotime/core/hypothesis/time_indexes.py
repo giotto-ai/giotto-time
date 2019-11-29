@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 import hypothesis.strategies as st
 import numpy as np
@@ -15,65 +15,65 @@ _pandas_range_params = ['start', 'end', 'periods', 'freq']
 @defines_strategy
 @st.composite
 def series_with_period_index(draw,
-                             start: Optional[pd.Timestamp] = None,
-                             end: Optional[pd.Timestamp] = None,
+                             start: Optional[pd.datetime] = None,
+                             end: Optional[pd.datetime] = None,
                              max_length: int = 1000):
     """ Returns a strategy to generate a Pandas Series with PeriodIndex
 
     Parameters
     ----------
     draw
-    start: ``pd.Timestamp``, optional, (default=None)
-    end: ``pd.Timestamp``, optional, (default=None)
-    max_length: int, optional, (default=None)
+    start : ``pd.datetime``, optional, (default=None)
+    end : ``pd.datetime``, optional, (default=None)
+    max_length : int, optional, (default=None)
 
     Returns
     -------
     pd.Series with PeriodIndex
     """
     index = draw(period_indexes(start, end, max_length))
-    values = arrays(dtype=np.float64, shape=index.shape[0])
+    values = draw(arrays(dtype=np.float64, shape=index.shape[0]))
     return pd.Series(index=index, data=values)
 
 
 @defines_strategy
 @st.composite
 def series_with_datetime_index(draw,
-                               start: Optional[pd.Timestamp] = None,
-                               end: Optional[pd.Timestamp] = None,
+                               start: Optional[pd.datetime] = None,
+                               end: Optional[pd.datetime] = None,
                                max_length: int = 1000):
     """ Returns a strategy to generate a Pandas Series with DatetimeIndex
 
     Parameters
     ----------
     draw
-    start: ``pd.Timestamp``, optional, (default=None)
-    end: ``pd.Timestamp``, optional, (default=None)
-    max_length: int, optional, (default=None)
+    start : ``pd.datetime``, optional, (default=None)
+    end : ``pd.datetime``, optional, (default=None)
+    max_length : int, optional, (default=None)
 
     Returns
     -------
     pd.Series with DatetimeIndex
     """
     index = draw(datetime_indexes(start, end, max_length))
-    values = arrays(dtype=np.float64, shape=index.shape[0])
+    values = draw(arrays(dtype=np.float64, shape=index.shape[0]))
     return pd.Series(index=index, data=values)
 
 
 @defines_strategy
 @st.composite
 def period_indexes(draw,
-                   start: Optional[pd.Timestamp] = None,
-                   end: Optional[pd.Timestamp] = None,
+                   start: Optional[pd.datetime] = None,
+                   end: Optional[pd.datetime] = None,
                    max_length: int = 1000):
     """ Returns a strategy to generate Pandas PeriodIndex
 
     Parameters
     ----------
     draw
-    start: ``pd.Timestamp``, optional, (default=None)
-    end: ``pd.Timestamp``, optional, (default=None)
-    max_length: int, optional, (default=1000)
+    start : ``pd.datetime``, optional, (default=None)
+    end : ``pd.datetime``, optional, (default=None)
+    max_length : int, optional, (default=1000)
 
     Returns
     -------
@@ -98,17 +98,17 @@ def period_indexes(draw,
 @defines_strategy
 @st.composite
 def datetime_indexes(draw,
-                     start: Optional[pd.Timestamp] = None,
-                     end: Optional[pd.Timestamp] = None,
+                     start: Optional[pd.datetime] = None,
+                     end: Optional[pd.datetime] = None,
                      max_length: int = 1000):
     """ Returns a strategy to generate Pandas DatetimeIndex.
 
     Parameters
     ----------
     draw
-    start: pd.Timestamp, optional
-    end: pd.Timestamp, optional
-    max_length: int, default: ``1000``
+    start : ``pd.datetime``, optional, (default=None)
+    end : ``pd.datetime``, optional, (default=None)
+    max_length : int, default: ``1000``
 
     Returns
     -------
@@ -134,6 +134,19 @@ def timedelta_indexes(draw,
                       start: Optional[pd.Timedelta] = None,
                       end: Optional[pd.Timedelta] = None,
                       max_length: int = 1000):
+    """ Returns a strategy to generate Pandas TimedeltaIndex
+
+    Parameters
+    ----------
+    draw
+    start : ``pd.Timedelta``, optional, (default=None)
+    end : ``pd.Timedelta``, optional, (default=None)
+    max_length : int, (default=1000)
+
+    Returns
+    -------
+    LazyStrategy that generates pd.TimedeltaIndex
+    """
     start, end, periods, freq = draw(
         _start_timedelta_end_timedelta_periods_freq(start, end, max_length)
     )
@@ -149,19 +162,19 @@ def timedelta_indexes(draw,
 
 
 @defines_strategy
-def pair_of_ordered_dates(start: Optional[pd.Timestamp] = None,
-                          end: Optional[pd.Timestamp] = None):
+def pair_of_ordered_dates(start: Optional[pd.datetime] = None,
+                          end: Optional[pd.datetime] = None):
     """ Returns an hypothesis strategy that generates a pair of ordered
-    pd.Timestamp. Useful to create a Pandas index
+    pd.datetime. Useful to create a Pandas index
 
     Parameters
     ----------
-    start: pd.Timestamp, optional
-    end: pd.Timestamp, optional
+    start : ``pd.datetime``, optional, (default=None)
+    end : ``pd.datetime``, optional, (default=None)
 
     Returns
     -------
-    LazyStrategy that generates Tuple[pd.Timestamp, pd.Timestamp]
+    LazyStrategy that generates Tuple[pd.datetime, pd.datetime]
     """
     start, end = _initialize_start_date_end_date(start, end)
 
@@ -179,8 +192,8 @@ def pair_of_ordered_timedeltas(start: Optional[pd.Timedelta] = None,
 
     Parameters
     ----------
-    start: pd.Timestamp, optional
-    end: pd.Timestamp, optional
+    start : ``pd.datetime``, optional, (default=None)
+    end : ``pd.datetime``, optional, (default=None)
 
     Returns
     -------
@@ -211,31 +224,35 @@ def available_freqs():
 
 
 @st.composite
-def _start_dates_end_dates_periods_freqs(draw,
-                                         start: Optional[pd.Timestamp] = None,
-                                         end: Optional[pd.Timestamp] = None,
-                                         max_length: int = 1000):
+def _start_dates_end_dates_periods_freqs(
+        draw,
+        start: Optional[pd.datetime] = None,
+        end: Optional[pd.datetime] = None,
+        max_length: int = 1000
+) -> Tuple[pd.datetime, pd.datetime, int, pd.Timedelta]:
     start_end_date_pair = draw(pair_of_ordered_dates(start, end))
     periods = draw(positive_bounded_integers(max_length))
-    freq = draw(samples_from(available_freq))
+    freq = _freq_to_timedelta(draw(samples_from(available_freq)))
     return start_end_date_pair[0], start_end_date_pair[1], periods, freq
 
 
 @st.composite
-def _start_timedelta_end_timedelta_periods_freq(draw,
-                                                start: Optional[pd.Timedelta] = None,
-                                                end: Optional[pd.Timestamp] = None,
-                                                max_length: int = 1000):
+def _start_timedelta_end_timedelta_periods_freq(
+        draw,
+        start: Optional[pd.Timedelta] = None,
+        end: Optional[pd.datetime] = None,
+        max_length: int = 1000
+) -> Tuple[pd.datetime, pd.datetime, int, pd.Timedelta]:
     start_end_date_pair = draw(pair_of_ordered_timedeltas(start, end))
     periods = draw(positive_bounded_integers(max_length))
-    freq = draw(samples_from(available_freq))
+    freq = _freq_to_timedelta(draw(samples_from(available_freq)))
     return start_end_date_pair[0], start_end_date_pair[1], periods, freq
 
 
-def _build_period_range_from(start: pd.Timestamp,
-                             end: pd.Timestamp,
+def _build_period_range_from(start: pd.datetime,
+                             end: pd.datetime,
                              periods: int,
-                             freq: str,
+                             freq: pd.Timedelta,
                              element_to_exclude: str,
                              max_length: int = 1000):
     period_range_kwargs = _get_pandas_range_kwargs_from(start,
@@ -248,10 +265,10 @@ def _build_period_range_from(start: pd.Timestamp,
     return pd.period_range(**period_range_kwargs)
 
 
-def _build_date_range_from(start: pd.Timestamp,
-                           end: pd.Timestamp,
+def _build_date_range_from(start: pd.datetime,
+                           end: pd.datetime,
                            periods: int,
-                           freq: str,
+                           freq: pd.Timedelta,
                            element_to_exclude: str,
                            max_length: int = 1000):
     date_range_kwargs = _get_pandas_range_kwargs_from(start,
@@ -274,44 +291,45 @@ def _build_date_range_from(start: pd.Timestamp,
 def _build_timedelta_range_from(start: pd.Timedelta,
                                 end: pd.Timedelta,
                                 periods: int,
-                                freq: str,
+                                freq: pd.Timedelta,
                                 element_to_exclude: str,
                                 max_length: int = 1000):
-    date_range_kwargs = _get_pandas_range_kwargs_from(start,
-                                                      end,
-                                                      periods,
-                                                      freq,
-                                                      element_to_exclude)
+    timedelta_range_kwargs = _get_pandas_range_kwargs_from(start,
+                                                           end,
+                                                           periods,
+                                                           freq,
+                                                           element_to_exclude)
     try:
-        if 'periods' not in date_range_kwargs:
-            assume(_expected_index_length_from(**date_range_kwargs) < max_length)
-        elif 'start' not in date_range_kwargs:
-            assume(_expected_start_date_from(**date_range_kwargs) >= start)
-        elif 'end' not in date_range_kwargs:
-            assume(_expected_end_date_from(**date_range_kwargs) <= end)
+        if 'periods' not in timedelta_range_kwargs:
+            assume(_expected_index_length_from(**timedelta_range_kwargs) < max_length)
+        elif 'start' not in timedelta_range_kwargs:
+            assume(_expected_start_date_from(**timedelta_range_kwargs) >= start)
+        elif 'end' not in timedelta_range_kwargs:
+            assume(_expected_end_date_from(**timedelta_range_kwargs) <= end)
     except OverflowError:
         _reject_test_case()
-    print(date_range_kwargs)
-    return pd.timedelta_range(**date_range_kwargs)
+    return pd.timedelta_range(**timedelta_range_kwargs)
 
 
-def _get_pandas_range_kwargs_from(start: pd.Timestamp,
-                                  end: pd.Timestamp,
+def _get_pandas_range_kwargs_from(start: pd.datetime,
+                                  end: pd.datetime,
                                   periods: int,
-                                  freq: str,
+                                  freq: pd.Timedelta,
                                   element_to_exclude: str):
     range_kwargs = {
         'start': start,
         'end': end,
         'periods': periods,
-        'freq': _freq_to_timedelta(freq),
+        'freq': freq,
     }
     del range_kwargs[element_to_exclude]
     return range_kwargs
 
 
-def _initialize_start_date_end_date(start: pd.Timestamp,
-                                    end: pd.Timestamp):
+def _initialize_start_date_end_date(
+        start: pd.datetime,
+        end: pd.datetime
+) -> Tuple[pd.datetime, pd.datetime]:
     start = start if start is not None \
         else pd.Timestamp('1980-01-01')
     end = end if end is not None else pd.Timestamp('2020-01-01')
@@ -333,23 +351,27 @@ def _order_pair(element1: LazyStrategy,
                      end=element2).filter(lambda x: x[0] < x[1])
 
 
-def _expected_start_date_from(end: pd.Timestamp, periods: int, freq: str):
+def _expected_start_date_from(end: pd.datetime,
+                              periods: int,
+                              freq: str) -> pd.datetime:
     return end - periods * _freq_to_timedelta(freq)
 
 
-def _expected_end_date_from(start: pd.Timestamp, periods: int, freq: str):
+def _expected_end_date_from(start: pd.datetime,
+                            periods: int,
+                            freq: str) -> pd.datetime:
     return start + periods * _freq_to_timedelta(freq)
 
 
-def _expected_index_length_from(start: pd.Timestamp,
-                                end: pd.Timestamp,
-                                freq: str):
-    timedelta_freq = _freq_to_timedelta(freq)
-    expected_index_length = (end - start) // timedelta_freq
+def _expected_index_length_from(start: pd.datetime,
+                                end: pd.datetime,
+                                freq: pd.Timedelta) -> int:
+    expected_index_length = (end - start) // freq
     return expected_index_length
 
 
-def _freq_to_timedelta(freq: str, approximate_if_non_uniform: bool = True):
+def _freq_to_timedelta(freq: str,
+                       approximate_if_non_uniform: bool = True) -> pd.Timedelta:
     try:
         return pd.to_timedelta(f'1{freq}')
     except ValueError as e:
