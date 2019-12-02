@@ -225,7 +225,7 @@ def positive_bounded_integers(max_value):
 
 
 @defines_strategy
-def samples_from(iterable: Iterable[Generic]):
+def samples_from(iterable: Iterable):
     """ Strategy that samples from an iterable.
 
     Parameters
@@ -298,7 +298,9 @@ def period_range_args_from(draw,
 
 
 def period_range_args_are_correct(period_range_args: IndexRangeArgs,
-                                  max_length: int = 1000) -> bool:
+                                  max_length: int = 1000,
+                                  min_start: Optional[pd.Period] = None,
+                                  max_end: Optional[pd.Period] = None, ) -> bool:
     """ Returns True if the period range arguments are correct. i.e. if
     'periods' is not a key it checks that the length of the resulting period
     index is below ``max_length``.
@@ -310,15 +312,27 @@ def period_range_args_are_correct(period_range_args: IndexRangeArgs,
         'freq'.
 
     max_length : ``int``, optional, (default=1000)
+    min_start : ``pd.Period``, optional, (default=1000)
+    max_end : ``pd.Period``, optional, (default=1000
+
 
     Returns
     -------
     bool
     """
-    if 'periods' not in period_range_args:
-        return expected_index_length_from(**period_range_args) < max_length
-    else:
-        return True
+    min_start = min_start if min_start is not None else pd.Period('1980-01-01')
+    max_end = max_end if max_end is not None else pd.Period('2020-01-01')
+    try:
+        if 'periods' not in period_range_args:
+            return expected_index_length_from(**period_range_args) < max_length
+        elif 'start' not in period_range_args:
+            return expected_start_date_from(**period_range_args) >= min_start
+        elif 'end' not in period_range_args:
+            return expected_end_date_from(**period_range_args) <= max_end
+        else:
+            return True
+    except OverflowError:
+        return False
 
 
 def compute_period_range(period_range_args: IndexRangeArgs) -> pd.PeriodIndex:

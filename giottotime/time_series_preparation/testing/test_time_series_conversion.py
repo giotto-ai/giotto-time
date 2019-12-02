@@ -8,9 +8,8 @@ from hypothesis import given
 from hypothesis.strategies import lists, datetimes, floats, integers
 from hypothesis.extra.numpy import arrays
 from hypothesis.extra.pandas import series as pd_series
-from giottotime.core.hypothesis.time_indexes import available_freq, \
-    samples_from, pair_of_ordered_dates, series_with_datetime_index, \
-    available_str_freqs, series_with_period_index
+from giottotime.core.hypothesis.time_indexes import pair_of_ordered_dates, \
+    series_with_datetime_index, series_with_period_index, available_freqs
 
 
 from ..time_series_conversion import SequenceToPandasTimeSeries, \
@@ -22,7 +21,7 @@ max_date = pd.Timestamp('2020-01-01')
 
 class TestListToPandasTimeSeries:
 
-    @given(lists(floats()), datetimes(min_date, max_date), available_str_freqs())
+    @given(lists(floats()), datetimes(min_date, max_date), available_freqs())
     def test_list_start_date_freq_as_input(
             self,
             list_: List[float],
@@ -33,7 +32,7 @@ class TestListToPandasTimeSeries:
             list_, start_date=start_date, end_date=None, freq=freq
         )
 
-    @given(lists(floats()), datetimes(min_date, max_date), available_str_freqs())
+    @given(lists(floats()), datetimes(min_date, max_date), available_freqs())
     def test_list_end_date_freq_as_input(
             self,
             list_: List[float],
@@ -55,7 +54,7 @@ class TestListToPandasTimeSeries:
                 list_, *start_end_dates, freq=None,
             )
 
-    @given(lists(floats()), pair_of_ordered_dates(), available_str_freqs())
+    @given(lists(floats()), pair_of_ordered_dates(), available_freqs())
     def test_too_many_parameters(
             self,
             list_: List[float],
@@ -72,7 +71,7 @@ class TestArrayToPandasTimeSeries:
 
     @given(arrays(np.float64, integers(0, 1000)),
            datetimes(min_date, max_date),
-           available_str_freqs())
+           available_freqs())
     def test_array_start_date_freq_as_input(
             self,
             array: np.ndarray,
@@ -85,7 +84,7 @@ class TestArrayToPandasTimeSeries:
 
     @given(arrays(np.float64, integers(0, 1000)),
            datetimes(min_date, max_date),
-           available_str_freqs())
+           available_freqs())
     def test_array_end_date_freq_as_input(
             self,
             array: List[float],
@@ -109,7 +108,7 @@ class TestArrayToPandasTimeSeries:
 
     @given(arrays(np.float64, integers(0, 1000)),
            pair_of_ordered_dates(),
-           available_str_freqs())
+           available_freqs())
     def test_too_many_parameters(
             self,
             array: List[float],
@@ -126,7 +125,7 @@ class TestPandasSeriesToPandasTimeSeries:
 
     @given(pd_series(dtype=float),
            datetimes(min_date, max_date),
-           available_str_freqs())
+           available_freqs())
     def test_series_start_date_freq_as_input(
             self,
             series: pd.Series,
@@ -139,7 +138,7 @@ class TestPandasSeriesToPandasTimeSeries:
 
     @given(pd_series(dtype=float),
            datetimes(min_date, max_date),
-           available_str_freqs())
+           available_freqs())
     def test_series_end_date_freq_as_input(
             self,
             series: pd.Series,
@@ -161,7 +160,7 @@ class TestPandasSeriesToPandasTimeSeries:
                 series, *start_end_dates, freq=None,
             )
 
-    @given(pd_series(dtype=float), pair_of_ordered_dates(), available_str_freqs())
+    @given(pd_series(dtype=float), pair_of_ordered_dates(), available_freqs())
     def test_too_many_parameters(
             self,
             series: pd.Series,

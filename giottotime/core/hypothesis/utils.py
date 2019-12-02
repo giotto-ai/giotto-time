@@ -29,20 +29,20 @@ def order_pair(element1: LazyStrategy,
                      end=element2).filter(lambda x: x[0] < x[1])
 
 
-def expected_start_date_from(end: pd.datetime,
+def expected_start_date_from(end: Union[pd.datetime, pd.Period],
                              periods: int,
-                             freq: pd.Timedelta) -> pd.datetime:
+                             freq: pd.Timedelta) -> Union[pd.datetime, pd.Period]:
     return end - periods * freq
 
 
-def expected_end_date_from(start: pd.datetime,
+def expected_end_date_from(start: Union[pd.datetime, pd.Period],
                            periods: int,
-                           freq: pd.Timedelta) -> pd.datetime:
+                           freq: pd.Timedelta) -> Union[pd.datetime, pd.Period]:
     return start + periods * freq
 
 
-def expected_index_length_from(start: pd.datetime,
-                               end: pd.datetime,
+def expected_index_length_from(start: Union[pd.datetime, pd.Period],
+                               end: Union[pd.datetime, pd.Period],
                                freq: pd.Timedelta) -> int:
     expected_index_length = (end - start) // freq
     return expected_index_length
