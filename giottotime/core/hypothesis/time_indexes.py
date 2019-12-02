@@ -20,6 +20,20 @@ pandas_range_params = ['start', 'end', 'periods', 'freq']
 
 @defines_strategy
 @st.composite
+def giotto_time_series(draw,
+                       start_date: Optional[pd.Timestamp] = None,
+                       end_date: Optional[pd.Timestamp] = None,
+                       max_length: int = 1000,
+                       name: str = 'time_series'):
+    period_index_series = draw(series_with_period_index(start_date,
+                                                        end_date,
+                                                        max_length))
+    assume(period_index_series.shape[0] != 0)
+    return pd.DataFrame({name: period_index_series})
+
+
+@defines_strategy
+@st.composite
 def series_with_period_index(draw,
                              start: Optional[pd.datetime] = None,
                              end: Optional[pd.datetime] = None,
