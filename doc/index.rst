@@ -6,9 +6,26 @@
 Welcome to giottotime's API reference!
 ======================================
 
+.. include:: docs
 
-:mod:`giottotime.feature_creation`: Features Creation
-======================================================
+:mod:`giottotime.causality_tests`: Causality Tests
+====================================================
+
+.. automodule:: giottotime.causality_tests
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   causality_tests.ShiftedLinearCorrelation
+   causality_tests.ShiftedPearsonCorrelation
+
+:mod:`giottotime.feature_creation`: Feature Creation
+====================================================
 
 .. automodule:: giottotime.feature_creation
    :no-members:
@@ -22,3 +39,26 @@ Welcome to giottotime's API reference!
 
    feature_creation.FeaturesCreation
    feature_creation.ShiftFeature
+   feature_creation.MovingAverageFeature
+   feature_creation.ConstantFeature
+   feature_creation.PolynomialFeature
+   feature_creation.ExogenousFeature
+   feature_creation.CustomFeature
+   feature_creation.CalendarFeature
+   feature_creation.PeriodicSeasonalFeature
+
+:mod:`giottotime.feature_creation.tda_features` TDA Features
+============================================================
+
+.. automodule:: giottotime.feature_creation.tda_features
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   causality_tests.ShiftedLinearCorrelation
+   causality_tests.ShiftedPearsonCorrelation

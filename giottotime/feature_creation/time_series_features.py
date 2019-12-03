@@ -1,56 +1,238 @@
+from typing import Callable
+
 import pandas as pd
 
-from giottotime.feature_creation.base import TimeSeriesFeature
+from .base import TimeSeriesFeature
+
+__all__ = [
+    'ShiftFeature',
+    'MovingAverageFeature',
+    'ConstantFeature',
+    'PolynomialFeature',
+    'ExogenousFeature',
+    'CustomFeature',
+]
 
 
 class ShiftFeature(TimeSeriesFeature):
+    """Perform a shift of a DataFrame of size equal to ``shift``.
+
+    Parameters
+    ----------
+    shift : ``int``, required.
+        How much to shift.
+
+    output_name : ``str``, required.
+        The name of the output column.
+
     """
-    Tentative Docstring
-    """
-    def __init__(self, shift):
+    def __init__(self, shift: int, output_name: str):
+        super().__init__(output_name)
         self.shift = shift
 
-    def fit_transform(self, time_series):
-        return time_series.shift(self.shift)
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Create a shifted version of ``X``.
+
+        Parameters
+        ----------
+        X : ``pd.DataFrame``, required.
+            The DataFrame to shift.
+
+        Returns
+        -------
+        X_shifted_renamed : ``pd.DataFrame``
+            The shifted version of the original ``X``.
+
+        """
+        X_shifted = X.shift(self.shift)
+        X_shifted_renamed = self._rename_columns(X_shifted)
+        return X_shifted_renamed
 
 
 class MovingAverageFeature(TimeSeriesFeature):
-    def __init__(self, window_size):
+    """For each row in ``X``, compute the moving average of the previous
+     ``window_size`` rows. If there are not enough rows, the value is Nan.
+
+    Parameters
+    ----------
+    window_size : ``int``, required.
+        The number of previous points on which to compute the moving average
+
+    output_name : ``str``, required.
+        The name of the output column.
+
+    """
+    def __init__(self, window_size: int, output_name: str):
+        super().__init__(output_name)
         self.window_size = window_size
 
-    def fit_transform(self, time_series):
-        return time_series.rolling(self.window_size).mean().shift(1)
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Compute the moving average, for every row of ``X``, of the previous
+        ``window_size`` elements.
+
+        Parameters
+        ----------
+        X : ``pd.DataFrame``, required.
+            The DataFrame on which to compute the rolling moving average
+
+        Returns
+        -------
+        X_mov_avg_renamed : ``pd.DataFrame``
+            A DataFrame, with the same length as ``X``, containing the rolling
+            moving average for each element.
+
+        """
+        X_mov_avg = X.rolling(self.window_size).mean().shift(1)
+        X_mov_avg_renamed = self._rename_columns(X_mov_avg)
+        return X_mov_avg_renamed
 
 
 class ConstantFeature(TimeSeriesFeature):
-    def __init__(self, constant=1):
+    """Generate a constant Series, of the same length as the input ``X`` and
+    containing the value ``constant`` across the whole Series.
+
+    Parameters
+    ----------
+    constant : ``int``, required.
+        The value to use to generate the Series.
+
+    output_name : ``str``, required.
+        The name of the output column.
+
+    """
+    def __init__(self, constant: int, output_name: str):
+        super().__init__(output_name)
         self.constant = constant
 
-    def fit_transform(self, time_series):
-        return pd.Series(data=self.constant, index=time_series.index)
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Generate a constant Series, with the same length as ``X`` and with
+        the same index.
+
+        Parameters
+        ----------
+        X : ``pd.DataFrame``, required.
+            The input DataFrame. It is used only for its index.
+
+        Returns
+        -------
+        constant_series_renamed : ``pd.DataFrame``
+            A constant series, with the same length of ``X`` and with the same
+            index.
+
+        """
+        constant_series = pd.Series(data=self.constant, index=X.index)\
+            .to_frame()
+        constant_series_renamed = self._rename_columns(constant_series)
+        return constant_series_renamed
+
+
+class PolynomialFeature(TimeSeriesFeature):
+    """Compute the polynomial feature_creation, of a degree equal to the input
+    ``degree``.
+
+    Parameters
+    ----------
+    degree: ``int``, required.
+        The degree of the polynomial feature_creation.
+
+    output_name : ``str`, required.
+        The name of the output column.
+    """
+    def __init__(self, degree: int, output_name: str):
+        super().__init__(output_name)
+        self._degree = degree
+
+    # TODO: finish the polynomial feature_creation
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Compute the polynomial feature_creation of ``X``, up to a degree equal to
+        ``self._degree``.
+
+        Parameters
+        ----------
+        X : ``pd.DataFrame``, required.
+            The input DataFrame. Used only for its index.
+
+        Returns
+        -------
+        polynomial_features : ``pd.DataFrame``
+            The computed polynomial feature_creation.
+
+        """
+        pass
 
 
 class ExogenousFeature(TimeSeriesFeature):
-    def __init__(self, exogenous_time_series, name):
+    """Reindex ``exogenous_time_series`` with the index of ``X``.
+
+    Parameters
+    ----------
+    exogenous_time_series : ``pd.DataFrame``, required.
+        The time-series to reindex
+
+    output_name : ``str`, required.
+        The name of the output column.
+
+    """
+    def __init__(self, exogenous_time_series: pd.DataFrame, output_name: str):
+        super().__init__(output_name)
         self.exogenous_time_series = exogenous_time_series
-        self.name = name
 
-    def __repr__(self):
-        return "{class_name}({name})".format(class_name=self.__class__.__name__,
-                                             name=self.name)
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Reindex the ``exogenous_time_series`` with the index of ``X``.
 
-    def fit_transform(self, time_series):
-        return self.exogenous_time_series.reindex(index=time_series.index)
+        Parameters
+        ----------
+        X : ``pd.DataFrame``, required.
+            The input DataFrame. Used only for its index.
+
+        Returns
+        -------
+        exog_feature_renamed : ``pd.DataFrame`
+            The original ``exogenous_time_series``, re-indexed with the index
+            of ``X``.
+
+        """
+        exog_feature = self.exogenous_time_series.reindex(index=X.index)
+        exog_feature_renamed = self._rename_columns(exog_feature)
+        return exog_feature_renamed
 
 
 class CustomFeature(TimeSeriesFeature):
-    def __init__(self, custom_feature_function, **kwargs):
+    """Given a custom function, generate a Series.
+
+    Parameters
+    ----------
+    custom_feature_function`: ``Callable`, required.
+        The function to use to generate the Series containing the feature
+
+    output_name: ``str``, required.
+        The name of the output column.
+
+    kwargs : ``object``, optional.
+        Optional arguments to pass to the function.
+
+    """
+    def __init__(self, custom_feature_function: Callable, output_name: str,
+                 **kwargs: object):
+        super().__init__(output_name)
         self.custom_feature_function = custom_feature_function
         self.kwargs = kwargs
 
-    def __repr__(self):
-        return "{class_name}({function_name})".format(class_name=self.__class__.__name__,
-                                                      function_name=self.custom_feature_function.__name__)
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Generate a Series, given ``X`` as input to the
+        ``custom_feature_function``, as well as other optional arguments.
 
-    def fit_transform(self, time_series):
-        return self.custom_feature_function(time_series, **self.kwargs)
+        Parameters
+        ----------
+        X : ``pd.DataFrame``, required.
+            The DataFrame from which to generate the feature_creation
+
+        Returns
+        -------
+        custom_feature_renamed : ``pd.DataFrame``
+            A DataFrame containing the generated feature_creation.
+
+        """
+        custom_feature = self.custom_feature_function(X, **self.kwargs)
+        custom_feature_renamed = self._rename_columns(custom_feature)
+        return custom_feature_renamed
