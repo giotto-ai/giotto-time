@@ -6,10 +6,35 @@ from giottotime.causality_tests.base import CausalityTest
 
 
 class ShiftedPearsonCorrelation(CausalityTest):
+    """Class responsible for assessing the shifted Pearson correlations (PPMCC) between two or more series.
+
+    Parameters
+    ----------
+    """
     def __init__(self):
         pass
 
     def fit(self, data, max_shift=10):
+        """Create the dataframe of shifts of each time series which maximize
+        the Pearson correlation (PPMCC).
+
+        Parameters
+        ----------
+        data : ``pd.DataFrame``, required.
+            The time-series on which to compute the shifted colleations.
+
+        max_shift : ``int``, optional, (default=10).
+
+        Returns
+        -------
+        best_shifts, max_corrs: ``pd.DataFrame``, ``pd.DataFrame``.
+            best_shifts: The dataframe (Pivot table) of the shifts which
+            maximize the correlation between each timeseries.
+            The shift is indicated in rows.
+
+            max_corrs: The dataframe (Pivot table) of the maximum (over all
+            shifts) correlations between each pair of input timeseries.
+        """
         self.best_shifts_ = pd.DataFrame()
 
         for x, y in product(data.columns, repeat=2 ):
@@ -41,6 +66,30 @@ class ShiftedPearsonCorrelation(CausalityTest):
         return best_shifts, max_corrs
 
     def transform(self, data, target_col='y', dropna=False):
+        """Shifts each input timeseries but the amount which optimizes
+        correlation with the selected 'y' colums.
+
+        Parameters
+        ----------
+        data : ``pd.DataFrame``, required.
+            The time-series on which to perform the transformation.
+
+        target_col : optional, (default='y').
+            The column to use as the a reference (i.e., the columns which is not shifted).
+
+        dropna : ``bool``, optional, (default=False).
+            Determins if the Nan values created by shifting are retained or dropped.
+
+        Returns
+        -------
+        best_shifts, max_corrs: ``pd.DataFrame``, ``pd.DataFrame``.
+            best_shifts: The dataframe (Pivot table) of the shifts which
+            maximize the correlation between each timeseries.
+            The shift is indicated in rows.
+
+            max_corrs: The dataframe (Pivot table) of the maximum (over all
+            shifts) correlations between each pair of input timeseries.
+        """
         for col in data:
             data[col] = data[col].shift(self.best_shifts_[col][target_col])
         if dropna:

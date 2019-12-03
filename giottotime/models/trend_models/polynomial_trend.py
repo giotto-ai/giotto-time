@@ -30,16 +30,16 @@ class PolynomialTrend(TrendModel):
 
         model_weights = np.zeros(self.order)
         res = minimize(prediction_error, model_weights, method=method, options={'disp': False})
-        self.model_weights = res['x']
+        self.model_params_ = res['x']
         return self
 
     def predict(self, t):
-        p = np.poly1d(self.model_weights)
+        p = np.poly1d(self.model_params_)
         return p(t)
 
     def transform(self, time_series):
         #check fit run
-        p = np.poly1d( self.model_weights )
+        p = np.poly1d( self.model_params_ )
         predictions = pd.DataFrame( index=time_series.index, data=[ p(t) for t in range( 0, time_series.shape[0] ) ] )
         return time_series - predictions[0]
 

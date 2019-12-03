@@ -3,7 +3,12 @@ from abc import ABCMeta, abstractmethod
 
 
 class CausalityTest(metaclass=ABCMeta):
+    """ Base class for causality tests. The children classes must implement
+    the fit and transform methods.
 
+    Both the data_matrix dataframe must be passed in the fit method.
+    Both the time_series dataframe must be passed in the transform method.
+    """
     @abstractmethod
     def fit(self, data_matrix):
         pass

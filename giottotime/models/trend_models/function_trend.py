@@ -20,9 +20,8 @@ class FunctionTrend(TrendModel):
     must accept y_true, y_pred and return a single real number.
 
     """
-    def __init__(self, model_form,  model_weights, loss=mean_squared_error):
+    def __init__(self, model_form, loss=mean_squared_error):
         self.model_form = model_form
-        self.model_weights = model_weights
         self.loss = loss
 
     def fit(self, time_series, model_form, method="BFGS"):
@@ -30,17 +29,15 @@ class FunctionTrend(TrendModel):
             predictions = [ self.model_form( t, model_weights ) for t in range( 0, time_series.shape[0] ) ]
             return self.loss(time_series.values, predictions)
 
-        model_weights = np.zeros(self.order)
         res = minimize(prediction_error, model_weights, method=method, options={'disp': False})
-        self.model_weights = res['x']
+        self.model_weights_ = res['x']
         return self
 
     def predict(self, t):
         #check fit run
-        #predictions = pd.DataFrame(index=X.index, data=[ p(t) for t in range( 0, X.shape[0] )   ])
-        return self.model_form( t, self.model_weights )
+        return self.model_form( t, self.model_weights_ )
 
     def transform(self, time_series):
         #check fit run
-        predictions = pd.DataFrame( index=time_series.index, data=[ self.model_form( t, sefl.model_weights ) for t in range( 0, time_series.shape[0] ) ] )
+        predictions = pd.DataFrame( index=time_series.index, data=[ self.model_form( t, self.model_weights_ ) for t in range( 0, time_series.shape[0] ) ] )
         return time_series - predictions[0]
