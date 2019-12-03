@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Union, Iterable, Generic
+from typing import Optional, Dict, Union, Iterable
 
 import hypothesis.strategies as st
 import numpy as np
@@ -334,13 +334,17 @@ def period_range_args_are_correct(period_range_args: IndexRangeArgs,
     -------
     bool
     """
-    min_start = min_start if min_start is not None else pd.Period('1980-01-01')
-    max_end = max_end if max_end is not None else pd.Period('2020-01-01')
+    min_start = min_start if min_start is not None else pd.Timestamp('1980-01-01')
+    max_end = max_end if max_end is not None else pd.Timestamp('2020-01-01')
     try:
         if 'periods' not in period_range_args:
             return expected_index_length_from(**period_range_args) < max_length
         elif 'start' not in period_range_args:
-            return expected_start_date_from(**period_range_args) >= min_start
+            try:
+                return expected_start_date_from(**period_range_args) >= min_start
+            except Exception as e:
+                print(period_range_args, min_start)
+                raise e
         elif 'end' not in period_range_args:
             return expected_end_date_from(**period_range_args) <= max_end
         else:

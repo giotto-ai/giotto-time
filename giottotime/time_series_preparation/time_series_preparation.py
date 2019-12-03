@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Union
 from numbers import Number
 
 import numpy as np
@@ -31,7 +31,7 @@ class TimeSeriesPreparation:
             self.start_date, self.end_date, self.freq
         )
 
-    def fit_transform(self, array_like_object: Any[List, np.array, pd.Series]):
+    def fit_transform(self, array_like_object: Union[List, np.array, pd.Series]):
         pandas_time_series = self._to_pandas_time_series(array_like_object)
         equispaced_time_series = self._to_equispaced_time_series(pandas_time_series)
         period_index_time_series = self._to_period_index_time_series(equispaced_time_series)
@@ -54,5 +54,3 @@ class TimeSeriesPreparation:
     def _to_period_index_time_series(self, time_series):
         raise NotImplementedError
 
-
-c

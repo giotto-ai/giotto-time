@@ -1,6 +1,4 @@
 from hypothesis import given
-import hypothesis.strategies as st
-import pandas as pd
 
 from ..time_indexes import *
 
@@ -8,11 +6,11 @@ from ..time_indexes import *
 class TestPeriodIndex:
 
     @given(period_indexes())
-    def test_period_indexes_is_datetime(self, index):
+    def test_period_indexes_is_period(self, index):
         assert isinstance(index, pd.PeriodIndex)
 
     @given(period_indexes(max_length=1000))
-    def test_datetime_indexes_size(self, index):
+    def test_period_indexes_size(self, index):
         assert len(index) <= 1000
 
     @given(period_indexes())
@@ -119,7 +117,7 @@ class TestTimedeltaSeries:
 
     @given(series_with_timedelta_index())
     def test_timedelta_series_boundaries(self, series):
-        start_timedelta, end_timedelta = pd.Timedelta(0), pd.Timedelta('40y')
+        start_timedelta, end_timedelta = pd.Timedelta(0), pd.Timedelta('41y')
         if len(series):
             assert series.index[0] >= start_timedelta
             assert series.index[-1] <= end_timedelta

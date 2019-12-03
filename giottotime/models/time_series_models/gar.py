@@ -3,7 +3,7 @@ from typing import Union, Dict, Optional
 
 import pandas as pd
 
-from giottotime.models.utils import check_is_fitted
+from .utils import check_is_fitted
 
 
 def check_input(X, y=None):
