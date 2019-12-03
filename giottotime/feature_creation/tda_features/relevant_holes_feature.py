@@ -3,8 +3,10 @@ from typing import Iterable, List, Optional, Union, Callable
 import numpy as np
 import pandas as pd
 
-from giottotime.features.tda_features.base import \
+from giottotime.feature_creation.tda_features.base import \
     TDAFeatures, _align_indices
+
+__all__ = ['NumberOfRelevantHolesFeature']
 
 
 class NumberOfRelevantHolesFeature(TDAFeatures):
@@ -21,7 +23,6 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
 
     theta: ``float``, optional, (default=``0.7``)
         Constant used to set the threshold in the computation of the holes
-
     interpolation_strategy : ``str``, optional, (default=``ffill``)
         The interpolation strategy to use to fill the values
 
@@ -31,7 +32,7 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         are used directly in :meth:`transform`. If set to ``'search'``,
         those values are only used as upper bounds in a search as follows:
         first, an optimal time delay is found by minimising the time delayed
-        mutual information; then, a heuristic based on an algorithm in [2]_ is
+        mutual information; then, a heuristic based on an algorithm in is
         used to select an embedding dimension which, when increased, does not
         reveal a large proportion of "false nearest neighbors".
 

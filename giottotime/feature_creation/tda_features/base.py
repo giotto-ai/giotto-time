@@ -8,7 +8,9 @@ import giotto.diagrams as diag
 import giotto.homology as hl
 import pandas as pd
 
-from giottotime.features.base import TimeSeriesFeature
+from giottotime.feature_creation.base import TimeSeriesFeature
+
+__all__ = ['TDAFeatures']
 
 
 def _align_indices(X: pd.DataFrame, n_points: int,
