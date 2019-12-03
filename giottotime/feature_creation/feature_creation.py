@@ -7,7 +7,7 @@ from giottotime.features.time_series_features import ShiftFeature
 
 
 class FeaturesCreation:
-    """Class responsible for the generation of the features_creation, starting from a
+    """Class responsible for the generation of the feature_creation, starting from a
     list of ``TimeSeriesFeature``.
 
     Parameters
@@ -18,7 +18,7 @@ class FeaturesCreation:
         on y.
 
     time_series_features : ``List[TimeSeriesFeature]``, required.
-        The list of ``TimeSeriesFeature`` from which to compute the features_creation.
+        The list of ``TimeSeriesFeature`` from which to compute the feature_creation.
 
     """
     def __init__(self, horizon: int,
@@ -28,7 +28,7 @@ class FeaturesCreation:
 
     def fit_transform(self, time_series: pd.DataFrame) \
             -> (pd.DataFrame, pd.DataFrame):
-        """Create the X matrix by generating the features_creation, starting from the
+        """Create the X matrix by generating the feature_creation, starting from the
         original ``time_series`` and using the list of ``time_series_features``.
         Also create the y matrix, by generating ``horizon`` number of shifts
         of the ``time_series``.
@@ -71,7 +71,7 @@ class FeaturesCreation:
         return y
 
     def _create_x_features(self, time_series: pd.DataFrame) -> pd.DataFrame:
-        """Create a DataFrame, containing a set of features_creation generated from the
+        """Create a DataFrame, containing a set of feature_creation generated from the
         ``time_series`` and using the ``time_series_features``.
 
         Parameters
@@ -81,8 +81,8 @@ class FeaturesCreation:
 
         Returns
         -------
-        features_creation : ``pd.DataFrame``
-            The DataFrame containing the features_creation.
+        feature_creation : ``pd.DataFrame``
+            The DataFrame containing the feature_creation.
 
         """
         features = pd.DataFrame(index=time_series.index)
