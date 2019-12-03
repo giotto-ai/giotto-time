@@ -271,7 +271,7 @@ class TestCustomFeature:
 
     def test_correct_custom_feature(self):
         output_name = 'custom'
-        power = ''
+        power = 3
         df = pd.DataFrame.from_dict({output_name: [0, 1, 2, 3, 4, 5]})
 
         custom_feature = CustomFeature(
