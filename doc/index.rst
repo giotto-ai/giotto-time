@@ -22,6 +22,33 @@ Welcome to giottotime's API reference!
    causality_tests.ShiftedLinearCoefficient
    causality_tests.ShiftedPearsonCorrelation
 
+:mod:`giottotime.feature_creation`: Feature Creation
+====================================================
+
+.. automodule:: giottotime.feature_creation
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   feature_creation.FeaturesCreation
+   feature_creation.ShiftFeature
+   feature_creation.MovingAverageFeature
+   feature_creation.ConstantFeature
+   feature_creation.PolynomialFeature
+   feature_creation.ExogenousFeature
+   feature_creation.CustomFeature
+   feature_creation.CalendarFeature
+   feature_creation.PeriodicSeasonalFeature
+   feature_creation.DetrendedFeature
+   feature_creation.RemovePolynomialTrend
+   feature_creation.RemoveExponentialTrend
+   feature_creation.RemoveFunctionTrend
+
 :mod:`giottotime.feature_creation.tda_features`: TDA Features
 =============================================================
 
@@ -40,10 +67,10 @@ Welcome to giottotime's API reference!
    feature_creation.tda_features.BettiCurvesFeature
    feature_creation.tda_features.NumberOfRelevantHolesFeature
 
-:mod:`giottotime.time_series_preparation`: Time Series Preparation
-==================================================================
+:mod:`giottotime.models.time_series_models`: Time Series Models
+====================================================
 
-.. automodule:: giottotime.time_series_preparation
+.. automodule:: giottotime.models.time_series_models
    :no-members:
    :no-inherited-members:
 
@@ -53,4 +80,38 @@ Welcome to giottotime's API reference!
    :toctree: generated/
    :template: class.rst
 
-   time_series_preparation.TimeSeriesPreparation
+   models.time_series_models.GAR
+
+:mod:`giottotime.models.trend_models`: Trend Models
+====================================================
+
+.. automodule:: giottotime.models.trend_models
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   models.trend_models.TrendModel
+   models.trend_models.CustomTrendForm_ts
+   models.trend_models.ExponentialTrend
+   models.trend_models.FunctionTrend
+   models.trend_models.PolynomialTrend
+
+:mod:`giottotime.models.regressors`: Regressor Models
+====================================================
+
+.. automodule:: giottotime.models.regressors
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   models.regressors.LinearRegressor
