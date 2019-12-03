@@ -1,7 +1,7 @@
 from sklearn.metrics import mean_squared_error
 
-from giottotime.features.base import TimeSeriesFeature
-from giottotime.models.trend_models import PolynomialTrend
+from giottotime.feature_creation.base import TimeSeriesFeature
+from giottotime.models.trend_models.polynomial_trend import PolynomialTrend
 from giottotime.models.trend_models.exponential_trend import ExponentialTrend
 
 

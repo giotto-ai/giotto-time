@@ -135,7 +135,7 @@ class PolynomialFeature(TimeSeriesFeature):
     degree: ``int``, required.
         The degree of the polynomial feature_creation.
 
-    output_name : ``str`, required.
+    output_name : ``str``, required.
         The name of the output column.
     """
     def __init__(self, degree: int, output_name: str):
@@ -169,7 +169,7 @@ class ExogenousFeature(TimeSeriesFeature):
     exogenous_time_series : ``pd.DataFrame``, required.
         The time-series to reindex
 
-    output_name : ``str`, required.
+    output_name : ``str``, required.
         The name of the output column.
 
     """
@@ -187,7 +187,7 @@ class ExogenousFeature(TimeSeriesFeature):
 
         Returns
         -------
-        exog_feature_renamed : ``pd.DataFrame`
+        exog_feature_renamed : ``pd.DataFrame``
             The original ``exogenous_time_series``, re-indexed with the index
             of ``X``.
 

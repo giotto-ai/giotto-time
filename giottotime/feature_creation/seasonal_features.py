@@ -3,7 +3,7 @@ from typing import Union
 import numpy as np
 import pandas as pd
 
-from giottotime.features.base import TimeSeriesFeature
+from giottotime.feature_creation.base import TimeSeriesFeature
 
 
 class PeriodicSeasonalFeature(TimeSeriesFeature):
