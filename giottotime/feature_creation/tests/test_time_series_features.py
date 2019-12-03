@@ -14,7 +14,7 @@ class TestShiftFeature:
         return df.shift(shift)
 
     def test_forward_time_shift_feature(self):
-        output_name = "shift"
+        output_name = 'shift'
         df = pd.DataFrame.from_dict({output_name: [0, 1, 2, 3, 4, 5]})
 
         shift_feature = ShiftFeature(shift=1, output_name=output_name)
@@ -25,7 +25,7 @@ class TestShiftFeature:
         testing.assert_frame_equal(expected_df, df_shifted)
 
     def test_backwards_time_shift_feature(self):
-        output_name = "shift"
+        output_name = 'shift'
         df = pd.DataFrame.from_dict({output_name: [0, 1, 2, 3, 4, 5]})
 
         shift_feature = ShiftFeature(shift=-2, output_name=output_name)
@@ -36,7 +36,7 @@ class TestShiftFeature:
         testing.assert_frame_equal(expected_df, df_shifted)
 
     def test_zero_shift_feature(self):
-        output_name = "shift"
+        output_name = 'shift'
         df = pd.DataFrame.from_dict({output_name: [0, 1, 2, 3, 4, 5]})
 
         shift_feature = ShiftFeature(shift=0, output_name=output_name)
@@ -50,7 +50,7 @@ class TestShiftFeature:
                               ),
            st.integers(0, 200))
     def test_random_ts_and_shifts(self, df: pd.DataFrame, shift: int):
-        output_name = "time_series"
+        output_name = 'time_series'
         shift_feature = ShiftFeature(shift=shift, output_name=output_name)
 
         df_shifted = shift_feature.fit_transform(df)
@@ -64,7 +64,7 @@ class TestMovingAverageFeature:
         return df.rolling(window_size).mean().shift(1)
 
     def test_invalid_window_size(self):
-        output_name = "moving_average"
+        output_name = 'moving_average'
         window_size = -1
         df = pd.DataFrame.from_dict({output_name: [0, 1, 2, 3, 4, 5]})
 
@@ -74,7 +74,7 @@ class TestMovingAverageFeature:
             ma_feature.fit_transform(df)
 
     def test_positive_window_size(self):
-        output_name = "moving_average"
+        output_name = 'moving_average'
         window_size = 2
         df = pd.DataFrame.from_dict({output_name: [0, 1, 2, 3, 4, 5]})
 
@@ -92,7 +92,7 @@ class TestMovingAverageFeature:
            st.integers(0, 100))
     def test_random_ts_and_window_size(self, df: pd.DataFrame,
                                        window_size: int):
-        output_name = "time_series"
+        output_name = 'time_series'
 
         ma_feature = MovingAverageFeature(window_size=window_size,
                                           output_name=output_name)
@@ -110,7 +110,7 @@ class TestConstantFeature:
         return constant_series.to_frame()
 
     def test_correct_constant_feature(self):
-        output_name = "constant_feature"
+        output_name = 'constant_feature'
         constant = 12
         df = pd.DataFrame.from_dict({output_name: [0, 1, 2, 3, 4, 5]})
 
@@ -129,7 +129,7 @@ class TestConstantFeature:
                               ),
            st.integers(0, 100))
     def test_random_ts_and_constant(self, df: pd.DataFrame, constant: int):
-        output_name = "time_series"
+        output_name = 'time_series'
 
         constant_feature = ConstantFeature(constant=constant,
                                            output_name=output_name)
@@ -145,47 +145,118 @@ class TestExogenousFeature:
             -> pd.DataFrame:
         return exog.reindex(index=df.index)
 
-    def test_correct_exog(self):
-        output_name = "exog"
+    def test_correct_exog_none_method(self):
+        output_name = 'exog'
+        method = None
         exog = pd.DataFrame.from_dict({output_name: [0, 1, 2, 3]})
         exog.index = ([pd.Timestamp(2000, 1, 1),
-                        pd.Timestamp(2000, 2, 1),
-                        pd.Timestamp(2000, 3, 1),
-                        pd.Timestamp(2000, 4, 1)])
+                       pd.Timestamp(2000, 2, 1),
+                       pd.Timestamp(2000, 3, 1),
+                       pd.Timestamp(2000, 4, 1)])
 
         df = pd.DataFrame.from_dict({output_name: [10, 11, 12, 13]})
         df.index = ([pd.Timestamp(2000, 1, 1),
-                      pd.Timestamp(2000, 1, 2),
-                      pd.Timestamp(2000, 1, 3),
-                      pd.Timestamp(2000, 1, 4)])
+                     pd.Timestamp(2000, 1, 2),
+                     pd.Timestamp(2000, 1, 3),
+                     pd.Timestamp(2000, 1, 4)])
 
         exog_feature = ExogenousFeature(exogenous_time_series=exog,
-                                        output_name=output_name)
+                                        output_name=output_name,
+                                        method=method)
 
         new_exog_feature = exog_feature.fit_transform(df)
-        expected_exog = self._correct_exog(exog, df)
+        expected_exog = pd.DataFrame.from_dict({output_name: [0,
+                                                              np.nan,
+                                                              np.nan,
+                                                              np.nan]})
+        expected_exog.index = ([pd.Timestamp(2000, 1, 1),
+                                pd.Timestamp(2000, 1, 2),
+                                pd.Timestamp(2000, 1, 3),
+                                pd.Timestamp(2000, 1, 4)])
 
         testing.assert_frame_equal(expected_exog, new_exog_feature)
 
-    @pytest.mark.skip(reason='to be fixed')
-    @settings(max_examples=10)
-    @given(giotto_time_series(start_date=pd.Timestamp(2000, 1, 1),
-                              end_date=pd.Timestamp(2010, 1, 1)
-                              ),
-           giotto_time_series(start_date=pd.Timestamp(2000, 1, 1),
-                              end_date=pd.Timestamp(2010, 1, 1)
-                              )
-           )
-    def test_random_ts_and_exog(self, exog: pd.DataFrame, df: pd.DataFrame):
-        output_name = "time_series"
+    def test_correct_exog_backfill_method(self):
+        output_name = 'exog'
+        method = 'backfill'
+        exog = pd.DataFrame.from_dict({output_name: [0, 1, 2, 3]})
+        exog.index = ([pd.Timestamp(2000, 1, 1),
+                       pd.Timestamp(2000, 2, 1),
+                       pd.Timestamp(2000, 3, 1),
+                       pd.Timestamp(2000, 4, 1)])
+
+        df = pd.DataFrame.from_dict({output_name: [10, 11, 12, 13]})
+        df.index = ([pd.Timestamp(2000, 1, 1),
+                     pd.Timestamp(2000, 1, 2),
+                     pd.Timestamp(2000, 1, 3),
+                     pd.Timestamp(2000, 1, 4)])
 
         exog_feature = ExogenousFeature(exogenous_time_series=exog,
-                                        output_name=output_name)
+                                        output_name=output_name,
+                                        method=method)
 
-        print(df)
-        print(exog)
         new_exog_feature = exog_feature.fit_transform(df)
-        expected_exog = self._correct_exog(exog, df)
+        expected_exog = pd.DataFrame.from_dict({output_name: [0, 1, 1, 1]})
+        expected_exog.index = ([pd.Timestamp(2000, 1, 1),
+                                pd.Timestamp(2000, 1, 2),
+                                pd.Timestamp(2000, 1, 3),
+                                pd.Timestamp(2000, 1, 4)])
+
+        testing.assert_frame_equal(expected_exog, new_exog_feature)
+
+    def test_correct_exog_pad_method(self):
+        output_name = 'exog'
+        method = 'pad'
+        exog = pd.DataFrame.from_dict({output_name: [0, 1, 2, 3]})
+        exog.index = ([pd.Timestamp(2000, 1, 1),
+                       pd.Timestamp(2000, 2, 1),
+                       pd.Timestamp(2000, 3, 1),
+                       pd.Timestamp(2000, 4, 1)])
+
+        df = pd.DataFrame.from_dict({output_name: [10, 11, 12, 13]})
+        df.index = ([pd.Timestamp(2000, 1, 1),
+                     pd.Timestamp(2000, 1, 2),
+                     pd.Timestamp(2000, 1, 3),
+                     pd.Timestamp(2000, 1, 4)])
+
+        exog_feature = ExogenousFeature(exogenous_time_series=exog,
+                                        output_name=output_name,
+                                        method=method)
+
+        new_exog_feature = exog_feature.fit_transform(df)
+        expected_exog = pd.DataFrame.from_dict({output_name: [0, 0, 0, 0]})
+        expected_exog.index = ([pd.Timestamp(2000, 1, 1),
+                                pd.Timestamp(2000, 1, 2),
+                                pd.Timestamp(2000, 1, 3),
+                                pd.Timestamp(2000, 1, 4)])
+
+        testing.assert_frame_equal(expected_exog, new_exog_feature)
+
+    def test_correct_nearest_pad_method(self):
+        output_name = 'exog'
+        method = 'nearest'
+        exog = pd.DataFrame.from_dict({output_name: [0, 1, 2, 3]})
+        exog.index = ([pd.Timestamp(2000, 1, 1),
+                       pd.Timestamp(2000, 2, 1),
+                       pd.Timestamp(2000, 3, 1),
+                       pd.Timestamp(2000, 4, 1)])
+
+        df = pd.DataFrame.from_dict({output_name: [10, 11, 12, 13]})
+        df.index = ([pd.Timestamp(2000, 1, 1),
+                     pd.Timestamp(2000, 1, 2),
+                     pd.Timestamp(2000, 1, 3),
+                     pd.Timestamp(2000, 1, 29)])
+
+        exog_feature = ExogenousFeature(exogenous_time_series=exog,
+                                        output_name=output_name,
+                                        method=method)
+
+        new_exog_feature = exog_feature.fit_transform(df)
+        expected_exog = pd.DataFrame.from_dict({output_name: [0, 0, 0, 1]})
+        expected_exog.index = ([pd.Timestamp(2000, 1, 1),
+                                pd.Timestamp(2000, 1, 2),
+                                pd.Timestamp(2000, 1, 3),
+                                pd.Timestamp(2000, 1, 29)])
 
         testing.assert_frame_equal(expected_exog, new_exog_feature)
 
@@ -199,8 +270,8 @@ class TestCustomFeature:
         return np.power(df, power)
 
     def test_correct_custom_feature(self):
-        output_name = "custom"
-        power = 3
+        output_name = 'custom'
+        power = ''
         df = pd.DataFrame.from_dict({output_name: [0, 1, 2, 3, 4, 5]})
 
         custom_feature = CustomFeature(
@@ -221,7 +292,7 @@ class TestCustomFeature:
            st.integers(0, 10)
            )
     def test_random_ts_and_power(self, df: pd.DataFrame, power: int):
-        output_name = "time_series"
+        output_name = 'time_series'
 
         custom_feature = CustomFeature(self.df_to_power, output_name,
                                        power=power)
