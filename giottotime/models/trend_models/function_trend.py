@@ -21,7 +21,6 @@ class FunctionTrend(TrendModel):
         accept y_true, y_pred and return a single real number.
 
     """
-
     def __init__(self, model_form, loss=mean_squared_error):
         self.model_form = model_form
         self.loss = loss
@@ -32,7 +31,7 @@ class FunctionTrend(TrendModel):
                            range(0, time_series.shape[0])]
             return self.loss(time_series.values, predictions)
 
-        res = minimize(prediction_error, model_weights, method=method,
+        res = minimize(prediction_error, [0.0, 0.0], method=method,
                        options={'disp': False})
         self.model_weights_ = res['x']
         return self
