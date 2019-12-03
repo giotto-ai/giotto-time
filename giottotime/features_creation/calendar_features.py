@@ -1,12 +1,30 @@
 import importlib
-from datetime import datetime
+from typing import Optional
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy import signal
 
-year = datetime.now().year
+from .base import TimeSeriesFeature
+
+
+class CalendarFeature(TimeSeriesFeature):
+
+    def __init__(self,
+                 region: str = 'america',
+                 country: str = 'Brazil',
+                 start_date: str = '01/01/2018',
+                 end_date: str = '01/01/2020',
+                 kernel: Optional[np.ndarray] = None,
+                 output_name: str = 'calendar_feature'):
+        super().__init__(output_name)
+        self.region = region
+        self.country = country
+        self.start_date = start_date
+        self.end_date = end_date
+        self.kernel = kernel
+
+    def transform(self, X: pd.DataFrame = None) -> pd.DataFrame:
+        raise NotImplementedError
 
 
 def holiday_ts(region="america", country="Brazil", start_date='01/01/2018',
@@ -50,17 +68,3 @@ def holiday_ts(region="america", country="Brazil", start_date='01/01/2018',
             ip)
 
         return events
-
-
-###########################################################################
-
-if __name__ == "__main__":
-    # kernel = list( range(1,11) ) + list( range(-10,1) )
-
-    kernel = signal.parzen(20)  # list( range(1, 11) )
-
-    e = holiday_ts(region="asia", country="Qatar", kernel=kernel)
-    print(e)
-
-    e.plot()
-    plt.show()

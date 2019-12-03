@@ -91,7 +91,7 @@ target/
 # Mypy cache
 .mypy_cache/
 
-# ignore huge models
+# ignore huge time_series_models
 models/*.joblib
 
 # Hypothesis

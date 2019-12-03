@@ -6,11 +6,14 @@
 Welcome to giottotime's API reference!
 ======================================
 
+Hello, how are you?
 
-:mod:`giottotime.feature_creation`: Features Creation
-======================================================
+.. include:: docs
 
-.. automodule:: giottotime.feature_creation
+:mod:`giottotime.models`: Models
+====================================
+
+.. automodule:: giottotime.models
    :no-members:
    :no-inherited-members:
 
@@ -20,5 +23,20 @@ Welcome to giottotime's API reference!
    :toctree: generated/
    :template: class.rst
 
-   feature_creation.FeaturesCreation
-   feature_creation.ShiftFeature
+   models.GAR
+
+:mod:`giottotime.features.feature_creation`: Features Creation
+======================================================
+
+.. automodule:: giottotime.features.feature_creation
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   features.feature_creation.time_series_features.FeaturesCreation
+   features.feature_creation.time_series_features.ShiftFeature

@@ -8,9 +8,9 @@ from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression
 
 
-from giottotime.features.features_creation.feature_creation import \
+from giottotime.features.feature_creation import \
     FeaturesCreation
-from giottotime.features.features_creation.time_series_features import \
+from giottotime.features.time_series_features import \
     MovingAverageFeature, ConstantFeature, ShiftFeature
 from giottotime.features.utils import split_train_test
 from giottotime.models.gar import GAR

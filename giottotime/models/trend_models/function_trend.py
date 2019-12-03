@@ -4,6 +4,9 @@ from scipy.optimize import minimize
 import numpy as np
 import pandas as pd
 
+from giottotime.models.trend_models.base import TrendModel
+
+
 class FunctionTrend(TrendModel):
     """
     A model for fitting, predicting and removing an custom functional trend from a time series.

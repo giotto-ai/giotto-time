@@ -2,7 +2,7 @@ from typing import Callable
 
 import pandas as pd
 
-from giottotime.features.features_creation.base import TimeSeriesFeature
+from giottotime.features.base import TimeSeriesFeature
 
 
 class ShiftFeature(TimeSeriesFeature):
@@ -118,13 +118,13 @@ class ConstantFeature(TimeSeriesFeature):
 
 
 class PolynomialFeature(TimeSeriesFeature):
-    """Compute the polynomial features, of a degree equal to the input
+    """Compute the polynomial features_creation, of a degree equal to the input
     ``degree``.
 
     Parameters
     ----------
     degree: ``int``, required.
-        The degree of the polynomial features.
+        The degree of the polynomial features_creation.
 
     output_name : ``str`, required.
         The name of the output column.
@@ -133,9 +133,9 @@ class PolynomialFeature(TimeSeriesFeature):
         super().__init__(output_name)
         self._degree = degree
 
-    # TODO: finish the polynomial features
+    # TODO: finish the polynomial features_creation
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Compute the polynomial features of ``X``, up to a degree equal to
+        """Compute the polynomial features_creation of ``X``, up to a degree equal to
         ``self._degree``.
 
         Parameters
@@ -146,7 +146,7 @@ class PolynomialFeature(TimeSeriesFeature):
         Returns
         -------
         polynomial_features : ``pd.DataFrame``
-            The computed polynomial features.
+            The computed polynomial features_creation.
 
         """
         pass
@@ -216,12 +216,12 @@ class CustomFeature(TimeSeriesFeature):
         Parameters
         ----------
         X : ``pd.DataFrame``, required.
-            The DataFrame from which to generate the features
+            The DataFrame from which to generate the features_creation
 
         Returns
         -------
         custom_feature_renamed : ``pd.DataFrame``
-            A DataFrame containing the generated features.
+            A DataFrame containing the generated features_creation.
 
         """
         custom_feature = self.custom_feature_function(X, **self.kwargs)

@@ -2,13 +2,12 @@ from typing import List
 
 import pandas as pd
 
-from giottotime.features.features_creation.base import TimeSeriesFeature
-from giottotime.features.features_creation.time_series_features import ShiftFeature
-from giottotime.features.utils import _get_non_nan_values
+from giottotime.features.base import TimeSeriesFeature
+from giottotime.features.time_series_features import ShiftFeature
 
 
 class FeaturesCreation:
-    """Class responsible for the generation of the features, starting from a
+    """Class responsible for the generation of the features_creation, starting from a
     list of ``TimeSeriesFeature``.
 
     Parameters
@@ -19,7 +18,7 @@ class FeaturesCreation:
         on y.
 
     time_series_features : ``List[TimeSeriesFeature]``, required.
-        The list of ``TimeSeriesFeature`` from which to compute the features.
+        The list of ``TimeSeriesFeature`` from which to compute the features_creation.
 
     """
     def __init__(self, horizon: int,
@@ -29,7 +28,7 @@ class FeaturesCreation:
 
     def fit_transform(self, time_series: pd.DataFrame) \
             -> (pd.DataFrame, pd.DataFrame):
-        """Create the X matrix by generating the features, starting from the
+        """Create the X matrix by generating the features_creation, starting from the
         original ``time_series`` and using the list of ``time_series_features``.
         Also create the y matrix, by generating ``horizon`` number of shifts
         of the ``time_series``.
@@ -72,7 +71,7 @@ class FeaturesCreation:
         return y
 
     def _create_x_features(self, time_series: pd.DataFrame) -> pd.DataFrame:
-        """Create a DataFrame, containing a set of features generated from the
+        """Create a DataFrame, containing a set of features_creation generated from the
         ``time_series`` and using the ``time_series_features``.
 
         Parameters
@@ -82,8 +81,8 @@ class FeaturesCreation:
 
         Returns
         -------
-        features : ``pd.DataFrame``
-            The DataFrame containing the features.
+        features_creation : ``pd.DataFrame``
+            The DataFrame containing the features_creation.
 
         """
         features = pd.DataFrame(index=time_series.index)
