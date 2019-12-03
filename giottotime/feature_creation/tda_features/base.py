@@ -10,6 +10,8 @@ import pandas as pd
 
 from giottotime.feature_creation.base import TimeSeriesFeature
 
+__all__ = ['TDAFeatures']
+
 
 def _align_indices(X: pd.DataFrame, n_points: int,
                    tda_feature_values: Union[List, np.ndarray]) -> pd.DataFrame:

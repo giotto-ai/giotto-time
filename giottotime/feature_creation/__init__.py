@@ -13,4 +13,5 @@ __all__ = [
     'CustomFeature',
     'CalendarFeature',
     'PeriodicSeasonalFeature',
+    'tda_features',
 ]

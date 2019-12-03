@@ -7,10 +7,12 @@ import pandas as pd
 import numpy as np
 import giotto.diagrams as diag
 
+__all__ = ['AmplitudeFeature']
+
 
 class AmplitudeFeature(TDAFeatures):
-    """Compute the list of average lifetime for each time window, starting
-    from the persistence diagrams.
+    """Compute the list of average lifetime for each time window, starting from
+    the persistence diagrams.
 
     Parameters
     ----------
