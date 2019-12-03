@@ -45,7 +45,7 @@ def _align_indices(X: pd.DataFrame, n_points: int,
 
 
 class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
-    """Base class for all the TDA features_creation contained in the package.
+    """Base class for all the TDA feature_creation contained in the package.
     Parameter documentation is in the derived classes.
     """
     @abstractmethod
