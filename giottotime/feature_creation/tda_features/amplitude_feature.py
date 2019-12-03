@@ -1,16 +1,18 @@
 from typing import Iterable, Dict, Optional, Union, Callable
 
-from giottotime.features.tda_features.base import \
+from giottotime.feature_creation.tda_features.base import \
     TDAFeatures, _align_indices
 
 import pandas as pd
 import numpy as np
 import giotto.diagrams as diag
 
+__all__ = ['AmplitudeFeature']
+
 
 class AmplitudeFeature(TDAFeatures):
-    """Compute the list of average lifetime for each time window, starting
-    from the persistence diagrams.
+    """Compute the list of average lifetime for each time window, starting from
+    the persistence diagrams.
 
     Parameters
     ----------
