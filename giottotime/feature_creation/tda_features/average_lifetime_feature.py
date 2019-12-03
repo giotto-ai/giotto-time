@@ -1,6 +1,6 @@
 from typing import Iterable, List, Optional, Callable, Union
 
-from giottotime.features.tda_features.base import \
+from giottotime.feature_creation.tda_features.base import \
     TDAFeatures, _align_indices
 
 import pandas as pd

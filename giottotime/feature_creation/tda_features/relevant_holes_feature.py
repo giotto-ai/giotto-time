@@ -3,7 +3,7 @@ from typing import Iterable, List, Optional, Union, Callable
 import numpy as np
 import pandas as pd
 
-from giottotime.features.tda_features.base import \
+from giottotime.feature_creation.tda_features.base import \
     TDAFeatures, _align_indices
 
 

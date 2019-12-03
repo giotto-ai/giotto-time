@@ -44,3 +44,21 @@ Welcome to giottotime's API reference!
    feature_creation.CustomFeature
    feature_creation.CalendarFeature
    feature_creation.PeriodicSeasonalFeature
+
+:mod:`giottotime.feature_creation.tda_features`: TDA Features
+=============================================================
+
+.. automodule:: giottotime.feature_creation.tda_features
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime.feature_creation
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   tda_features.AmplitudeFeature,
+   tda_features.AvgLifeTimeFeature,
+   tda_features.BettiCurvesFeature,
+   tda_features.NumberOfRelevantHolesFeature,
