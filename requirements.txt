@@ -4,3 +4,5 @@ numpy
 pandas
 hypothesis
 giotto-learn
+pytest
+pytest-cov
