@@ -8,12 +8,12 @@ from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression
 
 
-from giottotime.features.feature_creation import \
+from giottotime.feature_creation.feature_creation import \
     FeaturesCreation
-from giottotime.features.time_series_features import \
+from giottotime.feature_creation.time_series_features import \
     MovingAverageFeature, ConstantFeature, ShiftFeature
-from giottotime.features.utils import split_train_test
-from giottotime.models.gar import GAR
+from giottotime.feature_creation.utils import split_train_test
+from giottotime.models.time_series_models.gar import GAR
 
 
 class TestInputs:
@@ -63,11 +63,10 @@ class TestFitPredict:
         with pytest.raises(NotFittedError):
             gar_feedforward.predict(time_series)
 
-    @settings(suppress_health_check=(HealthCheck.filter_too_much,),
-              deadline=duration(milliseconds=500))
+    @settings(deadline=duration(milliseconds=500))
     @given(st.builds(
         arbitrary_features,
-        st.integers().filter(lambda x: 1 <= x <= 50)))
+        st.integers(1, 50)))
     def test_correct_features_dimension(self, time_series, features):
         horizon = 4
         feature_creation = FeaturesCreation(horizon, features)
@@ -87,11 +86,10 @@ class TestFitPredict:
         gar_feedforward.fit(x_train, y_train)
         assert gar_feedforward.train_features_.shape[1] == len(features)
 
-    @settings(suppress_health_check=(HealthCheck.filter_too_much,),
-              deadline=duration(milliseconds=500))
+    @settings(deadline=duration(milliseconds=500))
     @given(st.builds(
         arbitrary_features,
-        st.integers().filter(lambda x: 1 <= x <= 50)))
+        st.integers(1, 50)))
     def test_correct_fit_date(self, time_series, features):
         horizon = 4
         feature_creation = FeaturesCreation(horizon, features)
