@@ -1,5 +1,5 @@
-from .linear import LinearModel
+from .linear import LinearRegressor
 
 __all__ = [
-    'LinearModel'
+    'LinearRegressor'
 ]

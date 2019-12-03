@@ -3,7 +3,7 @@ from .time_series_models import *
 from .trend_models import *
 
 __all__ = [
-    'LinearModel',
+    'LinearRegressor',
     'GAR',
     'TrendModel',
     'CustomTrendForm_ts',

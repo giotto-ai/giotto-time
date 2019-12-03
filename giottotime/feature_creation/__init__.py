@@ -12,6 +12,7 @@ __all__ = [
     'PolynomialFeature',
     'ExogenousFeature',
     'CustomFeature',
+    'tda_features',
     'CalendarFeature',
     'PeriodicSeasonalFeature',
     'DetrendedFeature',
