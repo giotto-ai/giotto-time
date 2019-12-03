@@ -25,14 +25,15 @@ class FunctionTrend(TrendModel):
         self.model_form = model_form
         self.loss = loss
 
-    def fit(self, time_series, method="BFGS"):
+    def fit(self, time_series, x0, method="BFGS"):
         def prediction_error(model_weights):
             predictions = [self.model_form(t, model_weights) for t in
                            range(0, time_series.shape[0])]
             return self.loss(time_series.values, predictions)
 
-        res = minimize(prediction_error, [0.0, 0.0], method=method,
+        res = minimize(prediction_error, x0, method=method,
                        options={'disp': False})
+
         self.model_weights_ = res['x']
         return self
 
