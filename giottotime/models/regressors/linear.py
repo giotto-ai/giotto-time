@@ -4,6 +4,9 @@ import numpy as np
 
 from sklearn.linear_model import LinearRegression
 
+from ..utils import check_is_fitted
+
+
 class LinearRegressor:
     def __init__(self, loss=mean_squared_error): #weight_initialization_rule = lambda X, y: np.zeros(X.shape[1]) ):
         self.loss = loss
@@ -32,4 +35,5 @@ class LinearRegressor:
         return self
 
     def predict(self, X):
+        check_is_fitted(self)
         return self.model_weights_[0] + np.dot(X, self.model_weights_[1:])
