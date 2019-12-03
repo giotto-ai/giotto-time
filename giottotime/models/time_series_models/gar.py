@@ -21,7 +21,7 @@ class GAR:
         have a ``fit``and ``predict`` method.
 
     feed_forward: ``bool``, optional, (default=``False``).
-        If true, feed-forward the predictions of the models at training and
+        If true, feed-forward the predictions of the time_series_models at training and
         prediction time.
 
     """

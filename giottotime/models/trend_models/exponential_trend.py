@@ -1,9 +1,10 @@
 from sklearn.metrics import mean_squared_error
 from scipy.optimize import minimize
 
-import pandas.util.testing as testing
-
 import numpy as np
+
+from giottotime.models.trend_models.base import TrendModel
+
 
 class ExponentialTrend(TrendModel):
     """

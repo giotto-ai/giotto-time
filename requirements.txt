@@ -6,3 +6,4 @@ hypothesis
 giotto-learn
 pytest
 pytest-cov
+workalendar>=7.1.1

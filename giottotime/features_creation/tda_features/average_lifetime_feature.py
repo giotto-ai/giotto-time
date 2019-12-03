@@ -1,13 +1,13 @@
-from typing import Iterable, List, Optional, Union, Callable
+from typing import Iterable, List, Optional, Callable, Union
 
-import numpy as np
-import pandas as pd
-
-from giottotime.features.features_creation.tda_features.base import \
+from giottotime.features.tda_features.base import \
     TDAFeatures, _align_indices
 
+import pandas as pd
+import numpy as np
 
-class NumberOfRelevantHolesFeature(TDAFeatures):
+
+class AvgLifeTimeFeature(TDAFeatures):
     """Compute the list of average lifetime for each time window, starting
     from the persistence diagrams.
 
@@ -16,11 +16,8 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
     output_name : ``str``, required.
         The name of the output column
 
-    h_dim: ``int``, optional, (default=``0``)
+    h_dim : ``int``, optional, (default=``0``)
         The homology dimension on which to compute the average lifetime.
-
-    theta: ``float``, optional, (default=``0.7``)
-        Constant used to set the threshold in the computation of the holes
 
     interpolation_strategy : ``str``, optional, (default=``ffill``)
         The interpolation strategy to use to fill the values
@@ -80,10 +77,10 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         indicating the distance between them.
 
     diags_homology_dimensions : ``Iterable``, optional, (default=``(0, 1)``)
-        Dimensions (non-negative integers) of the topological features to be
+        Dimensions (non-negative integers) of the topological features_creation to be
         detected.
 
-    diags_coeff : ``int`` (prime), optional, (default=``2``)
+    diags_coeff : ``int`` prime, optional, (default=``2``)
         Compute homology with coefficients in the prime field
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
         :math:`p` equals `coeff`.
@@ -91,11 +88,11 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
     diags_max_edge_length : ``float``, optional, (default=``np.inf``)
         Upper bound on the maximum value of the Vietoris-Rips filtration
         parameter. Points whose distance is greater than this value will
-        never be connected by an edge, and topological features at scales
+        never be connected by an edge, and topological features_creation at scales
         larger than this value will not be detected.
 
     diags_infinity_values : ``float``, optional, (default=``None``)
-        Which death value to assign to features which are still alive at
+        Which death value to assign to features_creation which are still alive at
         filtration value `max_edge_length`. ``None`` has the same behaviour
         as `max_edge_length`.
 
@@ -108,7 +105,6 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
     def __init__(self,
                  output_name: str,
                  h_dim: int = 0,
-                 theta: float = 0.7,
                  interpolation_strategy: str = 'ffill',
                  takens_parameters_type: str = 'search',
                  takens_dimension: int = 5,
@@ -139,42 +135,41 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
                          diags_infinity_values=diags_infinity_values,
                          diags_n_jobs=diags_n_jobs
                          )
-
         self._h_dim = h_dim
-        self._theta = theta
         self._interpolation_strategy = interpolation_strategy
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
-        and detect the relevant number of holes. Then, assign a value to each
-        initial data points, according to the chosen ``interpolation_strategy``.
+        and detect the average lifetime for a given homology dimension.
+        Then, assign a value to each initial data points, according to the
+        chosen ``interpolation_strategy``.
 
         Parameters
         ----------
         X : ``pd.DataFrame``, required.
-            The DataFrame on which to compute the features.
+            The DataFrame on which to compute the features_creation.
 
         Returns
         -------
         X_renamed : ``pd.DataFrame``
-            A DataFrame containing, for each original data-point, the relevant
-            number of holes associated to it. If, given the initial parameters,
-            a point wasexcluded from the computation, its value is set to
+            A DataFrame containing, for each original data-point, the average
+            lifetime associated to it. If, given the initial parameters, a
+            point was excluded from the computation, its value is set to
             ``Nan``.
 
         """
         persistence_diagrams = self._compute_persistence_diagrams(X)
-        n_holes = self._compute_num_relevant_holes(persistence_diagrams)
-        n_points = self._compute_n_points(len(n_holes))
+        avg_lifetime = self._average_lifetime(persistence_diagrams)
+        original_points = self._compute_n_points(len(avg_lifetime))
 
-        X_aligned = _align_indices(X, n_points, n_holes)
+        X_aligned = _align_indices(X, original_points, avg_lifetime)
         X_renamed = self._rename_columns(X_aligned)
 
         return X_renamed
 
-    def _compute_num_relevant_holes(self, persistence_diagrams: np.ndarray)\
-            -> List:
-        """Compute the number of relevant holes in the point cloud.
+    def _average_lifetime(self, persistence_diagrams: np.ndarray) -> List:
+        """Compute the average lifetime of a given homology dimension in the
+        point cloud.
 
         Parameters
         ----------
@@ -183,22 +178,21 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
 
         Returns
         -------
-        n_rel_holes : ``List``
+        avg_lifetime : ``List``
             For each diagram present in ``persistence_diagrams``, return the
-            number of relevant holes that have been found.
+            average lifetime of a given homology dimension.
 
         """
-        n_rel_holes = []
+        avg_lifetime = []
+
         for i in range(persistence_diagrams.shape[0]):
-            pers_table = pd.DataFrame(persistence_diagrams[i],
-                                      columns=['birth', 'death', 'homology'])
+            persistence_table = pd.DataFrame(persistence_diagrams[i],
+                                             columns=['birth', 'death',
+                                                      'homology'])
+            persistence_table['lifetime'] = persistence_table['death'] - \
+                                            persistence_table['birth']
+            avg_lifetime.append(
+                persistence_table[persistence_table['homology']
+                                  == self._h_dim]['lifetime'].mean())
 
-            pers_table['lifetime'] = pers_table['death'] - pers_table['birth']
-            threshold = pers_table[pers_table['homology'] == self._h_dim][
-                            'lifetime'].max() * self._theta
-            n_rel_holes.append(pers_table[
-                                   (pers_table['lifetime'] > threshold) & (
-                                           pers_table[
-                                               'homology'] == self._h_dim)].shape[0])
-
-        return n_rel_holes
+        return avg_lifetime
