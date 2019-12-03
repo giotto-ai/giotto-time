@@ -54,3 +54,37 @@ Welcome to giottotime's API reference!
    :template: class.rst
 
    time_series_preparation.TimeSeriesPreparation
+   feature_creation.FeaturesCreation
+   feature_creation.ShiftFeature
+   feature_creation.MovingAverageFeature
+   feature_creation.ConstantFeature
+   feature_creation.PolynomialFeature
+   feature_creation.ExogenousFeature
+   feature_creation.CustomFeature
+   feature_creation.CalendarFeature
+   feature_creation.PeriodicSeasonalFeature
+   feature_creation.DetrendedFeature
+   feature_creation.RemovePolynomialTrend
+   feature_creation.RemoveExponentialTrend
+   feature_creation.RemoveFunctionTrend
+
+:mod:`giottotime.models.time_series_models`: Models
+====================================================
+
+.. automodule:: giottotime.models.time_series_models
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   models.regressors.LinearModel
+   models.time_series_models.GAR
+   models.trend_models.TrendModel
+   models.trend_models.CustomTrendForm_ts
+   models.trend_models.ExponentialTrend
+   models.trend_models.FunctionTrend
+   models.trend_models.PolynomialTrend

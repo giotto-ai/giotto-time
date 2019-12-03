@@ -94,7 +94,7 @@ class GAR:
 
         Raises
         ------
-        NotFittedError
+        ``NotFittedError``
             Thrown if the model has not been previously fitted.
 
         Notes

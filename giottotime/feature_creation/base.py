@@ -1,4 +1,3 @@
-import inspect
 from abc import ABCMeta, abstractmethod
 
 import pandas as pd
@@ -47,6 +46,7 @@ class TimeSeriesFeature(metaclass=ABCMeta):
         for index, col in enumerate(X_renamed.columns):
             if len(X.columns) > 1:
                 suffix = "_" + str(index)
-            X_renamed.rename(columns={col: self.output_name + str(suffix)}, inplace=True)
+            X_renamed.rename(columns={col: self.output_name + str(suffix)},
+                             inplace=True)
 
         return X_renamed

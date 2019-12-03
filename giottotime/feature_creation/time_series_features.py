@@ -144,8 +144,8 @@ class PolynomialFeature(TimeSeriesFeature):
 
     # TODO: finish the polynomial feature_creation
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Compute the polynomial feature_creation of ``X``, up to a degree equal to
-        ``self._degree``.
+        """Compute the polynomial feature_creation of ``X``, up to a degree
+        equal to ``degree``.
 
         Parameters
         ----------
