@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Optional
 
 import pandas as pd
 
@@ -162,19 +162,27 @@ class PolynomialFeature(TimeSeriesFeature):
 
 
 class ExogenousFeature(TimeSeriesFeature):
-    """Reindex ``exogenous_time_series`` with the index of ``X``.
+    """Reindex ``exogenous_time_series`` with the index of ``X``. To check the
+    documentation of ``pandas.DataFrame.reindex`` and to see which type of
+    ``method`` are available, please refer to the pandas `documentation
+    <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.reindex.html>`_.
 
     Parameters
     ----------
     exogenous_time_series : ``pd.DataFrame``, required.
         The time-series to reindex
-
+        None, ‘backfill’/’bfill’, ‘pad’/’ffill’, ‘nearest’
     output_name : ``str``, required.
         The name of the output column.
 
+    method : ``str``, optional, (default=``None``).
+        The method used to re-index. This must be a method used by the
+        ``pandas.DataFrame.reindex`` method.
     """
-    def __init__(self, exogenous_time_series: pd.DataFrame, output_name: str):
+    def __init__(self, exogenous_time_series: pd.DataFrame, output_name: str,
+                 method: Optional[str] = None):
         super().__init__(output_name)
+        self._method = method
         self.exogenous_time_series = exogenous_time_series
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -192,7 +200,8 @@ class ExogenousFeature(TimeSeriesFeature):
             of ``X``.
 
         """
-        exog_feature = self.exogenous_time_series.reindex(index=X.index)
+        exog_feature = self.exogenous_time_series.reindex(index=X.index,
+                                                          method=self._method)
         exog_feature_renamed = self._rename_columns(exog_feature)
         return exog_feature_renamed
 
