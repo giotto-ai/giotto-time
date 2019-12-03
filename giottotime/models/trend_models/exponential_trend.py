@@ -22,7 +22,8 @@ class ExponentialTrend(TrendModel):
     def __init__(self, loss=mean_squared_error):
         self.loss = loss
 
-    def fit(self, time_series: pd.DataFrame, method: str = "BFGS"):
+    def fit(self, time_series: pd.DataFrame, method: str = "BFGS") \
+            -> TrendModel:
         """Fit the model on the ``time_series``, with respect to the provided
         ``loss`` and using the provided ``method``. In order to see which
         methods are available, please check the 'scipy' `documentation
