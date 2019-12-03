@@ -1,11 +1,20 @@
+from typing import Tuple
+
 import pandas as pd
 
 from .base import Splitter
 
+FourPandasDataFrames = Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]
+
 
 class DatetimeSplitter(Splitter):
+    """ Splits
 
-    def transform(self, X, y, split_at_time: pd.Timestamp = None):
+    """
+    def transform(self,
+                  X: pd.DataFrame,
+                  y: pd.DataFrame,
+                  split_at_time: pd.Timestamp = None) -> FourPandasDataFrames:
         if split_at_time is None:
             X_test, y_test = pd.DataFrame(columns=X.columns), pd.DataFrame(columns=y.columns)
             return X, y, X_test, y_test
