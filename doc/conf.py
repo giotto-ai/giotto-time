@@ -19,10 +19,10 @@ sys.path.insert(0, os.path.abspath('../'))
 
 project = 'giotto-time'
 copyright = '2019, L2F'
-author = 'List of authors'
+author = 'Benjamin Russell, Stefano Savarè, Alessio Baccelli'
 
 copyright = '2019, L2F'
-author = 'List of authors'
+author = 'Benjamin Russell, Stefano Savarè, Alessio Baccelli'
 
 # The full version, including alpha/beta/rc tags
 from giottotime import __version__
