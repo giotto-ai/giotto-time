@@ -5,7 +5,7 @@ import numpy as np
 import giotto.diagrams as diag
 
 from giottotime.feature_creation.tda_features.base import \
-    TDAFeatures, _align_indices
+    TDAFeatures, align_indices
 
 __all__ = ['BettiCurvesFeature']
 
@@ -44,9 +44,6 @@ class BettiCurvesFeature(TDAFeatures):
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
-
-    interpolation_strategy : ``str``, optional, (default=``ffill``)
-        The interpolation strategy to use to fill the values.
 
     takens_parameters_type: ``'search'`` | ``'fixed'``, optional,
         (default=``'search'``)
@@ -134,7 +131,6 @@ class BettiCurvesFeature(TDAFeatures):
                  betti_n_values: int = 100,
                  betti_rolling: int = 1,
                  betti_n_jobs: Optional[int] = None,
-                 interpolation_strategy: str = 'ffill',
                  takens_parameters_type: str = 'search',
                  takens_dimension: int = 5,
                  takens_stride: int = 1,
@@ -168,14 +164,12 @@ class BettiCurvesFeature(TDAFeatures):
         self._betti_homology_dimensions = betti_homology_dimensions
         self._betti_n_values = betti_n_values
         self._betti_n_jobs = betti_n_jobs
-        self._interpolation_strategy = interpolation_strategy
         self._betti_rolling = betti_rolling
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
         and detect the average lifetime for a given homology dimension.
-        Then, assign a value to each initial data points, according to the
-        chosen ``interpolation_strategy``.
+        Then, assign a value to each initial data points.
 
         Parameters
         ----------
@@ -200,7 +194,7 @@ class BettiCurvesFeature(TDAFeatures):
         for betti_feature in betti_features:
             original_points = self._compute_n_points(len(betti_feature))
 
-            output_dfs.append(_align_indices(X, original_points, betti_feature))
+            output_dfs.append(align_indices(X, original_points, betti_feature))
 
         X_aligned = pd.concat(output_dfs, axis=1)
         X_renamed = self._rename_columns(X_aligned)

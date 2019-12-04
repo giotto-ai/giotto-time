@@ -1,7 +1,7 @@
 from typing import Iterable, List, Optional, Callable, Union
 
 from giottotime.feature_creation.tda_features.base import \
-    TDAFeatures, _align_indices
+    TDAFeatures, align_indices
 
 import pandas as pd
 import numpy as np
@@ -20,9 +20,6 @@ class AvgLifeTimeFeature(TDAFeatures):
 
     h_dim : ``int``, optional, (default=``0``)
         The homology dimension on which to compute the average lifetime.
-
-    interpolation_strategy : ``str``, optional, (default=``ffill``)
-        The interpolation strategy to use to fill the values.
 
     takens_parameters_type: ``'search'`` | ``'fixed'``, optional,
         (default=``'search'``)
@@ -107,7 +104,6 @@ class AvgLifeTimeFeature(TDAFeatures):
     def __init__(self,
                  output_name: str,
                  h_dim: int = 0,
-                 interpolation_strategy: str = 'ffill',
                  takens_parameters_type: str = 'search',
                  takens_dimension: int = 5,
                  takens_stride: int = 1,
@@ -138,13 +134,11 @@ class AvgLifeTimeFeature(TDAFeatures):
                          diags_n_jobs=diags_n_jobs
                          )
         self._h_dim = h_dim
-        self._interpolation_strategy = interpolation_strategy
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
         and detect the average lifetime for a given homology dimension.
-        Then, assign a value to each initial data points, according to the
-        chosen ``interpolation_strategy``.
+        Then, assign a value to each initial data points.
 
         Parameters
         ----------
@@ -161,15 +155,15 @@ class AvgLifeTimeFeature(TDAFeatures):
 
         """
         persistence_diagrams = self._compute_persistence_diagrams(X)
-        avg_lifetime = self._average_lifetime(persistence_diagrams)
+        avg_lifetime = self._compute_average_lifetime(persistence_diagrams)
         original_points = self._compute_n_points(len(avg_lifetime))
 
-        X_aligned = _align_indices(X, original_points, avg_lifetime)
+        X_aligned = align_indices(X, original_points, avg_lifetime)
         X_renamed = self._rename_columns(X_aligned)
 
         return X_renamed
 
-    def _average_lifetime(self, persistence_diagrams: np.ndarray) -> List:
+    def _compute_average_lifetime(self, persistence_diagrams: np.ndarray) -> List:
         """Compute the average lifetime of a given homology dimension in the
         point cloud.
 

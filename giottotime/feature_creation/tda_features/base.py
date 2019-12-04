@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from collections import Iterable
-from typing import Union, List
+from typing import Union, List, Optional
 
 import numpy as np
 from giotto.time_series import TakensEmbedding, SlidingWindow
@@ -11,12 +11,13 @@ import pandas as pd
 from giottotime.feature_creation.base import TimeSeriesFeature
 
 __all__ = [
-    'TDAFeatures'
+    'TDAFeatures',
+    'align_indices'
 ]
 
 
-def _align_indices(X: pd.DataFrame, n_points: int,
-                   tda_feature_values: Union[List, np.ndarray]) \
+def align_indices(X: pd.DataFrame, n_points: int,
+                  tda_feature_values: Union[List, np.ndarray]) \
         -> pd.DataFrame:
     """Given ``X`` of length ``n_samples``, set the first
     ``n_samples - n_points`` to ``np.nan``. Then, split the remaining points in
@@ -45,11 +46,16 @@ def _align_indices(X: pd.DataFrame, n_points: int,
 
     output_X.iloc[:-n_points] = np.nan
 
-    splits = np.array_split(output_X.iloc[-n_points:].index,
+    splits = np.array_split(output_X.iloc[-n_points:].index.values,
                             len(tda_feature_values))
 
     for index, split in enumerate(splits):
-        output_X.loc[split] = tda_feature_values[index]
+        if isinstance(tda_feature_values[index], list) or \
+                isinstance(tda_feature_values[index], np.ndarray):
+            target_value = tda_feature_values[index][0]
+        else:
+            target_value = tda_feature_values[index]
+        output_X.loc[split] = target_value
 
     return output_X
 
@@ -106,7 +112,7 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
             n_jobs=diags_n_jobs
         )
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None):
         return self
 
     def _compute_n_points(self, n_windows: int) -> int:
@@ -143,8 +149,7 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
 
         return n_used_points
 
-    def _compute_persistence_diagrams(self, X: Union[pd.DataFrame, pd.Series])\
-            -> np.ndarray:
+    def _compute_persistence_diagrams(self, X: pd.DataFrame) -> np.ndarray:
         """Compute the persistence diagrams starting from a time-series using
         the Vietoris Rips algorithm. The resulting diagrams are then scaled.
 

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from giottotime.feature_creation.tda_features.base import \
-    TDAFeatures, _align_indices
+    TDAFeatures, align_indices
 
 __all__ = ['NumberOfRelevantHolesFeature']
 
@@ -23,8 +23,6 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
 
     theta: ``float``, optional, (default=``0.7``)
         Constant used to set the threshold in the computation of the holes
-    interpolation_strategy : ``str``, optional, (default=``ffill``)
-        The interpolation strategy to use to fill the values.
 
     takens_parameters_type: ``'search'`` | ``'fixed'``, optional,
         (default=``'search'``)
@@ -110,7 +108,6 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
                  output_name: str,
                  h_dim: int = 0,
                  theta: float = 0.7,
-                 interpolation_strategy: str = 'ffill',
                  takens_parameters_type: str = 'search',
                  takens_dimension: int = 5,
                  takens_stride: int = 1,
@@ -143,12 +140,11 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
 
         self._h_dim = h_dim
         self._theta = theta
-        self._interpolation_strategy = interpolation_strategy
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
         and detect the relevant number of holes. Then, assign a value to each
-        initial data points, according to the chosen ``interpolation_strategy``.
+        initial data points.
 
         Parameters
         ----------
@@ -168,7 +164,7 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         n_holes = self._compute_num_relevant_holes(persistence_diagrams)
         n_points = self._compute_n_points(len(n_holes))
 
-        X_aligned = _align_indices(X, n_points, n_holes)
+        X_aligned = align_indices(X, n_points, n_holes)
         X_renamed = self._rename_columns(X_aligned)
 
         return X_renamed

@@ -1,11 +1,14 @@
 from typing import Iterable
 
+import giotto.diagrams as diag
 import numpy as np
 import pandas as pd
 import pytest
 from hypothesis import given, strategies as st
 
 from giottotime.feature_creation.tda_features import TDAFeatures
+
+np.random.seed(0)
 
 
 class TestTDAFeature(TDAFeatures):
@@ -27,6 +30,27 @@ class TestTDAFeature(TDAFeatures):
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         pass
+
+    def _correct_n_points_formula(self, n_windows: int) -> int:
+        embedder_length = self.sliding_stride * (
+                n_windows - 1) + self.sliding_window_width
+
+        n_used_points = self.takens_stride * (embedder_length - 1) + \
+                        (self.takens_dimension * self.takens_time_delay)
+        return n_used_points
+
+    def _correct_compute_persistence_diagrams(self, X: pd.DataFrame) \
+            -> np.ndarray:
+        X_embedded = self._takens_embedding.fit_transform(X)
+        self.X_embedded_dims_ = X_embedded.shape
+
+        X_windows = self._sliding_window.fit_transform(X_embedded)
+        X_diagrams = self._vietoris_rips_persistence.fit_transform(X_windows)
+
+        diagram_scaler = diag.Scaler()
+        diagram_scaler.fit(X_diagrams)
+
+        return diagram_scaler.transform(X_diagrams)
 
 
 def test_correct_compute_n_points():
@@ -60,17 +84,6 @@ def test_negative_or_zero_n_windows():
         tda_feature._compute_n_points(-4)
 
 
-def _correct_n_points_formula(n_windows, sliding_stride, sliding_window_width,
-                              takens_stride, takens_dimension,
-                              takens_time_delay):
-    embedder_length = sliding_stride * (n_windows - 1) + \
-                      sliding_window_width
-
-    n_used_points = takens_stride * (embedder_length - 1) + \
-                    takens_dimension * takens_time_delay
-    return n_used_points
-
-
 @given(st.integers(1, 20), st.integers(1, 20), st.integers(1, 20),
        st.integers(1, 20), st.integers(1, 20), st.integers(1, 20))
 def test_correct_n_points_random_ts_and_values(n_windows, sliding_stride,
@@ -85,10 +98,31 @@ def test_correct_n_points_random_ts_and_values(n_windows, sliding_stride,
                                  takens_time_delay=takens_time_delay
                                  )
     n_points = tda_feature._compute_n_points(n_windows)
-    expected_n_points = _correct_n_points_formula(n_windows, sliding_stride,
-                                                  sliding_window_width,
-                                                  takens_stride,
-                                                  takens_dimension,
-                                                  takens_time_delay)
+    expected_n_points = tda_feature.\
+        _correct_n_points_formula(n_windows)
     assert expected_n_points == n_points
     assert expected_n_points > 0
+
+
+def test_correct_persistence_diagrams():
+    df = pd.DataFrame(np.random.randint(0, 100, size=(13, 1)),
+                      columns=list('A'))
+
+    tda_feature = TestTDAFeature(output_name='ignored')
+    persistence_diagrams = tda_feature._compute_persistence_diagrams(df)
+    expected_diagrams = np.array([[[0., 0.435255, 0.],
+                                   [0., 0.44177876, 0.],
+                                   [0., 0.62426053, 0.],
+                                   [0., 0.64725938, 0.],
+                                   [0., 0.76393602, 0.],
+                                   [0., 0.86575012, 0.],
+                                   [0., 1.21810876, 0.],
+                                   [0., 1.28787198, 0.],
+                                   [0., 1.40406276, 0.],
+                                   [0., 1.41421356, 0.],
+                                   [1.54689366, 1.57882526, 1.],
+                                   [1.46434634, 1.4783885, 1.],
+                                   [0., 0., 2.]
+                                   ]])
+
+    assert np.allclose(expected_diagrams, persistence_diagrams)
