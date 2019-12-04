@@ -109,10 +109,10 @@ class PeriodicSeasonalFeature(TimeSeriesFeature):
         """
         sampling_frequency = pd.Timedelta(datetime_index.freq)
         if sampling_frequency < 2 * self.period:
-            raise ValueError(f'Sampling frequency must be at least two times'
-                             f'the period to obtain meaningful results. '
-                             f'Sampling frequency = {sampling_frequency},'
-                             f'period = {self.period}')
+            raise ValueError(f"Sampling frequency must be at least two times"
+                             f"the period to obtain meaningful results. "
+                             f"Sampling frequency = {sampling_frequency},"
+                             f"period = {self.period}.")
 
     def _compute_periodic_feature(self, datetime_index: pd.DatetimeIndex):
         """Compute a sinusoid with the specified parameters.
