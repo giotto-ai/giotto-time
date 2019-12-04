@@ -1,11 +1,11 @@
-from typing import Any, List, Union
-from numbers import Number
+from typing import List, Union
 
 import numpy as np
 import pandas as pd
 
-from .time_series_conversion import PandasSeriesToPandasTimeSeries, \
-    SequenceToPandasTimeSeries
+from giottotime.time_series_preparation.time_series_resampling import TimeSeriesResampler
+from .time_series_conversion import PandasSeriesToTimeIndexSeries, \
+    SequenceToTimeIndexSeries
 
 SUPPORTED_SEQUENCE_TYPES = [
     np.ndarray,
@@ -24,12 +24,13 @@ class TimeSeriesPreparation:
         self.freq = freq
         self.resample_if_not_equispaced = resample_if_not_equispaced
 
-        self.pandas_converter = PandasSeriesToPandasTimeSeries(
+        self.pandas_converter = PandasSeriesToTimeIndexSeries(
             self.start_date, self.end_date, self.freq
         )
-        self.sequence_converter = SequenceToPandasTimeSeries(
+        self.sequence_converter = SequenceToTimeIndexSeries(
             self.start_date, self.end_date, self.freq
         )
+        self.resampler = TimeSeriesResampler()
 
     def fit_transform(self, array_like_object: Union[List, np.array, pd.Series]):
         pandas_time_series = self._to_pandas_time_series(array_like_object)
@@ -49,7 +50,10 @@ class TimeSeriesPreparation:
                             f'supported time series type')
 
     def _to_equispaced_time_series(self, time_series):
-        raise NotImplementedError
+        if self.resample_if_not_equispaced:
+            self.resampler.transform(time_series)
+        else:
+            return time_series
 
     def _to_period_index_time_series(self, time_series):
         raise NotImplementedError

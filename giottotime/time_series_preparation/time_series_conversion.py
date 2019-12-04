@@ -4,6 +4,8 @@ from typing import Optional, Union, List
 import numpy as np
 import pandas as pd
 
+from giottotime.core.constants import DEFAULT_START, DEFAULT_END, DEFAULT_FREQ
+
 PandasTimeIndex = Union[pd.DatetimeIndex, pd.PeriodIndex, pd.TimedeltaIndex]
 PandasDate = Union[pd.datetime, pd.Timestamp, str]
 
@@ -26,12 +28,10 @@ def check_period_range_parameters(
 class TimeSeriesConversion(ABC):
 
     def __init__(self,
-                 start_date: Optional[PandasDate] = None,
-                 end_date: Optional[PandasDate] = None,
-                 freq: Optional[pd.DateOffset] = None) -> None:
-        self.start_date = start_date
-        self.end_date = end_date
-        self.freq = freq
+                 start: Optional[PandasDate] = None,
+                 end: Optional[PandasDate] = None,
+                 freq: Optional[pd.Timedelta] = None) -> None:
+        self._initialize_start_end_freq(start, end, freq)
 
     def fit(self, X, y=None):
         return self
@@ -70,23 +70,62 @@ class TimeSeriesConversion(ABC):
                          ) -> np.array:
         pass
 
+    def _initialize_start_end_freq(self,
+                                   start: PandasDate,
+                                   end: PandasDate,
+                                   freq: pd.Timedelta):
+        not_none_params = count_not_none(start, end, freq)
+        if not_none_params == 0:
+            self._default_params_initialization()
+        elif not_none_params == 1:
+            self._one_not_none_param_initialization(start, end, freq)
+        elif not_none_params == 2:
+            self._two_not_none_params_initialization(start, end, freq)
+        else:
+            raise ValueError("Of the three parameters: start, end, and "
+                             "freq, exactly two must be specified")
+
+    def _default_params_initialization(self):
+        self.start = DEFAULT_START
+        self.end = None
+        self.freq = DEFAULT_FREQ
+
+    def _one_not_none_param_initialization(self, start, end, freq):
+        if start is not None:
+            self.start = start
+            self.end = None
+            self.freq = DEFAULT_FREQ
+        elif end is not None:
+            self.start = None
+            self.end = end
+            self.freq = DEFAULT_FREQ
+        else:
+            self.start = DEFAULT_START
+            self.end = None
+            self.freq = freq
+
+    def _two_not_none_params_initialization(self, start, end, freq):
+        self.start = start
+        self.end = end
+        self.freq = freq
+
     def _compute_index_of_length(self, length: int) -> pd.PeriodIndex:
-        check_period_range_parameters(self.start_date, self.end_date, length)
+        check_period_range_parameters(self.start, self.end, length)
         return pd.period_range(
-            start=self.start_date,
-            end=self.end_date,
+            start=self.start,
+            end=self.end,
             periods=length,
             freq=self.freq
         )
 
 
-class SequenceToPandasTimeSeries(TimeSeriesConversion):
+class SequenceToTimeIndexSeries(TimeSeriesConversion):
 
     def __init__(self,
-                 start_date: Optional[Union[pd.datetime, str]] = None,
-                 end_date: Optional[Union[pd.datetime, str]] = None,
+                 start: Optional[Union[pd.datetime, str]] = None,
+                 end: Optional[Union[pd.datetime, str]] = None,
                  freq: Optional[pd.DateOffset] = None) -> None:
-        super().__init__(start_date, end_date, freq)
+        super().__init__(start, end, freq)
 
     def _get_index_from(self,
                         array_like_object: Union[np.array, List[float]]
@@ -99,13 +138,13 @@ class SequenceToPandasTimeSeries(TimeSeriesConversion):
         return np.array(array_like_object)
 
 
-class PandasSeriesToPandasTimeSeries(TimeSeriesConversion):
+class PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
 
     def __init__(self,
-                 start_date: Optional[Union[pd.datetime, str]] = None,
-                 end_date: Optional[Union[pd.datetime, str]] = None,
+                 start: Optional[Union[pd.datetime, str]] = None,
+                 end: Optional[Union[pd.datetime, str]] = None,
                  freq: Optional[pd.DateOffset] = None) -> None:
-        super().__init__(start_date, end_date, freq)
+        super().__init__(start, end, freq)
 
     def _get_index_from(self,
                         array_like_object: Union[pd.Series, np.array, list]
@@ -125,3 +164,41 @@ class PandasSeriesToPandasTimeSeries(TimeSeriesConversion):
         return isinstance(index, pd.DatetimeIndex) or \
                isinstance(index, pd.TimedeltaIndex) or \
                isinstance(index, pd.PeriodIndex)
+
+
+class TimeIndexSeriesToPeriodIndexSeries(TimeSeriesConversion):
+
+    def __init__(self, freq: pd.Timedelta = None):
+        super().__init__(start=None, end=None, freq=freq)
+
+    def _get_index_from(self,
+                        time_series: pd.Series,
+                        ) -> PandasTimeIndex:
+        index = time_series.index
+        if isinstance(index, pd.PeriodIndex):
+            return index
+        elif isinstance(index, pd.DatetimeIndex):
+            return self._datetime_index_to_period(index)
+        elif isinstance(index, pd.TimedeltaIndex):
+            return self._timedelta_index_to_period(index)
+        else:
+            raise ValueError(f'Only PeriodIndex, DatetimeIndex and '
+                             f'TimedeltaIndex are supported. Detected: '
+                             f'{type(index)}')
+
+    def _datetime_index_to_period(self,
+                                  index: pd.DatetimeIndex) -> pd.PeriodIndex:
+        if index.freq is None:
+            return index.to_period(freq=self.freq)
+        else:
+            return index.to_period()
+
+    def _timedelta_index_to_period(self,
+                                   index: pd.TimedeltaIndex) -> pd.PeriodIndex:
+        pass
+
+    def _get_values_from(self,
+                         time_series: pd.Series
+                         ) -> np.array:
+        return time_series.values
+
