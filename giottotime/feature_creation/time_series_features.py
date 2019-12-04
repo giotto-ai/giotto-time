@@ -1,6 +1,7 @@
 from typing import Callable, Optional
 
 import pandas as pd
+from sklearn.preprocessing import PolynomialFeatures
 
 from .base import TimeSeriesFeature
 
@@ -88,13 +89,14 @@ class MovingAverageFeature(TimeSeriesFeature):
 
 
 class ConstantFeature(TimeSeriesFeature):
-    """Generate a constant Series, of the same length as the input ``X`` and
-    containing the value ``constant`` across the whole Series.
+    """Generate a ``pd.DataFrame`` with one column, of the same length as the
+    input ``X`` and containing the value ``constant`` across the whole column.
 
     Parameters
     ----------
     constant : ``int``, required.
-        The value to use to generate the Series.
+        The value to use to generate the constant column of the
+        ``pd.DataFrame``.
 
     output_name : ``str``, required.
         The name of the output column.
@@ -105,8 +107,9 @@ class ConstantFeature(TimeSeriesFeature):
         self.constant = constant
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Generate a constant Series, with the same length as ``X`` and with
-        the same index.
+        """Generate a ``pd.DataFrame`` with one column with the same length as
+        ``X`` and with the same index, containing a value equal to
+        ``constant``.
 
         Parameters
         ----------
@@ -154,11 +157,17 @@ class PolynomialFeature(TimeSeriesFeature):
 
         Returns
         -------
-        polynomial_features : ``pd.DataFrame``
+        pol_of_X_renamed : ``pd.DataFrame``
             The computed polynomial feature_creation.
 
         """
-        pass
+        pol_feature = PolynomialFeatures(self._degree)
+        pol_of_X_array = pol_feature.fit_transform(X)
+        pol_of_X = pd.DataFrame(pol_of_X_array, index=X.index)
+
+        pol_of_X_renamed = self._rename_columns(pol_of_X)
+
+        return pol_of_X_renamed
 
 
 class ExogenousFeature(TimeSeriesFeature):
@@ -207,12 +216,14 @@ class ExogenousFeature(TimeSeriesFeature):
 
 
 class CustomFeature(TimeSeriesFeature):
-    """Given a custom function, generate a Series.
+    """Given a custom function, apply it to a time series and generate a
+    ``pd.Dataframe``.
 
     Parameters
     ----------
     custom_feature_function`: ``Callable`, required.
-        The function to use to generate the Series containing the feature
+        The function to use to generate a ``pd.DataFrame`` containing the
+        feature.
 
     output_name: ``str``, required.
         The name of the output column.
@@ -228,7 +239,7 @@ class CustomFeature(TimeSeriesFeature):
         self.kwargs = kwargs
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Generate a Series, given ``X`` as input to the
+        """Generate a ``pd.DataFrame``, given ``X`` as input to the
         ``custom_feature_function``, as well as other optional arguments.
 
         Parameters

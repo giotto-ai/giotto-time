@@ -8,7 +8,7 @@ def test_correct_renaming_single_col():
     testing.N, testing.K = 500, n_cols
     df = testing.makeTimeDataFrame(freq='MS')
 
-    output_name = "shift"
+    output_name = 'shift'
     shift_feature = ShiftFeature(shift=1, output_name=output_name)
     df_renamed = shift_feature._rename_columns(df)
 
@@ -24,13 +24,13 @@ def test_correct_renaming_multiple_columns():
     testing.N, testing.K = 500, n_cols
     df = testing.makeTimeDataFrame(freq='MS')
 
-    output_name = "shift"
+    output_name = 'shift'
     shift_feature = ShiftFeature(shift=1, output_name=output_name)
     df_renamed = shift_feature._rename_columns(df)
 
     assert df.shape == df_renamed.shape
 
-    expected_cols = [f"{output_name}_{k}" for k in range(n_cols)]
+    expected_cols = ['{output_name}_{k}' for k in range(n_cols)]
 
     assert (expected_cols == df_renamed.columns).all()
 
@@ -40,7 +40,7 @@ def test_correct_fit_transform():
     testing.N, testing.K = 500, n_cols
     df = testing.makeTimeDataFrame(freq='MS')
 
-    output_name = "shift"
+    output_name = 'shift'
     ma_feature = MovingAverageFeature(window_size=2,
                                       output_name=output_name)
 
