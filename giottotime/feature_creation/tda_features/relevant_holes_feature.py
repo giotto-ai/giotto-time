@@ -137,6 +137,7 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
                          diags_infinity_values=diags_infinity_values,
                          diags_n_jobs=diags_n_jobs
                          )
+        self._validate_inputs(h_dim=h_dim, theta=theta)
 
         self._h_dim = h_dim
         self._theta = theta
@@ -199,3 +200,33 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
                                                'homology'] == self._h_dim)].shape[0])
 
         return n_rel_holes
+
+    def _validate_inputs(self, h_dim: int, theta: float) -> None:
+        """Validate that ``h_dim`` is either ``0``, ``1`` or ``2`` and that
+        ``theta`` has a strictly postive value.
+
+        Parameters
+        ----------
+        h_dim : ``int``, required.
+            The value of the target homology dimension.
+
+        theta : ``float``, required.
+            The value of theta.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ``ValueError``
+            Raised if ``theta`` is not strictly positive or ``h_dim`` is not
+            ``0``, ``1`` or ``2``.
+        """
+        if h_dim != 0 and h_dim != 1 and h_dim != 2:
+            raise ValueError(f"'h_dim' must have be either 0, 1 or 2, "
+                             f"but has value {h_dim}.")
+
+        if not theta > 0:
+            raise ValueError(f"'theta' must be greater than 0, but instead "
+                             f"has value {theta}.")

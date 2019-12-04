@@ -3,10 +3,10 @@ import pandas as pd
 
 from giottotime.feature_creation.tda_features import AmplitudeFeature
 
-np.random.seed(0)
-
 
 def test_correct_amplitude_computation():
+    np.random.seed(0)
+
     output_name = 'ignored'
     amplitude_feature = AmplitudeFeature(output_name=output_name)
     df = pd.DataFrame(np.random.randint(0, 100, size=(30, 1)),
@@ -27,6 +27,8 @@ def test_correct_amplitude_computation():
 
 
 def test_correct_amplitude_feature():
+    np.random.seed(0)
+
     output_name = 'amplitude_feature'
     amplitude_feature = AmplitudeFeature(output_name=output_name)
     df = pd.DataFrame(np.random.randint(0, 100, size=(30, 1)),

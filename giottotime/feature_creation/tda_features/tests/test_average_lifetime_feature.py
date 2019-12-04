@@ -3,10 +3,10 @@ import pandas as pd
 
 from giottotime.feature_creation.tda_features import AvgLifeTimeFeature
 
-np.random.seed(0)
 
+def test_correct_average_lifetime_computation():
+    np.random.seed(0)
 
-def test_correct__average_lifetime_computation():
     output_name = 'ignored'
     avg_lifetime_feature = AvgLifeTimeFeature(output_name=output_name)
     df = pd.DataFrame(np.random.randint(0, 100, size=(30, 1)),
@@ -32,6 +32,8 @@ def test_correct__average_lifetime_computation():
 
 
 def test_correct_avg_lifetime_feature():
+    np.random.seed(0)
+
     output_name = 'avg_lifetime_feature'
     avg_lifetime_feature = AvgLifeTimeFeature(output_name=output_name)
     df = pd.DataFrame(np.random.randint(0, 100, size=(30, 1)),

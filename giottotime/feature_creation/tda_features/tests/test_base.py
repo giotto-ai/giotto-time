@@ -8,8 +8,6 @@ from hypothesis import given, strategies as st
 
 from giottotime.feature_creation.tda_features import TDAFeatures
 
-np.random.seed(0)
-
 
 class TestTDAFeature(TDAFeatures):
     def __init__(self, output_name: str,
@@ -105,6 +103,7 @@ def test_correct_n_points_random_ts_and_values(n_windows, sliding_stride,
 
 
 def test_correct_persistence_diagrams():
+    np.random.seed(0)
     df = pd.DataFrame(np.random.randint(0, 100, size=(13, 1)),
                       columns=list('A'))
 

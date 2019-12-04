@@ -20,6 +20,7 @@ def _find_mean_nonzero(g):
 class BettiCurvesFeature(TDAFeatures):
     """Compute the list of average lifetime for each time window, starting
     from the persistence diagrams.
+
     Parameters
     ----------
     betti_mode : ``'mean'`` | ``'arg_max'``, required.
@@ -123,6 +124,7 @@ class BettiCurvesFeature(TDAFeatures):
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
     """
     def __init__(self,
                  betti_mode: str,
@@ -203,6 +205,7 @@ class BettiCurvesFeature(TDAFeatures):
 
     def _compute_betti_curves(self, diagrams: np.ndarray) -> List:
         """Given a list of diagrams, compute the betti curves for each of them.
+
         Parameters
         ----------
         diagrams : ``np.ndarray``, required.
@@ -230,20 +233,24 @@ class BettiCurvesFeature(TDAFeatures):
         ``self._betti_mode``. If the value is set to ``mean`` compute the
         rolling mean, if set to ``arg_max`` compute the argmax along the
         epsilon axis.
+
         Parameters
         ----------
         betti_curves : ``List[pd.DataFrame]``, required.
             A list containing the betti surfaces, one for each homology
             dimension.
+
         Returns
         -------
         betti_features : ``List[np.ndarray]``
             The feature_creation extracted from the betti curves.
+
         Raises
         ------
-        ValueError
-            Thrown if a ``self._betti_mode`` has a value which is different
+        ``ValueError``
+            Raised if a ``self._betti_mode`` has a value which is different
             from ``mean`` or ``arg_max``.
+
         """
         if self._betti_mode == 'mean':
             betti_features = self._compute_betti_mean(betti_curves)
@@ -287,6 +294,7 @@ class BettiCurvesFeature(TDAFeatures):
             -> List[np.ndarray]:
         """For each surface in ``betti_surfaces``, compute the argmax along the
          epsilon axis.
+
         Parameters
         ----------
         betti_surfaces : ``List[pd.DataFrame]``, required.
