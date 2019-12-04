@@ -96,7 +96,6 @@ Welcome to giottotime's API reference!
    :template: class.rst
 
    models.trend_models.TrendModel
-   models.trend_models.CustomTrend
    models.trend_models.ExponentialTrend
    models.trend_models.FunctionTrend
    models.trend_models.PolynomialTrend
