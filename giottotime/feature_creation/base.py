@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from typing import Union
 
 import pandas as pd
 
@@ -23,7 +24,8 @@ class TimeSeriesFeature(metaclass=ABCMeta):
         self.fit(X, y)
         return self.transform(X)
 
-    def _rename_columns(self, X: pd.DataFrame) -> pd.DataFrame:
+    def _rename_columns(self, X: Union[pd.DataFrame, pd.Series]) \
+            -> pd.DataFrame:
         """Rename (in place) the column of the DataFrame with the
         ``output_name``. In case the output columns are more than one, a suffix
          is appended to the name, from ``_0`` to ``_n``, where ``n`` is the
@@ -31,8 +33,8 @@ class TimeSeriesFeature(metaclass=ABCMeta):
 
         Parameters
         ----------
-        X : ``pd.DataFrame``, required.
-            The DataFrame to be renamed.
+        X : ``Union[pd.DataFrame, pd.Series]``, required.
+            The DataFrame or Series to be renamed.
 
         Returns
         -------
@@ -40,6 +42,9 @@ class TimeSeriesFeature(metaclass=ABCMeta):
             The original DataFrame ``X``, with the columns renamed.
 
         """
+        if isinstance(X, pd.Series):
+            X = X.to_frame()
+
         suffix = ''
 
         X_renamed = X.T.reset_index(drop=True).T
