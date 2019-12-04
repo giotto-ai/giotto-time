@@ -189,13 +189,14 @@ class TimeIndexSeriesToPeriodIndexSeries(TimeSeriesConversion):
     def _datetime_index_to_period(self,
                                   index: pd.DatetimeIndex) -> pd.PeriodIndex:
         if index.freq is None:
-            return index.to_period(freq=self.freq)
+            return pd.PeriodIndex(index, freq=self.freq)
         else:
-            return index.to_period()
+            return pd.PeriodIndex(index)
 
     def _timedelta_index_to_period(self,
                                    index: pd.TimedeltaIndex) -> pd.PeriodIndex:
-        pass
+        datetime_index = pd.to_datetime(index)
+        return self._datetime_index_to_period(datetime_index)
 
     def _get_values_from(self,
                          time_series: pd.Series
