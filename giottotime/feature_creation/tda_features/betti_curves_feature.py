@@ -5,7 +5,7 @@ import numpy as np
 import giotto.diagrams as diag
 
 from giottotime.feature_creation.tda_features.base import \
-    TDAFeatures, _align_indices
+    TDAFeatures, align_indices
 
 __all__ = ['BettiCurvesFeature']
 
@@ -20,27 +20,32 @@ def _find_mean_nonzero(g):
 class BettiCurvesFeature(TDAFeatures):
     """Compute the list of average lifetime for each time window, starting
     from the persistence diagrams.
+
     Parameters
     ----------
     betti_mode : ``'mean'`` | ``'arg_max'``, required.
-        If ``mean``, compute the mean
+        If ``mean``, compute the mean.
+
     output_name : ``str``, required.
-        The name of the output column
+        The name of the output column.
+
     betti_homology_dimensions : ``Iterable`, optional, (default=``(0, 1)``)
-        Dimensions (non-negative integers) of the topological feature_creation to be
-        detected.
+        Dimensions (non-negative integers) of the topological feature_creation
+        to be detected.
+
     betti_n_values : ``int``, optional, (default=``100``)
         The number of filtration parameter values, per available homology
         dimension, to sample during :meth:`fit`.
+
     betti_rolling : ``int``, optional, (default=``1``)
         Used only if ``betti_mode`` is set to ``mean``. When computing the
         betti surfaces, used to set the rolling parameter.
+
     betti_n_jobs : ``int``, optional, (default=``None``)
         The number of jobs to use for the computation. ``None`` means 1
         unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
         using all processors.
-    interpolation_strategy : ``str``, optional, (default=``ffill``)
-        The interpolation strategy to use to fill the values
+
     takens_parameters_type: ``'search'`` | ``'fixed'``, optional,
         (default=``'search'``)
         If set to ``'fixed'``, the values of `time_delay` and `dimension`
@@ -50,28 +55,35 @@ class BettiCurvesFeature(TDAFeatures):
         mutual information; then, a heuristic based on an algorithm in [2]_ is
         used to select an embedding dimension which, when increased, does not
         reveal a large proportion of "false nearest neighbors".
+
     takens_time_delay : ``int``, optional, (default=``1``)
         Time delay between two consecutive values for constructing one
         embedded point. If `parameters_type` is ``'search'``,
         it corresponds to the maximal embedding time delay that will be
         considered.
+
     takens_dimension : ``int``, optional, (default=``5``)
         Dimension of the embedding space. If `parameters_type` is ``'search'``,
         it corresponds to the maximum embedding dimension that will be
         considered.
+
     takens_stride : ``int``, optional, (default=``1``)
         Stride duration between two consecutive embedded points. It defaults
         to 1 as this is the usual value in the statement of Takens's embedding
         theorem.
+
     takens_n_jobs : ``int``, optional, (default=``None``)
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
     sliding_window_width : ``int``, optional, (default=``10``)
         Width of each sliding window. Each window contains ``width + 1``
         objects from the original time series.
+
     sliding_stride : ``int``, optional, (default=``1``)
         Stride between consecutive windows.
+
     diags_metric : ``Union[str, Callable]``, optional,
     (default=``'euclidean'``)
         If set to `'precomputed'`, input data is to be interpreted as a
@@ -87,26 +99,32 @@ class BettiCurvesFeature(TDAFeatures):
         instances and the resulting value recorded. The callable should take
         two arrays from the entry in `X` as input, and return a value
         indicating the distance between them.
+
     diags_homology_dimensions : ``Iterable``, optional, (default=``(0, 1)``)
-        Dimensions (non-negative integers) of the topological feature_creation to be
-        detected.
+        Dimensions (non-negative integers) of the topological feature_creation
+        to be detected.
+
     diags_coeff : ``int`` prime, optional, (default=``2``)
         Compute homology with coefficients in the prime field
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
         :math:`p` equals `coeff`.
+
     diags_max_edge_length : ``float``, optional, (default=``np.inf``)
         Upper bound on the maximum value of the Vietoris-Rips filtration
         parameter. Points whose distance is greater than this value will
-        never be connected by an edge, and topological feature_creation at scales
-        larger than this value will not be detected.
+        never be connected by an edge, and topological feature_creation at
+        scales larger than this value will not be detected.
+
     diags_infinity_values : ``float``, optional, (default=``None``)
-        Which death value to assign to feature_creation which are still alive at
-        filtration value `max_edge_length`. ``None`` has the same behaviour
+        Which death value to assign to feature_creation which are still alive
+        at filtration value `max_edge_length`. ``None`` has the same behaviour
         as `max_edge_length`.
+
     diags_n_jobs : ``int``, optional, (default=``None``)
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
+
     """
     def __init__(self,
                  betti_mode: str,
@@ -115,7 +133,6 @@ class BettiCurvesFeature(TDAFeatures):
                  betti_n_values: int = 100,
                  betti_rolling: int = 1,
                  betti_n_jobs: Optional[int] = None,
-                 interpolation_strategy: str = 'ffill',
                  takens_parameters_type: str = 'search',
                  takens_dimension: int = 5,
                  takens_stride: int = 1,
@@ -149,14 +166,12 @@ class BettiCurvesFeature(TDAFeatures):
         self._betti_homology_dimensions = betti_homology_dimensions
         self._betti_n_values = betti_n_values
         self._betti_n_jobs = betti_n_jobs
-        self._interpolation_strategy = interpolation_strategy
         self._betti_rolling = betti_rolling
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
         and detect the average lifetime for a given homology dimension.
-        Then, assign a value to each initial data points, according to the
-        chosen ``interpolation_strategy``.
+        Then, assign a value to each initial data points.
 
         Parameters
         ----------
@@ -181,7 +196,7 @@ class BettiCurvesFeature(TDAFeatures):
         for betti_feature in betti_features:
             original_points = self._compute_n_points(len(betti_feature))
 
-            output_dfs.append(_align_indices(X, original_points, betti_feature))
+            output_dfs.append(align_indices(X, original_points, betti_feature))
 
         X_aligned = pd.concat(output_dfs, axis=1)
         X_renamed = self._rename_columns(X_aligned)
@@ -190,6 +205,7 @@ class BettiCurvesFeature(TDAFeatures):
 
     def _compute_betti_curves(self, diagrams: np.ndarray) -> List:
         """Given a list of diagrams, compute the betti curves for each of them.
+
         Parameters
         ----------
         diagrams : ``np.ndarray``, required.
@@ -217,20 +233,24 @@ class BettiCurvesFeature(TDAFeatures):
         ``self._betti_mode``. If the value is set to ``mean`` compute the
         rolling mean, if set to ``arg_max`` compute the argmax along the
         epsilon axis.
+
         Parameters
         ----------
         betti_curves : ``List[pd.DataFrame]``, required.
             A list containing the betti surfaces, one for each homology
             dimension.
+
         Returns
         -------
         betti_features : ``List[np.ndarray]``
             The feature_creation extracted from the betti curves.
+
         Raises
         ------
-        ValueError
-            Thrown if a ``self._betti_mode`` has a value which is different
+        ``ValueError``
+            Raised if a ``self._betti_mode`` has a value which is different
             from ``mean`` or ``arg_max``.
+
         """
         if self._betti_mode == 'mean':
             betti_features = self._compute_betti_mean(betti_curves)
@@ -274,6 +294,7 @@ class BettiCurvesFeature(TDAFeatures):
             -> List[np.ndarray]:
         """For each surface in ``betti_surfaces``, compute the argmax along the
          epsilon axis.
+
         Parameters
         ----------
         betti_surfaces : ``List[pd.DataFrame]``, required.

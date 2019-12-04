@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from giottotime.feature_creation.tda_features.base import \
-    TDAFeatures, _align_indices
+    TDAFeatures, align_indices
 
 __all__ = ['NumberOfRelevantHolesFeature']
 
@@ -16,15 +16,13 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
     Parameters
     ----------
     output_name : ``str``, required.
-        The name of the output column
+        The name of the output column.
 
     h_dim: ``int``, optional, (default=``0``)
         The homology dimension on which to compute the average lifetime.
 
     theta: ``float``, optional, (default=``0.7``)
         Constant used to set the threshold in the computation of the holes
-    interpolation_strategy : ``str``, optional, (default=``ffill``)
-        The interpolation strategy to use to fill the values
 
     takens_parameters_type: ``'search'`` | ``'fixed'``, optional,
         (default=``'search'``)
@@ -81,8 +79,8 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         indicating the distance between them.
 
     diags_homology_dimensions : ``Iterable``, optional, (default=``(0, 1)``)
-        Dimensions (non-negative integers) of the topological feature_creation to be
-        detected.
+        Dimensions (non-negative integers) of the topological feature_creation
+        to be detected.
 
     diags_coeff : ``int`` (prime), optional, (default=``2``)
         Compute homology with coefficients in the prime field
@@ -92,12 +90,12 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
     diags_max_edge_length : ``float``, optional, (default=``np.inf``)
         Upper bound on the maximum value of the Vietoris-Rips filtration
         parameter. Points whose distance is greater than this value will
-        never be connected by an edge, and topological feature_creation at scales
-        larger than this value will not be detected.
+        never be connected by an edge, and topological feature_creation at
+        scales larger than this value will not be detected.
 
     diags_infinity_values : ``float``, optional, (default=``None``)
-        Which death value to assign to feature_creation which are still alive at
-        filtration value `max_edge_length`. ``None`` has the same behaviour
+        Which death value to assign to feature_creation which are still alive
+        at filtration value `max_edge_length`. ``None`` has the same behaviour
         as `max_edge_length`.
 
     diags_n_jobs : ``int``, optional, (default=``None``)
@@ -110,7 +108,6 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
                  output_name: str,
                  h_dim: int = 0,
                  theta: float = 0.7,
-                 interpolation_strategy: str = 'ffill',
                  takens_parameters_type: str = 'search',
                  takens_dimension: int = 5,
                  takens_stride: int = 1,
@@ -140,15 +137,15 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
                          diags_infinity_values=diags_infinity_values,
                          diags_n_jobs=diags_n_jobs
                          )
+        self._validate_inputs(h_dim=h_dim, theta=theta)
 
         self._h_dim = h_dim
         self._theta = theta
-        self._interpolation_strategy = interpolation_strategy
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
         and detect the relevant number of holes. Then, assign a value to each
-        initial data points, according to the chosen ``interpolation_strategy``.
+        initial data points.
 
         Parameters
         ----------
@@ -168,7 +165,7 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         n_holes = self._compute_num_relevant_holes(persistence_diagrams)
         n_points = self._compute_n_points(len(n_holes))
 
-        X_aligned = _align_indices(X, n_points, n_holes)
+        X_aligned = align_indices(X, n_points, n_holes)
         X_renamed = self._rename_columns(X_aligned)
 
         return X_renamed
@@ -203,3 +200,33 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
                                                'homology'] == self._h_dim)].shape[0])
 
         return n_rel_holes
+
+    def _validate_inputs(self, h_dim: int, theta: float) -> None:
+        """Validate that ``h_dim`` is either ``0``, ``1`` or ``2`` and that
+        ``theta`` has a strictly postive value.
+
+        Parameters
+        ----------
+        h_dim : ``int``, required.
+            The value of the target homology dimension.
+
+        theta : ``float``, required.
+            The value of theta.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ``ValueError``
+            Raised if ``theta`` is not strictly positive or ``h_dim`` is not
+            ``0``, ``1`` or ``2``.
+        """
+        if h_dim != 0 and h_dim != 1 and h_dim != 2:
+            raise ValueError(f"'h_dim' must have be either 0, 1 or 2, "
+                             f"but has value {h_dim}.")
+
+        if not theta > 0:
+            raise ValueError(f"'theta' must be greater than 0, but instead "
+                             f"has value {theta}.")

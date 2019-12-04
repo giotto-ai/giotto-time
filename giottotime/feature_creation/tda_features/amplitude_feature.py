@@ -1,11 +1,11 @@
 from typing import Iterable, Dict, Optional, Union, Callable
 
-from giottotime.feature_creation.tda_features.base import \
-    TDAFeatures, _align_indices
-
-import pandas as pd
-import numpy as np
 import giotto.diagrams as diag
+import numpy as np
+import pandas as pd
+
+from giottotime.feature_creation.tda_features.base import TDAFeatures, \
+    align_indices
 
 __all__ = ['AmplitudeFeature']
 
@@ -17,7 +17,7 @@ class AmplitudeFeature(TDAFeatures):
     Parameters
     ----------
     output_name: ``str``, required,
-        The name of the output column
+        The name of the output column.
 
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
         ``'betti'`` | ``'heat'``, optional, (default=``'landscape'``)
@@ -55,9 +55,6 @@ class AmplitudeFeature(TDAFeatures):
         The number of jobs to use for the computation. ``None`` means 1 unless
         in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
         processors.
-
-    interpolation_strategy : ``str``, optional, (default=``ffill``)
-        The interpolation strategy to use to fill the values
 
     takens_parameters_type: ``'search'`` | ``'fixed'``, optional,
         (default=``'search'``)
@@ -114,8 +111,8 @@ class AmplitudeFeature(TDAFeatures):
         indicating the distance between them.
 
     diags_homology_dimensions : ``Iterable``, optional, (default=``(0, 1)``)
-        Dimensions (non-negative integers) of the topological feature_creation to be
-        detected.
+        Dimensions (non-negative integers) of the topological feature_creation
+        to be detected.
 
     diags_coeff : ``int`` prime, optional, (default=``2``)
         Compute homology with coefficients in the prime field
@@ -125,12 +122,12 @@ class AmplitudeFeature(TDAFeatures):
     diags_max_edge_length : ``float``, optional, (default=``np.inf``)
         Upper bound on the maximum value of the Vietoris-Rips filtration
         parameter. Points whose distance is greater than this value will
-        never be connected by an edge, and topological feature_creation at scales
-        larger than this value will not be detected.
+        never be connected by an edge, and topological feature_creation at
+        scales larger than this value will not be detected.
 
     diags_infinity_values : ``float``, optional, (default=``None``)
-        Which death value to assign to feature_creation which are still alive at
-        filtration value `max_edge_length`. ``None`` has the same behaviour
+        Which death value to assign to feature_creation which are still alive
+        at filtration value `max_edge_length`. ``None`` has the same behaviour
         as `max_edge_length`.
 
     diags_n_jobs : ``int``, optional, (default=``None``)
@@ -145,7 +142,6 @@ class AmplitudeFeature(TDAFeatures):
                  amplitude_metric_params: Optional[Dict] = None,
                  amplitude_order: Dict = 2,
                  amplitude_n_jobs: Optional[float] = None,
-                 interpolation_strategy: str = 'ffill',
                  takens_parameters_type: str = 'search',
                  takens_dimension: int = 5,
                  takens_stride: int = 1,
@@ -179,13 +175,11 @@ class AmplitudeFeature(TDAFeatures):
         self._amplitude_metric_params = amplitude_metric_params
         self._amplitude_order = amplitude_order
         self._amplitude_n_jobs = amplitude_n_jobs
-        self._interpolation_strategy = interpolation_strategy
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
         and detect the average lifetime for a given homology dimension.
-        Then, assign a value to each initial data points, according to the
-        chosen ``interpolation_strategy``.
+        Then, assign a value to each initial data points.
 
         Parameters
         ----------
@@ -203,9 +197,10 @@ class AmplitudeFeature(TDAFeatures):
         """
         persistence_diagrams = self._compute_persistence_diagrams(X)
         amplitudes = self._calculate_amplitude_feature(persistence_diagrams)
+
         original_points = self._compute_n_points(len(amplitudes))
 
-        X_aligned = _align_indices(X, original_points, amplitudes)
+        X_aligned = align_indices(X, original_points, amplitudes)
         X_renamed = self._rename_columns(X_aligned)
 
         return X_renamed
@@ -225,7 +220,6 @@ class AmplitudeFeature(TDAFeatures):
             calculated with with the given ``metric`` and ``amplitude_order``.
 
         """
-
         amplitude = diag.Amplitude(metric=self._metric,
                                    order=self._amplitude_order,
                                    metric_params=self._amplitude_metric_params,

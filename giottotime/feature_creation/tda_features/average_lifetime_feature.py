@@ -1,7 +1,7 @@
 from typing import Iterable, List, Optional, Callable, Union
 
 from giottotime.feature_creation.tda_features.base import \
-    TDAFeatures, _align_indices
+    TDAFeatures, align_indices
 
 import pandas as pd
 import numpy as np
@@ -16,13 +16,10 @@ class AvgLifeTimeFeature(TDAFeatures):
     Parameters
     ----------
     output_name : ``str``, required.
-        The name of the output column
+        The name of the output column.
 
     h_dim : ``int``, optional, (default=``0``)
         The homology dimension on which to compute the average lifetime.
-
-    interpolation_strategy : ``str``, optional, (default=``ffill``)
-        The interpolation strategy to use to fill the values
 
     takens_parameters_type: ``'search'`` | ``'fixed'``, optional,
         (default=``'search'``)
@@ -79,8 +76,8 @@ class AvgLifeTimeFeature(TDAFeatures):
         indicating the distance between them.
 
     diags_homology_dimensions : ``Iterable``, optional, (default=``(0, 1)``)
-        Dimensions (non-negative integers) of the topological feature_creation to be
-        detected.
+        Dimensions (non-negative integers) of the topological feature_creation
+        to be detected.
 
     diags_coeff : ``int`` prime, optional, (default=``2``)
         Compute homology with coefficients in the prime field
@@ -90,12 +87,12 @@ class AvgLifeTimeFeature(TDAFeatures):
     diags_max_edge_length : ``float``, optional, (default=``np.inf``)
         Upper bound on the maximum value of the Vietoris-Rips filtration
         parameter. Points whose distance is greater than this value will
-        never be connected by an edge, and topological feature_creation at scales
-        larger than this value will not be detected.
+        never be connected by an edge, and topological feature_creation at
+        scales larger than this value will not be detected.
 
     diags_infinity_values : ``float``, optional, (default=``None``)
-        Which death value to assign to feature_creation which are still alive at
-        filtration value `max_edge_length`. ``None`` has the same behaviour
+        Which death value to assign to feature_creation which are still alive
+        at filtration value `max_edge_length`. ``None`` has the same behaviour
         as `max_edge_length`.
 
     diags_n_jobs : ``int``, optional, (default=``None``)
@@ -107,7 +104,6 @@ class AvgLifeTimeFeature(TDAFeatures):
     def __init__(self,
                  output_name: str,
                  h_dim: int = 0,
-                 interpolation_strategy: str = 'ffill',
                  takens_parameters_type: str = 'search',
                  takens_dimension: int = 5,
                  takens_stride: int = 1,
@@ -138,13 +134,11 @@ class AvgLifeTimeFeature(TDAFeatures):
                          diags_n_jobs=diags_n_jobs
                          )
         self._h_dim = h_dim
-        self._interpolation_strategy = interpolation_strategy
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
         and detect the average lifetime for a given homology dimension.
-        Then, assign a value to each initial data points, according to the
-        chosen ``interpolation_strategy``.
+        Then, assign a value to each initial data points.
 
         Parameters
         ----------
@@ -161,15 +155,15 @@ class AvgLifeTimeFeature(TDAFeatures):
 
         """
         persistence_diagrams = self._compute_persistence_diagrams(X)
-        avg_lifetime = self._average_lifetime(persistence_diagrams)
+        avg_lifetime = self._compute_average_lifetime(persistence_diagrams)
         original_points = self._compute_n_points(len(avg_lifetime))
 
-        X_aligned = _align_indices(X, original_points, avg_lifetime)
+        X_aligned = align_indices(X, original_points, avg_lifetime)
         X_renamed = self._rename_columns(X_aligned)
 
         return X_renamed
 
-    def _average_lifetime(self, persistence_diagrams: np.ndarray) -> List:
+    def _compute_average_lifetime(self, persistence_diagrams: np.ndarray) -> List:
         """Compute the average lifetime of a given homology dimension in the
         point cloud.
 
