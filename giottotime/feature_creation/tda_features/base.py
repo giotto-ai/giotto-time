@@ -117,7 +117,8 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
         Parameters
         ----------
         n_windows : ``int``, required.
-            The number of windows after the SlidingWindow step.
+            The number of windows after the SlidingWindow step. This must be
+            strictly positive.
 
         Returns
         -------
@@ -125,7 +126,15 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
             The total number of points that have been used in the
             TakensEmbedding and SlidingWindow steps.
 
+        Raises
+        ------
+        ``ValueError``
+            Raised if ``n_windows`` is not positive.
+
         """
+        if n_windows <= 0:
+            raise ValueError(f"The number of windows should be greater than "
+                             f"0, instead was {n_windows}.")
         embedder_length = self.sliding_stride * (n_windows-1) + \
                           self.sliding_window_width
 
