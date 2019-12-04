@@ -40,12 +40,12 @@ class TimeSeriesFeature(metaclass=ABCMeta):
             The original DataFrame ``X``, with the columns renamed.
 
         """
-        suffix = ""
+        suffix = ''
 
         X_renamed = X.T.reset_index(drop=True).T
         for index, col in enumerate(X_renamed.columns):
             if len(X.columns) > 1:
-                suffix = "_" + str(index)
+                suffix = '_' + str(index)
             X_renamed.rename(columns={col: self.output_name + str(suffix)},
                              inplace=True)
 
