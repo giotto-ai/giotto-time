@@ -1,6 +1,16 @@
+import pandas as pd
 import pandas.util.testing as testing
 
-from giottotime.feature_creation import ShiftFeature, MovingAverageFeature
+from giottotime.feature_creation import MovingAverageFeature
+from giottotime.feature_creation.base import TimeSeriesFeature
+
+
+class TestTimeSeriesFeature(TimeSeriesFeature):
+    def __init__(self, output_name):
+        super().__init__(output_name=output_name)
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        pass
 
 
 def test_correct_renaming_single_col():
@@ -9,7 +19,7 @@ def test_correct_renaming_single_col():
     df = testing.makeTimeDataFrame(freq='MS')
 
     output_name = 'shift'
-    shift_feature = ShiftFeature(shift=1, output_name=output_name)
+    shift_feature = TestTimeSeriesFeature(output_name=output_name)
     df_renamed = shift_feature._rename_columns(df)
 
     assert df.shape == df_renamed.shape
@@ -25,12 +35,12 @@ def test_correct_renaming_multiple_columns():
     df = testing.makeTimeDataFrame(freq='MS')
 
     output_name = 'shift'
-    shift_feature = ShiftFeature(shift=1, output_name=output_name)
+    shift_feature = TestTimeSeriesFeature(output_name=output_name)
     df_renamed = shift_feature._rename_columns(df)
 
     assert df.shape == df_renamed.shape
 
-    expected_cols = ['{output_name}_{k}' for k in range(n_cols)]
+    expected_cols = [f'{output_name}_{k}' for k in range(n_cols)]
 
     assert (expected_cols == df_renamed.columns).all()
 
