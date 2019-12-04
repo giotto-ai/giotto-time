@@ -6,7 +6,6 @@ __all__ = [
     'LinearRegressor',
     'GAR',
     'TrendModel',
-    'CustomTrend',
     'ExponentialTrend',
     'FunctionTrend',
     'PolynomialTrend'
