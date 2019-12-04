@@ -16,7 +16,7 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
     Parameters
     ----------
     output_name : ``str``, required.
-        The name of the output column
+        The name of the output column.
 
     h_dim: ``int``, optional, (default=``0``)
         The homology dimension on which to compute the average lifetime.
@@ -24,7 +24,7 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
     theta: ``float``, optional, (default=``0.7``)
         Constant used to set the threshold in the computation of the holes
     interpolation_strategy : ``str``, optional, (default=``ffill``)
-        The interpolation strategy to use to fill the values
+        The interpolation strategy to use to fill the values.
 
     takens_parameters_type: ``'search'`` | ``'fixed'``, optional,
         (default=``'search'``)
@@ -81,8 +81,8 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         indicating the distance between them.
 
     diags_homology_dimensions : ``Iterable``, optional, (default=``(0, 1)``)
-        Dimensions (non-negative integers) of the topological feature_creation to be
-        detected.
+        Dimensions (non-negative integers) of the topological feature_creation
+        to be detected.
 
     diags_coeff : ``int`` (prime), optional, (default=``2``)
         Compute homology with coefficients in the prime field
@@ -92,12 +92,12 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
     diags_max_edge_length : ``float``, optional, (default=``np.inf``)
         Upper bound on the maximum value of the Vietoris-Rips filtration
         parameter. Points whose distance is greater than this value will
-        never be connected by an edge, and topological feature_creation at scales
-        larger than this value will not be detected.
+        never be connected by an edge, and topological feature_creation at
+        scales larger than this value will not be detected.
 
     diags_infinity_values : ``float``, optional, (default=``None``)
-        Which death value to assign to feature_creation which are still alive at
-        filtration value `max_edge_length`. ``None`` has the same behaviour
+        Which death value to assign to feature_creation which are still alive
+        at filtration value `max_edge_length`. ``None`` has the same behaviour
         as `max_edge_length`.
 
     diags_n_jobs : ``int``, optional, (default=``None``)
