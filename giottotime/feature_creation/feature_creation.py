@@ -2,8 +2,8 @@ from typing import List
 
 import pandas as pd
 
-from giottotime.feature_creation.base import TimeSeriesFeature
-from giottotime.feature_creation.time_series_features import ShiftFeature
+from .base import TimeSeriesFeature
+from .time_series_features import ShiftFeature
 
 __all__ = ["FeatureCreation"]
 

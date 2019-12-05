@@ -6,8 +6,8 @@ from scipy.optimize import minimize
 import numpy as np
 import pandas as pd
 
-from giottotime.models.utils import check_is_fitted
-from giottotime.models.trend_models.base import TrendModel
+from ..utils import check_is_fitted
+from ..trend_models.base import TrendModel
 
 
 class PolynomialTrend(TrendModel):
