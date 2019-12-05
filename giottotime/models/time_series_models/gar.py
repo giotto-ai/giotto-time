@@ -25,17 +25,17 @@ class GAR:
         prediction time.
 
     """
+
     def __init__(self, base_model: object, feed_forward: bool = False):
-        if not hasattr(base_model, 'fit') or \
-                not hasattr(base_model, 'predict'):
-            raise TypeError(f"{base_model} must implement both 'fit' "
-                            f"and 'predict' methods")
+        if not hasattr(base_model, "fit") or not hasattr(base_model, "predict"):
+            raise TypeError(
+                f"{base_model} must implement both 'fit' " f"and 'predict' methods"
+            )
 
         self._base_model = base_model
         self._feed_forward = feed_forward
 
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame,
-            **kwargs: object) -> object:
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame, **kwargs: object) -> object:
         """Fit the GAR model according to the training data.
 
         Parameters
@@ -62,21 +62,21 @@ class GAR:
         models_per_predstep = [deepcopy(self._base_model) for _ in range(y.shape[1])]
 
         for pred_step, model_for_pred_step in enumerate(models_per_predstep):
-            target_y = y[f'y_{pred_step}']
+            target_y = y[f"y_{pred_step}"]
             model_for_pred_step.fit(features, target_y, **kwargs)
 
             if self._feed_forward:
                 predictions = model_for_pred_step.predict(features)
-                features[f'preds_{pred_step}'] = predictions
+                features[f"preds_{pred_step}"] = predictions
 
         self.models_per_predstep_ = models_per_predstep
         self.train_features_ = X
 
         return self
 
-    def predict(self, X: pd.DataFrame,
-                start_date: Optional[Union[pd.Timestamp, str]] = None) \
-            -> pd.DataFrame:
+    def predict(
+        self, X: pd.DataFrame, start_date: Optional[Union[pd.Timestamp, str]] = None
+    ) -> pd.DataFrame:
         """Make predictions for each sample and for each prediction step.
 
         Parameters
@@ -117,9 +117,9 @@ class GAR:
 
         for pred_step, model_for_pred_step in enumerate(self.models_per_predstep_):
             model_predictions = model_for_pred_step.predict(test_features)
-            predictions[f'y_{pred_step}'] = model_predictions
+            predictions[f"y_{pred_step}"] = model_predictions
 
             if self._feed_forward:
-                test_features[f'preds_{pred_step}'] = model_predictions
+                test_features[f"preds_{pred_step}"] = model_predictions
 
         return predictions

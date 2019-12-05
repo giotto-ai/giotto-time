@@ -21,12 +21,12 @@ def check_is_fitted(estimator: object) -> None:
         If the attributes are not found.
 
     """
-    if not hasattr(estimator, 'fit'):
-        raise TypeError(f"{estimator} must implement both 'fit' "
-                        f"and 'predict' methods")
+    if not hasattr(estimator, "fit"):
+        raise TypeError(
+            f"{estimator} must implement both 'fit' " f"and 'predict' methods"
+        )
 
-    attrs = [v for v in vars(estimator)
-             if v.endswith("_")]
+    attrs = [v for v in vars(estimator) if v.endswith("_")]
 
     if not attrs:
         raise NotFittedError("Not fitted")

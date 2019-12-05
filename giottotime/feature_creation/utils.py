@@ -3,8 +3,9 @@ from typing import Tuple
 import pandas as pd
 
 
-def split_train_test(X: pd.DataFrame, y: pd.DataFrame) \
-        -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def split_train_test(
+    X: pd.DataFrame, y: pd.DataFrame
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Split the ``X`` and ``y`` in train and test set. First, the rows of
     ``X`` that contain a ``Nan`` value are dropped, as well as the
     corresponding rows of ``y``. Then, the training set is composed of all the
@@ -39,8 +40,9 @@ def split_train_test(X: pd.DataFrame, y: pd.DataFrame) \
     return X_train, y_train, X_test, y_test
 
 
-def _get_non_nan_values(X: pd.DataFrame, y: pd.DataFrame) \
-        -> (pd.DataFrame, pd.DataFrame):
+def _get_non_nan_values(
+    X: pd.DataFrame, y: pd.DataFrame
+) -> (pd.DataFrame, pd.DataFrame):
     """Find all rows of X that have at least a ``Nan``value and drop them. Drop
     also the corresponding rows of y.
 
@@ -59,7 +61,7 @@ def _get_non_nan_values(X: pd.DataFrame, y: pd.DataFrame) \
         A tuple containing the two DataFrame.
 
     """
-    X_non_nans = X.dropna(axis='index', how='any')
+    X_non_nans = X.dropna(axis="index", how="any")
     y_non_nans = y.loc[X_non_nans.index]
 
     return X_non_nans, y_non_nans

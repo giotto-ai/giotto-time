@@ -7,6 +7,7 @@ class Splitter(metaclass=ABCMeta):
 
     Both the X and y matrices must be passed in the transform methods
     """
+
     @abstractmethod
     def transform(self, X, y, **kwargs):
         pass

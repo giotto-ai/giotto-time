@@ -7,10 +7,10 @@ from giottotime.models.trend_models.polynomial_trend import PolynomialTrend
 from giottotime.models.trend_models.exponential_trend import ExponentialTrend
 
 __all__ = [
-    'DetrendedFeature',
-    'RemovePolynomialTrend',
-    'RemoveExponentialTrend',
-    'RemoveFunctionTrend'
+    "DetrendedFeature",
+    "RemovePolynomialTrend",
+    "RemoveExponentialTrend",
+    "RemoveFunctionTrend",
 ]
 
 
@@ -26,6 +26,7 @@ class DetrendedFeature(TimeSeriesFeature):
         The name of the output column.
 
     """
+
     def __init__(self, trend_model: TrendModel, output_name: str):
         super().__init__(output_name)
         self.trend_model = trend_model
@@ -49,8 +50,7 @@ class DetrendedFeature(TimeSeriesFeature):
 
 
 class RemovePolynomialTrend(DetrendedFeature):
-    def __init__(self, output_name: str, polynomial_order=1,
-                 loss=mean_squared_error):
+    def __init__(self, output_name: str, polynomial_order=1, loss=mean_squared_error):
         self.trend_model = PolynomialTrend(order=polynomial_order, loss=loss)
         super().__init__(trend_model=self.trend_model, output_name=output_name)
 

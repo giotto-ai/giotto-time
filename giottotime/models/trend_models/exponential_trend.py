@@ -19,10 +19,11 @@ class ExponentialTrend(TrendModel):
         accept y_true, y_pred and return a single real number.
 
     """
+
     def __init__(self, loss=mean_squared_error):
         self.loss = loss
 
-    def fit(self, time_series: pd.DataFrame, method: str = "BFGS"):
+    def fit(self, time_series: pd.DataFrame, method: str = "BFGS") -> TrendModel:
         """Fit the model on the ``time_series``, with respect to the provided
         ``loss`` and using the provided ``method``. In order to see which
         methods are available, please check the 'scipy' `documentation
@@ -42,16 +43,20 @@ class ExponentialTrend(TrendModel):
             The fitted object.
 
         """
+
         def prediction_error(exponent):
-            predictions = [np.exp(t * exponent) for t in
-                           range(0, time_series.shape[0])]
+            predictions = [np.exp(t * exponent) for t in range(0, time_series.shape[0])]
             return self.loss(time_series.values, predictions)
 
         model_exponent = 0
-        res = minimize(prediction_error, np.array([model_exponent]),
-                       method=method, options={'disp': False})
+        res = minimize(
+            prediction_error,
+            np.array([model_exponent]),
+            method=method,
+            options={"disp": False},
+        )
 
-        self.model_exponent_ = res['x'][0]
+        self.model_exponent_ = res["x"][0]
         return self
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -91,7 +96,10 @@ class ExponentialTrend(TrendModel):
             The transformed time series, without the trend.
 
         """
-        predictions = pd.DataFrame(index=time_series.index,
-                                   data=[np.exp(t * self.model_exponent_) for t
-                                         in range(0, time_series.shape[0])])
+        predictions = pd.DataFrame(
+            index=time_series.index,
+            data=[
+                np.exp(t * self.model_exponent_) for t in range(0, time_series.shape[0])
+            ],
+        )
         return time_series - predictions[0]

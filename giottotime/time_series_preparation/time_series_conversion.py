@@ -138,7 +138,6 @@ class SequenceToTimeIndexSeries(TimeSeriesConversion):
 
 
 class PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
-
     def __init__(self,
                  start: Optional[Union[pd.datetime, str]] = None,
                  end: Optional[Union[pd.datetime, str]] = None,
