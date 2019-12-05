@@ -11,8 +11,7 @@ PandasDate = Union[pd.datetime, pd.Timestamp, str]
 
 
 def count_not_none(*args):
-    """
-    Returns the count of arguments that are not None.
+    """Returns the count of arguments that are not None.
     """
     return sum(x is not None for x in args)
 
