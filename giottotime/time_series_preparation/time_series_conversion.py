@@ -27,6 +27,26 @@ def check_period_range_parameters(
 
 
 class TimeSeriesConversion(ABC):
+    """Parent class for all time series type conversions.
+
+    Subclasses must implement the two methods `_get_index_from` and `_get_values_from`.
+
+    Parameters
+    ----------
+    start : ``PandasData``, optional, (default=``None``)
+        start date of the output time series. Not mandatory for all time series
+        conversion.
+
+    end : ``PandasData``, optional, (default=``None``)
+        end date of the output time series. Not mandatory for all time series
+        conversion.
+
+    freq : ``pd.Timedelta``, optional, (default=``None``)
+        frequency of the output time series. Not mandatory for all time series
+        conversion.
+
+    """
+
     def __init__(
         self,
         start: Optional[PandasDate] = None,
@@ -36,18 +56,32 @@ class TimeSeriesConversion(ABC):
         self._initialize_start_end_freq(start, end, freq)
 
     def fit(self, X, y=None):
+        """Default method for compatibility.
+
+        Parameters
+        ----------
+        X : object, required.
+        y : object, optional, (default=``None``)
+
+        Returns
+        -------
+        self
+        """
         return self
 
     def transform(
         self, array_like_object: Union[pd.Series, np.array, list]
     ) -> pd.Series:
-        """
-        Transforms an array-like object (list, np.array, pd.Series)
-        into a pd.Series with PeriodIndex
+        """Transforms an array-like object (list, np.array, pd.Series)
+        into a pd.Series with time index.
+
+        It calls internally the abstract methods `_get_index_from()` and
+        `_get_values_from()`. These are implemented in the subclasses.
 
         Parameters
         ----------
-        array_like_object: Union[List, np.array, pd.Series]
+        array_like_object : Union[List, np.array, pd.Series], required.
+            It depends on the implementation of the subclasses.
 
         Returns
         -------
@@ -58,23 +92,76 @@ class TimeSeriesConversion(ABC):
         return pd.Series(data=values, index=index)
 
     def fit_transform(self, X, y=None):
+        """Default method for compatibility.
+
+        Parameters
+        ----------
+        X : object, required.
+        y : object, optional, (default=``None``)
+
+        Returns
+        -------
+        self.transform(X)
+        """
         return self.transform(X)
 
     @abstractmethod
     def _get_index_from(
-        self, array_like_object: Union[pd.Series, np.array, list]
+        self, array_like_object: Union[pd.Series, np.ndarray, list]
     ) -> PandasTimeIndex:
+        """Abstract method that extract the index from an array-like object.
+        It must return a PandasTimeIndex
+
+        Parameters
+        ----------
+        array_like_object : Union[pd.Series, np.ndarray, list], required.
+
+        Returns
+        -------
+        index : PandasTimeIndex
+            the index of the returning Pandas Series.
+        """
         pass
 
     @abstractmethod
     def _get_values_from(
         self, array_like_object: Union[pd.Series, np.array, list]
-    ) -> np.array:
+    ) -> np.ndarray:
+        """Abstract method that extract the index from an array-like object.
+        It must return a np.array
+
+        Parameters
+        ----------
+        array_like_object : Union[pd.Series, np.ndarray, list], required.
+
+        Returns
+        -------
+        values : np.array
+            the values of the returning Pandas Series.
+        """
         pass
 
     def _initialize_start_end_freq(
         self, start: PandasDate, end: PandasDate, freq: pd.Timedelta
     ):
+        """Initialization of the parameters `start`, `end` and `freq`.
+
+        Exactly two out of three must be specified.
+
+        Parameters
+        ----------
+        start : PandasData, required.
+        end : PandasData, required
+        freq : pd.Timedelta, required
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError : if three of them are specified.
+        """
         not_none_params = count_not_none(start, end, freq)
         if not_none_params == 0:
             self._default_params_initialization()
@@ -112,7 +199,18 @@ class TimeSeriesConversion(ABC):
         self.end = end
         self.freq = freq
 
-    def _compute_index_of_length(self, length: int) -> pd.PeriodIndex:
+    def _compute_period_index_of_length(self, length: int) -> pd.PeriodIndex:
+        """ Returns a period index of the given length. It uses the private attributes
+        ``start``, ``end``, ``freq``.
+
+        Parameters
+        ----------
+        length : int, required.
+
+        Returns
+        -------
+        pd.PeriodIndex
+        """
         check_period_range_parameters(self.start, self.end, length)
         return pd.period_range(
             start=self.start, end=self.end, periods=length, freq=self.freq
@@ -120,20 +218,59 @@ class TimeSeriesConversion(ABC):
 
 
 class SequenceToTimeIndexSeries(TimeSeriesConversion):
+    """Converts a np.array or list to Series with PeriodIndex.
+
+    Parameters
+    -----------
+    start : ``PandasDate``, optional, (default=``None``)
+        start date of the output time series. Not mandatory for all time series
+        conversion.
+
+    end : ``PandasDate``, optional, (default=``None``)
+        end date of the output time series. Not mandatory for all time series
+        conversion.
+
+    freq : ``pd.Timedelta``, optional, (default=``None``)
+        frequency of the output time series. Not mandatory for all time series
+        conversion.
+    """
+
     def __init__(
         self,
-        start: Optional[Union[pd.datetime, str]] = None,
-        end: Optional[Union[pd.datetime, str]] = None,
-        freq: Optional[pd.DateOffset] = None,
+        start: Optional[PandasDate] = None,
+        end: Optional[PandasDate] = None,
+        freq: Optional[pd.Timedelta] = None,
     ) -> None:
         super().__init__(start, end, freq)
 
     def _get_index_from(
         self, array_like_object: Union[np.array, List[float]]
-    ) -> PandasTimeIndex:
-        return self._compute_index_of_length(len(array_like_object))
+    ) -> pd.PeriodIndex:
+        """Computes a pd.PeriodIndex for the output time series.
 
-    def _get_values_from(self, array_like_object: List[float]) -> np.array:
+        Parameters
+        ----------
+        array_like_object: Union[np.array, List[float]], required
+
+        Returns
+        -------
+        pd.PeriodIndex
+        """
+        return self._compute_period_index_of_length(len(array_like_object))
+
+    def _get_values_from(
+        self, array_like_object: Union[np.array, List[float]]
+    ) -> np.array:
+        """Computes the values for the output time series.
+
+        Parameters
+        ----------
+        array_like_object: Union[np.array, List[float]], required
+
+        Returns
+        -------
+        pd.PeriodIndex
+        """
         return np.array(array_like_object)
 
 
@@ -152,7 +289,7 @@ class PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
         if self._has_time_index(array_like_object):
             return array_like_object.index
         else:
-            return self._compute_index_of_length(array_like_object.shape[0])
+            return self._compute_period_index_of_length(array_like_object.shape[0])
 
     def _get_values_from(
         self, array_like_object: Union[pd.Series, np.array, list]

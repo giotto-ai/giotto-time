@@ -2,6 +2,7 @@ from typing import List, Union
 
 import numpy as np
 import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
 
 from giottotime.time_series_preparation.time_series_resampling import (
     TimeSeriesResampler,
@@ -18,7 +19,7 @@ SUPPORTED_SEQUENCE_TYPES = [
 ]
 
 
-class TimeSeriesPreparation:
+class TimeSeriesPreparation(BaseEstimator, TransformerMixin):
     def __init__(
         self,
         start_date: pd.datetime = None,
@@ -44,10 +45,11 @@ class TimeSeriesPreparation:
             self.freq
         )
 
-    def fit_transform(
-        self, array_like_object: Union[List, np.array, pd.Series]
-    ) -> pd.DataFrame:
-        pandas_time_series = self._to_time_index_series(array_like_object)
+    def fit(self, X: Union[List, np.array, pd.Series], y=None):
+        return self
+
+    def transform(self, X: Union[List, np.array, pd.Series]) -> pd.DataFrame:
+        pandas_time_series = self._to_time_index_series(X)
         equispaced_time_series = self._to_equispaced_time_series(pandas_time_series)
         period_index_time_series = self._to_period_index_time_series(
             equispaced_time_series
