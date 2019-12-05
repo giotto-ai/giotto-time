@@ -5,10 +5,10 @@ import pandas as pd
 from giottotime.feature_creation.base import TimeSeriesFeature
 from giottotime.feature_creation.time_series_features import ShiftFeature
 
-__all__ = ["FeaturesCreation"]
+__all__ = ["FeatureCreation"]
 
 
-class FeaturesCreation:
+class FeatureCreation:
     """Class responsible for the generation of the feature_creation, starting
     from a list of ``TimeSeriesFeature``.
 
