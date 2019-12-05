@@ -5,18 +5,18 @@ from .time_series_features import *
 from .trend_features import *
 
 __all__ = [
-    'FeaturesCreation',
-    'ShiftFeature',
-    'MovingAverageFeature',
-    'ConstantFeature',
-    'PolynomialFeature',
-    'ExogenousFeature',
-    'CustomFeature',
-    'tda_features',
-    'CalendarFeature',
-    'PeriodicSeasonalFeature',
-    'DetrendedFeature',
-    'RemovePolynomialTrend',
-    'RemoveExponentialTrend',
-    'RemoveFunctionTrend'
+    "FeaturesCreation",
+    "ShiftFeature",
+    "MovingAverageFeature",
+    "ConstantFeature",
+    "PolynomialFeature",
+    "ExogenousFeature",
+    "CustomFeature",
+    "tda_features",
+    "CalendarFeature",
+    "PeriodicSeasonalFeature",
+    "DetrendedFeature",
+    "RemovePolynomialTrend",
+    "RemoveExponentialTrend",
+    "RemoveFunctionTrend",
 ]

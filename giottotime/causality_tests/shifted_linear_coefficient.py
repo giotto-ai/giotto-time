@@ -13,6 +13,7 @@ class ShiftedLinearCoefficient(CausalityTest):
     Parameters
     ----------
     """
+
     def __init__(self):
         pass
 
@@ -47,24 +48,24 @@ class ShiftedLinearCoefficient(CausalityTest):
             max_corr = res[0]
             N = data.shape[0] - max_shift
 
-            self.best_shifts_ = self.best_shifts_.append({'x': x,
-                                                          'y': y,
-                                                          'shift': best_shift,
-                                                          'max_corr': max_corr
-                                                          }, ignore_index=True
-                                                         )
+            self.best_shifts_ = self.best_shifts_.append(
+                {"x": x, "y": y, "shift": best_shift, "max_corr": max_corr},
+                ignore_index=True,
+            )
 
-        best_shifts = pd.pivot_table(self.best_shifts_, index=['x'],
-                                     columns=['y'], values='shift')
-        max_corrs = pd.pivot_table(self.best_shifts_, index=['x'],
-                                   columns=['y'], values='max_corr')
+        best_shifts = pd.pivot_table(
+            self.best_shifts_, index=["x"], columns=["y"], values="shift"
+        )
+        max_corrs = pd.pivot_table(
+            self.best_shifts_, index=["x"], columns=["y"], values="max_corr"
+        )
 
         self.best_shifts_ = best_shifts
         self.max_corrs_ = max_corrs
 
         return best_shifts, max_corrs
 
-    def transform(self, data, target_col='y', dropna=False):
+    def transform(self, data, target_col="y", dropna=False):
         """Shifts each input timeseries but the amount which maximizes
         shifted linear fit coefficients with the selected 'y' colums.
 
@@ -97,7 +98,6 @@ class ShiftedLinearCoefficient(CausalityTest):
 
         return data
 
-
     def _all_best_coeff_shifts(self, max_shift):
         self.best_shifts_ = pd.DataFrame()
 
@@ -108,20 +108,21 @@ class ShiftedLinearCoefficient(CausalityTest):
             max_corr = res[0]
             N = self.data.shape[0] - max_shift
 
-            self.best_shifts_ = self.best_shifts_.append({'x': x,
-                                                        'y': y,
-                                                        'shift': best_shift,
-                                                        'max_corr': max_corr
-                                                          }, ignore_index=True)
+            self.best_shifts_ = self.best_shifts_.append(
+                {"x": x, "y": y, "shift": best_shift, "max_corr": max_corr},
+                ignore_index=True,
+            )
 
-        best_shifts = pd.pivot_table(self.best_shifts_, index=['x'],
-                                     columns=['y'], values='shift')
-        max_corrs = pd.pivot_table(self.best_shifts_, index=['x'],
-                                   columns=['y'], values='max_corr')
+        best_shifts = pd.pivot_table(
+            self.best_shifts_, index=["x"], columns=["y"], values="shift"
+        )
+        max_corrs = pd.pivot_table(
+            self.best_shifts_, index=["x"], columns=["y"], values="max_corr"
+        )
 
         return best_shifts, max_corrs
 
-    def _get_max_coeff_shift(self, data, max_shift, x='x', y='y'):
+    def _get_max_coeff_shift(self, data, max_shift, x="x", y="y"):
         shifts = pd.DataFrame()
 
         shifts[x] = self.data[x]
@@ -131,8 +132,7 @@ class ShiftedLinearCoefficient(CausalityTest):
             shifts[shift] = self.data[x].shift(shift)
 
         shifts = shifts.dropna()
-        lf = LinearRegression().fit(shifts[range(max_shift)].values,
-                                    shifts[y].values)
+        lf = LinearRegression().fit(shifts[range(max_shift)].values, shifts[y].values)
 
         q = lf.coef_.max(), np.argmax(lf.coef_)
         return q

@@ -9,7 +9,7 @@ class GrangerTest:
     def __init__(self, data):
         self.data = data
 
-    def shifted_partial_corr_matrix(self, max_shift, x='x', y='y'):
+    def shifted_partial_corr_matrix(self, max_shift, x="x", y="y"):
         shifts = pd.DataFrame()
 
         for shift in range(max_shift):
@@ -30,20 +30,21 @@ class GrangerTest:
             max_corr = res[0]
             N = self.data.shape[0] - max_shift
 
-            self.best_shifts = self.best_shifts.append({'x': x,
-                                                        'y': y,
-                                                        'shift': best_shift,
-                                                        'max_corr': max_corr
-                                                        }, ignore_index=True)
+            self.best_shifts = self.best_shifts.append(
+                {"x": x, "y": y, "shift": best_shift, "max_corr": max_corr},
+                ignore_index=True,
+            )
 
-        best_shifts = pd.pivot_table(self.best_shifts, index=['x'],
-                                     columns=['y'], values='shift')
-        max_corrs = pd.pivot_table(self.best_shifts, index=['x'],
-                                   columns=['y'], values='max_corr')
+        best_shifts = pd.pivot_table(
+            self.best_shifts, index=["x"], columns=["y"], values="shift"
+        )
+        max_corrs = pd.pivot_table(
+            self.best_shifts, index=["x"], columns=["y"], values="max_corr"
+        )
 
         return best_shifts, max_corrs
 
-    def get_max_corr_shift(self, max_shift, x='x', y='y'):
+    def get_max_corr_shift(self, max_shift, x="x", y="y"):
         shifts = pd.DataFrame()
 
         for shift in range(max_shift):
@@ -65,20 +66,21 @@ class GrangerTest:
             max_corr = res[0]
             N = self.data.shape[0] - max_shift
 
-            self.best_shifts = self.best_shifts.append({'x': x,
-                                                        'y': y,
-                                                        'shift': best_shift,
-                                                        'max_corr': max_corr
-                                                        }, ignore_index=True)
+            self.best_shifts = self.best_shifts.append(
+                {"x": x, "y": y, "shift": best_shift, "max_corr": max_corr},
+                ignore_index=True,
+            )
 
-        best_shifts = pd.pivot_table(self.best_shifts, index=['x'],
-                                     columns=['y'], values='shift')
-        max_corrs = pd.pivot_table(self.best_shifts, index=['x'],
-                                   columns=['y'], values='max_corr')
+        best_shifts = pd.pivot_table(
+            self.best_shifts, index=["x"], columns=["y"], values="shift"
+        )
+        max_corrs = pd.pivot_table(
+            self.best_shifts, index=["x"], columns=["y"], values="max_corr"
+        )
 
         return best_shifts, max_corrs
 
-    def get_max_coeff_shift(self, max_shift, x='x', y='y'):
+    def get_max_coeff_shift(self, max_shift, x="x", y="y"):
         shifts = pd.DataFrame()
 
         shifts[x] = self.data[x]
@@ -88,12 +90,10 @@ class GrangerTest:
             shifts[shift] = self.data[x].shift(shift)
 
         shifts = shifts.dropna()
-        lf = LinearRegression().fit(shifts[range(max_shift)].values,
-                                    shifts[y].values)
+        lf = LinearRegression().fit(shifts[range(max_shift)].values, shifts[y].values)
 
         q = lf.coef_.max(), np.argmax(lf.coef_)
         return q
-
 
 
 if __name__ == "__main__":
@@ -102,13 +102,15 @@ if __name__ == "__main__":
 
     testing.N, testing.K = 2000, 1
 
-    df = testing.makeTimeDataFrame(freq='MS')
-    df['B'] = df['A'].shift(8) + pd.Series(
-        data=np.random.normal(0, 0.3, df.shape[0]), index=df.index)
+    df = testing.makeTimeDataFrame(freq="MS")
+    df["B"] = df["A"].shift(8) + pd.Series(
+        data=np.random.normal(0, 0.3, df.shape[0]), index=df.index
+    )
 
     for k in range(10):
-        df[f'C_{k}'] = df['A'].shift(8 + randint(10, 20)) + pd.Series(
-            data=np.random.normal(0, 0.3, df.shape[0]), index=df.index)
+        df[f"C_{k}"] = df["A"].shift(8 + randint(10, 20)) + pd.Series(
+            data=np.random.normal(0, 0.3, df.shape[0]), index=df.index
+        )
 
     df = df.dropna()
 
@@ -121,7 +123,8 @@ if __name__ == "__main__":
     print(w[1])
 
     print(
-        "\n\n±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±\n\n")
+        "\n\n±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±\n\n"
+    )
 
     q = gt.all_best_coeff_shifts(max_shift=20)
 

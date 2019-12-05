@@ -11,6 +11,7 @@ class ShiftedPearsonCorrelation(CausalityTest):
     Parameters
     ----------
     """
+
     def __init__(self):
         pass
 
@@ -37,35 +38,31 @@ class ShiftedPearsonCorrelation(CausalityTest):
         """
         self.best_shifts_ = pd.DataFrame()
 
-        for x, y in product(data.columns, repeat=2 ):
+        for x, y in product(data.columns, repeat=2):
             res = self._get_max_corr_shift(data, max_shift, x=x, y=y)
 
             best_shift = res[1]
             max_corr = res[0]
             # N = data.shape[0] - max_shift
 
-            self.best_shifts_ = self.best_shifts_.append({'x': x ,
-                                                          'y': y,
-                                                          'shift': best_shift,
-                                                          'max_corr': max_corr
-                                                          }, ignore_index=True
-                                                         )
+            self.best_shifts_ = self.best_shifts_.append(
+                {"x": x, "y": y, "shift": best_shift, "max_corr": max_corr},
+                ignore_index=True,
+            )
 
-        best_shifts = pd.pivot_table(self.best_shifts_,
-                                     index=['x'],
-                                     columns=['y'],
-                                     values='shift')
-        max_corrs = pd.pivot_table(self.best_shifts_,
-                                   index=['x'],
-                                   columns=['y'],
-                                   values='max_corr')
+        best_shifts = pd.pivot_table(
+            self.best_shifts_, index=["x"], columns=["y"], values="shift"
+        )
+        max_corrs = pd.pivot_table(
+            self.best_shifts_, index=["x"], columns=["y"], values="max_corr"
+        )
 
         self.best_shifts_ = best_shifts
         self.max_corrs_ = max_corrs
 
         return best_shifts, max_corrs
 
-    def transform(self, data, target_col='y', dropna=False):
+    def transform(self, data, target_col="y", dropna=False):
         """Shifts each input timeseries but the amount which optimizes
         correlation with the selected 'y' colums.
 
@@ -97,7 +94,7 @@ class ShiftedPearsonCorrelation(CausalityTest):
 
         return data
 
-    def _shifted_partial_corr_matrix(self, data, max_shift, x='x', y='y'):
+    def _shifted_partial_corr_matrix(self, data, max_shift, x="x", y="y"):
         shifts = pd.DataFrame()
 
         for shift in range(max_shift):
@@ -108,7 +105,7 @@ class ShiftedPearsonCorrelation(CausalityTest):
 
         return self.shifted_corrs
 
-    def _get_max_corr_shift(self, data, max_shift, x='x', y='y'):
+    def _get_max_corr_shift(self, data, max_shift, x="x", y="y"):
         shifts = pd.DataFrame()
 
         for shift in range(max_shift):

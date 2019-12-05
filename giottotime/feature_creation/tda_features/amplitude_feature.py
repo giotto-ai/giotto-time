@@ -4,10 +4,9 @@ import giotto.diagrams as diag
 import numpy as np
 import pandas as pd
 
-from giottotime.feature_creation.tda_features.base import TDAFeatures, \
-    align_indices
+from giottotime.feature_creation.tda_features.base import TDAFeatures, align_indices
 
-__all__ = ['AmplitudeFeature']
+__all__ = ["AmplitudeFeature"]
 
 
 class AmplitudeFeature(TDAFeatures):
@@ -136,41 +135,44 @@ class AmplitudeFeature(TDAFeatures):
         processors.
 
     """
-    def __init__(self,
-                 output_name: str,
-                 metric: str = 'landscape',
-                 amplitude_metric_params: Optional[Dict] = None,
-                 amplitude_order: Dict = 2,
-                 amplitude_n_jobs: Optional[float] = None,
-                 takens_parameters_type: str = 'search',
-                 takens_dimension: int = 5,
-                 takens_stride: int = 1,
-                 takens_time_delay: int = 1,
-                 takens_n_jobs: Optional[int] = 1,
-                 sliding_window_width: int = 10,
-                 sliding_stride: int = 1,
-                 diags_metric: Union[str, Callable] = 'euclidean',
-                 diags_coeff: int = 2,
-                 diags_max_edge_length: float = np.inf,
-                 diags_homology_dimensions: Iterable = (0, 1, 2),
-                 diags_infinity_values: Optional[float] = None,
-                 diags_n_jobs: Optional[int] = 1
-                 ):
-        super().__init__(output_name=output_name,
-                         takens_parameters_type=takens_parameters_type,
-                         takens_dimension=takens_dimension,
-                         takens_stride=takens_stride,
-                         takens_time_delay=takens_time_delay,
-                         takens_n_jobs=takens_n_jobs,
-                         sliding_window_width=sliding_window_width,
-                         sliding_stride=sliding_stride,
-                         diags_metric=diags_metric,
-                         diags_coeff=diags_coeff,
-                         diags_max_edge_length=diags_max_edge_length,
-                         diags_homology_dimensions=diags_homology_dimensions,
-                         diags_infinity_values=diags_infinity_values,
-                         diags_n_jobs=diags_n_jobs
-                         )
+
+    def __init__(
+        self,
+        output_name: str,
+        metric: str = "landscape",
+        amplitude_metric_params: Optional[Dict] = None,
+        amplitude_order: Dict = 2,
+        amplitude_n_jobs: Optional[float] = None,
+        takens_parameters_type: str = "search",
+        takens_dimension: int = 5,
+        takens_stride: int = 1,
+        takens_time_delay: int = 1,
+        takens_n_jobs: Optional[int] = 1,
+        sliding_window_width: int = 10,
+        sliding_stride: int = 1,
+        diags_metric: Union[str, Callable] = "euclidean",
+        diags_coeff: int = 2,
+        diags_max_edge_length: float = np.inf,
+        diags_homology_dimensions: Iterable = (0, 1, 2),
+        diags_infinity_values: Optional[float] = None,
+        diags_n_jobs: Optional[int] = 1,
+    ):
+        super().__init__(
+            output_name=output_name,
+            takens_parameters_type=takens_parameters_type,
+            takens_dimension=takens_dimension,
+            takens_stride=takens_stride,
+            takens_time_delay=takens_time_delay,
+            takens_n_jobs=takens_n_jobs,
+            sliding_window_width=sliding_window_width,
+            sliding_stride=sliding_stride,
+            diags_metric=diags_metric,
+            diags_coeff=diags_coeff,
+            diags_max_edge_length=diags_max_edge_length,
+            diags_homology_dimensions=diags_homology_dimensions,
+            diags_infinity_values=diags_infinity_values,
+            diags_n_jobs=diags_n_jobs,
+        )
         self._metric = metric
         self._amplitude_metric_params = amplitude_metric_params
         self._amplitude_order = amplitude_order
@@ -220,8 +222,10 @@ class AmplitudeFeature(TDAFeatures):
             calculated with with the given ``metric`` and ``amplitude_order``.
 
         """
-        amplitude = diag.Amplitude(metric=self._metric,
-                                   order=self._amplitude_order,
-                                   metric_params=self._amplitude_metric_params,
-                                   n_jobs=self._amplitude_n_jobs)
+        amplitude = diag.Amplitude(
+            metric=self._metric,
+            order=self._amplitude_order,
+            metric_params=self._amplitude_metric_params,
+            n_jobs=self._amplitude_n_jobs,
+        )
         return amplitude.fit_transform(diagrams)

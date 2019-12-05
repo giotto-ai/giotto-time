@@ -3,10 +3,9 @@ from typing import Iterable, List, Optional, Union, Callable
 import numpy as np
 import pandas as pd
 
-from giottotime.feature_creation.tda_features.base import \
-    TDAFeatures, align_indices
+from giottotime.feature_creation.tda_features.base import TDAFeatures, align_indices
 
-__all__ = ['NumberOfRelevantHolesFeature']
+__all__ = ["NumberOfRelevantHolesFeature"]
 
 
 class NumberOfRelevantHolesFeature(TDAFeatures):
@@ -104,39 +103,42 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         processors.
 
     """
-    def __init__(self,
-                 output_name: str,
-                 h_dim: int = 0,
-                 theta: float = 0.7,
-                 takens_parameters_type: str = 'search',
-                 takens_dimension: int = 5,
-                 takens_stride: int = 1,
-                 takens_time_delay: int = 1,
-                 takens_n_jobs: Optional[int] = 1,
-                 sliding_window_width: int = 10,
-                 sliding_stride: int = 1,
-                 diags_metric: Union[str, Callable] = 'euclidean',
-                 diags_coeff: int = 2,
-                 diags_max_edge_length: float = np.inf,
-                 diags_homology_dimensions: Iterable = (0, 1, 2),
-                 diags_infinity_values: Optional[float] = None,
-                 diags_n_jobs: Optional[int] = 1
-                 ):
-        super().__init__(output_name=output_name,
-                         takens_parameters_type=takens_parameters_type,
-                         takens_dimension=takens_dimension,
-                         takens_stride=takens_stride,
-                         takens_time_delay=takens_time_delay,
-                         takens_n_jobs=takens_n_jobs,
-                         sliding_window_width=sliding_window_width,
-                         sliding_stride=sliding_stride,
-                         diags_metric=diags_metric,
-                         diags_coeff=diags_coeff,
-                         diags_max_edge_length=diags_max_edge_length,
-                         diags_homology_dimensions=diags_homology_dimensions,
-                         diags_infinity_values=diags_infinity_values,
-                         diags_n_jobs=diags_n_jobs
-                         )
+
+    def __init__(
+        self,
+        output_name: str,
+        h_dim: int = 0,
+        theta: float = 0.7,
+        takens_parameters_type: str = "search",
+        takens_dimension: int = 5,
+        takens_stride: int = 1,
+        takens_time_delay: int = 1,
+        takens_n_jobs: Optional[int] = 1,
+        sliding_window_width: int = 10,
+        sliding_stride: int = 1,
+        diags_metric: Union[str, Callable] = "euclidean",
+        diags_coeff: int = 2,
+        diags_max_edge_length: float = np.inf,
+        diags_homology_dimensions: Iterable = (0, 1, 2),
+        diags_infinity_values: Optional[float] = None,
+        diags_n_jobs: Optional[int] = 1,
+    ):
+        super().__init__(
+            output_name=output_name,
+            takens_parameters_type=takens_parameters_type,
+            takens_dimension=takens_dimension,
+            takens_stride=takens_stride,
+            takens_time_delay=takens_time_delay,
+            takens_n_jobs=takens_n_jobs,
+            sliding_window_width=sliding_window_width,
+            sliding_stride=sliding_stride,
+            diags_metric=diags_metric,
+            diags_coeff=diags_coeff,
+            diags_max_edge_length=diags_max_edge_length,
+            diags_homology_dimensions=diags_homology_dimensions,
+            diags_infinity_values=diags_infinity_values,
+            diags_n_jobs=diags_n_jobs,
+        )
         self._validate_inputs(h_dim=h_dim, theta=theta)
 
         self._h_dim = h_dim
@@ -170,8 +172,7 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
 
         return X_renamed
 
-    def _compute_num_relevant_holes(self, persistence_diagrams: np.ndarray)\
-            -> List:
+    def _compute_num_relevant_holes(self, persistence_diagrams: np.ndarray) -> List:
         """Compute the number of relevant holes in the point cloud.
 
         Parameters
@@ -188,16 +189,21 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         """
         n_rel_holes = []
         for i in range(persistence_diagrams.shape[0]):
-            pers_table = pd.DataFrame(persistence_diagrams[i],
-                                      columns=['birth', 'death', 'homology'])
+            pers_table = pd.DataFrame(
+                persistence_diagrams[i], columns=["birth", "death", "homology"]
+            )
 
-            pers_table['lifetime'] = pers_table['death'] - pers_table['birth']
-            threshold = pers_table[pers_table['homology'] == self._h_dim][
-                            'lifetime'].max() * self._theta
-            n_rel_holes.append(pers_table[
-                                   (pers_table['lifetime'] > threshold) & (
-                                           pers_table[
-                                               'homology'] == self._h_dim)].shape[0])
+            pers_table["lifetime"] = pers_table["death"] - pers_table["birth"]
+            threshold = (
+                pers_table[pers_table["homology"] == self._h_dim]["lifetime"].max()
+                * self._theta
+            )
+            n_rel_holes.append(
+                pers_table[
+                    (pers_table["lifetime"] > threshold)
+                    & (pers_table["homology"] == self._h_dim)
+                ].shape[0]
+            )
 
         return n_rel_holes
 
@@ -224,9 +230,11 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
             ``0``, ``1`` or ``2``.
         """
         if h_dim != 0 and h_dim != 1 and h_dim != 2:
-            raise ValueError(f"'h_dim' must have be either 0, 1 or 2, "
-                             f"but has value {h_dim}.")
+            raise ValueError(
+                f"'h_dim' must have be either 0, 1 or 2, " f"but has value {h_dim}."
+            )
 
         if not theta > 0:
-            raise ValueError(f"'theta' must be greater than 0, but instead "
-                             f"has value {theta}.")
+            raise ValueError(
+                f"'theta' must be greater than 0, but instead " f"has value {theta}."
+            )

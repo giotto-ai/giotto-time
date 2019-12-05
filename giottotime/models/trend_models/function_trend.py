@@ -18,12 +18,14 @@ class FunctionTrend(TrendModel):
         accept y_true, y_pred and return a single real number.
 
     """
+
     def __init__(self, model_form, loss=mean_squared_error):
         self.model_form = model_form
         self.loss = loss
 
-    def fit(self, time_series: pd.DataFrame, x0: list, method: str = 'BFGS') \
-        -> TrendModel:
+    def fit(
+        self, time_series: pd.DataFrame, x0: list, method: str = "BFGS"
+    ) -> TrendModel:
         """Fit the model on the ``time_series``, with respect to the provided
         ``loss`` and using the provided ``method``. In order to see which
         methods are available, please check the 'scipy' `documentation
@@ -45,15 +47,17 @@ class FunctionTrend(TrendModel):
             The fitted object.
 
         """
+
         def prediction_error(model_weights):
-            predictions = [self.model_form(t, model_weights) for t in
-                           range(0, time_series.shape[0])]
+            predictions = [
+                self.model_form(t, model_weights)
+                for t in range(0, time_series.shape[0])
+            ]
             return self.loss(time_series.values, predictions)
 
-        res = minimize(prediction_error, x0, method=method,
-                       options={'disp': False})
+        res = minimize(prediction_error, x0, method=method, options={"disp": False})
 
-        self.model_weights_ = res['x']
+        self.model_weights_ = res["x"]
         return self
 
     def predict(self, t):
@@ -93,7 +97,11 @@ class FunctionTrend(TrendModel):
 
         """
         # check fit run
-        predictions = pd.DataFrame(index=time_series.index, data=[
-            self.model_form(t, self.model_weights_) for t in
-            range(0, time_series.shape[0])])
+        predictions = pd.DataFrame(
+            index=time_series.index,
+            data=[
+                self.model_form(t, self.model_weights_)
+                for t in range(0, time_series.shape[0])
+            ],
+        )
         return time_series - predictions[0]

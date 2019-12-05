@@ -1,5 +1,3 @@
 from .gar import GAR
 
-__all__ = [
-    'GAR'
-]
+__all__ = ["GAR"]

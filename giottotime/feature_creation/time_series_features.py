@@ -6,12 +6,12 @@ from sklearn.preprocessing import PolynomialFeatures
 from .base import TimeSeriesFeature
 
 __all__ = [
-    'ShiftFeature',
-    'MovingAverageFeature',
-    'ConstantFeature',
-    'PolynomialFeature',
-    'ExogenousFeature',
-    'CustomFeature',
+    "ShiftFeature",
+    "MovingAverageFeature",
+    "ConstantFeature",
+    "PolynomialFeature",
+    "ExogenousFeature",
+    "CustomFeature",
 ]
 
 
@@ -27,6 +27,7 @@ class ShiftFeature(TimeSeriesFeature):
         The name of the output column.
 
     """
+
     def __init__(self, shift: int, output_name: str):
         super().__init__(output_name)
         self.shift = shift
@@ -63,6 +64,7 @@ class MovingAverageFeature(TimeSeriesFeature):
         The name of the output column.
 
     """
+
     def __init__(self, window_size: int, output_name: str):
         super().__init__(output_name)
         self.window_size = window_size
@@ -102,6 +104,7 @@ class ConstantFeature(TimeSeriesFeature):
         The name of the output column.
 
     """
+
     def __init__(self, constant: int, output_name: str):
         super().__init__(output_name)
         self.constant = constant
@@ -123,8 +126,7 @@ class ConstantFeature(TimeSeriesFeature):
             index.
 
         """
-        constant_series = pd.Series(data=self.constant, index=X.index)\
-            .to_frame()
+        constant_series = pd.Series(data=self.constant, index=X.index).to_frame()
         constant_series_renamed = self._rename_columns(constant_series)
         return constant_series_renamed
 
@@ -141,6 +143,7 @@ class PolynomialFeature(TimeSeriesFeature):
     output_name : ``str``, required.
         The name of the output column.
     """
+
     def __init__(self, degree: int, output_name: str):
         super().__init__(output_name)
         self._degree = degree
@@ -188,8 +191,13 @@ class ExogenousFeature(TimeSeriesFeature):
         The method used to re-index. This must be a method used by the
         ``pandas.DataFrame.reindex`` method.
     """
-    def __init__(self, exogenous_time_series: pd.DataFrame, output_name: str,
-                 method: Optional[str] = None):
+
+    def __init__(
+        self,
+        exogenous_time_series: pd.DataFrame,
+        output_name: str,
+        method: Optional[str] = None,
+    ):
         super().__init__(output_name)
         self._method = method
         self.exogenous_time_series = exogenous_time_series
@@ -209,8 +217,9 @@ class ExogenousFeature(TimeSeriesFeature):
             of ``X``.
 
         """
-        exog_feature = self.exogenous_time_series.reindex(index=X.index,
-                                                          method=self._method)
+        exog_feature = self.exogenous_time_series.reindex(
+            index=X.index, method=self._method
+        )
         exog_feature_renamed = self._rename_columns(exog_feature)
         return exog_feature_renamed
 
@@ -232,8 +241,10 @@ class CustomFeature(TimeSeriesFeature):
         Optional arguments to pass to the function.
 
     """
-    def __init__(self, custom_feature_function: Callable, output_name: str,
-                 **kwargs: object):
+
+    def __init__(
+        self, custom_feature_function: Callable, output_name: str, **kwargs: object
+    ):
         super().__init__(output_name)
         self.custom_feature_function = custom_feature_function
         self.kwargs = kwargs
