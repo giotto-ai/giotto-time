@@ -89,7 +89,7 @@ class FeaturesCreation:
         """
         features = pd.DataFrame(index=time_series.index)
         for time_series_feature in self.time_series_features:
-            x_trasformed = time_series_feature.fit_transform(time_series)
-            features = pd.concat([features, x_trasformed], axis=1)
+            x_transformed = time_series_feature.fit_transform(time_series)
+            features = pd.concat([features, x_transformed], axis=1)
 
         return features
