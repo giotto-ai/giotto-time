@@ -1,7 +1,7 @@
 import pandas as pd
 
-class TimeSeriesResampler:
 
+class TimeSeriesResampler:
     def __init__(self):
         pass
 
