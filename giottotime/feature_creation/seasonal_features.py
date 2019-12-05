@@ -5,9 +5,7 @@ import pandas as pd
 
 from giottotime.feature_creation.base import TimeSeriesFeature
 
-__all__ = [
-    'PeriodicSeasonalFeature'
-]
+__all__ = ["PeriodicSeasonalFeature"]
 
 
 class PeriodicSeasonalFeature(TimeSeriesFeature):
@@ -29,11 +27,14 @@ class PeriodicSeasonalFeature(TimeSeriesFeature):
         The name of the output column.
 
     """
-    def __init__(self,
-                 start_date: pd.Timestamp,
-                 period: Union[pd.Timedelta, str],
-                 amplitude: float,
-                 output_name: str):
+
+    def __init__(
+        self,
+        start_date: pd.Timestamp,
+        period: Union[pd.Timedelta, str],
+        amplitude: float,
+        output_name: str,
+    ):
         super().__init__(output_name)
         self.start_date = start_date
         self.period = pd.Timedelta(period)
@@ -57,13 +58,11 @@ class PeriodicSeasonalFeature(TimeSeriesFeature):
         """
         datetime_index = self._convert_index_to_datetime(X.index)
         periodic_feature_values = self._compute_periodic_feature(datetime_index)
-        periodic_feature = pd.DataFrame(index=X.index,
-                                        data=periodic_feature_values)
+        periodic_feature = pd.DataFrame(index=X.index, data=periodic_feature_values)
         periodic_feature = self._rename_columns(periodic_feature)
         return periodic_feature
 
-    def _convert_index_to_datetime(self, index: pd.PeriodIndex) \
-            -> pd.DatetimeIndex:
+    def _convert_index_to_datetime(self, index: pd.PeriodIndex) -> pd.DatetimeIndex:
         """Convert a ``pd.PeriodIndex`` to a ``pd.DatetimeIndex``.
 
         Parameters
@@ -87,8 +86,7 @@ class PeriodicSeasonalFeature(TimeSeriesFeature):
         self._check_sampling_frequency(datetime_index)
         return datetime_index
 
-    def _check_sampling_frequency(self, datetime_index: pd.DatetimeIndex) \
-            -> None:
+    def _check_sampling_frequency(self, datetime_index: pd.DatetimeIndex) -> None:
         """Check that the sampling frequency is at least two times the period.
 
         Parameters
@@ -109,10 +107,12 @@ class PeriodicSeasonalFeature(TimeSeriesFeature):
         """
         sampling_frequency = pd.Timedelta(datetime_index.freq)
         if sampling_frequency < 2 * self.period:
-            raise ValueError(f"Sampling frequency must be at least two times"
-                             f"the period to obtain meaningful results. "
-                             f"Sampling frequency = {sampling_frequency},"
-                             f"period = {self.period}.")
+            raise ValueError(
+                f"Sampling frequency must be at least two times"
+                f"the period to obtain meaningful results. "
+                f"Sampling frequency = {sampling_frequency},"
+                f"period = {self.period}."
+            )
 
     def _compute_periodic_feature(self, datetime_index: pd.DatetimeIndex):
         """Compute a sinusoid with the specified parameters.
@@ -128,5 +128,6 @@ class PeriodicSeasonalFeature(TimeSeriesFeature):
             The generated sinusoid.
 
         """
-        return (np.sin((datetime_index - self.start_date) / self.period)) * \
-               self.amplitude
+        return (
+            np.sin((datetime_index - self.start_date) / self.period)
+        ) * self.amplitude

@@ -1,12 +1,11 @@
 from typing import Iterable, List, Optional, Callable, Union
 
-from giottotime.feature_creation.tda_features.base import \
-    TDAFeatures, align_indices
+from giottotime.feature_creation.tda_features.base import TDAFeatures, align_indices
 
 import pandas as pd
 import numpy as np
 
-__all__ = ['AvgLifeTimeFeature']
+__all__ = ["AvgLifeTimeFeature"]
 
 
 class AvgLifeTimeFeature(TDAFeatures):
@@ -101,38 +100,41 @@ class AvgLifeTimeFeature(TDAFeatures):
         processors.
 
     """
-    def __init__(self,
-                 output_name: str,
-                 h_dim: int = 0,
-                 takens_parameters_type: str = 'search',
-                 takens_dimension: int = 5,
-                 takens_stride: int = 1,
-                 takens_time_delay: int = 1,
-                 takens_n_jobs: Optional[int] = 1,
-                 sliding_window_width: int = 10,
-                 sliding_stride: int = 1,
-                 diags_metric: Union[str, Callable] = 'euclidean',
-                 diags_coeff: int = 2,
-                 diags_max_edge_length: float = np.inf,
-                 diags_homology_dimensions: Iterable = (0, 1, 2),
-                 diags_infinity_values: Optional[float] = None,
-                 diags_n_jobs: Optional[int] = 1
-                 ):
-        super().__init__(output_name=output_name,
-                         takens_parameters_type=takens_parameters_type,
-                         takens_dimension=takens_dimension,
-                         takens_stride=takens_stride,
-                         takens_time_delay=takens_time_delay,
-                         takens_n_jobs=takens_n_jobs,
-                         sliding_window_width=sliding_window_width,
-                         sliding_stride=sliding_stride,
-                         diags_metric=diags_metric,
-                         diags_coeff=diags_coeff,
-                         diags_max_edge_length=diags_max_edge_length,
-                         diags_homology_dimensions=diags_homology_dimensions,
-                         diags_infinity_values=diags_infinity_values,
-                         diags_n_jobs=diags_n_jobs
-                         )
+
+    def __init__(
+        self,
+        output_name: str,
+        h_dim: int = 0,
+        takens_parameters_type: str = "search",
+        takens_dimension: int = 5,
+        takens_stride: int = 1,
+        takens_time_delay: int = 1,
+        takens_n_jobs: Optional[int] = 1,
+        sliding_window_width: int = 10,
+        sliding_stride: int = 1,
+        diags_metric: Union[str, Callable] = "euclidean",
+        diags_coeff: int = 2,
+        diags_max_edge_length: float = np.inf,
+        diags_homology_dimensions: Iterable = (0, 1, 2),
+        diags_infinity_values: Optional[float] = None,
+        diags_n_jobs: Optional[int] = 1,
+    ):
+        super().__init__(
+            output_name=output_name,
+            takens_parameters_type=takens_parameters_type,
+            takens_dimension=takens_dimension,
+            takens_stride=takens_stride,
+            takens_time_delay=takens_time_delay,
+            takens_n_jobs=takens_n_jobs,
+            sliding_window_width=sliding_window_width,
+            sliding_stride=sliding_stride,
+            diags_metric=diags_metric,
+            diags_coeff=diags_coeff,
+            diags_max_edge_length=diags_max_edge_length,
+            diags_homology_dimensions=diags_homology_dimensions,
+            diags_infinity_values=diags_infinity_values,
+            diags_n_jobs=diags_n_jobs,
+        )
         self._h_dim = h_dim
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -182,13 +184,16 @@ class AvgLifeTimeFeature(TDAFeatures):
         avg_lifetime = []
 
         for i in range(persistence_diagrams.shape[0]):
-            persistence_table = pd.DataFrame(persistence_diagrams[i],
-                                             columns=['birth', 'death',
-                                                      'homology'])
-            persistence_table['lifetime'] = persistence_table['death'] - \
-                                            persistence_table['birth']
+            persistence_table = pd.DataFrame(
+                persistence_diagrams[i], columns=["birth", "death", "homology"]
+            )
+            persistence_table["lifetime"] = (
+                persistence_table["death"] - persistence_table["birth"]
+            )
             avg_lifetime.append(
-                persistence_table[persistence_table['homology']
-                                  == self._h_dim]['lifetime'].mean())
+                persistence_table[persistence_table["homology"] == self._h_dim][
+                    "lifetime"
+                ].mean()
+            )
 
         return avg_lifetime

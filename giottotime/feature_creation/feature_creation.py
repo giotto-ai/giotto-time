@@ -5,9 +5,7 @@ import pandas as pd
 from giottotime.feature_creation.base import TimeSeriesFeature
 from giottotime.feature_creation.time_series_features import ShiftFeature
 
-__all__ = [
-    'FeaturesCreation'
-]
+__all__ = ["FeaturesCreation"]
 
 
 class FeaturesCreation:
@@ -26,13 +24,12 @@ class FeaturesCreation:
         feature_creation.
 
     """
-    def __init__(self, horizon: int,
-                 time_series_features: List[TimeSeriesFeature]):
+
+    def __init__(self, horizon: int, time_series_features: List[TimeSeriesFeature]):
         self.time_series_features = time_series_features
         self.horizon = horizon
 
-    def fit_transform(self, time_series: pd.DataFrame) \
-            -> (pd.DataFrame, pd.DataFrame):
+    def fit_transform(self, time_series: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
         """Create the X matrix by generating the feature_creation, starting
         from the original ``time_series`` and using the list of
         ``time_series_features``. Also create the y matrix, by generating
@@ -70,8 +67,8 @@ class FeaturesCreation:
         """
         y = pd.DataFrame(index=time_series.index)
         for k in range(self.horizon):
-            shift_feature = ShiftFeature(-k, f'shift_{k}')
-            y[f'y_{k}'] = shift_feature.fit_transform(time_series)
+            shift_feature = ShiftFeature(-k, f"shift_{k}")
+            y[f"y_{k}"] = shift_feature.fit_transform(time_series)
 
         return y
 

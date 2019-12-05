@@ -10,15 +10,12 @@ import pandas as pd
 
 from giottotime.feature_creation.base import TimeSeriesFeature
 
-__all__ = [
-    'TDAFeatures',
-    'align_indices'
-]
+__all__ = ["TDAFeatures", "align_indices"]
 
 
-def align_indices(X: pd.DataFrame, n_points: int,
-                  tda_feature_values: Union[List, np.ndarray]) \
-        -> pd.DataFrame:
+def align_indices(
+    X: pd.DataFrame, n_points: int, tda_feature_values: Union[List, np.ndarray]
+) -> pd.DataFrame:
     """Given ``X`` of length ``n_samples``, set the first
     ``n_samples - n_points`` to ``np.nan``. Then, split the remaining points in
     ``len(tda_feature_values)`` chunks and, to each data-point in a chunk, set
@@ -46,12 +43,14 @@ def align_indices(X: pd.DataFrame, n_points: int,
 
     output_X.iloc[:-n_points] = np.nan
 
-    splits = np.array_split(output_X.iloc[-n_points:].index.values,
-                            len(tda_feature_values))
+    splits = np.array_split(
+        output_X.iloc[-n_points:].index.values, len(tda_feature_values)
+    )
 
     for index, split in enumerate(splits):
-        if isinstance(tda_feature_values[index], list) or \
-                isinstance(tda_feature_values[index], np.ndarray):
+        if isinstance(tda_feature_values[index], list) or isinstance(
+            tda_feature_values[index], np.ndarray
+        ):
             target_value = tda_feature_values[index][0]
         else:
             target_value = tda_feature_values[index]
@@ -65,23 +64,25 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
     Parameter documentation is in the derived classes.
 
     """
+
     @abstractmethod
-    def __init__(self,
-                 output_name: str,
-                 takens_parameters_type: str = 'search',
-                 takens_dimension: int = 5,
-                 takens_stride: int = 1,
-                 takens_time_delay: int = 1,
-                 takens_n_jobs: int = 1,
-                 sliding_window_width: int = 10,
-                 sliding_stride: int = 1,
-                 diags_metric: str = 'euclidean',
-                 diags_coeff: int = 2,
-                 diags_max_edge_length: float = np.inf,
-                 diags_homology_dimensions: Iterable = (0, 1, 2),
-                 diags_infinity_values: float = None,
-                 diags_n_jobs: int = 1,
-                 ):
+    def __init__(
+        self,
+        output_name: str,
+        takens_parameters_type: str = "search",
+        takens_dimension: int = 5,
+        takens_stride: int = 1,
+        takens_time_delay: int = 1,
+        takens_n_jobs: int = 1,
+        sliding_window_width: int = 10,
+        sliding_stride: int = 1,
+        diags_metric: str = "euclidean",
+        diags_coeff: int = 2,
+        diags_max_edge_length: float = np.inf,
+        diags_homology_dimensions: Iterable = (0, 1, 2),
+        diags_infinity_values: float = None,
+        diags_n_jobs: int = 1,
+    ):
         super().__init__(output_name)
 
         self._takens_embedding = TakensEmbedding(
@@ -89,7 +90,7 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
             dimension=takens_dimension,
             stride=takens_stride,
             time_delay=takens_time_delay,
-            n_jobs=takens_n_jobs
+            n_jobs=takens_n_jobs,
         )
         self.takens_dimension = takens_dimension
         self.takens_stride = takens_stride
@@ -97,8 +98,7 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
         self.takens_dimension = takens_dimension
 
         self._sliding_window = SlidingWindow(
-            width=sliding_window_width,
-            stride=sliding_stride
+            width=sliding_window_width, stride=sliding_stride
         )
         self.sliding_window_width = sliding_window_width
         self.sliding_stride = sliding_stride
@@ -109,7 +109,7 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
             max_edge_length=diags_max_edge_length,
             homology_dimensions=diags_homology_dimensions,
             infinity_values=diags_infinity_values,
-            n_jobs=diags_n_jobs
+            n_jobs=diags_n_jobs,
         )
 
     def fit(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None):
@@ -139,13 +139,18 @@ class TDAFeatures(TimeSeriesFeature, metaclass=ABCMeta):
 
         """
         if n_windows <= 0:
-            raise ValueError(f"The number of windows should be greater than "
-                             f"0, instead was {n_windows}.")
-        embedder_length = self.sliding_stride * (n_windows-1) + \
-                          self.sliding_window_width
+            raise ValueError(
+                f"The number of windows should be greater than "
+                f"0, instead was {n_windows}."
+            )
+        embedder_length = (
+            self.sliding_stride * (n_windows - 1) + self.sliding_window_width
+        )
 
-        n_used_points = self.takens_stride * (embedder_length-1) + \
-                          self.takens_dimension*self.takens_time_delay
+        n_used_points = (
+            self.takens_stride * (embedder_length - 1)
+            + self.takens_dimension * self.takens_time_delay
+        )
 
         return n_used_points
 

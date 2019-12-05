@@ -8,9 +8,7 @@ from .time_indexes import giotto_time_series
 
 
 @st.composite
-def X_y_matrices(draw,
-                 horizon: int,
-                 time_series_features: List[TimeSeriesFeature]):
+def X_y_matrices(draw, horizon: int, time_series_features: List[TimeSeriesFeature]):
     """ Returns a strategy that generates X and y feature matrices.
 
     Parameters
@@ -30,15 +28,15 @@ def X_y_matrices(draw,
         y feature matrix
     """
     period_index_series = draw(giotto_time_series())
-    feature_creation = FeaturesCreation(horizon=horizon,
-                                        time_series_features=time_series_features)
+    feature_creation = FeaturesCreation(
+        horizon=horizon, time_series_features=time_series_features
+    )
     X, y = feature_creation.fit_transform(period_index_series)
     return X, y
 
 
 @st.composite
-def y_matrices(draw,
-               horizon: int = 3):
+def y_matrices(draw, horizon: int = 3):
     """ Returns a strategy that generates the y feature matrix.
 
     Parameters
@@ -56,8 +54,7 @@ def y_matrices(draw,
 
 
 @st.composite
-def X_matrices(draw,
-               time_series_features: List[TimeSeriesFeature]):
+def X_matrices(draw, time_series_features: List[TimeSeriesFeature]):
     """ Returns a strategy that generates the X feature matrix.
 
     Parameters

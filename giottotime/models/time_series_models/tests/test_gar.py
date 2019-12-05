@@ -8,10 +8,12 @@ from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression
 
 
-from giottotime.feature_creation.feature_creation import \
-    FeaturesCreation
-from giottotime.feature_creation.time_series_features import \
-    MovingAverageFeature, ConstantFeature, ShiftFeature
+from giottotime.feature_creation.feature_creation import FeaturesCreation
+from giottotime.feature_creation.time_series_features import (
+    MovingAverageFeature,
+    ConstantFeature,
+    ShiftFeature,
+)
 from giottotime.feature_creation.utils import split_train_test
 from giottotime.models.time_series_models.gar import GAR
 
@@ -29,22 +31,19 @@ class TestInputs:
 @pytest.fixture
 def time_series():
     testing.N, testing.K = 200, 1
-    return testing.makeTimeDataFrame(freq='MS')
+    return testing.makeTimeDataFrame(freq="MS")
 
 
 def arbitrary_features(feature_length):
-    possible_features = [
-        MovingAverageFeature,
-        ConstantFeature,
-        ShiftFeature
-    ]
+    possible_features = [MovingAverageFeature, ConstantFeature, ShiftFeature]
     random_features = []
     random_params = random.sample(range(1, 100), feature_length)
 
     for random_param in random_params:
         random_feature = random.sample(possible_features, 1)[0]
-        random_features.append(random_feature(random_param,
-                                              output_name=str(random_feature)))
+        random_features.append(
+            random_feature(random_param, output_name=str(random_feature))
+        )
 
     return random_features
 
@@ -64,9 +63,7 @@ class TestFitPredict:
             gar_feedforward.predict(time_series)
 
     @settings(deadline=duration(milliseconds=500))
-    @given(st.builds(
-        arbitrary_features,
-        st.integers(1, 50)))
+    @given(st.builds(arbitrary_features, st.integers(1, 50)))
     def test_correct_features_dimension(self, time_series, features):
         horizon = 4
         feature_creation = FeaturesCreation(horizon, features)
@@ -87,9 +84,7 @@ class TestFitPredict:
         assert gar_feedforward.train_features_.shape[1] == len(features)
 
     @settings(deadline=duration(milliseconds=500))
-    @given(st.builds(
-        arbitrary_features,
-        st.integers(1, 50)))
+    @given(st.builds(arbitrary_features, st.integers(1, 50)))
     def test_correct_fit_date(self, time_series, features):
         horizon = 4
         feature_creation = FeaturesCreation(horizon, features)

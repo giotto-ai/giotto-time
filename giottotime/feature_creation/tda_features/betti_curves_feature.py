@@ -4,10 +4,9 @@ import pandas as pd
 import numpy as np
 import giotto.diagrams as diag
 
-from giottotime.feature_creation.tda_features.base import \
-    TDAFeatures, align_indices
+from giottotime.feature_creation.tda_features.base import TDAFeatures, align_indices
 
-__all__ = ['BettiCurvesFeature']
+__all__ = ["BettiCurvesFeature"]
 
 
 def _find_mean_nonzero(g):
@@ -126,42 +125,45 @@ class BettiCurvesFeature(TDAFeatures):
         processors.
 
     """
-    def __init__(self,
-                 betti_mode: str,
-                 output_name: str,
-                 betti_homology_dimensions: Iterable = (0, 1, 2),
-                 betti_n_values: int = 100,
-                 betti_rolling: int = 1,
-                 betti_n_jobs: Optional[int] = None,
-                 takens_parameters_type: str = 'search',
-                 takens_dimension: int = 5,
-                 takens_stride: int = 1,
-                 takens_time_delay: int = 1,
-                 takens_n_jobs: Optional[int] = 1,
-                 sliding_window_width: int = 10,
-                 sliding_stride: int = 1,
-                 diags_metric: Union[str, Callable] = 'euclidean',
-                 diags_coeff: int = 2,
-                 diags_max_edge_length: float = np.inf,
-                 diags_homology_dimensions: Iterable = (0, 1, 2),
-                 diags_infinity_values: Optional[float] = None,
-                 diags_n_jobs: Optional[int] = 1
-                 ):
-        super().__init__(output_name=output_name,
-                         takens_parameters_type=takens_parameters_type,
-                         takens_dimension=takens_dimension,
-                         takens_stride=takens_stride,
-                         takens_time_delay=takens_time_delay,
-                         takens_n_jobs=takens_n_jobs,
-                         sliding_window_width=sliding_window_width,
-                         sliding_stride=sliding_stride,
-                         diags_metric=diags_metric,
-                         diags_coeff=diags_coeff,
-                         diags_max_edge_length=diags_max_edge_length,
-                         diags_homology_dimensions=diags_homology_dimensions,
-                         diags_infinity_values=diags_infinity_values,
-                         diags_n_jobs=diags_n_jobs
-                         )
+
+    def __init__(
+        self,
+        betti_mode: str,
+        output_name: str,
+        betti_homology_dimensions: Iterable = (0, 1, 2),
+        betti_n_values: int = 100,
+        betti_rolling: int = 1,
+        betti_n_jobs: Optional[int] = None,
+        takens_parameters_type: str = "search",
+        takens_dimension: int = 5,
+        takens_stride: int = 1,
+        takens_time_delay: int = 1,
+        takens_n_jobs: Optional[int] = 1,
+        sliding_window_width: int = 10,
+        sliding_stride: int = 1,
+        diags_metric: Union[str, Callable] = "euclidean",
+        diags_coeff: int = 2,
+        diags_max_edge_length: float = np.inf,
+        diags_homology_dimensions: Iterable = (0, 1, 2),
+        diags_infinity_values: Optional[float] = None,
+        diags_n_jobs: Optional[int] = 1,
+    ):
+        super().__init__(
+            output_name=output_name,
+            takens_parameters_type=takens_parameters_type,
+            takens_dimension=takens_dimension,
+            takens_stride=takens_stride,
+            takens_time_delay=takens_time_delay,
+            takens_n_jobs=takens_n_jobs,
+            sliding_window_width=sliding_window_width,
+            sliding_stride=sliding_stride,
+            diags_metric=diags_metric,
+            diags_coeff=diags_coeff,
+            diags_max_edge_length=diags_max_edge_length,
+            diags_homology_dimensions=diags_homology_dimensions,
+            diags_infinity_values=diags_infinity_values,
+            diags_n_jobs=diags_n_jobs,
+        )
         self._betti_mode = betti_mode
         self._betti_homology_dimensions = betti_homology_dimensions
         self._betti_n_values = betti_n_values
@@ -227,8 +229,9 @@ class BettiCurvesFeature(TDAFeatures):
 
         return betti_curves
 
-    def _compute_betti_features(self, betti_curves: List[pd.DataFrame]) \
-            -> List[np.ndarray]:
+    def _compute_betti_features(
+        self, betti_curves: List[pd.DataFrame]
+    ) -> List[np.ndarray]:
         """Compute the betti feature_creation, depending on the values of
         ``self._betti_mode``. If the value is set to ``mean`` compute the
         rolling mean, if set to ``arg_max`` compute the argmax along the
@@ -252,21 +255,24 @@ class BettiCurvesFeature(TDAFeatures):
             from ``mean`` or ``arg_max``.
 
         """
-        if self._betti_mode == 'mean':
+        if self._betti_mode == "mean":
             betti_features = self._compute_betti_mean(betti_curves)
 
-        elif self._betti_mode == 'arg_max':
+        elif self._betti_mode == "arg_max":
             betti_features = self._compute_arg_max_by_time(betti_curves)
 
         else:
-            raise ValueError(f"The valid values for 'betti_mode' are 'mean' "
-                             f"or 'arg_max', instead has value "
-                             f"{self._betti_mode}.")
+            raise ValueError(
+                f"The valid values for 'betti_mode' are 'mean' "
+                f"or 'arg_max', instead has value "
+                f"{self._betti_mode}."
+            )
 
         return betti_features
 
-    def _compute_betti_mean(self, betti_surfaces: List[pd.DataFrame]) \
-            -> List[pd.DataFrame]:
+    def _compute_betti_mean(
+        self, betti_surfaces: List[pd.DataFrame]
+    ) -> List[pd.DataFrame]:
         """Compute the mean along the epsilon axis of the non-zero elements of
         the betti surface.
 
@@ -284,14 +290,19 @@ class BettiCurvesFeature(TDAFeatures):
         """
         betti_means = []
         for betti_surface in betti_surfaces:
-            betti_means.append(betti_surface.groupby(betti_surface.index)
-                               .apply(lambda g: _find_mean_nonzero(g))
-                               .rolling(self._betti_rolling).mean().values)
+            betti_means.append(
+                betti_surface.groupby(betti_surface.index)
+                .apply(lambda g: _find_mean_nonzero(g))
+                .rolling(self._betti_rolling)
+                .mean()
+                .values
+            )
 
         return betti_means
 
-    def _compute_arg_max_by_time(self, betti_surfaces: List[pd.DataFrame]) \
-            -> List[np.ndarray]:
+    def _compute_arg_max_by_time(
+        self, betti_surfaces: List[pd.DataFrame]
+    ) -> List[np.ndarray]:
         """For each surface in ``betti_surfaces``, compute the argmax along the
          epsilon axis.
 
