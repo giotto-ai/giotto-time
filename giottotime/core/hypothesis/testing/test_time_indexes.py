@@ -1,6 +1,18 @@
 from hypothesis import given
+import pandas as pd
 
-from ..time_indexes import *
+from giottotime.core.hypothesis.time_indexes import (
+    period_indexes,
+    series_with_period_index,
+    datetime_indexes,
+    series_with_datetime_index,
+    timedelta_indexes,
+    series_with_timedelta_index,
+    available_freqs,
+    positive_bounded_integers,
+    pair_of_ordered_timedeltas,
+    pair_of_ordered_dates,
+)
 
 
 class TestPeriodIndex:
