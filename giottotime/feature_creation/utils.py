@@ -3,7 +3,7 @@ from typing import Tuple
 import pandas as pd
 
 
-def split_train_test(
+def trim_feature_nans(
     X: pd.DataFrame, y: pd.DataFrame
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Split the ``X`` and ``y`` in train and test set. First, the rows of
