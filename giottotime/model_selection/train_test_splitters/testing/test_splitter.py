@@ -105,7 +105,7 @@ class TestPercentageSplitter:
 
     @given(
         X_y_matrices(horizon=3, time_series_features=features_to_consider),
-        floats(-1000000, -0.001),
+        floats(-1000001, -0.001),
     )
     def test_error_with_negative_percentage(
         self, matrices: Tuple[pd.DataFrame, pd.DataFrame], percentage: float
@@ -162,7 +162,7 @@ class TestPercentageSplitter:
         X_train, y_train, X_test, y_test = percentage_splitter.transform(
             X, y, split_at_percentage=percentage
         )
-        expected_train_shape = int(X.shape[0] * percentage) + 1
+        expected_train_shape = min(int(X.shape[0] * percentage) + 1, X.shape[0])
 
         assert X_train.shape[0] == expected_train_shape
         assert y_train.shape[0] == expected_train_shape
