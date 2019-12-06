@@ -2,14 +2,13 @@ from typing import List, Union
 
 import numpy as np
 import pandas as pd
-from sklearn.base import BaseEstimator, TransformerMixin
 
-from ..time_series_preparation.time_series_resampling import TimeSeriesResampler
 from .time_series_conversion import (
     PandasSeriesToTimeIndexSeries,
     SequenceToTimeIndexSeries,
     TimeIndexSeriesToPeriodIndexSeries,
 )
+from ..time_series_preparation.time_series_resampling import TimeSeriesResampler
 
 SUPPORTED_SEQUENCE_TYPES = [
     np.ndarray,
@@ -17,34 +16,36 @@ SUPPORTED_SEQUENCE_TYPES = [
 ]
 
 
-class TimeSeriesPreparation(BaseEstimator, TransformerMixin):
+class TimeSeriesPreparation:
+    """Transforms an array-like sequence in a period-index DataFrame with a single
+    column
+
+    """
+
     def __init__(
         self,
-        start_date: pd.datetime = None,
-        end_date: pd.datetime = None,
-        freq: pd.DateOffset = None,
+        start: pd.datetime = None,
+        end: pd.datetime = None,
+        freq: pd.Timedelta = None,
         resample_if_not_equispaced: bool = True,
         output_name: str = "time_series",
     ):
-        self.start_date = start_date
-        self.end_date = end_date
+        self.start = start
+        self.end = end
         self.freq = freq
         self.resample_if_not_equispaced = resample_if_not_equispaced
         self.output_name = output_name
 
         self.pandas_converter = PandasSeriesToTimeIndexSeries(
-            self.start_date, self.end_date, self.freq
+            self.start, self.end, self.freq
         )
         self.sequence_converter = SequenceToTimeIndexSeries(
-            self.start_date, self.end_date, self.freq
+            self.start, self.end, self.freq
         )
         self.resampler = TimeSeriesResampler()
         self.to_period_index_series_converter = TimeIndexSeriesToPeriodIndexSeries(
             self.freq
         )
-
-    def fit(self, X: Union[List, np.array, pd.Series], y=None):
-        return self
 
     def transform(self, X: Union[List, np.array, pd.Series]) -> pd.DataFrame:
         pandas_time_series = self._to_time_index_series(X)
