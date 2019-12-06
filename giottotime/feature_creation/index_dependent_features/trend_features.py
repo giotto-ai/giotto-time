@@ -1,10 +1,10 @@
 from sklearn.metrics import mean_squared_error
 import pandas as pd
 
-from .base import TimeSeriesFeature
-from ..models.trend_models.base import TrendModel
-from ..models.trend_models.polynomial_trend import PolynomialTrend
-from ..models.trend_models.exponential_trend import ExponentialTrend
+from .base import IndexDependentFeature
+from giottotime.models.trend_models.base import TrendModel
+from giottotime.models.trend_models.polynomial_trend import PolynomialTrend
+from giottotime.models.trend_models.exponential_trend import ExponentialTrend
 
 __all__ = [
     "DetrendedFeature",
@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-class DetrendedFeature(TimeSeriesFeature):
+class DetrendedFeature(IndexDependentFeature):
     """Apply a de-trend transformation to a time series.
 
     Parameters

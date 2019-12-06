@@ -3,7 +3,7 @@ from typing import Iterable, List, Optional, Union, Callable
 import numpy as np
 import pandas as pd
 
-from giottotime.feature_creation.tda_features.base import TDAFeatures, align_indices
+from .base import TDAFeatures, align_indices
 
 __all__ = ["NumberOfRelevantHolesFeature"]
 

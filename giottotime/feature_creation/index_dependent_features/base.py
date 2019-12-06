@@ -1,13 +1,27 @@
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 from typing import Union
 
 import pandas as pd
 
+from giottotime.feature_creation.base import Feature
 
-class Feature:
+
+class IndexDependentFeature(Feature, metaclass=ABCMeta):
+    """Base class for all the feature classes in this package.
+
+    Parameters documentation is in the derived classes.
+    """
+
+    def fit(self, X, y=None):
+        return self
+
     @abstractmethod
-    def __init__(self, output_name):
-        self.output_name = output_name
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        pass
+
+    def fit_transform(self, X, y=None):
+        self.fit(X, y)
+        return self.transform(X)
 
     def _rename_columns(self, X: Union[pd.DataFrame, pd.Series]) -> pd.DataFrame:
         """Rename (in place) the column of the DataFrame with the

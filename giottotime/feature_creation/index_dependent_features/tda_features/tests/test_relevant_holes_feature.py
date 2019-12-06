@@ -3,7 +3,9 @@ import pandas as pd
 import pytest
 from hypothesis import given, strategies as st
 
-from giottotime.feature_creation.tda_features import NumberOfRelevantHolesFeature
+from giottotime.feature_creation.index_dependent_features.tda_features import (
+    NumberOfRelevantHolesFeature,
+)
 
 
 @given(st.integers(min_value=3))

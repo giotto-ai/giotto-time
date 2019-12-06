@@ -1,20 +1,20 @@
-from .calendar_features import CalendarFeature
 from .feature_creation import FeatureCreation
-from .seasonal_features import PeriodicSeasonalFeature
-from .time_series_features import (
-    ShiftFeature,
-    MovingAverageFeature,
-    ConstantFeature,
-    PolynomialFeature,
-    ExogenousFeature,
-    CustomFeature,
-)
-from .trend_features import (
+from .index_dependent_features import (
+    CalendarFeature,
     DetrendedFeature,
     RemovePolynomialTrend,
     RemoveExponentialTrend,
     RemoveFunctionTrend,
+    tda_features,
 )
+from .index_dependent_features import (
+    ShiftFeature,
+    MovingAverageFeature,
+    PolynomialFeature,
+    ExogenousFeature,
+)
+
+from .standard_features import ConstantFeature, PeriodicSeasonalFeature, CustomFeature
 
 __all__ = [
     "FeatureCreation",
@@ -23,7 +23,6 @@ __all__ = [
     "ConstantFeature",
     "PolynomialFeature",
     "ExogenousFeature",
-    "CustomFeature",
     "tda_features",
     "CalendarFeature",
     "PeriodicSeasonalFeature",

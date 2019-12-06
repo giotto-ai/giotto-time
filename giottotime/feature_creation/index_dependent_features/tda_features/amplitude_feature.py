@@ -1,24 +1,59 @@
-from typing import Iterable, List, Optional, Callable, Union
+from typing import Iterable, Dict, Optional, Union, Callable
 
-from giottotime.feature_creation.tda_features.base import TDAFeatures, align_indices
-
-import pandas as pd
+import giotto.diagrams as diag
 import numpy as np
+import pandas as pd
 
-__all__ = ["AvgLifeTimeFeature"]
+from .base import TDAFeatures, align_indices
+
+__all__ = ["AmplitudeFeature"]
 
 
-class AvgLifeTimeFeature(TDAFeatures):
-    """Compute the list of average lifetime for each time window, starting
-    from the persistence diagrams.
+class AmplitudeFeature(TDAFeatures):
+    """Compute the list of average lifetime for each time window, starting from
+    the persistence diagrams.
 
     Parameters
     ----------
-    output_name : ``str``, required.
+    output_name: ``str``, required,
         The name of the output column.
 
-    h_dim : ``int``, optional, (default=``0``)
-        The homology dimension on which to compute the average lifetime.
+    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
+        ``'betti'`` | ``'heat'``, optional, (default=``'landscape'``)
+        Distance or dissimilarity function used to define the amplitude of
+        a subdiagram as its distance from the diagonal diagram:
+        - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
+          perfect-matching--based notions of distance.
+        - ``'landscape'`` refers to the :math:`L^p` distance between
+          persistence landscapes.
+        - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
+        - ``'heat'`` refers to the :math:`L^p` distance between
+          Gaussian-smoothed diagrams.
+
+    amplitude_metric_params : ``Dict``, optional, (default=``None``)
+        Additional keyword arguments for the metric function:
+        - If ``metric == 'bottleneck'`` there are no available arguments.
+        - If ``metric == 'wasserstein'`` the only argument is `p` (int,
+          default: ``2``).
+        - If ``metric == 'betti'`` the available arguments are `p` (float,
+          default: ``2.``) and `n_values` (int, default: ``100``).
+        - If ``metric == 'landscape'`` the available arguments are `p`
+          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          `n_layers` (int, default: ``1``).
+        - If ``metric == 'heat'`` the available arguments are `p` (float,
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
+          (int, default: ``100``).
+
+    amplitude_order : ``float``, optional, (default=``2.``)
+        If ``None``, :meth:`transform` returns for each diagram a vector of
+        amplitudes corresponding to the dimensions in
+        :attr:`homology_dimensions_`. Otherwise, the :math:`p`-norm of
+        these vectors with :math:`p` equal to `order` is taken.
+
+    amplitude_n_jobs : ``int``, optional, (default=``None``)
+        The number of jobs to use for the computation. ``None`` means 1 unless
+        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
+        processors.
 
     takens_parameters_type: ``'search'`` | ``'fixed'``, optional,
         (default=``'search'``)
@@ -104,7 +139,10 @@ class AvgLifeTimeFeature(TDAFeatures):
     def __init__(
         self,
         output_name: str,
-        h_dim: int = 0,
+        metric: str = "landscape",
+        amplitude_metric_params: Optional[Dict] = None,
+        amplitude_order: Dict = 2,
+        amplitude_n_jobs: Optional[float] = None,
         takens_parameters_type: str = "search",
         takens_dimension: int = 5,
         takens_stride: int = 1,
@@ -135,7 +173,10 @@ class AvgLifeTimeFeature(TDAFeatures):
             diags_infinity_values=diags_infinity_values,
             diags_n_jobs=diags_n_jobs,
         )
-        self._h_dim = h_dim
+        self._metric = metric
+        self._amplitude_metric_params = amplitude_metric_params
+        self._amplitude_order = amplitude_order
+        self._amplitude_n_jobs = amplitude_n_jobs
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
@@ -157,43 +198,34 @@ class AvgLifeTimeFeature(TDAFeatures):
 
         """
         persistence_diagrams = self._compute_persistence_diagrams(X)
-        avg_lifetime = self._compute_average_lifetime(persistence_diagrams)
-        original_points = self._compute_n_points(len(avg_lifetime))
+        amplitudes = self._calculate_amplitude_feature(persistence_diagrams)
 
-        X_aligned = align_indices(X, original_points, avg_lifetime)
+        original_points = self._compute_n_points(len(amplitudes))
+
+        X_aligned = align_indices(X, original_points, amplitudes)
         X_renamed = self._rename_columns(X_aligned)
 
         return X_renamed
 
-    def _compute_average_lifetime(self, persistence_diagrams: np.ndarray) -> List:
-        """Compute the average lifetime of a given homology dimension in the
-        point cloud.
+    def _calculate_amplitude_feature(self, diagrams: np.ndarray) -> np.ndarray:
+        """Calculate the amplitude of the persistence diagrams
 
         Parameters
         ----------
-        persistence_diagrams : ``np.ndarray``, required.
-            The array containing the scaled persistent diagrams.
+        diagrams : ``np.ndarray``, required.
+            Array containing the persistence diagrams.
 
         Returns
         -------
-        avg_lifetime : ``List``
-            For each diagram present in ``persistence_diagrams``, return the
-            average lifetime of a given homology dimension.
+        amplitudes : ``np.ndarray``
+            Array containing, for each diagrams, the corresponding amplitude,
+            calculated with with the given ``metric`` and ``amplitude_order``.
 
         """
-        avg_lifetime = []
-
-        for i in range(persistence_diagrams.shape[0]):
-            persistence_table = pd.DataFrame(
-                persistence_diagrams[i], columns=["birth", "death", "homology"]
-            )
-            persistence_table["lifetime"] = (
-                persistence_table["death"] - persistence_table["birth"]
-            )
-            avg_lifetime.append(
-                persistence_table[persistence_table["homology"] == self._h_dim][
-                    "lifetime"
-                ].mean()
-            )
-
-        return avg_lifetime
+        amplitude = diag.Amplitude(
+            metric=self._metric,
+            order=self._amplitude_order,
+            metric_params=self._amplitude_metric_params,
+            n_jobs=self._amplitude_n_jobs,
+        )
+        return amplitude.fit_transform(diagrams)

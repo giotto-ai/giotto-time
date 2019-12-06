@@ -7,14 +7,14 @@ from hypothesis._settings import duration
 from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression
 
-
-from giottotime.feature_creation.feature_creation import FeatureCreation
-from giottotime.feature_creation.time_series_features import (
+from giottotime.feature_creation import (
     MovingAverageFeature,
     ConstantFeature,
     ShiftFeature,
 )
-from giottotime.feature_creation.utils import split_train_test
+from giottotime.feature_creation.feature_creation import FeatureCreation
+
+from giottotime.feature_creation.utils import trim_feature_nans
 from giottotime.models.time_series_models.gar import GAR
 
 
@@ -71,7 +71,7 @@ class TestFitPredict:
 
         x, y = feature_creation.fit_transform(time_series)
 
-        x_train, y_train, x_test, y_test = split_train_test(x, y)
+        x_train, y_train, x_test, y_test = trim_feature_nans(x, y)
 
         gar_no_feedforward = GAR(base_model=base_model, feed_forward=False)
 
@@ -92,7 +92,7 @@ class TestFitPredict:
 
         x, y = feature_creation.fit_transform(time_series)
 
-        x_train, y_train, x_test, y_test = split_train_test(x, y)
+        x_train, y_train, x_test, y_test = trim_feature_nans(x, y)
 
         gar_no_feedforward = GAR(base_model=base_model, feed_forward=False)
 

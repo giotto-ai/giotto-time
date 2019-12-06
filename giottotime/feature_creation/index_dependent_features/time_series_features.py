@@ -1,21 +1,19 @@
-from typing import Callable, Optional
+from typing import Optional
 
 import pandas as pd
 from sklearn.preprocessing import PolynomialFeatures
 
-from .base import TimeSeriesFeature
+from .base import IndexDependentFeature
 
 __all__ = [
     "ShiftFeature",
     "MovingAverageFeature",
-    "ConstantFeature",
     "PolynomialFeature",
     "ExogenousFeature",
-    "CustomFeature",
 ]
 
 
-class ShiftFeature(TimeSeriesFeature):
+class ShiftFeature(IndexDependentFeature):
     """Perform a shift of a DataFrame of size equal to ``shift``.
 
     Parameters
@@ -51,7 +49,7 @@ class ShiftFeature(TimeSeriesFeature):
         return X_shifted_renamed
 
 
-class MovingAverageFeature(TimeSeriesFeature):
+class MovingAverageFeature(IndexDependentFeature):
     """For each row in ``X``, compute the moving average of the previous
      ``window_size`` rows. If there are not enough rows, the value is Nan.
 
@@ -90,48 +88,7 @@ class MovingAverageFeature(TimeSeriesFeature):
         return X_mov_avg_renamed
 
 
-class ConstantFeature(TimeSeriesFeature):
-    """Generate a ``pd.DataFrame`` with one column, of the same length as the
-    input ``X`` and containing the value ``constant`` across the whole column.
-
-    Parameters
-    ----------
-    constant : ``int``, required.
-        The value to use to generate the constant column of the
-        ``pd.DataFrame``.
-
-    output_name : ``str``, required.
-        The name of the output column.
-
-    """
-
-    def __init__(self, constant: int, output_name: str):
-        super().__init__(output_name)
-        self.constant = constant
-
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Generate a ``pd.DataFrame`` with one column with the same length as
-        ``X`` and with the same index, containing a value equal to
-        ``constant``.
-
-        Parameters
-        ----------
-        X : ``pd.DataFrame``, required.
-            The input DataFrame. It is used only for its index.
-
-        Returns
-        -------
-        constant_series_renamed : ``pd.DataFrame``
-            A constant series, with the same length of ``X`` and with the same
-            index.
-
-        """
-        constant_series = pd.Series(data=self.constant, index=X.index).to_frame()
-        constant_series_renamed = self._rename_columns(constant_series)
-        return constant_series_renamed
-
-
-class PolynomialFeature(TimeSeriesFeature):
+class PolynomialFeature(IndexDependentFeature):
     """Compute the polynomial feature_creation, of a degree equal to the input
     ``degree``.
 
@@ -173,7 +130,7 @@ class PolynomialFeature(TimeSeriesFeature):
         return pol_of_X_renamed
 
 
-class ExogenousFeature(TimeSeriesFeature):
+class ExogenousFeature(IndexDependentFeature):
     """Reindex ``exogenous_time_series`` with the index of ``X``. To check the
     documentation of ``pandas.DataFrame.reindex`` and to see which type of
     ``method`` are available, please refer to the pandas `documentation
@@ -222,48 +179,3 @@ class ExogenousFeature(TimeSeriesFeature):
         )
         exog_feature_renamed = self._rename_columns(exog_feature)
         return exog_feature_renamed
-
-
-class CustomFeature(TimeSeriesFeature):
-    """Given a custom function, apply it to a time series and generate a
-    ``pd.Dataframe``.
-
-    Parameters
-    ----------
-    custom_feature_function`: ``Callable`, required.
-        The function to use to generate a ``pd.DataFrame`` containing the
-        feature.
-
-    output_name: ``str``, required.
-        The name of the output column.
-
-    kwargs : ``object``, optional.
-        Optional arguments to pass to the function.
-
-    """
-
-    def __init__(
-        self, custom_feature_function: Callable, output_name: str, **kwargs: object
-    ):
-        super().__init__(output_name)
-        self.custom_feature_function = custom_feature_function
-        self.kwargs = kwargs
-
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Generate a ``pd.DataFrame``, given ``X`` as input to the
-        ``custom_feature_function``, as well as other optional arguments.
-
-        Parameters
-        ----------
-        X : ``pd.DataFrame``, required.
-            The DataFrame from which to generate the feature_creation
-
-        Returns
-        -------
-        custom_feature_renamed : ``pd.DataFrame``
-            A DataFrame containing the generated feature_creation.
-
-        """
-        custom_feature = self.custom_feature_function(X, **self.kwargs)
-        custom_feature_renamed = self._rename_columns(custom_feature)
-        return custom_feature_renamed

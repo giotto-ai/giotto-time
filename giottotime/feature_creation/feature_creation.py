@@ -1,15 +1,14 @@
 from typing import List
 
-import numpy as np
 import pandas as pd
 
-from .base import TimeSeriesFeature
-from .time_series_features import ShiftFeature
+from .base import Feature
+from .index_dependent_features import ShiftFeature
 
 __all__ = ["FeatureCreation"]
 
 
-def check_feature_names(time_series_features: List[TimeSeriesFeature]) -> None:
+def check_feature_names(time_series_features: List[Feature]) -> None:
     """Check that all the output names are different and that there aren't two different
     features with the same name.
 
@@ -53,7 +52,7 @@ class FeatureCreation:
 
     """
 
-    def __init__(self, horizon: int, time_series_features: List[TimeSeriesFeature]):
+    def __init__(self, horizon: int, time_series_features: List[Feature]):
         check_feature_names(time_series_features)
 
         self._time_series_features = time_series_features
