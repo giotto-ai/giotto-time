@@ -27,7 +27,7 @@ def smape(y_true: Union[List, np.ndarray], y_pred: Union[List, np.ndarray]) \
                          f"have length {len(y_pred)} and {len(y_true)}.")
 
     non_normalized_smape = sum(np.abs(y_pred - y_true) /
-                               np.abs(y_pred) - np.abs(y_true))
+                               (np.abs(y_pred) - np.abs(y_true)) )
     smape = (2 / len(y_pred)) * non_normalized_smape
     return smape
 
