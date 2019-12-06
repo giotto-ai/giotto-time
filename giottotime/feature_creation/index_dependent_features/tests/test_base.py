@@ -2,7 +2,7 @@ import pandas as pd
 import pandas.util.testing as testing
 
 from giottotime.feature_creation import MovingAverageFeature
-from giottotime.feature_creation.base import TimeSeriesFeature
+from giottotime.feature_creation.index_dependent_features import TimeSeriesFeature
 
 
 class TestTimeSeriesFeature(TimeSeriesFeature):

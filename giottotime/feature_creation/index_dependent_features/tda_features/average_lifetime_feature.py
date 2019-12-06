@@ -1,49 +1,24 @@
 from typing import Iterable, List, Optional, Callable, Union
 
+from .base import TDAFeatures, align_indices
+
 import pandas as pd
 import numpy as np
-import giotto.diagrams as diag
 
-from giottotime.feature_creation.tda_features.base import TDAFeatures, align_indices
-
-__all__ = ["BettiCurvesFeature"]
+__all__ = ["AvgLifeTimeFeature"]
 
 
-def _find_mean_nonzero(g):
-    if g.to_numpy().nonzero()[1].any():
-        return g.to_numpy().nonzero()[1].mean()
-    else:
-        return 0
-
-
-class BettiCurvesFeature(TDAFeatures):
+class AvgLifeTimeFeature(TDAFeatures):
     """Compute the list of average lifetime for each time window, starting
     from the persistence diagrams.
 
     Parameters
     ----------
-    betti_mode : ``'mean'`` | ``'arg_max'``, required.
-        If ``mean``, compute the mean.
-
     output_name : ``str``, required.
         The name of the output column.
 
-    betti_homology_dimensions : ``Iterable`, optional, (default=``(0, 1)``)
-        Dimensions (non-negative integers) of the topological feature_creation
-        to be detected.
-
-    betti_n_values : ``int``, optional, (default=``100``)
-        The number of filtration parameter values, per available homology
-        dimension, to sample during :meth:`fit`.
-
-    betti_rolling : ``int``, optional, (default=``1``)
-        Used only if ``betti_mode`` is set to ``mean``. When computing the
-        betti surfaces, used to set the rolling parameter.
-
-    betti_n_jobs : ``int``, optional, (default=``None``)
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
+    h_dim : ``int``, optional, (default=``0``)
+        The homology dimension on which to compute the average lifetime.
 
     takens_parameters_type: ``'search'`` | ``'fixed'``, optional,
         (default=``'search'``)
@@ -128,12 +103,8 @@ class BettiCurvesFeature(TDAFeatures):
 
     def __init__(
         self,
-        betti_mode: str,
         output_name: str,
-        betti_homology_dimensions: Iterable = (0, 1, 2),
-        betti_n_values: int = 100,
-        betti_rolling: int = 1,
-        betti_n_jobs: Optional[int] = None,
+        h_dim: int = 0,
         takens_parameters_type: str = "search",
         takens_dimension: int = 5,
         takens_stride: int = 1,
@@ -164,11 +135,7 @@ class BettiCurvesFeature(TDAFeatures):
             diags_infinity_values=diags_infinity_values,
             diags_n_jobs=diags_n_jobs,
         )
-        self._betti_mode = betti_mode
-        self._betti_homology_dimensions = betti_homology_dimensions
-        self._betti_n_values = betti_n_values
-        self._betti_n_jobs = betti_n_jobs
-        self._betti_rolling = betti_rolling
+        self._h_dim = h_dim
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``X``, compute the persistence diagrams
@@ -190,137 +157,43 @@ class BettiCurvesFeature(TDAFeatures):
 
         """
         persistence_diagrams = self._compute_persistence_diagrams(X)
-        betti_curves = self._compute_betti_curves(persistence_diagrams)
+        avg_lifetime = self._compute_average_lifetime(persistence_diagrams)
+        original_points = self._compute_n_points(len(avg_lifetime))
 
-        betti_features = self._compute_betti_features(betti_curves)
-
-        output_dfs = []
-        for betti_feature in betti_features:
-            original_points = self._compute_n_points(len(betti_feature))
-
-            output_dfs.append(align_indices(X, original_points, betti_feature))
-
-        X_aligned = pd.concat(output_dfs, axis=1)
+        X_aligned = align_indices(X, original_points, avg_lifetime)
         X_renamed = self._rename_columns(X_aligned)
 
         return X_renamed
 
-    def _compute_betti_curves(self, diagrams: np.ndarray) -> List:
-        """Given a list of diagrams, compute the betti curves for each of them.
+    def _compute_average_lifetime(self, persistence_diagrams: np.ndarray) -> List:
+        """Compute the average lifetime of a given homology dimension in the
+        point cloud.
 
         Parameters
         ----------
-        diagrams : ``np.ndarray``, required.
-            Compute the betti curves of the diagrams.
+        persistence_diagrams : ``np.ndarray``, required.
+            The array containing the scaled persistent diagrams.
 
         Returns
         -------
-        betti_curves : ``List``
-            The ``List`` containing the Betti curves.
+        avg_lifetime : ``List``
+            For each diagram present in ``persistence_diagrams``, return the
+            average lifetime of a given homology dimension.
 
         """
-        betti_curves = diag.BettiCurve()
-        betti_curves.fit(diagrams)
-        X_betti_curves = betti_curves.transform(diagrams)
+        avg_lifetime = []
 
-        betti_curves = []
-        for h_dim in self._betti_homology_dimensions:
-            betti_curves.append(pd.DataFrame(X_betti_curves[:, h_dim, :]))
-
-        return betti_curves
-
-    def _compute_betti_features(
-        self, betti_curves: List[pd.DataFrame]
-    ) -> List[np.ndarray]:
-        """Compute the betti feature_creation, depending on the values of
-        ``self._betti_mode``. If the value is set to ``mean`` compute the
-        rolling mean, if set to ``arg_max`` compute the argmax along the
-        epsilon axis.
-
-        Parameters
-        ----------
-        betti_curves : ``List[pd.DataFrame]``, required.
-            A list containing the betti surfaces, one for each homology
-            dimension.
-
-        Returns
-        -------
-        betti_features : ``List[np.ndarray]``
-            The feature_creation extracted from the betti curves.
-
-        Raises
-        ------
-        ``ValueError``
-            Raised if a ``self._betti_mode`` has a value which is different
-            from ``mean`` or ``arg_max``.
-
-        """
-        if self._betti_mode == "mean":
-            betti_features = self._compute_betti_mean(betti_curves)
-
-        elif self._betti_mode == "arg_max":
-            betti_features = self._compute_arg_max_by_time(betti_curves)
-
-        else:
-            raise ValueError(
-                f"The valid values for 'betti_mode' are 'mean' "
-                f"or 'arg_max', instead has value "
-                f"{self._betti_mode}."
+        for i in range(persistence_diagrams.shape[0]):
+            persistence_table = pd.DataFrame(
+                persistence_diagrams[i], columns=["birth", "death", "homology"]
+            )
+            persistence_table["lifetime"] = (
+                persistence_table["death"] - persistence_table["birth"]
+            )
+            avg_lifetime.append(
+                persistence_table[persistence_table["homology"] == self._h_dim][
+                    "lifetime"
+                ].mean()
             )
 
-        return betti_features
-
-    def _compute_betti_mean(
-        self, betti_surfaces: List[pd.DataFrame]
-    ) -> List[pd.DataFrame]:
-        """Compute the mean along the epsilon axis of the non-zero elements of
-        the betti surface.
-
-        Parameters
-        ----------
-        betti_surfaces : ``List[pd.DataFrame]``, required.
-            A list containing the betti surfaces, one for each homology
-            dimension.
-
-        Returns
-        -------
-        betti_means : ``List[np.ndarray]``
-            The mean of each betti surfaces.
-
-        """
-        betti_means = []
-        for betti_surface in betti_surfaces:
-            betti_means.append(
-                betti_surface.groupby(betti_surface.index)
-                .apply(lambda g: _find_mean_nonzero(g))
-                .rolling(self._betti_rolling)
-                .mean()
-                .values
-            )
-
-        return betti_means
-
-    def _compute_arg_max_by_time(
-        self, betti_surfaces: List[pd.DataFrame]
-    ) -> List[np.ndarray]:
-        """For each surface in ``betti_surfaces``, compute the argmax along the
-         epsilon axis.
-
-        Parameters
-        ----------
-        betti_surfaces : ``List[pd.DataFrame]``, required.
-            A list containing the betti surfaces, one for each homology
-            dimension.
-
-        Returns
-        -------
-        betti_arg_maxes : ``List[np.ndarray]``
-            The argmax of each betti surfaces.
-
-        """
-        betti_arg_maxes = []
-        for betti_surface in betti_surfaces:
-            arg_max = np.argmax(np.array(betti_surface), axis=1)
-            betti_arg_maxes.append(arg_max)
-
-        return betti_arg_maxes
+        return avg_lifetime

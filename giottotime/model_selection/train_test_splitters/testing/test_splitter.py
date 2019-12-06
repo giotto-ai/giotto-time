@@ -7,10 +7,7 @@ import pandas as pd
 from hypothesis._strategies import integers, datetimes, floats
 from pandas.testing import assert_frame_equal
 
-from giottotime.feature_creation.time_series_features import (
-    ShiftFeature,
-    MovingAverageFeature,
-)
+from giottotime.feature_creation import ShiftFeature, MovingAverageFeature
 from ..base import Splitter
 from ..splitters import DatetimeSplitter, PercentageSplitter, TrainSizeSplitter
 from giottotime.core.hypothesis.feature_matrices import X_y_matrices

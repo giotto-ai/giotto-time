@@ -8,7 +8,7 @@ import giotto.diagrams as diag
 import giotto.homology as hl
 import pandas as pd
 
-from giottotime.feature_creation.base import TimeSeriesFeature
+from ..base import TimeSeriesFeature
 
 __all__ = ["TDAFeatures", "align_indices"]
 

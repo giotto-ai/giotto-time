@@ -2,7 +2,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from giottotime.feature_creation.tda_features import BettiCurvesFeature
+from giottotime.feature_creation.index_dependent_features.tda_features import (
+    BettiCurvesFeature,
+)
 
 
 def test_correct_betti_curves_mean():

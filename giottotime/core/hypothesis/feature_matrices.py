@@ -2,12 +2,13 @@ from typing import List
 
 import hypothesis.strategies as st
 
-from ...feature_creation.feature_creation import TimeSeriesFeature, FeatureCreation
+from giottotime.feature_creation import FeatureCreation
+from giottotime.feature_creation.base import Feature
 from .time_indexes import giotto_time_series
 
 
 @st.composite
-def X_y_matrices(draw, horizon: int, time_series_features: List[TimeSeriesFeature]):
+def X_y_matrices(draw, horizon: int, time_series_features: List[Feature]):
     """ Returns a strategy that generates X and y feature matrices.
 
     Parameters
@@ -53,7 +54,7 @@ def y_matrices(draw, horizon: int = 3):
 
 
 @st.composite
-def X_matrices(draw, time_series_features: List[TimeSeriesFeature]):
+def X_matrices(draw, time_series_features: List[Feature]):
     """ Returns a strategy that generates the X feature matrix.
 
     Parameters

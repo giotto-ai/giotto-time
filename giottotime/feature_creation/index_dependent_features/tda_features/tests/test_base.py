@@ -6,7 +6,9 @@ import pandas as pd
 import pytest
 from hypothesis import given, strategies as st
 
-from giottotime.feature_creation.tda_features import TDAFeatures
+from giottotime.feature_creation.index_dependent_features.tda_features import (
+    TDAFeatures,
+)
 
 
 class TestTDAFeature(TDAFeatures):
