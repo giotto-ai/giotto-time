@@ -49,7 +49,7 @@ class PeriodicSeasonalFeature(StandardFeature):
     ):
         super().__init__(output_name=output_name)
         self._start_date = start_date
-        self._period = pd.Timedelta(period)
+        self._period = period
         self._amplitude = amplitude
         self._length = length
         self._index_period = index_period
@@ -78,6 +78,7 @@ class PeriodicSeasonalFeature(StandardFeature):
 
         """
         self._validate_input(X)
+        self._transform_inputs(X)
         datetime_index = self._get_time_index(X)
 
         periodic_feature_values = self._compute_periodic_feature(datetime_index)
@@ -109,9 +110,6 @@ class PeriodicSeasonalFeature(StandardFeature):
         ------
         ValueError
         """
-        if isinstance(self._start_date, str):
-            self._start_date = pd.to_datetime(self._start_date)
-
         if X is None:
             if self._start_date is None:
                 raise ValueError(
@@ -125,6 +123,32 @@ class PeriodicSeasonalFeature(StandardFeature):
                     f"must be provided, but instead was "
                     f"{self._index_period}."
                 )
+
+    def _transform_inputs(self, X: pd.DataFrame) -> None:
+        """If needed, transform the inputs of the user into the appropriate ones. The
+        ``period`` should be a ``pd.Timedelta`` while the ``start_date`` is taken from
+        the first index value of ``X`` (if present). If ``X`` is not present, convert
+        the ``start_date`` if is a string.
+
+        Parameters
+        ----------
+        X : ``pd.DataFrame``, required.
+            The input DataFrame.
+
+        Returns
+        -------
+        None
+
+        """
+        if isinstance(self._period, str):
+            self._period = pd.Timedelta(self._period)
+
+        if X is not None:
+            self._start_date = X.index.values[0]
+
+        else:
+            if isinstance(self._start_date, str):
+                self._start_date = pd.to_datetime(self._start_date)
 
     def _get_time_index(self, X: pd.DataFrame) -> pd.DatetimeIndex:
         """Get the time index. If ``X`` is not None, the index of used. Otherwise, the
@@ -144,6 +168,7 @@ class PeriodicSeasonalFeature(StandardFeature):
         """
         if X is not None:
             datetime_index = X.index
+
         else:
             if isinstance(self._index_period, int):
                 datetime_index = pd.date_range(

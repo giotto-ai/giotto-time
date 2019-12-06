@@ -61,7 +61,7 @@ class FunctionTrend(TrendModel):
         return self
 
     def predict(self, t):
-        """Using the fitted polynomial, predict the values starting from ``X``.
+        """Using the fitted model, predict the values starting from ``X``.
 
         Parameters
         ----------
