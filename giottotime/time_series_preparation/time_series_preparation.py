@@ -27,7 +27,7 @@ class TimeSeriesPreparation:
         start: pd.datetime = None,
         end: pd.datetime = None,
         freq: pd.Timedelta = None,
-        resample_if_not_equispaced: bool = True,
+        resample_if_not_equispaced: bool = False,
         output_name: str = "time_series",
     ):
         self.start = start

@@ -191,7 +191,7 @@ class TestToPeriodIndex:
         assert_series_equal(computed_time_series, expected_time_series)
 
 
-class ToPeriodIndexDataFrame:
+class TestToPeriodIndexDataFrame:
     @given(series_with_period_index(), st.text())
     def test_output_dataframe_is_correct(
         self, period_index_series: pd.Series, output_name: str
@@ -201,4 +201,94 @@ class ToPeriodIndexDataFrame:
             period_index_series
         )
         expected_time_series = pd.DataFrame({output_name: period_index_series})
+        assert_frame_equal(computed_time_series, expected_time_series)
+
+
+class TestTransform:
+    @given(st.lists(st.floats()), st.datetimes(), available_freqs(), st.text())
+    def test_list_as_input(
+        self,
+        input_list: pd.Series,
+        start: pd.datetime,
+        freq: pd.Timedelta,
+        output_name: str,
+    ):
+        time_series_preparation = TimeSeriesPreparation(
+            start=start, freq=freq, output_name=output_name
+        )
+        computed_time_series = time_series_preparation.transform(input_list)
+        expected_series = pandas_series_with_period_index(input_list, start, freq=freq)
+        expected_time_series = pd.DataFrame({output_name: expected_series})
+        assert_frame_equal(computed_time_series, expected_time_series)
+
+    @given(
+        arrays(shape=st.integers(0, 1000), dtype=float),
+        st.datetimes(),
+        available_freqs(),
+        st.text(),
+    )
+    def test_array_as_input(
+        self,
+        input_array: np.ndarray,
+        start: pd.datetime,
+        freq: pd.Timedelta,
+        output_name: str,
+    ):
+        time_series_preparation = TimeSeriesPreparation(
+            start=start, freq=freq, output_name=output_name
+        )
+        computed_time_series = time_series_preparation.transform(input_array)
+        expected_series = pandas_series_with_period_index(input_array, start, freq=freq)
+        expected_time_series = pd.DataFrame({output_name: expected_series})
+        assert_frame_equal(computed_time_series, expected_time_series)
+
+    @given(series_with_period_index(), st.datetimes(), available_freqs(), st.text())
+    def test_period_index_as_input(
+        self,
+        period_index_series: pd.Series,
+        start: pd.datetime,
+        freq: pd.Timedelta,
+        output_name: str,
+    ):
+        time_series_preparation = TimeSeriesPreparation(
+            start=start, freq=freq, output_name=output_name
+        )
+        computed_time_series = time_series_preparation.transform(period_index_series)
+        expected_time_series = pd.DataFrame({output_name: period_index_series})
+        assert_frame_equal(computed_time_series, expected_time_series)
+
+    @given(series_with_datetime_index(), st.datetimes(), available_freqs(), st.text())
+    def test_datetime_index_as_input(
+        self,
+        datetime_index_series: pd.Series,
+        start: pd.datetime,
+        freq: pd.Timedelta,
+        output_name: str,
+    ):
+        time_series_preparation = TimeSeriesPreparation(
+            start=start, freq=freq, output_name=output_name
+        )
+        computed_time_series = time_series_preparation.transform(datetime_index_series)
+        expected_series = datetime_index_series_to_period_index_series(
+            datetime_index_series, freq=freq
+        )
+        expected_time_series = pd.DataFrame({output_name: expected_series})
+        assert_frame_equal(computed_time_series, expected_time_series)
+
+    @given(series_with_timedelta_index(), st.datetimes(), available_freqs(), st.text())
+    def test_timedelta_index_as_input(
+        self,
+        timedelta_index_series: pd.Series,
+        start: pd.datetime,
+        freq: pd.Timedelta,
+        output_name: str,
+    ):
+        time_series_preparation = TimeSeriesPreparation(
+            start=start, freq=freq, output_name=output_name
+        )
+        computed_time_series = time_series_preparation.transform(timedelta_index_series)
+        expected_series = timedelta_index_series_to_period_index_series(
+            timedelta_index_series, freq=freq
+        )
+        expected_time_series = pd.DataFrame({output_name: expected_series})
         assert_frame_equal(computed_time_series, expected_time_series)
