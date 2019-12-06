@@ -2,8 +2,7 @@ from typing import List
 
 import hypothesis.strategies as st
 
-from giottotime.feature_creation.feature_creation import TimeSeriesFeature
-from giottotime.feature_creation.feature_creation import FeaturesCreation
+from ...feature_creation.feature_creation import TimeSeriesFeature, FeatureCreation
 from .time_indexes import giotto_time_series
 
 
@@ -28,7 +27,7 @@ def X_y_matrices(draw, horizon: int, time_series_features: List[TimeSeriesFeatur
         y feature matrix
     """
     period_index_series = draw(giotto_time_series())
-    feature_creation = FeaturesCreation(
+    feature_creation = FeatureCreation(
         horizon=horizon, time_series_features=time_series_features
     )
     X, y = feature_creation.fit_transform(period_index_series)

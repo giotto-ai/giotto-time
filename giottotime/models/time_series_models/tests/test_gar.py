@@ -8,7 +8,7 @@ from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression
 
 
-from giottotime.feature_creation.feature_creation import FeaturesCreation
+from giottotime.feature_creation.feature_creation import FeatureCreation
 from giottotime.feature_creation.time_series_features import (
     MovingAverageFeature,
     ConstantFeature,
@@ -19,7 +19,7 @@ from giottotime.models.time_series_models.gar import GAR
 
 
 class TestInputs:
-    @pytest.mark.parametrize("base_model", [None, FeaturesCreation(1, [])])
+    @pytest.mark.parametrize("base_model", [None, FeatureCreation(1, [])])
     def test_invalid_base_model(self, base_model):
         with pytest.raises(TypeError):
             GAR(base_model=base_model, feed_forward=False)
@@ -66,7 +66,7 @@ class TestFitPredict:
     @given(st.builds(arbitrary_features, st.integers(1, 50)))
     def test_correct_features_dimension(self, time_series, features):
         horizon = 4
-        feature_creation = FeaturesCreation(horizon, features)
+        feature_creation = FeatureCreation(horizon, features)
         base_model = LinearRegression()
 
         x, y = feature_creation.fit_transform(time_series)
@@ -87,7 +87,7 @@ class TestFitPredict:
     @given(st.builds(arbitrary_features, st.integers(1, 50)))
     def test_correct_fit_date(self, time_series, features):
         horizon = 4
-        feature_creation = FeaturesCreation(horizon, features)
+        feature_creation = FeatureCreation(horizon, features)
         base_model = LinearRegression()
 
         x, y = feature_creation.fit_transform(time_series)
