@@ -37,8 +37,8 @@ class PercentageSplitter(Splitter):
             )
 
         train_max_index = int(X.shape[0] * split_at_percentage) + 1
-        X_train, X_test = X[:train_max_index], X[train_max_index:]
-        y_train, y_test = y[:train_max_index], y[train_max_index:]
+        X_train, X_test = X.iloc[:train_max_index], X.iloc[train_max_index:]
+        y_train, y_test = y.iloc[:train_max_index], y.iloc[train_max_index:]
 
         return X_train, y_train, X_test, y_test
 
