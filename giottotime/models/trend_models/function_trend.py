@@ -2,7 +2,7 @@ import pandas as pd
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
 
-from giottotime.models.trend_models.base import TrendModel
+from ..trend_models.base import TrendModel
 
 
 class FunctionTrend(TrendModel):

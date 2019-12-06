@@ -4,9 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from giottotime.time_series_preparation.time_series_resampling import (
-    TimeSeriesResampler,
-)
+from ..time_series_preparation.time_series_resampling import TimeSeriesResampler
 from .time_series_conversion import (
     PandasSeriesToTimeIndexSeries,
     SequenceToTimeIndexSeries,

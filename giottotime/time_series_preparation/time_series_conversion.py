@@ -4,7 +4,7 @@ from typing import Optional, Union, List
 import numpy as np
 import pandas as pd
 
-from giottotime.core.constants import DEFAULT_START, DEFAULT_END, DEFAULT_FREQ
+from ..core.constants import DEFAULT_START, DEFAULT_FREQ
 
 PandasTimeIndex = Union[pd.DatetimeIndex, pd.PeriodIndex, pd.TimedeltaIndex]
 PandasDate = Union[pd.datetime, pd.Timestamp, str]
