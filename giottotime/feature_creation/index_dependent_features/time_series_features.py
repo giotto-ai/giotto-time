@@ -3,7 +3,7 @@ from typing import Optional
 import pandas as pd
 from sklearn.preprocessing import PolynomialFeatures
 
-from .base import TimeSeriesFeature
+from .base import IndexDependentFeature
 
 __all__ = [
     "ShiftFeature",
@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 
-class ShiftFeature(TimeSeriesFeature):
+class ShiftFeature(IndexDependentFeature):
     """Perform a shift of a DataFrame of size equal to ``shift``.
 
     Parameters
@@ -49,7 +49,7 @@ class ShiftFeature(TimeSeriesFeature):
         return X_shifted_renamed
 
 
-class MovingAverageFeature(TimeSeriesFeature):
+class MovingAverageFeature(IndexDependentFeature):
     """For each row in ``X``, compute the moving average of the previous
      ``window_size`` rows. If there are not enough rows, the value is Nan.
 
@@ -88,7 +88,7 @@ class MovingAverageFeature(TimeSeriesFeature):
         return X_mov_avg_renamed
 
 
-class PolynomialFeature(TimeSeriesFeature):
+class PolynomialFeature(IndexDependentFeature):
     """Compute the polynomial feature_creation, of a degree equal to the input
     ``degree``.
 
@@ -130,7 +130,7 @@ class PolynomialFeature(TimeSeriesFeature):
         return pol_of_X_renamed
 
 
-class ExogenousFeature(TimeSeriesFeature):
+class ExogenousFeature(IndexDependentFeature):
     """Reindex ``exogenous_time_series`` with the index of ``X``. To check the
     documentation of ``pandas.DataFrame.reindex`` and to see which type of
     ``method`` are available, please refer to the pandas `documentation

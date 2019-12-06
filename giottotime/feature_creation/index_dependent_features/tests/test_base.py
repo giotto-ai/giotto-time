@@ -2,10 +2,10 @@ import pandas as pd
 import pandas.util.testing as testing
 
 from giottotime.feature_creation import MovingAverageFeature
-from giottotime.feature_creation.index_dependent_features import TimeSeriesFeature
+from giottotime.feature_creation.index_dependent_features import IndexDependentFeature
 
 
-class TestTimeSeriesFeature(TimeSeriesFeature):
+class TestIndexDependentFeature(IndexDependentFeature):
     def __init__(self, output_name):
         super().__init__(output_name=output_name)
 
@@ -19,7 +19,7 @@ def test_correct_renaming_single_col():
     df = testing.makeTimeDataFrame(freq="MS")
 
     output_name = "shift"
-    shift_feature = TestTimeSeriesFeature(output_name=output_name)
+    shift_feature = TestIndexDependentFeature(output_name=output_name)
     df_renamed = shift_feature._rename_columns(df)
 
     assert df.shape == df_renamed.shape
@@ -35,7 +35,7 @@ def test_correct_renaming_multiple_columns():
     df = testing.makeTimeDataFrame(freq="MS")
 
     output_name = "shift"
-    shift_feature = TestTimeSeriesFeature(output_name=output_name)
+    shift_feature = TestIndexDependentFeature(output_name=output_name)
     df_renamed = shift_feature._rename_columns(df)
 
     assert df.shape == df_renamed.shape

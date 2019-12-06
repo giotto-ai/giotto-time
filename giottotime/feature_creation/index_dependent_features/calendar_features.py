@@ -4,12 +4,12 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 
-from .base import TimeSeriesFeature
+from .base import IndexDependentFeature
 
 __all__ = ["CalendarFeature"]
 
 
-class CalendarFeature(TimeSeriesFeature):
+class CalendarFeature(IndexDependentFeature):
     """Create a feature based on the national holidays of a specific country,
     based on a given kernel (if provided). The interface for this is based on
     the one of 'workalendar'. To see which regions and countries are available,

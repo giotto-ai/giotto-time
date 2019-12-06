@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 from pandas import DatetimeIndex
 
-from giottotime.feature_creation import FeatureCreation
 from giottotime.feature_creation.standard_features.base import StandardFeature
 
 

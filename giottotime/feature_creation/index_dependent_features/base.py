@@ -3,16 +3,14 @@ from typing import Union
 
 import pandas as pd
 
+from giottotime.feature_creation.base import Feature
 
-class TimeSeriesFeature(metaclass=ABCMeta):
+
+class IndexDependentFeature(Feature, metaclass=ABCMeta):
     """Base class for all the feature classes in this package.
 
     Parameters documentation is in the derived classes.
     """
-
-    @abstractmethod
-    def __init__(self, output_name):
-        self.output_name = output_name
 
     def fit(self, X, y=None):
         return self
