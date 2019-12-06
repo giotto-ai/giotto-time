@@ -8,6 +8,33 @@ from .index_dependent_features import ShiftFeature
 __all__ = ["FeatureCreation"]
 
 
+def check_feature_names(time_series_features: List[Feature]) -> None:
+    """Check that all the output names are different and that there aren't two different
+    features with the same name.
+
+    Parameters
+    ----------
+    time_series_features : ``List[TimeSeriesFeature]``, required.
+        The list of features.
+
+    Returns
+    -------
+    None
+
+    Raises
+    ------
+    ``ValueError``
+        Raised if there are two features with the same name.
+
+    """
+    feature_output_names = [feature.output_name for feature in time_series_features]
+    if len(set(feature_output_names)) != len(feature_output_names):
+        raise ValueError(
+            "The input features should all have different names, instead "
+            f"they are {feature_output_names}."
+        )
+
+
 class FeatureCreation:
     """Class responsible for the generation of the feature_creation, starting
     from a list of ``TimeSeriesFeature``.
@@ -26,8 +53,10 @@ class FeatureCreation:
     """
 
     def __init__(self, horizon: int, time_series_features: List[Feature]):
-        self.time_series_features = time_series_features
-        self.horizon = horizon
+        check_feature_names(time_series_features)
+
+        self._time_series_features = time_series_features
+        self._horizon = horizon
 
     def fit_transform(self, time_series: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
         """Create the X matrix by generating the feature_creation, starting
@@ -66,7 +95,7 @@ class FeatureCreation:
 
         """
         y = pd.DataFrame(index=time_series.index)
-        for k in range(self.horizon):
+        for k in range(self._horizon):
             shift_feature = ShiftFeature(-k, f"shift_{k}")
             y[f"y_{k}"] = shift_feature.fit_transform(time_series)
 
@@ -88,7 +117,7 @@ class FeatureCreation:
 
         """
         features = pd.DataFrame(index=time_series.index)
-        for time_series_feature in self.time_series_features:
+        for time_series_feature in self._time_series_features:
             x_transformed = time_series_feature.fit_transform(time_series)
             features = pd.concat([features, x_transformed], axis=1)
 
