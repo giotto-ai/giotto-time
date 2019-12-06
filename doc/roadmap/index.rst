@@ -10,9 +10,10 @@ Overview
 `giotto-time` is a time series forecasting library in Python. The main novelties
 compared to traditional time series libraries are the following:
 
-- built-in feature creation step with several commonly used features already available
-- availability of any machine learning regression model for forecasting
-- easy-to-use API
+- feature creation, model selection, model assessment and prediction pipeline for time series models.
+- plug-and-play availability of any scikit-learn-compatible regression or classification model for forecasting.
+- minimization of standard custom loss functions for time series (SMAPE, max error, etc..)
+- easy-to-use scikit-learn-familiar API.
 
 Additionally we provide standard causality tests with a scikit-learn-like interface.
 
