@@ -39,11 +39,15 @@ def arbitrary_features(feature_length):
     random_features = []
     random_params = random.sample(range(1, 100), feature_length)
 
+    feature_names = []
     for random_param in random_params:
         random_feature = random.sample(possible_features, 1)[0]
-        random_features.append(
-            random_feature(random_param, output_name=str(random_feature))
-        )
+        output_name = f"{random_feature}_{random_params}"
+        if output_name in feature_names:
+            continue
+        feature_names.append(output_name)
+        feature = random_feature(random_param, output_name=output_name)
+        random_features.append(feature)
 
     return random_features
 
