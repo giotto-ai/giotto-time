@@ -103,7 +103,8 @@ class PolynomialTrend(TrendModel):
 
         """
         p = np.poly1d(self.model_weights_)
-        predictions = pd.DataFrame(
+        predictions = pd.Series(
             index=time_series.index, data=[p(t) for t in range(0, time_series.shape[0])]
         )
-        return time_series - predictions[0]
+
+        return time_series.sub(predictions, axis=0)

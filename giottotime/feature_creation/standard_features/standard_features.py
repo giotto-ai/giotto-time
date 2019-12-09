@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 from pandas import DatetimeIndex
 
+from math import pi
+
 from giottotime.feature_creation.standard_features.base import StandardFeature
 
 
@@ -246,7 +248,7 @@ class PeriodicSeasonalFeature(StandardFeature):
 
         """
         return (
-            np.sin((datetime_index - self._start_date) / self._period)
+            np.sin( 2*pi* (datetime_index - self._start_date) / self._period )
         ) * self._amplitude
 
 
