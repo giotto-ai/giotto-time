@@ -31,7 +31,9 @@ class TestConstantFeature:
 
     @given(
         giotto_time_series(
-            start_date=pd.Timestamp(2000, 1, 1), end_date=pd.Timestamp(2010, 1, 1)
+            min_length=1,
+            start_date=pd.Timestamp(2000, 1, 1),
+            end_date=pd.Timestamp(2010, 1, 1),
         ),
         st.integers(0, 100),
     )

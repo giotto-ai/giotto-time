@@ -20,9 +20,17 @@ class TestPeriodIndex:
     def test_period_indexes_is_period(self, index):
         assert isinstance(index, pd.PeriodIndex)
 
-    @given(period_indexes(max_length=1000))
+    @given(period_indexes(min_length=10, max_length=1000))
     def test_period_indexes_size(self, index):
-        assert len(index) <= 1000
+        assert 10 <= len(index) <= 1000
+
+    @given(period_indexes(min_length=10, max_length=10))
+    def test_period_indexes_size_fixed_value(self, index):
+        assert len(index) == 10
+
+    @given(period_indexes(min_length=0, max_length=0))
+    def test_period_indexes_size_fixed_value_0(self, index):
+        assert len(index) == 0
 
     @given(period_indexes())
     def test_period_indexes_boundaries(self, index):
@@ -38,9 +46,17 @@ class TestPeriodSeries:
     def test_period_series_has_period_index(self, series):
         assert isinstance(series.index, pd.PeriodIndex)
 
-    @given(series_with_period_index(max_length=1000))
+    @given(series_with_period_index(min_length=10, max_length=1000))
     def test_period_series_size(self, series):
-        assert len(series.index) <= 1000
+        assert 10 <= len(series.index) <= 1000
+
+    @given(series_with_period_index(min_length=10, max_length=10))
+    def test_period_series_size_fixed_value(self, series):
+        assert len(series.index) == 10
+
+    @given(series_with_period_index(min_length=0, max_length=0))
+    def test_period_series_size_fixed_value_0(self, series):
+        assert len(series.index) == 0
 
     @given(series_with_period_index())
     def test_period_series_boundaries(self, series):
@@ -60,9 +76,17 @@ class TestDatetimeIndex:
     def test_datetime_indexes_is_datetime(self, index):
         assert isinstance(index, pd.DatetimeIndex)
 
-    @given(datetime_indexes(max_length=1000))
+    @given(datetime_indexes(min_length=30, max_length=1000))
     def test_datetime_indexes_size(self, index):
-        assert len(index) <= 1000
+        assert 30 <= len(index) <= 1000
+
+    @given(datetime_indexes(min_length=30, max_length=30))
+    def test_datetime_indexes_size_fixed_value(self, index):
+        assert len(index) == 30
+
+    @given(datetime_indexes(min_length=0, max_length=0))
+    def test_datetime_indexes_size_fixed_value_0(self, index):
+        assert len(index) == 0
 
     @given(datetime_indexes())
     def test_datetime_indexes_boundaries(self, index):
@@ -78,9 +102,17 @@ class TestDatetimeSeries:
     def test_datetime_series_has_datetime_index(self, series):
         assert isinstance(series.index, pd.DatetimeIndex)
 
-    @given(series_with_datetime_index(max_length=1000))
+    @given(series_with_datetime_index(min_length=40, max_length=1000))
     def test_datetime_series_size(self, series):
-        assert len(series.index) <= 1000
+        assert 40 <= len(series.index) <= 1000
+
+    @given(series_with_datetime_index(min_length=40, max_length=40))
+    def test_datetime_series_size_fixed_value(self, series):
+        assert len(series.index) == 40
+
+    @given(series_with_datetime_index(min_length=0, max_length=0))
+    def test_datetime_series_size_fixed_value_0(self, series):
+        assert len(series.index) == 0
 
     @given(series_with_datetime_index())
     def test_datetime_series_boundaries(self, series):
@@ -100,9 +132,17 @@ class TestTimedeltaIndex:
     def test_timedelta_indexes_is_timedelta(self, index):
         assert isinstance(index, pd.TimedeltaIndex)
 
-    @given(timedelta_indexes(max_length=1000))
+    @given(timedelta_indexes(min_length=30, max_length=1000))
     def test_timedelta_indexes_size(self, index):
-        assert len(index) <= 1000
+        assert 30 <= len(index) <= 1000
+
+    @given(timedelta_indexes(min_length=30, max_length=30))
+    def test_timedelta_indexes_size_fixed_value(self, index):
+        assert len(index) == 30
+
+    @given(timedelta_indexes(min_length=0, max_length=0))
+    def test_timedelta_indexes_size_fixed_value_0(self, index):
+        assert len(index) == 0
 
     @given(timedelta_indexes())
     def test_timedelta_indexes_boundaries(self, index):
@@ -117,9 +157,17 @@ class TestTimedeltaSeries:
     def test_timedelta_series_has_timedelta_index(self, series):
         assert isinstance(series.index, pd.TimedeltaIndex)
 
-    @given(series_with_timedelta_index(max_length=1000))
+    @given(series_with_timedelta_index(min_length=15, max_length=1000))
     def test_timedelta_series_size(self, series):
-        assert len(series.index) <= 1000
+        assert 15 <= len(series.index) <= 1000
+
+    @given(series_with_timedelta_index(min_length=15, max_length=15))
+    def test_timedelta_series_size_fixed_value(self, series):
+        assert len(series.index) == 15
+
+    @given(series_with_timedelta_index(min_length=0, max_length=0))
+    def test_timedelta_series_size_fixed_value_0(self, series):
+        assert len(series.index) == 0
 
     @given(series_with_timedelta_index())
     def test_timedelta_series_boundaries(self, series):

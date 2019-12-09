@@ -32,7 +32,7 @@ class PercentageSplitter(Splitter):
     def transform(self, X, y, split_at_percentage: float = 1):
         if not 0 <= split_at_percentage <= 1:
             raise ValueError(
-                f"split_at_percentage has to be between 0"
+                f"split_at_percentage has to be between 0 "
                 f"and 1. Detected: {split_at_percentage}"
             )
 

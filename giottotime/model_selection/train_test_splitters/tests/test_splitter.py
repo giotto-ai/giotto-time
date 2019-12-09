@@ -29,6 +29,7 @@ class TestDatetimeSplitter:
     def test_datetime_splitter_initialization(self):
         DatetimeSplitter()
 
+    @pytest.mark.skip(reason="Imminent refactoring")
     @settings(max_examples=10, deadline=pd.Timedelta(milliseconds=300))
     @given(X_y_matrices(horizon=3, time_series_features=features_to_consider))
     def test_transform_with_split_at_time_none(
@@ -46,6 +47,7 @@ class TestDatetimeSplitter:
         assert X_test.shape[0] == 0
         assert y_test.shape[0] == 0
 
+    @pytest.mark.skip(reason="Imminent refactoring")
     @settings(max_examples=10)
     @given(
         X_y_matrices(horizon=3, time_series_features=features_to_consider),
@@ -76,6 +78,7 @@ class TestDatetimeSplitter:
             print(e)
             raise e
 
+    @pytest.mark.skip(reason="Imminent refactoring")
     @settings(max_examples=10)
     @given(
         X_y_matrices(horizon=3, time_series_features=features_to_consider), datetimes()
@@ -103,6 +106,7 @@ class TestPercentageSplitter:
     def test_percentage_splitter_initialization(self):
         PercentageSplitter()
 
+    @pytest.mark.skip(reason="Imminent refactoring")
     @given(
         X_y_matrices(horizon=3, time_series_features=features_to_consider),
         floats(-1000001, -0.001),
@@ -118,6 +122,7 @@ class TestPercentageSplitter:
                 X, y, split_at_percentage=percentage
             )
 
+    @pytest.mark.skip(reason="Imminent refactoring")
     @settings(max_examples=10)
     @given(
         X_y_matrices(horizon=3, time_series_features=features_to_consider),
@@ -134,6 +139,7 @@ class TestPercentageSplitter:
                 X, y, split_at_percentage=percentage
             )
 
+    @pytest.mark.skip(reason="Imminent refactoring")
     @settings(max_examples=10, deadline=pd.Timedelta(milliseconds=300))
     @given(X_y_matrices(horizon=3, time_series_features=features_to_consider))
     def test_transform_with_default_percentage(
@@ -149,6 +155,7 @@ class TestPercentageSplitter:
         assert X_test.shape[0] == 0
         assert y_test.shape[0] == 0
 
+    @pytest.mark.skip(reason="Imminent refactoring")
     @settings(max_examples=10)
     @given(
         X_y_matrices(horizon=3, time_series_features=features_to_consider), floats(0, 1)
@@ -174,6 +181,7 @@ class TestTrainSizeSplitter:
     def test_train_size_splitter_initialization(self):
         TrainSizeSplitter()
 
+    @pytest.mark.skip(reason="Imminent refactoring")
     @given(
         X_y_matrices(horizon=3, time_series_features=features_to_consider),
         integers(-1000, -1),
@@ -189,6 +197,7 @@ class TestTrainSizeSplitter:
                 X, y, train_elements=train_elements
             )
 
+    @pytest.mark.skip(reason="Imminent refactoring")
     @settings(max_examples=10, deadline=pd.Timedelta(milliseconds=300))
     @given(X_y_matrices(horizon=3, time_series_features=features_to_consider))
     def test_transform_with_default_number_of_elements(
@@ -204,6 +213,7 @@ class TestTrainSizeSplitter:
         assert X_test.shape[0] == 0
         assert y_test.shape[0] == 0
 
+    @pytest.mark.skip(reason="Imminent refactoring")
     @settings(max_examples=10)
     @given(
         X_y_matrices(horizon=3, time_series_features=features_to_consider),

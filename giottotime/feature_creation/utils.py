@@ -18,7 +18,7 @@ def trim_feature_nans(
         The ``pd.DataFrame`` containing ``X``.
 
     y : ``pd.DataFrame``, required.
-     The ``pd.DataFrame`` containing ``y``.
+        The ``pd.DataFrame`` containing ``y``.
 
     Returns
     -------
