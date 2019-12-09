@@ -18,8 +18,28 @@ SUPPORTED_SEQUENCE_TYPES = [
 
 class TimeSeriesPreparation:
     """Transforms an array-like sequence in a period-index DataFrame with a single
-    column
+    column.
 
+    Here is what happens:
+    - if a `list` or `np.array` is passed, the PeriodIndex is built using the parameters
+        `start`, `end` and `freq`
+    - if a `pd.Series` is passed, it checks if the index is a time index (`DatetimeIndex`,
+        `TimedeltaIndex`, `PeriodIndex`) or not. If not the index is built as if it were
+        a `list` or `np.array. If yes the index is converted to PeriodIndex.
+
+    Parameters
+    ----------
+    start : ``pd.datetime``, optional, (default=``None``)
+    end : ``pd.datetime``, optional, (default=``None``)
+    freq : ``pd.Timedelta``, optional, (default=``None``)
+    resample_if_not_equispaced : ``bool``, optional, (default=``False``)
+        not supported yet, leave it as True
+    output_name : ``str``, optional, (default=``"time_series"``)
+
+    Raises
+    ------
+    ``ValueError``
+        Of the three parameters: start, end, and periods, exactly two must be specified.
     """
 
     def __init__(
@@ -48,6 +68,18 @@ class TimeSeriesPreparation:
         )
 
     def transform(self, X: Union[List, np.array, pd.Series]) -> pd.DataFrame:
+        """Transforms an array-like sequence in a period-index DataFrame with a single
+        column.
+
+        Parameters
+        ----------
+        X : ``Union[List, np.array, pd.Series]``, required
+
+        Returns
+        -------
+        period_index_dataframe : ``pd.DataFrame``
+            the output dataframe with a period index.
+        """
         pandas_time_series = self._to_time_index_series(X)
         equispaced_time_series = self._to_equispaced_time_series(pandas_time_series)
         period_index_time_series = self._to_period_index_time_series(
