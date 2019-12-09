@@ -69,9 +69,7 @@ class TimeSeriesConversion(ABC):
         """
         return self
 
-    def transform(
-        self, array_like_object: Union[pd.Series, np.array, list]
-    ) -> pd.Series:
+    def transform(self, X: Union[pd.Series, np.array, list]) -> pd.Series:
         """Transforms an array-like object (list, np.array, pd.Series)
         into a pd.Series with time index.
 
@@ -80,18 +78,18 @@ class TimeSeriesConversion(ABC):
 
         Parameters
         ----------
-        array_like_object : Union[List, np.array, pd.Series], required.
+        X : Union[List, np.array, pd.Series], required.
             It depends on the implementation of the subclasses.
 
         Returns
         -------
         transformed series: pd.Series
         """
-        index = self._get_index_from(array_like_object)
-        values = self._get_values_from(array_like_object)
+        index = self._get_index_from(X)
+        values = self._get_values_from(X)
         return pd.Series(data=values, index=index)
 
-    def fit_transform(self, X, y=None):
+    def fit_transform(self, X: Union[pd.Series, np.array, list], y=None) -> pd.Series:
         """Default method for compatibility.
 
         Parameters
@@ -143,7 +141,7 @@ class TimeSeriesConversion(ABC):
 
     def _initialize_start_end_freq(
         self, start: PandasDate, end: PandasDate, freq: pd.Timedelta
-    ):
+    ) -> None:
         """Initialization of the parameters `start`, `end` and `freq`.
 
         Exactly two out of three must be specified.

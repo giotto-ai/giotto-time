@@ -5,5 +5,5 @@ class TimeSeriesResampler:
     def __init__(self):
         pass
 
-    def transform(self, time_series: pd.Series):
+    def transform(self, X: pd.Series):
         raise NotImplementedError

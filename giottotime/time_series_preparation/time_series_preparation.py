@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Optional
 
 import numpy as np
 import pandas as pd
@@ -24,9 +24,9 @@ class TimeSeriesPreparation:
 
     def __init__(
         self,
-        start: pd.datetime = None,
-        end: pd.datetime = None,
-        freq: pd.Timedelta = None,
+        start: Optional[pd.datetime] = None,
+        end: Optional[pd.datetime] = None,
+        freq: Optional[pd.Timedelta] = None,
         resample_if_not_equispaced: bool = False,
         output_name: str = "time_series",
     ):
