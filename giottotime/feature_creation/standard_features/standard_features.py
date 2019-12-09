@@ -248,7 +248,7 @@ class PeriodicSeasonalFeature(StandardFeature):
 
         """
         return (
-            np.sin( 2*pi* (datetime_index - self._start_date) / self._period )
+            np.sin(2 * pi * (datetime_index - self._start_date) / self._period)
         ) * self._amplitude
 
 
