@@ -44,7 +44,6 @@ class TimeSeriesConversion(ABC):
     freq : ``pd.Timedelta``, optional, (default=``None``)
         frequency of the output time series. Not mandatory for all time series
         conversion.
-
     """
 
     def __init__(
@@ -54,20 +53,6 @@ class TimeSeriesConversion(ABC):
         freq: Optional[pd.Timedelta] = None,
     ) -> None:
         self._initialize_start_end_freq(start, end, freq)
-
-    def fit(self, X, y=None):
-        """Default method for compatibility.
-
-        Parameters
-        ----------
-        X : object, required.
-        y : object, optional, (default=``None``)
-
-        Returns
-        -------
-        self
-        """
-        return self
 
     def transform(self, X: Union[pd.Series, np.array, list]) -> pd.Series:
         """Transforms an array-like object (list, np.array, pd.Series)
@@ -88,20 +73,6 @@ class TimeSeriesConversion(ABC):
         index = self._get_index_from(X)
         values = self._get_values_from(X)
         return pd.Series(data=values, index=index)
-
-    def fit_transform(self, X: Union[pd.Series, np.array, list], y=None) -> pd.Series:
-        """Default method for compatibility.
-
-        Parameters
-        ----------
-        X : object, required.
-        y : object, optional, (default=``None``)
-
-        Returns
-        -------
-        self.transform(X)
-        """
-        return self.transform(X)
 
     @abstractmethod
     def _get_index_from(
@@ -178,7 +149,9 @@ class TimeSeriesConversion(ABC):
         self.end = None
         self.freq = DEFAULT_FREQ
 
-    def _one_not_none_param_initialization(self, start, end, freq):
+    def _one_not_none_param_initialization(
+        self, start: PandasDate, end: PandasDate, freq: pd.Timedelta
+    ):
         if start is not None:
             self.start = start
             self.end = None
@@ -192,7 +165,9 @@ class TimeSeriesConversion(ABC):
             self.end = None
             self.freq = freq
 
-    def _two_not_none_params_initialization(self, start, end, freq):
+    def _two_not_none_params_initialization(
+        self, start: PandasDate, end: PandasDate, freq: pd.Timedelta
+    ):
         self.start = start
         self.end = end
         self.freq = freq
@@ -267,23 +242,44 @@ class SequenceToTimeIndexSeries(TimeSeriesConversion):
 
         Returns
         -------
-        pd.PeriodIndex
+        np.array
         """
         return np.array(array_like_object)
 
 
 class PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
+    """Returns a Pandas Series with time index (DatetimeIndex, TimedeltaIndex or
+    PeriodIndex from a standard Pandas Series
+
+    Parameters
+    ----------
+    start : ``Union[pd.datetime, str]``, optional, (default=``None``)
+    end : ``Union[pd.datetime, str]``, optional, (default=``None``)
+    freq : ``pd.Timedelta``, optional, (default=``None``)
+
+    """
+
     def __init__(
         self,
         start: Optional[Union[pd.datetime, str]] = None,
         end: Optional[Union[pd.datetime, str]] = None,
-        freq: Optional[pd.DateOffset] = None,
+        freq: Optional[pd.Timedelta] = None,
     ) -> None:
         super().__init__(start, end, freq)
 
     def _get_index_from(
         self, array_like_object: Union[pd.Series, np.array, list]
     ) -> PandasTimeIndex:
+        """Returns a time index from a pandas Series. It converts
+
+        Parameters
+        ----------
+        array_like_object
+
+        Returns
+        -------
+
+        """
         if self._has_time_index(array_like_object):
             return array_like_object.index
         else:

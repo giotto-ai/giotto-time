@@ -134,7 +134,7 @@ class TestPercentageSplitter:
                 X, y, split_at_percentage=percentage
             )
 
-    @settings(max_examples=10)
+    @settings(max_examples=10, deadline=pd.Timedelta(milliseconds=300))
     @given(X_y_matrices(horizon=3, time_series_features=features_to_consider))
     def test_transform_with_default_percentage(
         self, matrices: Tuple[pd.DataFrame, pd.DataFrame]
