@@ -4,7 +4,7 @@ import pytest
 import numpy as np
 from hypothesis._settings import duration
 
-from giottotime.utils.hypothesis import giotto_time_series
+from giottotime.utils.hypothesis.time_indexes import giotto_time_series
 from giottotime.feature_creation import ShiftFeature, MovingAverageFeature
 from giottotime.feature_creation.feature_creation import (
     check_feature_names,
