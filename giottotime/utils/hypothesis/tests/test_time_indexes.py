@@ -1,7 +1,7 @@
 from hypothesis import given
 import pandas as pd
 
-from ..time_indexes import (
+from giottotime.utils.hypothesis.time_indexes import (
     period_indexes,
     series_with_period_index,
     datetime_indexes,

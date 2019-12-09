@@ -3,7 +3,7 @@ import pandas as pd
 from hypothesis import given, strategies as st
 from pandas.util import testing as testing
 
-from giottotime.core.hypothesis.time_indexes import giotto_time_series
+from giottotime.utils.hypothesis.time_indexes import giotto_time_series
 from giottotime.feature_creation import ConstantFeature, CustomFeature
 
 
