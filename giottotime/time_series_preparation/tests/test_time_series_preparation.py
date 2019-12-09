@@ -160,7 +160,7 @@ class TestToEquispacedTimeSeries:
 
 
 class TestToPeriodIndex:
-    @settings(suppress_health_check=2)
+    @settings(suppress_health_check=[2])
     @given(series_with_period_index())
     def test_with_period_index_as_input(self, period_index_series):
         time_series_preparation = TimeSeriesPreparation()
