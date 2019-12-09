@@ -10,7 +10,7 @@ from giottotime.time_series_preparation.time_series_conversion import (
     TimeIndexSeriesToPeriodIndexSeries,
     count_not_none,
 )
-from giottotime.core.testing_constants import DEFAULT_START, DEFAULT_END, DEFAULT_FREQ
+from giottotime.utils.testing_constants import DEFAULT_START, DEFAULT_FREQ
 
 PandasDate = Union[pd.datetime, pd.Timestamp, str]
 

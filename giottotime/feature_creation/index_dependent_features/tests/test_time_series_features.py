@@ -5,7 +5,7 @@ import pytest
 from hypothesis import given, strategies as st
 from sklearn.preprocessing import PolynomialFeatures
 
-from giottotime.core.hypothesis.time_indexes import giotto_time_series
+from giottotime.utils.hypothesis.time_indexes import giotto_time_series
 from giottotime.feature_creation import (
     ShiftFeature,
     MovingAverageFeature,

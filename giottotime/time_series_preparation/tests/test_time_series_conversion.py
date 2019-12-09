@@ -9,14 +9,14 @@ from hypothesis.extra.pandas import series as pd_series
 from hypothesis.strategies import lists, datetimes, floats, integers
 from pandas.testing import assert_series_equal
 
-from giottotime.core.hypothesis.time_indexes import (
+from giottotime.utils.hypothesis.time_indexes import (
     pair_of_ordered_dates,
     series_with_datetime_index,
     series_with_period_index,
     available_freqs,
     series_with_timedelta_index,
 )
-from giottotime.core.testing_constants import DEFAULT_START, DEFAULT_END
+from giottotime.utils.testing_constants import DEFAULT_START, DEFAULT_END
 from .utils import (
     compare_output_of_input_sequence_to_expected_one,
     compare_output_of_input_series_to_expected_one,
