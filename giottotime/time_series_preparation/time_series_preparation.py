@@ -1,15 +1,14 @@
-from typing import List, Union
+from typing import List, Union, Optional
 
 import numpy as np
 import pandas as pd
-from sklearn.base import BaseEstimator, TransformerMixin
 
-from ..time_series_preparation.time_series_resampling import TimeSeriesResampler
 from .time_series_conversion import (
     PandasSeriesToTimeIndexSeries,
     SequenceToTimeIndexSeries,
     TimeIndexSeriesToPeriodIndexSeries,
 )
+from ..time_series_preparation.time_series_resampling import TimeSeriesResampler
 
 SUPPORTED_SEQUENCE_TYPES = [
     np.ndarray,
@@ -17,36 +16,70 @@ SUPPORTED_SEQUENCE_TYPES = [
 ]
 
 
-class TimeSeriesPreparation(BaseEstimator, TransformerMixin):
+class TimeSeriesPreparation:
+    """Transforms an array-like sequence in a period-index DataFrame with a single
+    column.
+
+    Here is what happens:
+    - if a `list` or `np.array` is passed, the PeriodIndex is built using the parameters
+        `start`, `end` and `freq`
+    - if a `pd.Series` is passed, it checks if the index is a time index (`DatetimeIndex`,
+        `TimedeltaIndex`, `PeriodIndex`) or not. If not the index is built as if it were
+        a `list` or `np.array. If yes the index is converted to PeriodIndex.
+
+    Parameters
+    ----------
+    start : ``pd.datetime``, optional, (default=``None``)
+    end : ``pd.datetime``, optional, (default=``None``)
+    freq : ``pd.Timedelta``, optional, (default=``None``)
+    resample_if_not_equispaced : ``bool``, optional, (default=``False``)
+        not supported yet, leave it as True
+    output_name : ``str``, optional, (default=``"time_series"``)
+        column name of the output `pd.DataFrame`
+    Raises
+    ------
+    ``ValueError``
+        Of the three parameters: start, end, and periods, exactly two must be specified.
+    """
+
     def __init__(
         self,
-        start_date: pd.datetime = None,
-        end_date: pd.datetime = None,
-        freq: pd.DateOffset = None,
-        resample_if_not_equispaced: bool = True,
+        start: Optional[pd.datetime] = None,
+        end: Optional[pd.datetime] = None,
+        freq: Optional[pd.Timedelta] = None,
+        resample_if_not_equispaced: bool = False,
         output_name: str = "time_series",
     ):
-        self.start_date = start_date
-        self.end_date = end_date
+        self.start = start
+        self.end = end
         self.freq = freq
         self.resample_if_not_equispaced = resample_if_not_equispaced
         self.output_name = output_name
 
         self.pandas_converter = PandasSeriesToTimeIndexSeries(
-            self.start_date, self.end_date, self.freq
+            self.start, self.end, self.freq
         )
         self.sequence_converter = SequenceToTimeIndexSeries(
-            self.start_date, self.end_date, self.freq
+            self.start, self.end, self.freq
         )
         self.resampler = TimeSeriesResampler()
         self.to_period_index_series_converter = TimeIndexSeriesToPeriodIndexSeries(
             self.freq
         )
 
-    def fit(self, X: Union[List, np.array, pd.Series], y=None):
-        return self
-
     def transform(self, X: Union[List, np.array, pd.Series]) -> pd.DataFrame:
+        """Transforms an array-like sequence in a period-index DataFrame with a single
+        column.
+
+        Parameters
+        ----------
+        X : ``Union[List, np.array, pd.Series]``, required
+
+        Returns
+        -------
+        period_index_dataframe : ``pd.DataFrame``
+            the output dataframe with a period index.
+        """
         pandas_time_series = self._to_time_index_series(X)
         equispaced_time_series = self._to_equispaced_time_series(pandas_time_series)
         period_index_time_series = self._to_period_index_time_series(
@@ -60,6 +93,17 @@ class TimeSeriesPreparation(BaseEstimator, TransformerMixin):
     def _to_time_index_series(
         self, array_like_object: Union[List, np.array, pd.Series]
     ) -> pd.Series:
+        """Converts an array_like_object to a Series with a time index (`DatetimeIndex`,
+        `TimedeltaIndex`, `PeriodIndex`
+
+        Parameters
+        ----------
+        array_like_object : ``Union[List, np.array, pd.Series]``, required
+
+        Returns
+        -------
+        series : ``pd.Series``
+        """
         if isinstance(array_like_object, pd.Series):
             return self.pandas_converter.transform(array_like_object)
         elif any(
@@ -73,13 +117,47 @@ class TimeSeriesPreparation(BaseEstimator, TransformerMixin):
             )
 
     def _to_equispaced_time_series(self, time_series: pd.Series) -> pd.Series:
+        """Converts an input time series into an equispaced series. NOT WORKING YET.
+
+        Parameters
+        ----------
+        time_series : ``pd.Series``, required
+
+        Returns
+        -------
+        ``pd.Series``
+
+        Raises
+        ------
+        ``NotImplementedError``
+        """
         if self.resample_if_not_equispaced:
             self.resampler.transform(time_series)
         else:
             return time_series
 
     def _to_period_index_time_series(self, time_series: pd.Series) -> pd.Series:
+        """Converts a time index series into a Series with a `PeriodIndex`
+
+        Parameters
+        ----------
+        time_series : ``pd.Series``, required
+
+        Returns
+        -------
+        ``pd.Series``
+        """
         return self.to_period_index_series_converter.transform(time_series)
 
     def _to_period_index_dataframe(self, time_series: pd.Series) -> pd.DataFrame:
+        """Converts a pd.Series into a DataFrame, naming the column with `self.output_name`
+
+        Parameters
+        ----------
+        time_series : ``pd.Series``, required
+
+        Returns
+        -------
+        ``pd.DataFrame``
+        """
         return pd.DataFrame({self.output_name: time_series})
