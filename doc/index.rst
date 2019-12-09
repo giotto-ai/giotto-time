@@ -6,8 +6,8 @@ giottotime: Time Series forecasting library
     :hidden:
 
     reference/index
-    roadmap/index
+    release_notes/index
 
 
 * :doc:`reference/index`
-* :doc:`roadmap/index`
+* :doc:`release_notes/index`
