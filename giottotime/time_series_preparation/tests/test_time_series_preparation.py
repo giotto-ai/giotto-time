@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 from pandas.testing import assert_series_equal, assert_frame_equal
 from hypothesis.extra.numpy import arrays
-from hypothesis import given, settings
+from hypothesis import given, settings, HealthCheck
 
 from giottotime.utils.hypothesis.time_indexes import (
     series_with_timedelta_index,
@@ -160,7 +160,7 @@ class TestToEquispacedTimeSeries:
 
 
 class TestToPeriodIndex:
-    @settings(suppress_health_check=[2])
+    @settings(suppress_health_check=[HealthCheck.filter_too_much])
     @given(series_with_period_index())
     def test_with_period_index_as_input(self, period_index_series):
         time_series_preparation = TimeSeriesPreparation()
