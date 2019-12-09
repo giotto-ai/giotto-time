@@ -1,61 +1,100 @@
 import importlib
-from typing import Optional
+import warnings
+from typing import Optional, Union
 
+import datetime
 import numpy as np
 import pandas as pd
+import workalendar
 
 from .base import IndexDependentFeature
 
 __all__ = ["CalendarFeature"]
 
 
+def check_index(time_series: pd.DataFrame) -> None:
+    index_series = pd.Series(time_series.index)
+    unique_differences = pd.unique(index_series.diff().dropna().values)
+
+    if len(unique_differences) != 1:
+        raise ValueError(
+            "The time series should be evenly spaced in order to obtain "
+            "meaningful results."
+        )
+
+
+def get_period(X):
+    if isinstance(X.index, pd.PeriodIndex):
+        freq = X.index.freqstr
+    else:
+        warnings.warn("Frequency inferred from X.")
+        freq = pd.Timedelta(X.index.values[1] - X.index.values[0])
+
+    return freq
+
+
 class CalendarFeature(IndexDependentFeature):
-    """Create a feature based on the national holidays of a specific country,
-    based on a given kernel (if provided). The interface for this is based on
-    the one of 'workalendar'. To see which regions and countries are available,
-    check the 'workalendar' `documentation
-    <https://peopledoc.github.io/workalendar/>`_.
+    """Create a feature based on the national holidays of a specific country, based on
+    a given kernel (if provided). The interface for this is based on the one of
+    'workalendar'. To see which regions and countries are available, check the
+    'workalendar' `documentation <https://peopledoc.github.io/workalendar/>`_.
 
     Parameters
     ----------
-    output_name : ``str``, required.
-        The name of the output column.
 
-    region : ``str``, optional, (default=``'america'``).
+    region : ``str``, required.
         The region in which the ``country`` is located.
 
-    country : ``str``, optional, (default=``'Brazil'`).
-        The name of the country from which to retrieve the holidays. The
-        country must be located in the given ``region``.
+    country : ``str``, required.
+        The name of the country from which to retrieve the holidays. The country must be
+         located in the given ``region``.
 
-    start_date : ``str``, optional, (default=``'01/01/2018'``)
+    kernel : ``np.ndarray``, required.
+        The kernel to use when creating the feature.
+
+    output_name : ``str``, required.
+        The name of the output column.+
+
+    start_date : ``str``, optional, (default=``'01/01/2018'``).
         The date starting from which to retrieve the holidays.
 
-    end_date : ``str``, optional, (default=``'01/01/2020'``)
+    end_date : ``str``, optional, (default=``'01/01/2020'``).
         The date until which to retrieve the holidays.
 
-    kernel : ``np.ndarray``, optional, (default=``None``).
-        The kernel to use when creating the feature.
+    reindex_method : ``str``, optional, (default=``pad``).
+        Used only if X is passed in the ``transform`` method. It is used as the method
+        with which to reindex the holiday events with the index of X. This method
+        should be compatible with the reindex methods provided by pandas. Please refer
+        to the pandas `documentation
+        https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.reindex.html`_
+        for further details.
+
+    return_name_event : ``bool``, optional, (default=``False``)
+        If ``True``, also return a column containing the name of the event.
 
     """
 
     def __init__(
         self,
+        region: str,
+        country: str,
+        kernel: Union[np.array, list, pd.Series],
         output_name: str,
-        region: str = "america",
-        country: str = "Brazil",
         start_date: str = "01/01/2018",
         end_date: str = "01/01/2020",
-        kernel: Optional[np.ndarray] = None,
+        reindex_method: str = "pad",
+        return_name_event: bool = False,
     ):
         super().__init__(output_name)
-        self.region = region
-        self.country = country
-        self.start_date = start_date
-        self.end_date = end_date
-        self.kernel = kernel
+        self._region = region
+        self._country = country
+        self._kernel = kernel
+        self._start_date = start_date
+        self._end_date = end_date
+        self._reindex_method = reindex_method
+        self._return_name_event = return_name_event
 
-    # TODO: finish docstrings
+    # TODO: write the description of the transform method
     def transform(self, X: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """
 
@@ -63,20 +102,85 @@ class CalendarFeature(IndexDependentFeature):
         ----------
         X : ``pd.DataFrame``, optional, (default=``None``).
             If provided, both ``start_date`` and ``end_date`` are going to be
-            overwritten with the start and end date of the index of ``X``.
+            overwritten with the start and end date of the index of ``X``. Also, if
+            provided the output DataFrame is going to be re-indexed with the index of
+            ``X``, using the chosen ``reindex_method``.
 
         Returns
         -------
         events : ``pd.DataFrame``
+            A DataFrame containing the events.
 
         """
-        mod = importlib.import_module(f".{self.region}", "workalendar")
-        country_mod = getattr(mod, self.country)()
+        if X is not None:
+            check_index(X)
 
-        index = pd.date_range(start=self.start_date, end=self.end_date, freq="D")
+        self._initialize_start_end_date(X)
 
+        workalendar_region = importlib.import_module(f".{self._region}", "workalendar")
+        workalendar_country = getattr(workalendar_region, self._country)()
+
+        events = self._get_holiday_events(workalendar_country)
+
+        if self._kernel is not None:
+            klen = len(self._kernel)
+
+            def apply_kernel(w):
+                if sum(w) != 0:
+                    return np.dot(w, self._kernel) / sum(w)
+                else:
+                    return 0
+
+            events["status"] = (
+                events["status"]
+                .rolling(klen, center=True)
+                .apply(apply_kernel, raw=False)
+            )
+
+        events_renamed = self._rename_columns(events)
+
+        if X is not None:
+            freq = get_period(X)
+            events_renamed = events_renamed.resample(freq).sum()
+            print(events_renamed)
+            print(freq)
+
+        events_renamed = events_renamed[str(self._start_date) : str(self._end_date)]
+        print("STRINGS")
+        print(str(self._start_date))
+        print(str(self._end_date))
+        if X is not None:
+            print(X)
+            events_renamed.index = X.index
+
+        return events_renamed
+
+    def _initialize_start_end_date(self, X: pd.DataFrame):
+        if X is not None:
+            self._start_date = X.index.values[0]
+            self._end_date = X.index.values[-1]
+        else:
+            self._start_date = pd.Timestamp(self._start_date)
+            self._end_date = pd.Timestamp(self._end_date)
+
+        slack_period = round(len(self._kernel) / 2)
+        slack_days = np.timedelta64(slack_period, "D")
+
+        self.slacked_start_date_ = self._start_date - slack_days
+        self.slacked_end_date_ = self._end_date + slack_days
+        print("SLACKED")
+
+        if isinstance(self._start_date, pd.Period):
+            self.slacked_start_date_ = self.slacked_start_date_.to_timestamp()
+            self.slacked_end_date_ = self.slacked_end_date_.to_timestamp()
+        print(self.slacked_start_date_)
+        print(self.slacked_end_date_)
+
+    def _get_holiday_events(self, country_mod):
+        index = pd.date_range(
+            start=self.slacked_start_date_, end=self.slacked_end_date_, freq="D"
+        )
         years = index.year.unique()
-
         events = pd.DataFrame()
 
         for year in years:
@@ -86,27 +190,28 @@ class CalendarFeature(IndexDependentFeature):
         events["date"] = pd.to_datetime(events["date"])
         events["status"] = 1
         events = events.set_index("date")
+        events = self._group_by_event_name(events)
 
         events = events.reindex(index)
 
-        events["events"] = events["events"].fillna("none")
-        events["status"] = events["status"].fillna(0).astype(int)
-
-        events = events.sort_index()
-
-        klen = len(self.kernel)
-
-        if self.kernel is None:
-            return events
+        if not self._return_name_event:
+            events = events.drop(columns=["events"])
 
         else:
+            events["events"] = events["events"].fillna("No Event")
 
-            def ip(w):
-                if sum(w) != 0:
-                    return np.dot(w, self.kernel) / sum(w)
-                else:
-                    return 0
+        events["status"] = events["status"].fillna(0).astype(int)
+        events = events.sort_index()
 
-            events["status"] = events["status"].rolling(klen, center=True).apply(ip)
+        return events
 
-            return events
+    def _group_by_event_name(self, events_df):
+        def aggregate_events_same_day(event):
+            return pd.Series(
+                {"status": 1, "events": " & ".join(event["events"].tolist())}
+            )
+
+        grouped_events = events_df.groupby(events_df.index).apply(
+            aggregate_events_same_day
+        )
+        return grouped_events
