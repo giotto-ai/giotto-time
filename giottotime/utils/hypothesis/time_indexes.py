@@ -147,7 +147,11 @@ def period_indexes(
     LazyStrategy that generates pandas PeriodIndex
     """
     period_range_args = draw(period_range_args_from(start, end, min_length, max_length))
-    assume(period_range_args_are_correct(period_range_args))
+    assume(
+        period_range_args_are_correct(
+            period_range_args, min_length, max_length, start, end
+        )
+    )
     return compute_period_range(period_range_args)
 
 
@@ -175,7 +179,9 @@ def datetime_indexes(
     LazyStrategy that generates pd.DatetimeIndex
     """
     date_range_args = draw(date_range_args_from(start, end, min_length, max_length))
-    assume(date_range_args_are_correct(date_range_args))
+    assume(
+        date_range_args_are_correct(date_range_args, min_length, max_length, start, end)
+    )
     return compute_date_range(date_range_args)
 
 
