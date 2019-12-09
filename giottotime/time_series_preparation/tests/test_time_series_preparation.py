@@ -6,7 +6,7 @@ from pandas.testing import assert_series_equal, assert_frame_equal
 from hypothesis.extra.numpy import arrays
 from hypothesis import given
 
-from giottotime.core.hypothesis.time_indexes import (
+from giottotime.utils.hypothesis import (
     series_with_timedelta_index,
     series_with_period_index,
     series_with_datetime_index,

@@ -10,7 +10,7 @@ from pandas.testing import assert_frame_equal
 from giottotime.feature_creation import ShiftFeature, MovingAverageFeature
 from ..base import Splitter
 from ..splitters import DatetimeSplitter, PercentageSplitter, TrainSizeSplitter
-from giottotime.core.hypothesis.feature_matrices import X_y_matrices
+from giottotime.utils.hypothesis.feature_matrices import X_y_matrices
 
 features_to_consider = [
     ShiftFeature(1, "shift_feature_1"),
