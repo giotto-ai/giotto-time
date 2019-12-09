@@ -1,8 +1,9 @@
 import random
 
+import numpy as np
 import pandas.util.testing as testing
 import pytest
-from hypothesis import given, strategies as st, settings, HealthCheck
+from hypothesis import given, strategies as st, settings
 from hypothesis._settings import duration
 from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression
@@ -13,7 +14,6 @@ from giottotime.feature_creation import (
     ShiftFeature,
 )
 from giottotime.feature_creation.feature_creation import FeatureCreation
-
 from giottotime.feature_creation.utils import trim_feature_nans
 from giottotime.models.time_series_models.gar import GAR
 
@@ -66,7 +66,7 @@ class TestFitPredict:
         with pytest.raises(NotFittedError):
             gar_feedforward.predict(time_series)
 
-    @settings(deadline=duration(milliseconds=500))
+    @settings(deadline=duration(milliseconds=500), max_examples=20)
     @given(st.builds(arbitrary_features, st.integers(1, 50)))
     def test_correct_features_dimension(self, time_series, features):
         horizon = 4
@@ -87,7 +87,7 @@ class TestFitPredict:
         gar_feedforward.fit(x_train, y_train)
         assert gar_feedforward.train_features_.shape[1] == len(features)
 
-    @settings(deadline=duration(milliseconds=500))
+    @settings(deadline=duration(milliseconds=500), max_examples=20)
     @given(st.builds(arbitrary_features, st.integers(1, 50)))
     def test_correct_fit_date(self, time_series, features):
         horizon = 4
@@ -105,7 +105,7 @@ class TestFitPredict:
         predictions = gar_no_feedforward.predict(x_test)
 
         assert len(predictions) == len(x_test)
-        assert (predictions.index == x_test.index).all()
+        np.testing.assert_array_equal(predictions.index, x_test.index)
 
         gar_with_feedforward = GAR(base_model=base_model, feed_forward=True)
 
@@ -114,4 +114,4 @@ class TestFitPredict:
         predictions = gar_with_feedforward.predict(x_test)
 
         assert len(predictions) == len(x_test)
-        assert (predictions.index == x_test.index).all()
+        np.testing.assert_array_equal(predictions.index, x_test.index)

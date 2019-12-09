@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import pandas.util.testing as testing
 
@@ -26,7 +27,7 @@ def test_correct_renaming_single_col():
 
     expected_cols = output_name
 
-    assert (expected_cols == df_renamed.columns).all()
+    np.testing.assert_array_equal(expected_cols, df_renamed.columns)
 
 
 def test_correct_renaming_multiple_columns():
@@ -42,7 +43,7 @@ def test_correct_renaming_multiple_columns():
 
     expected_cols = [f"{output_name}_{k}" for k in range(n_cols)]
 
-    assert (expected_cols == df_renamed.columns).all()
+    np.testing.assert_array_equal(expected_cols, df_renamed.columns)
 
 
 def test_correct_fit_transform():
