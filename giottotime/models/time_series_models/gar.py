@@ -6,11 +6,6 @@ import pandas as pd
 from ..utils import check_is_fitted
 
 
-def check_input(X, y=None):
-    # TODO: Call Stefano's function to check whether X is a valid input or not
-    pass
-
-
 class GAR:
     """This class implements the Generalized Auto Regression model.
 
@@ -56,8 +51,6 @@ class GAR:
             The fitted GAR object.
 
         """
-        check_input(X, y)
-
         features = X.copy()
         models_per_predstep = [deepcopy(self._base_model) for _ in range(y.shape[1])]
 

@@ -93,17 +93,6 @@ class TimeSeriesPreparation:
     def _to_time_index_series(
         self, array_like_object: Union[List, np.array, pd.Series]
     ) -> pd.Series:
-        """Converts an array_like_object to a Series with a time index (`DatetimeIndex`,
-        `TimedeltaIndex`, `PeriodIndex`
-
-        Parameters
-        ----------
-        array_like_object : ``Union[List, np.array, pd.Series]``, required
-
-        Returns
-        -------
-        series : ``pd.Series``
-        """
         if isinstance(array_like_object, pd.Series):
             return self.pandas_converter.transform(array_like_object)
         elif any(
@@ -117,47 +106,13 @@ class TimeSeriesPreparation:
             )
 
     def _to_equispaced_time_series(self, time_series: pd.Series) -> pd.Series:
-        """Converts an input time series into an equispaced series. NOT WORKING YET.
-
-        Parameters
-        ----------
-        time_series : ``pd.Series``, required
-
-        Returns
-        -------
-        ``pd.Series``
-
-        Raises
-        ------
-        ``NotImplementedError``
-        """
         if self.resample_if_not_equispaced:
             self.resampler.transform(time_series)
         else:
             return time_series
 
     def _to_period_index_time_series(self, time_series: pd.Series) -> pd.Series:
-        """Converts a time index series into a Series with a `PeriodIndex`
-
-        Parameters
-        ----------
-        time_series : ``pd.Series``, required
-
-        Returns
-        -------
-        ``pd.Series``
-        """
         return self.to_period_index_series_converter.transform(time_series)
 
     def _to_period_index_dataframe(self, time_series: pd.Series) -> pd.DataFrame:
-        """Converts a pd.Series into a DataFrame, naming the column with `self.output_name`
-
-        Parameters
-        ----------
-        time_series : ``pd.Series``, required
-
-        Returns
-        -------
-        ``pd.DataFrame``
-        """
         return pd.DataFrame({self.output_name: time_series})

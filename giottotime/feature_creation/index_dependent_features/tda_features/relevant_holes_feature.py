@@ -173,20 +173,6 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         return X_renamed
 
     def _compute_num_relevant_holes(self, persistence_diagrams: np.ndarray) -> List:
-        """Compute the number of relevant holes in the point cloud.
-
-        Parameters
-        ----------
-        persistence_diagrams : ``np.ndarray``, required.
-            The array containing the scaled persistent diagrams.
-
-        Returns
-        -------
-        n_rel_holes : ``List``
-            For each diagram present in ``persistence_diagrams``, return the
-            number of relevant holes that have been found.
-
-        """
         n_rel_holes = []
         for i in range(persistence_diagrams.shape[0]):
             pers_table = pd.DataFrame(
@@ -208,27 +194,6 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         return n_rel_holes
 
     def _validate_inputs(self, h_dim: int, theta: float) -> None:
-        """Validate that ``h_dim`` is either ``0``, ``1`` or ``2`` and that
-        ``theta`` has a strictly postive value.
-
-        Parameters
-        ----------
-        h_dim : ``int``, required.
-            The value of the target homology dimension.
-
-        theta : ``float``, required.
-            The value of theta.
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        ``ValueError``
-            Raised if ``theta`` is not strictly positive or ``h_dim`` is not
-            ``0``, ``1`` or ``2``.
-        """
         if h_dim != 0 and h_dim != 1 and h_dim != 2:
             raise ValueError(
                 f"'h_dim' must have be either 0, 1 or 2, " f"but has value {h_dim}."

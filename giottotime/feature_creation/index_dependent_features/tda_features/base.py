@@ -116,28 +116,6 @@ class TDAFeatures(IndexDependentFeature, metaclass=ABCMeta):
         return self
 
     def _compute_n_points(self, n_windows: int) -> int:
-        """Given the initial parameters used in the TakensEmbedding and
-        SlidingWindow steps, compute the total number of points that have been
-        used during the computation.
-
-        Parameters
-        ----------
-        n_windows : ``int``, required.
-            The number of windows after the SlidingWindow step. This must be
-            strictly positive.
-
-        Returns
-        -------
-        n_used_points : ``int``
-            The total number of points that have been used in the
-            TakensEmbedding and SlidingWindow steps.
-
-        Raises
-        ------
-        ``ValueError``
-            Raised if ``n_windows`` is not positive.
-
-        """
         if n_windows <= 0:
             raise ValueError(
                 f"The number of windows should be greater than "
@@ -155,20 +133,6 @@ class TDAFeatures(IndexDependentFeature, metaclass=ABCMeta):
         return n_used_points
 
     def _compute_persistence_diagrams(self, X: pd.DataFrame) -> np.ndarray:
-        """Compute the persistence diagrams starting from a time-series using
-        the Vietoris Rips algorithm. The resulting diagrams are then scaled.
-
-        Parameters
-        ----------
-        X : ``Union[pd.DataFrame, pd.Series]``, required.
-            The time-series on which to compute the persistence diagrams.
-
-        Returns
-        -------
-        X_scaled : ``np.ndarray``
-            The scaled persistence diagrams.
-
-        """
         X_embedded = self._takens_embedding.fit_transform(X)
         self.X_embedded_dims_ = X_embedded.shape
 

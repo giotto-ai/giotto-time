@@ -96,22 +96,6 @@ class PeriodicSeasonalFeature(StandardFeature):
         return periodic_feature
 
     def _validate_input(self, X: pd.DataFrame) -> None:
-        """Validate that the needed variables are present if X is not passed. Also
-        transform the start_date to datetime in case it is a string.
-
-        Parameters
-        ----------
-        X : ``pd.DataFrame``, required.
-            The input DataFrame.
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        ValueError
-        """
         if X is None:
             if self._start_date is None:
                 raise ValueError(
@@ -127,21 +111,6 @@ class PeriodicSeasonalFeature(StandardFeature):
                 )
 
     def _transform_inputs(self, X: pd.DataFrame) -> None:
-        """If needed, transform the inputs of the user into the appropriate ones. The
-        ``period`` should be a ``pd.Timedelta`` while the ``start_date`` is taken from
-        the first index value of ``X`` (if present). If ``X`` is not present, convert
-        the ``start_date`` if is a string.
-
-        Parameters
-        ----------
-        X : ``pd.DataFrame``, required.
-            The input DataFrame.
-
-        Returns
-        -------
-        None
-
-        """
         if isinstance(self._period, str):
             self._period = pd.Timedelta(self._period)
 
@@ -153,21 +122,6 @@ class PeriodicSeasonalFeature(StandardFeature):
                 self._start_date = pd.to_datetime(self._start_date)
 
     def _get_time_index(self, X: pd.DataFrame) -> pd.DatetimeIndex:
-        """Get the time index. If ``X`` is not None, the index of used. Otherwise, the
-        index is computed from the ``start_date`` and ``index_period`` passed in the
-        constructor.
-
-        Parameters
-        ----------
-        X : ``pd.DataFrame``, required.
-            The input DataFrame. If present, is used only for its index.
-
-        Returns
-        -------
-        datetime_index : ``pd.DatetimeIndex``
-            A fixed frequency DatetimeIndex.
-
-        """
         if X is not None:
             datetime_index = X.index
 
@@ -182,48 +136,11 @@ class PeriodicSeasonalFeature(StandardFeature):
         return datetime_index
 
     def _convert_index_to_datetime(self, index: pd.PeriodIndex) -> pd.DatetimeIndex:
-        """Convert a ``pd.PeriodIndex`` to a ``pd.DatetimeIndex``.
-
-        Parameters
-        ----------
-        index : ``pd.PeriodIndex``, required.
-            The index to convert to ``pd.DatetimeIndex``.
-
-        Returns
-        -------
-        datetime_index : ``pd.DatetimeIndex``
-            The original index, converted to ``pd.DatetimeIndex``.
-
-        Raises
-        ------
-        ValueError
-            Raised if the sampling frequency is not at least two times with
-            respect to the period.
-
-        """
         datetime_index = index.to_timestamp()
         self._check_sampling_frequency(datetime_index)
         return datetime_index
 
     def _check_sampling_frequency(self, datetime_index: pd.DatetimeIndex) -> None:
-        """Check that the sampling frequency is at least two times the period.
-
-        Parameters
-        ----------
-        datetime_index : ``pd.DatetimeIndex``, required.
-            The index on which to perform the check of the frequency.
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        ValueError
-            Raised if the sampling frequency is not at least two times with
-            respect to the period.
-
-        """
         sampling_frequency = pd.Timedelta(datetime_index.freq)
         if sampling_frequency < 2 * self._period:
             raise ValueError(
@@ -234,19 +151,6 @@ class PeriodicSeasonalFeature(StandardFeature):
             )
 
     def _compute_periodic_feature(self, datetime_index: pd.DatetimeIndex):
-        """Compute a sinusoid with the specified parameters.
-
-        Parameters
-        ----------
-        datetime_index : ``pd.DatetimeIndex``, required.
-            The index from which to compute the sinusoid.
-
-        Returns
-        -------
-        sinusoid : ``np.ndarray``
-            The generated sinusoid.
-
-        """
         return (
             np.sin(2 * pi * (datetime_index - self._start_date) / self._period)
         ) * self._amplitude

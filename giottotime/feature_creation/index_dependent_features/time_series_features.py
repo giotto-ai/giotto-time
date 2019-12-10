@@ -105,7 +105,6 @@ class PolynomialFeature(IndexDependentFeature):
         super().__init__(output_name)
         self._degree = degree
 
-    # TODO: finish the polynomial feature_creation
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Compute the polynomial feature_creation of ``X``, up to a degree
         equal to ``degree``.

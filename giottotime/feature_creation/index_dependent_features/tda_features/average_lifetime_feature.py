@@ -166,21 +166,6 @@ class AvgLifeTimeFeature(TDAFeatures):
         return X_renamed
 
     def _compute_average_lifetime(self, persistence_diagrams: np.ndarray) -> List:
-        """Compute the average lifetime of a given homology dimension in the
-        point cloud.
-
-        Parameters
-        ----------
-        persistence_diagrams : ``np.ndarray``, required.
-            The array containing the scaled persistent diagrams.
-
-        Returns
-        -------
-        avg_lifetime : ``List``
-            For each diagram present in ``persistence_diagrams``, return the
-            average lifetime of a given homology dimension.
-
-        """
         avg_lifetime = []
 
         for i in range(persistence_diagrams.shape[0]):

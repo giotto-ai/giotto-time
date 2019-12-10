@@ -8,25 +8,7 @@ from .index_dependent_features import ShiftFeature
 __all__ = ["FeatureCreation"]
 
 
-def check_feature_names(time_series_features: List[Feature]) -> None:
-    """Check that all the output names are different and that there aren't two different
-    features with the same name.
-
-    Parameters
-    ----------
-    time_series_features : ``List[TimeSeriesFeature]``, required.
-        The list of features.
-
-    Returns
-    -------
-    None
-
-    Raises
-    ------
-    ``ValueError``
-        Raised if there are two features with the same name.
-
-    """
+def _check_feature_names(time_series_features: List[Feature]) -> None:
     feature_output_names = [feature.output_name for feature in time_series_features]
     if len(set(feature_output_names)) != len(feature_output_names):
         raise ValueError(
@@ -53,7 +35,7 @@ class FeatureCreation:
     """
 
     def __init__(self, horizon: int, time_series_features: List[Feature]):
-        check_feature_names(time_series_features)
+        _check_feature_names(time_series_features)
 
         self._time_series_features = time_series_features
         self._horizon = horizon
@@ -80,20 +62,6 @@ class FeatureCreation:
         return x, y
 
     def _create_y_shifts(self, time_series: pd.DataFrame) -> pd.DataFrame:
-        """Generate ``n`` shifts of ``time_series``, where ``n`` is equal to
-        the ``horizon``.
-
-        Parameters
-        ----------
-        time_series : ``pd.DataFrame``, required.
-            The original DataFrame on which to generate the shifts.
-
-        Returns
-        -------
-        y_shifted : ``pd.DataFrame``
-            The DataFrame containing the shifts of ``time_series``.
-
-        """
         y = pd.DataFrame(index=time_series.index)
         for k in range(self._horizon):
             shift_feature = ShiftFeature(-k, f"shift_{k}")
@@ -102,20 +70,6 @@ class FeatureCreation:
         return y
 
     def _create_x_features(self, time_series: pd.DataFrame) -> pd.DataFrame:
-        """Create a DataFrame, containing a set of feature_creation generated
-        from the ``time_series`` and using the ``time_series_features``.
-
-        Parameters
-        ----------
-        time_series : ``pd.DataFrame``, required.
-            The original DataFrame on which to generate the shifts.
-
-        Returns
-        -------
-        feature_creation : ``pd.DataFrame``
-            The DataFrame containing the feature_creation.
-
-        """
         features = pd.DataFrame(index=time_series.index)
         for time_series_feature in self._time_series_features:
             x_transformed = time_series_feature.fit_transform(time_series)

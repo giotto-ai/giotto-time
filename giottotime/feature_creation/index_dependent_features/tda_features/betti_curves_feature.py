@@ -206,19 +206,6 @@ class BettiCurvesFeature(TDAFeatures):
         return X_renamed
 
     def _compute_betti_curves(self, diagrams: np.ndarray) -> List:
-        """Given a list of diagrams, compute the betti curves for each of them.
-
-        Parameters
-        ----------
-        diagrams : ``np.ndarray``, required.
-            Compute the betti curves of the diagrams.
-
-        Returns
-        -------
-        betti_curves : ``List``
-            The ``List`` containing the Betti curves.
-
-        """
         betti_curves = diag.BettiCurve()
         betti_curves.fit(diagrams)
         X_betti_curves = betti_curves.transform(diagrams)
@@ -232,29 +219,6 @@ class BettiCurvesFeature(TDAFeatures):
     def _compute_betti_features(
         self, betti_curves: List[pd.DataFrame]
     ) -> List[np.ndarray]:
-        """Compute the betti feature_creation, depending on the values of
-        ``self._betti_mode``. If the value is set to ``mean`` compute the
-        rolling mean, if set to ``arg_max`` compute the argmax along the
-        epsilon axis.
-
-        Parameters
-        ----------
-        betti_curves : ``List[pd.DataFrame]``, required.
-            A list containing the betti surfaces, one for each homology
-            dimension.
-
-        Returns
-        -------
-        betti_features : ``List[np.ndarray]``
-            The feature_creation extracted from the betti curves.
-
-        Raises
-        ------
-        ``ValueError``
-            Raised if a ``self._betti_mode`` has a value which is different
-            from ``mean`` or ``arg_max``.
-
-        """
         if self._betti_mode == "mean":
             betti_features = self._compute_betti_mean(betti_curves)
 
@@ -273,21 +237,6 @@ class BettiCurvesFeature(TDAFeatures):
     def _compute_betti_mean(
         self, betti_surfaces: List[pd.DataFrame]
     ) -> List[pd.DataFrame]:
-        """Compute the mean along the epsilon axis of the non-zero elements of
-        the betti surface.
-
-        Parameters
-        ----------
-        betti_surfaces : ``List[pd.DataFrame]``, required.
-            A list containing the betti surfaces, one for each homology
-            dimension.
-
-        Returns
-        -------
-        betti_means : ``List[np.ndarray]``
-            The mean of each betti surfaces.
-
-        """
         betti_means = []
         for betti_surface in betti_surfaces:
             betti_means.append(
@@ -303,21 +252,6 @@ class BettiCurvesFeature(TDAFeatures):
     def _compute_arg_max_by_time(
         self, betti_surfaces: List[pd.DataFrame]
     ) -> List[np.ndarray]:
-        """For each surface in ``betti_surfaces``, compute the argmax along the
-         epsilon axis.
-
-        Parameters
-        ----------
-        betti_surfaces : ``List[pd.DataFrame]``, required.
-            A list containing the betti surfaces, one for each homology
-            dimension.
-
-        Returns
-        -------
-        betti_arg_maxes : ``List[np.ndarray]``
-            The argmax of each betti surfaces.
-
-        """
         betti_arg_maxes = []
         for betti_surface in betti_surfaces:
             arg_max = np.argmax(np.array(betti_surface), axis=1)

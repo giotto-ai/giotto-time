@@ -10,22 +10,6 @@ class Feature:
         self.output_name = output_name
 
     def _rename_columns(self, X: Union[pd.DataFrame, pd.Series]) -> pd.DataFrame:
-        """Rename (in place) the column of the DataFrame with the
-        ``output_name``. In case the output columns are more than one, a suffix
-         is appended to the name, from ``_0`` to ``_n``, where ``n`` is the
-         number of output columns.
-
-        Parameters
-        ----------
-        X : ``Union[pd.DataFrame, pd.Series]``, required.
-            The DataFrame or Series to be renamed.
-
-        Returns
-        -------
-        X_renamed : ``pd.DataFrame``
-            The original DataFrame ``X``, with the columns renamed.
-
-        """
         if isinstance(X, pd.Series):
             X = X.to_frame()
 

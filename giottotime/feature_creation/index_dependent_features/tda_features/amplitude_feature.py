@@ -208,20 +208,6 @@ class AmplitudeFeature(TDAFeatures):
         return X_renamed
 
     def _calculate_amplitude_feature(self, diagrams: np.ndarray) -> np.ndarray:
-        """Calculate the amplitude of the persistence diagrams
-
-        Parameters
-        ----------
-        diagrams : ``np.ndarray``, required.
-            Array containing the persistence diagrams.
-
-        Returns
-        -------
-        amplitudes : ``np.ndarray``
-            Array containing, for each diagrams, the corresponding amplitude,
-            calculated with with the given ``metric`` and ``amplitude_order``.
-
-        """
         amplitude = diag.Amplitude(
             metric=self._metric,
             order=self._amplitude_order,
