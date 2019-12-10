@@ -2,11 +2,11 @@ from copy import deepcopy
 from typing import Union, Optional
 
 import pandas as pd
+from sklearn.base import BaseEstimator
+from sklearn.utils.validation import check_is_fitted, check_array
 
-from ..utils import check_is_fitted
 
-
-class GAR:
+class GAR(BaseEstimator):
     """This class implements the Generalized Auto Regression model.
 
     Parameters
@@ -24,13 +24,14 @@ class GAR:
     def __init__(self, base_model: object, feed_forward: bool = False):
         if not hasattr(base_model, "fit") or not hasattr(base_model, "predict"):
             raise TypeError(
-                f"{base_model} must implement both 'fit' " f"and 'predict' methods"
+                f"To use {base_model} as a base model, it must implement both 'fit' "
+                "and 'predict' methods."
             )
 
         self._base_model = base_model
         self._feed_forward = feed_forward
 
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame, **kwargs: object) -> object:
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame, **kwargs: object) -> "GAR":
         """Fit the GAR model according to the training data.
 
         Parameters
@@ -47,10 +48,11 @@ class GAR:
 
         Returns
         -------
-        self: ``object``
+        self: ``GAR``
             The fitted GAR object.
 
         """
+        check_array(X)
         features = X.copy()
         models_per_predstep = [deepcopy(self._base_model) for _ in range(y.shape[1])]
 
@@ -99,7 +101,8 @@ class GAR:
         length ``ts``.
 
         """
-        check_is_fitted(self)
+        check_array(X)
+        check_is_fitted(self, attributes=["models_per_predstep", "train_features_"])
 
         test_features = X.copy()
 

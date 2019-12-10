@@ -30,7 +30,7 @@ class TestFeatureCreation:
     def _correct_x(self, ts, time_series_features):
         features = pd.DataFrame(index=ts.index)
         for time_series_feature in time_series_features:
-            x_transformed = time_series_feature.fit_transform(ts)
+            x_transformed = time_series_feature.fit_transform(ts,)
             features = pd.concat([features, x_transformed], axis=1)
         return features
 
@@ -132,7 +132,7 @@ class TestFeatureCreation:
         ]
 
         fc = FeatureCreation(horizon=horizon, time_series_features=time_series_features)
-        x, y = fc.fit_transform(ts)
+        x, y = fc.fit_transform(ts,)
 
         expected_x = pd.DataFrame.from_dict(
             {
@@ -173,7 +173,7 @@ class TestFeatureCreation:
         ]
 
         fc = FeatureCreation(horizon=horizon, time_series_features=time_series_features)
-        x, y = fc.fit_transform(ts)
+        x, y = fc.fit_transform(ts,)
 
         expected_x = self._correct_x(ts, time_series_features)
         pd.testing.assert_frame_equal(expected_x, x)

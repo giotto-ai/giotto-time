@@ -155,6 +155,9 @@ class PeriodicSeasonalFeature(StandardFeature):
             np.sin(2 * pi * (datetime_index - self._start_date) / self._period)
         ) * self._amplitude
 
+    def _more_tags(self):
+        return {"requires_fit": False}
+
 
 class ConstantFeature(StandardFeature):
     """Generate a ``pd.DataFrame`` with one column, of the same length as the

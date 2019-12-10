@@ -1,25 +1,17 @@
-import inspect
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
+
+import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
 
 
-class TrendModel(metaclass=ABCMeta):
-    @abstractmethod
-    def fit(self, time_series):
-        pass
+class TrendModel(BaseEstimator, TransformerMixin):
+    def fit(self, time_series: pd.DataFrame) -> "TrendModel":
+        return self
 
     @abstractmethod
     def predict(self, t):
         pass
 
     @abstractmethod
-    def transform(self, time_series):
+    def transform(self, time_series: pd.DataFrame):
         pass
-
-    def __repr__(self):
-        constructor_attributes = inspect.getfullargspec(self.__init__).args
-        attributes_to_print = [
-            str(getattr(self, attribute))
-            for attribute in constructor_attributes
-            if attribute in self.__dict__
-        ]
-        return f"{self.__class__.__name__}({', '.join(attributes_to_print)})"

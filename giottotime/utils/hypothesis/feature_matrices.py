@@ -31,7 +31,7 @@ def X_y_matrices(draw, horizon: int, time_series_features: List[Feature]):
     feature_creation = FeatureCreation(
         horizon=horizon, time_series_features=time_series_features
     )
-    X, y = feature_creation.fit_transform(period_index_series)
+    X, y = feature_creation.fit_transform(period_index_series,)
     return X, y
 
 

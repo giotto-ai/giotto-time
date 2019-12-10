@@ -59,7 +59,7 @@ def align_indices(
     return output_X
 
 
-class TDAFeatures(IndexDependentFeature, metaclass=ABCMeta):
+class TDAFeatures(IndexDependentFeature):
     """Base class for all the TDA feature_creation contained in the package.
     Parameter documentation is in the derived classes.
 
@@ -112,7 +112,7 @@ class TDAFeatures(IndexDependentFeature, metaclass=ABCMeta):
             n_jobs=diags_n_jobs,
         )
 
-    def fit(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None):
+    def fit(self, time_series: Optional[pd.DataFrame] = None):
         return self
 
     def _compute_n_points(self, n_windows: int) -> int:

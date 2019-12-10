@@ -2,9 +2,9 @@ from itertools import product
 
 import pandas as pd
 import numpy as np
+from sklearn.utils.validation import check_is_fitted
 
 from giottotime.causality_tests.base import CausalityTest
-from giottotime.models.utils import check_is_fitted
 
 
 class ShiftedPearsonCorrelation(CausalityTest):
@@ -91,7 +91,7 @@ class ShiftedPearsonCorrelation(CausalityTest):
             between each timeseries The shift is indicated in rows.
 
         """
-        check_is_fitted(self)
+        check_is_fitted(self, attributes=["best_shifts_", "max_corrs_"])
         shifted_data = data.copy()
 
         for col in shifted_data:

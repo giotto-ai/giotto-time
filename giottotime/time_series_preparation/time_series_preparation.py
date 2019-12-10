@@ -2,6 +2,7 @@ from typing import List, Union, Optional
 
 import numpy as np
 import pandas as pd
+from sklearn.base import TransformerMixin, BaseEstimator
 
 from .time_series_conversion import (
     PandasSeriesToTimeIndexSeries,
@@ -16,7 +17,7 @@ SUPPORTED_SEQUENCE_TYPES = [
 ]
 
 
-class TimeSeriesPreparation:
+class TimeSeriesPreparation(BaseEstimator, TransformerMixin):
     """Transforms an array-like sequence in a period-index DataFrame with a single
     column.
 

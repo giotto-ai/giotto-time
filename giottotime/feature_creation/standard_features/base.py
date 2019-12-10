@@ -12,13 +12,6 @@ class StandardFeature(Feature):
     Parameters documentation is in the derived classes.
     """
 
-    def fit(self, X, y=None):
-        return self
-
     @abstractmethod
     def transform(self, X: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         pass
-
-    def fit_transform(self, X, y=None):
-        self.fit(X, y)
-        return self.transform(X)

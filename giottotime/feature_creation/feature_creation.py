@@ -1,6 +1,10 @@
-from typing import List
+from typing import List, Union
 
+import numpy as np
 import pandas as pd
+from sklearn.base import TransformerMixin, BaseEstimator
+from sklearn.utils import check_array
+from sklearn.utils.validation import check_is_fitted
 
 from .base import Feature
 from .index_dependent_features import ShiftFeature
@@ -17,7 +21,7 @@ def _check_feature_names(time_series_features: List[Feature]) -> None:
         )
 
 
-class FeatureCreation:
+class FeatureCreation(BaseEstimator, TransformerMixin):
     """Class responsible for the generation of the feature_creation, starting
     from a list of ``TimeSeriesFeature``.
 
@@ -37,10 +41,38 @@ class FeatureCreation:
     def __init__(self, horizon: int, time_series_features: List[Feature]):
         _check_feature_names(time_series_features)
 
-        self._time_series_features = time_series_features
+        self._features = time_series_features
         self._horizon = horizon
 
-    def fit_transform(self, time_series: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
+    def fit(
+        self, time_series: Union[pd.Series, np.array, list], y=None
+    ) -> "FeatureCreation":
+        """Fit the given features.
+
+        Parameters
+        ----------
+        time_series : ``np.ndarray``, required.
+            Input data.
+
+        y : ``None``
+            There is no need for a target in a transformer, yet the pipeline
+            API requires this parameter.
+
+        Returns
+        -------
+        self : object
+
+        """
+        check_array(time_series)
+
+        for feature in self._features:
+            feature.fit(time_series)
+
+        self.is_fitted_ = True
+
+        return self
+
+    def transform(self, time_series: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
         """Create the X matrix by generating the feature_creation, starting
         from the original ``time_series`` and using the list of
         ``time_series_features``. Also create the y matrix, by generating
@@ -57,6 +89,8 @@ class FeatureCreation:
             A tuple containing the ``X`` and ``y`` matrices.
 
         """
+        check_is_fitted(self, attributes=["is_fitted_"])
+
         x = self._create_x_features(time_series)
         y = self._create_y_shifts(time_series)
         return x, y
@@ -71,7 +105,7 @@ class FeatureCreation:
 
     def _create_x_features(self, time_series: pd.DataFrame) -> pd.DataFrame:
         features = pd.DataFrame(index=time_series.index)
-        for time_series_feature in self._time_series_features:
+        for time_series_feature in self._features:
             x_transformed = time_series_feature.fit_transform(time_series)
             features = pd.concat([features, x_transformed], axis=1)
 

@@ -3,9 +3,9 @@ from itertools import product
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
+from sklearn.utils.validation import check_is_fitted
 
-from giottotime.causality_tests.base import CausalityTest
-from giottotime.models.utils import check_is_fitted
+from .base import CausalityTest
 
 
 class ShiftedLinearCoefficient(CausalityTest):
@@ -92,7 +92,7 @@ class ShiftedLinearCoefficient(CausalityTest):
             fit coefficients between each timeseries. The shift is indicated in rows.
 
         """
-        check_is_fitted(self)
+        check_is_fitted(self, attributes=["best_shifts_", "max_corrs_"])
         shifted_data = data.copy()
 
         for col in shifted_data:

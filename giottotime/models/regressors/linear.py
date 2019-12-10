@@ -1,14 +1,13 @@
-from sklearn.metrics import mean_squared_error
-from scipy.optimize import minimize
 import numpy as np
 import pandas as pd
-
+from scipy.optimize import minimize
+from sklearn.base import BaseEstimator
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+from sklearn.utils.validation import check_is_fitted
 
-from ..utils import check_is_fitted
 
-
-class LinearRegressor:
+class LinearRegressor(BaseEstimator):
     """This class implements a LinearRegressor that takes a custom loss
     function and is able to fit the model over it.
 
@@ -93,6 +92,6 @@ class LinearRegressor:
             The predictions of the model
 
         """
-        check_is_fitted(self)
+        check_is_fitted(self, attributes=["model_weights_"])
 
         return self.model_weights_[0] + np.dot(X, self.model_weights_[1:])

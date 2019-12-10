@@ -73,7 +73,7 @@ class TestFitPredict:
         feature_creation = FeatureCreation(horizon, features)
         base_model = LinearRegression()
 
-        x, y = feature_creation.fit_transform(time_series)
+        x, y = feature_creation.fit_transform(time_series,)
 
         x_train, y_train, x_test, y_test = trim_feature_nans(x, y)
 
@@ -94,7 +94,7 @@ class TestFitPredict:
         feature_creation = FeatureCreation(horizon, features)
         base_model = LinearRegression()
 
-        x, y = feature_creation.fit_transform(time_series)
+        x, y = feature_creation.fit_transform(time_series,)
 
         x_train, y_train, x_test, y_test = trim_feature_nans(x, y)
 

@@ -5,8 +5,8 @@ from scipy.optimize import minimize
 
 import numpy as np
 import pandas as pd
+from sklearn.utils.validation import check_is_fitted
 
-from ..utils import check_is_fitted
 from ..trend_models.base import TrendModel
 
 
@@ -83,7 +83,7 @@ class PolynomialTrend(TrendModel):
             Raised if the model is not fitted yet.
 
         """
-        check_is_fitted(self)
+        check_is_fitted(self, attributes=["model_weights_"])
 
         p = np.poly1d(self.model_weights_)
         return p(X.values)
