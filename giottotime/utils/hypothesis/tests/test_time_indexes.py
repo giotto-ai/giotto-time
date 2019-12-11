@@ -71,7 +71,7 @@ class TestPeriodSeries:
     def test_period_series_has_float_values(self, series: pd.Series):
         assert series.dtype == "float64"
 
-    @given(series_with_period_index(allow_nan=True))
+    @given(series_with_period_index(allow_nan=False))
     def test_period_series_no_nan(self, series: pd.Series):
         assert_series_equal(series, series.dropna())
 
@@ -131,7 +131,7 @@ class TestDatetimeSeries:
     def test_datetime_series_has_float_values(self, series: pd.Series):
         assert series.dtype == "float64"
 
-    @given(series_with_datetime_index(allow_nan=True))
+    @given(series_with_datetime_index(allow_nan=False))
     def test_datetime_series_no_nan(self, series: pd.Series):
         assert_series_equal(series, series.dropna())
 
@@ -189,7 +189,7 @@ class TestTimedeltaSeries:
     def test_timedelta_series_has_float_values(self, series: pd.Series):
         assert series.dtype == "float64"
 
-    @given(series_with_timedelta_index(allow_nan=True))
+    @given(series_with_timedelta_index(allow_nan=False))
     def test_timedelta_series_no_nan(self, series: pd.Series):
         assert_series_equal(series, series.dropna())
 
