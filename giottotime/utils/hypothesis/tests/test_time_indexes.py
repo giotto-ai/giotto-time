@@ -1,5 +1,6 @@
 from hypothesis import given
 import pandas as pd
+from pandas.testing import assert_series_equal
 
 from giottotime.utils.hypothesis.time_indexes import (
     period_indexes,
@@ -70,6 +71,10 @@ class TestPeriodSeries:
     def test_period_series_has_float_values(self, series: pd.Series):
         assert series.dtype == "float64"
 
+    @given(series_with_period_index(allow_nan=True))
+    def test_period_series_no_nan(self, series: pd.Series):
+        assert_series_equal(series, series.dropna())
+
 
 class TestDatetimeIndex:
     @given(datetime_indexes())
@@ -126,6 +131,10 @@ class TestDatetimeSeries:
     def test_datetime_series_has_float_values(self, series: pd.Series):
         assert series.dtype == "float64"
 
+    @given(series_with_datetime_index(allow_nan=True))
+    def test_datetime_series_no_nan(self, series: pd.Series):
+        assert_series_equal(series, series.dropna())
+
 
 class TestTimedeltaIndex:
     @given(timedelta_indexes())
@@ -179,6 +188,10 @@ class TestTimedeltaSeries:
     @given(series_with_timedelta_index())
     def test_timedelta_series_has_float_values(self, series: pd.Series):
         assert series.dtype == "float64"
+
+    @given(series_with_timedelta_index(allow_nan=True))
+    def test_timedelta_series_no_nan(self, series: pd.Series):
+        assert_series_equal(series, series.dropna())
 
 
 class TestGeneric:
