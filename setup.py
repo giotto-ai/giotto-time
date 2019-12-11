@@ -28,7 +28,7 @@ MAINTAINER = 'Alessio Baccelli'
 MAINTAINER_EMAIL = 'maintainers@giotto.ai'
 URL = 'https://github.com/giotto-ai/giotto-time'
 LICENSE = 'GPLv3'
-DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-time/tarball/v0.0.0a'
+DOWNLOAD_URL = 'https://github.com/giotto-ai/giotto-time/tarball/v0.0a0'
 VERSION = __version__ # noqa
 CLASSIFIERS = ['Intended Audience :: Science/Corporate',
                'Intended Audience :: Developers',
