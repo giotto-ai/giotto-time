@@ -27,7 +27,6 @@ jobs:
 
   - script: |
       pip install plotly matplotlib openml
-#      jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giottotime --cov-report xml
       flake8
     displayName: 'Test with pytest, nbconvert and flake8'
@@ -59,7 +58,6 @@ jobs:
 
   - script: |
       pip install plotly matplotlib openml
-#      jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giottotime --cov-report xml
       flake8
     displayName: 'Test with pytest, nbconvert and flake8'
@@ -91,7 +89,6 @@ jobs:
 
   - script: |
       pip install plotly matplotlib openml
-#      jupyter nbconvert --to notebook --execute examples/*.ipynb
       pytest --cov giottotime --cov-report xml
       flake8
     displayName: 'Test with pytest, nbconvert and flake8'
@@ -178,7 +175,6 @@ jobs:
 
   - script: |
       pip install plotly matplotlib openml
-#      jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-time
       pytest --cov giottotime --cov-report xml
       flake8
@@ -248,7 +244,6 @@ jobs:
 
   - script: |
       pip install plotly matplotlib openml
-#      jupyter nbconvert --to notebook --execute examples/*.ipynb
       pip uninstall -y giotto-time
       pytest --cov giottotime --cov-report xml
       flake8
