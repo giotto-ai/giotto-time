@@ -33,10 +33,16 @@ def giotto_time_series(
     max_length: int = 1000,
     name: str = "time_series",
     allow_nan: bool = True,
+    allow_infinity: bool = True,
 ):
     period_index_series = draw(
         series_with_period_index(
-            start_date, end_date, min_length, max_length, allow_nan=allow_nan
+            start_date,
+            end_date,
+            min_length,
+            max_length,
+            allow_nan=allow_nan,
+            allow_infinity=allow_infinity,
         )
     )
     return pd.DataFrame({name: period_index_series})
@@ -51,6 +57,7 @@ def series_with_period_index(
     min_length: int = 0,
     max_length: int = 1000,
     allow_nan: bool = True,
+    allow_infinity: bool = True,
 ):
     """ Returns a strategy to generate a Pandas Series with PeriodIndex
 
@@ -62,6 +69,7 @@ def series_with_period_index(
     min_length : ``int``, optional, (default=0)
     max_length : ``int``, optional, (default=None)
     allow_nan : ``bool``, optional, (default=True)
+    allow_infinity : ``bool``, optional, (default=True)
 
     Returns
     -------
@@ -72,7 +80,7 @@ def series_with_period_index(
         arrays(
             dtype=np.float64,
             shape=index.shape[0],
-            elements=st.floats(allow_nan=allow_nan),
+            elements=st.floats(allow_nan=allow_nan, allow_infinity=allow_infinity),
         )
     )
     return pd.Series(index=index, data=values)
@@ -87,6 +95,7 @@ def series_with_datetime_index(
     min_length: int = 0,
     max_length: int = 1000,
     allow_nan: bool = True,
+    allow_infinity: bool = True,
 ):
     """ Returns a strategy to generate a Pandas Series with DatetimeIndex
 
@@ -98,6 +107,7 @@ def series_with_datetime_index(
     min_length : ``int``, optional, (default=0)
     max_length : ``int``, optional, (default=1000)
     allow_nan : ``bool``, optional, (default=True)
+    allow_infinity : ``bool``, optional, (default=True)
 
     Returns
     -------
@@ -108,7 +118,7 @@ def series_with_datetime_index(
         arrays(
             dtype=np.float64,
             shape=index.shape[0],
-            elements=st.floats(allow_nan=allow_nan),
+            elements=st.floats(allow_nan=allow_nan, allow_infinity=allow_infinity),
         )
     )
     return pd.Series(index=index, data=values)
@@ -123,6 +133,7 @@ def series_with_timedelta_index(
     min_length: int = 0,
     max_length: int = 1000,
     allow_nan: bool = True,
+    allow_infinity: bool = True,
 ):
     """ Returns a strategy to generate a Pandas Series with Timedelta index
 
@@ -134,6 +145,7 @@ def series_with_timedelta_index(
     min_length : ``int``, optional, (default=0)
     max_length : ``int``, optional, (default=None)
     allow_nan : ``bool``, optional, (default=True)
+    allow_infinity : ``bool``, optional, (default=True)
 
     Returns
     -------
@@ -144,7 +156,7 @@ def series_with_timedelta_index(
         arrays(
             dtype=np.float64,
             shape=index.shape[0],
-            elements=st.floats(allow_nan=allow_nan),
+            elements=st.floats(allow_nan=allow_nan, allow_infinity=allow_infinity),
         )
     )
     return pd.Series(index=index, data=values)
