@@ -3,8 +3,8 @@ import pandas as pd
 from hypothesis import given, strategies as st
 from pandas.util import testing as testing
 
-from giottotime.utils.hypothesis.time_indexes import giotto_time_series
 from giottotime.feature_creation import ConstantFeature, CustomFeature
+from giottotime.utils.hypothesis.time_indexes import giotto_time_series
 
 
 class TestConstantFeature:
@@ -34,6 +34,8 @@ class TestConstantFeature:
             min_length=1,
             start_date=pd.Timestamp(2000, 1, 1),
             end_date=pd.Timestamp(2010, 1, 1),
+            allow_nan=False,
+            allow_infinity=False,
         ),
         st.integers(0, 100),
     )
@@ -94,7 +96,11 @@ class TestCustomFeature:
 
     @given(
         giotto_time_series(
-            start_date=pd.Timestamp(2000, 1, 1), end_date=pd.Timestamp(2010, 1, 1)
+            start_date=pd.Timestamp(2000, 1, 1),
+            end_date=pd.Timestamp(2010, 1, 1),
+            allow_nan=False,
+            allow_infinity=False,
+            min_length=1,
         ),
         st.integers(0, 10),
     )

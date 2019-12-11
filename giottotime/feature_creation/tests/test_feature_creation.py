@@ -47,15 +47,16 @@ class TestFeatureCreation:
             ShiftFeature(shift=5, output_name="same_name"),
         ]
 
+        fc = FeatureCreation(horizon=1, features=time_series_features)
         with pytest.raises(ValueError):
-            FeatureCreation(horizon=1, time_series_features=time_series_features)
+            fc.fit_transform(np.array([]))
 
     def test_correct_y_shifts(self):
         horizon = 2
         ts = pd.DataFrame.from_dict({"ignored": range(10)})
         ts.index = np.random.random(len(ts))
 
-        feature_creation = FeatureCreation(horizon=horizon, time_series_features=[])
+        feature_creation = FeatureCreation(horizon=horizon, features=[])
         y_shifts = feature_creation._create_y_shifts(ts)
         expected_y_shifts = pd.DataFrame.from_dict(
             {
@@ -68,9 +69,9 @@ class TestFeatureCreation:
         pd.testing.assert_frame_equal(expected_y_shifts, y_shifts)
 
     @settings(deadline=duration(milliseconds=500), max_examples=20)
-    @given(giotto_time_series(), st.integers(1, 10))
+    @given(giotto_time_series(allow_nan=False), st.integers(1, 10))
     def test_correct_y_shifts_random_ts(self, ts, horizon):
-        feature_creation = FeatureCreation(horizon=horizon, time_series_features=[])
+        feature_creation = FeatureCreation(horizon=horizon, features=[])
         y_shifts = feature_creation._create_y_shifts(ts)
         expected_y_shifts = self._correct_y(ts, horizon)
 
@@ -86,9 +87,7 @@ class TestFeatureCreation:
             ShiftFeature(shift=3, output_name="shift_3"),
         ]
 
-        feature_creation = FeatureCreation(
-            horizon=horizon, time_series_features=features
-        )
+        feature_creation = FeatureCreation(horizon=horizon, features=features)
         x_shifts = feature_creation._create_x_features(ts)
         expected_x_shifts = pd.DataFrame.from_dict(
             {
@@ -102,7 +101,10 @@ class TestFeatureCreation:
         pd.testing.assert_frame_equal(expected_x_shifts, x_shifts)
 
     @settings(deadline=duration(milliseconds=500), max_examples=20)
-    @given(giotto_time_series(), st.integers(1, 10))
+    @given(
+        giotto_time_series(min_length=1, allow_nan=False, allow_infinity=False),
+        st.integers(1, 10),
+    )
     def test_correct_y_shifts_random_ts(self, ts, horizon):
         features = [
             MovingAverageFeature(window_size=2, output_name="mov_avg_2"),
@@ -110,9 +112,7 @@ class TestFeatureCreation:
             ShiftFeature(shift=3, output_name="shift_3"),
         ]
 
-        feature_creation = FeatureCreation(
-            horizon=horizon, time_series_features=features
-        )
+        feature_creation = FeatureCreation(horizon=horizon, features=features)
         x_shifts = feature_creation._create_x_features(ts)
         expected_x_shifts = self._correct_x(ts, features)
 
@@ -131,7 +131,7 @@ class TestFeatureCreation:
             ShiftFeature(shift=-5, output_name="shift_5"),
         ]
 
-        fc = FeatureCreation(horizon=horizon, time_series_features=time_series_features)
+        fc = FeatureCreation(horizon=horizon, features=time_series_features)
         x, y = fc.fit_transform(ts,)
 
         expected_x = pd.DataFrame.from_dict(
@@ -165,15 +165,18 @@ class TestFeatureCreation:
         pd.testing.assert_frame_equal(expected_y, y)
 
     @settings(deadline=duration(milliseconds=500), max_examples=20)
-    @given(giotto_time_series(min_length=1), st.integers(1, 10))
+    @given(
+        giotto_time_series(min_length=1, allow_nan=False, allow_infinity=False),
+        st.integers(1, 10),
+    )
     def test_correct_fit_random_ts(self, ts, horizon):
         time_series_features = [
             ShiftFeature(shift=2, output_name="shift_2"),
             ShiftFeature(shift=-5, output_name="shift_5"),
         ]
 
-        fc = FeatureCreation(horizon=horizon, time_series_features=time_series_features)
-        x, y = fc.fit_transform(ts,)
+        fc = FeatureCreation(horizon=horizon, features=time_series_features)
+        x, y = fc.fit_transform(ts)
 
         expected_x = self._correct_x(ts, time_series_features)
         pd.testing.assert_frame_equal(expected_x, x)

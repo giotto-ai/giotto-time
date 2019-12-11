@@ -32,16 +32,14 @@ class FeatureCreation(BaseEstimator, TransformerMixin):
         corresponds to the number of shifts that are going to be performed
         on y.
 
-    time_series_features : ``List[TimeSeriesFeature]``, required.
+    features : ``List[TimeSeriesFeature]``, required.
         The list of ``TimeSeriesFeature`` from which to compute the
         feature_creation.
 
     """
 
-    def __init__(self, horizon: int, time_series_features: List[Feature]):
-        _check_feature_names(time_series_features)
-
-        self._features = time_series_features
+    def __init__(self, horizon: int, features: List[Feature]):
+        self.features = features
         self._horizon = horizon
 
     def fit(
@@ -63,9 +61,11 @@ class FeatureCreation(BaseEstimator, TransformerMixin):
         self : object
 
         """
+        _check_feature_names(self.features)
+
         check_array(time_series)
 
-        for feature in self._features:
+        for feature in self.features:
             feature.fit(time_series)
 
         self.is_fitted_ = True
@@ -105,7 +105,7 @@ class FeatureCreation(BaseEstimator, TransformerMixin):
 
     def _create_x_features(self, time_series: pd.DataFrame) -> pd.DataFrame:
         features = pd.DataFrame(index=time_series.index)
-        for time_series_feature in self._features:
+        for time_series_feature in self.features:
             x_transformed = time_series_feature.fit_transform(time_series)
             features = pd.concat([features, x_transformed], axis=1)
 

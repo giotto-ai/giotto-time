@@ -69,7 +69,11 @@ class TestShiftFeature:
 
     @given(
         giotto_time_series(
-            start_date=pd.Timestamp(2000, 1, 1), end_date=pd.Timestamp(2010, 1, 1)
+            min_length=1,
+            start_date=pd.Timestamp(2000, 1, 1),
+            end_date=pd.Timestamp(2010, 1, 1),
+            allow_nan=False,
+            allow_infinity=False,
         ),
         st.integers(0, 200),
     )
@@ -135,7 +139,11 @@ class TestMovingAverageFeature:
 
     @given(
         giotto_time_series(
-            start_date=pd.Timestamp(2000, 1, 1), end_date=pd.Timestamp(2010, 1, 1)
+            min_length=1,
+            start_date=pd.Timestamp(2000, 1, 1),
+            end_date=pd.Timestamp(2010, 1, 1),
+            allow_nan=False,
+            allow_infinity=False,
         ),
         st.integers(0, 100),
     )

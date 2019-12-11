@@ -3,42 +3,7 @@ from typing import Optional, Union, List
 import numpy as np
 import pandas as pd
 
-from giottotime.time_series_preparation.base import TimeSeriesConversion
-
-PandasTimeIndex = Union[pd.DatetimeIndex, pd.PeriodIndex, pd.TimedeltaIndex]
-PandasDate = Union[pd.datetime, pd.Timestamp, str]
-
-
-def count_not_none(*args):
-    """Returns the count of arguments that are not None.
-    """
-    return sum(x is not None for x in args)
-
-
-def check_period_range_parameters(
-    start_date: PandasDate, end_date: PandasDate, periods: int
-) -> None:
-    """Check if the period range parameters given as input are compatible with the
-    `pd.period_range` method.
-
-    Of the three parameters: start, end, and periods, exactly two must be specified.
-
-    Parameters
-    ----------
-    start_date : ``PandasDate``, required
-    end_date : ``PandasDate``, required
-    periods : ``int``, required
-
-    Raises
-    ------
-    ``ValueError``  
-        Of the three parameters: start, end, and periods, exactly two must be specified.
-    """
-    if count_not_none(start_date, end_date, periods) != 2:
-        raise ValueError(
-            "Of the three parameters: start, end, and periods, "
-            "exactly two must be specified"
-        )
+from .base import TimeSeriesConversion, PandasDate, PandasTimeIndex
 
 
 class SequenceToTimeIndexSeries(TimeSeriesConversion):

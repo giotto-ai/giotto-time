@@ -6,6 +6,14 @@ from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_is_fitted, check_array
 
 
+def _check_base_model(base_model: object):
+    if not hasattr(base_model, "fit") or not hasattr(base_model, "predict"):
+        raise TypeError(
+            f"To use {base_model} as a base model, it must implement both 'fit' "
+            "and 'predict' methods."
+        )
+
+
 class GAR(BaseEstimator):
     """This class implements the Generalized Auto Regression model.
 
@@ -22,14 +30,8 @@ class GAR(BaseEstimator):
     """
 
     def __init__(self, base_model: object, feed_forward: bool = False):
-        if not hasattr(base_model, "fit") or not hasattr(base_model, "predict"):
-            raise TypeError(
-                f"To use {base_model} as a base model, it must implement both 'fit' "
-                "and 'predict' methods."
-            )
-
-        self._base_model = base_model
-        self._feed_forward = feed_forward
+        self.base_model = base_model
+        self.feed_forward = feed_forward
 
     def fit(self, X: pd.DataFrame, y: pd.DataFrame, **kwargs: object) -> "GAR":
         """Fit the GAR model according to the training data.
@@ -52,15 +54,17 @@ class GAR(BaseEstimator):
             The fitted GAR object.
 
         """
+        _check_base_model(self.base_model)
         check_array(X)
+
         features = X.copy()
-        models_per_predstep = [deepcopy(self._base_model) for _ in range(y.shape[1])]
+        models_per_predstep = [deepcopy(self.base_model) for _ in range(y.shape[1])]
 
         for pred_step, model_for_pred_step in enumerate(models_per_predstep):
             target_y = y[f"y_{pred_step}"]
             model_for_pred_step.fit(features, target_y, **kwargs)
 
-            if self._feed_forward:
+            if self.feed_forward:
                 predictions = model_for_pred_step.predict(features)
                 features[f"preds_{pred_step}"] = predictions
 
@@ -102,7 +106,7 @@ class GAR(BaseEstimator):
 
         """
         check_array(X)
-        check_is_fitted(self, attributes=["models_per_predstep", "train_features_"])
+        check_is_fitted(self, attributes=["models_per_predstep_", "train_features_"])
 
         test_features = X.copy()
 
@@ -115,7 +119,7 @@ class GAR(BaseEstimator):
             model_predictions = model_for_pred_step.predict(test_features)
             predictions[f"y_{pred_step}"] = model_predictions
 
-            if self._feed_forward:
+            if self.feed_forward:
                 test_features[f"preds_{pred_step}"] = model_predictions
 
         return predictions

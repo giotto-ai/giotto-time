@@ -4,17 +4,13 @@ import numpy as np
 import pandas as pd
 from sklearn.base import TransformerMixin, BaseEstimator
 
+from .base import SUPPORTED_SEQUENCE_TYPES
 from .time_series_conversion import (
     PandasSeriesToTimeIndexSeries,
     SequenceToTimeIndexSeries,
     TimeIndexSeriesToPeriodIndexSeries,
 )
 from ..time_series_preparation.time_series_resampling import TimeSeriesResampler
-
-SUPPORTED_SEQUENCE_TYPES = [
-    np.ndarray,
-    list,
-]
 
 
 class TimeSeriesPreparation(BaseEstimator, TransformerMixin):

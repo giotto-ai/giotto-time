@@ -2,6 +2,7 @@ import random
 
 import numpy as np
 import pandas.util.testing as testing
+import pandas as pd
 import pytest
 from hypothesis import given, strategies as st, settings
 from hypothesis._settings import duration
@@ -21,11 +22,14 @@ from giottotime.models.time_series_models.gar import GAR
 class TestInputs:
     @pytest.mark.parametrize("base_model", [None, FeatureCreation(1, [])])
     def test_invalid_base_model(self, base_model):
-        with pytest.raises(TypeError):
-            GAR(base_model=base_model, feed_forward=False)
+        gar = GAR(base_model=base_model, feed_forward=False)
 
         with pytest.raises(TypeError):
-            GAR(base_model=base_model, feed_forward=True)
+            gar.fit(pd.DataFrame(), pd.DataFrame())
+
+        gar = GAR(base_model=base_model, feed_forward=True)
+        with pytest.raises(TypeError):
+            gar.fit(pd.DataFrame(), pd.DataFrame())
 
 
 @pytest.fixture

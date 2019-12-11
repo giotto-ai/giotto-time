@@ -28,9 +28,7 @@ def X_y_matrices(draw, horizon: int, time_series_features: List[Feature]):
         y feature matrix
     """
     period_index_series = draw(giotto_time_series())
-    feature_creation = FeatureCreation(
-        horizon=horizon, time_series_features=time_series_features
-    )
+    feature_creation = FeatureCreation(horizon=horizon, features=time_series_features)
     X, y = feature_creation.fit_transform(period_index_series,)
     return X, y
 

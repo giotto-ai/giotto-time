@@ -23,10 +23,10 @@ class FunctionTrend(TrendModel):
     def __init__(
         self, model_form, x0: np.ndarray, loss=mean_squared_error, method: str = "BFGS"
     ):
-        self._x0 = x0
-        self._model_form = model_form
-        self._loss = loss
-        self._method = method
+        self.x0 = x0
+        self.model_form = model_form
+        self.loss = loss
+        self.method = method
 
     def fit(self, time_series: pd.DataFrame) -> TrendModel:
         """Fit the model on the ``time_series``, with respect to the provided
@@ -53,13 +53,13 @@ class FunctionTrend(TrendModel):
 
         def prediction_error(model_weights):
             predictions = [
-                self._model_form(t, model_weights)
+                self.model_form(t, model_weights)
                 for t in range(0, time_series.shape[0])
             ]
-            return self._loss(time_series.values, predictions)
+            return self.loss(time_series.values, predictions)
 
         res = minimize(
-            prediction_error, self._x0, method=self._method, options={"disp": False}
+            prediction_error, self.x0, method=self.method, options={"disp": False}
         )
 
         self.model_weights_ = res["x"]
@@ -85,7 +85,7 @@ class FunctionTrend(TrendModel):
 
         """
         # check fit run
-        return self._model_form(t, self.model_weights_)
+        return self.model_form(t, self.model_weights_)
 
     def transform(self, time_series):
         """Transform the ``time_series`` by removing the trend.
@@ -105,7 +105,7 @@ class FunctionTrend(TrendModel):
         predictions = pd.Series(
             index=time_series.index,
             data=[
-                self._model_form(t, self.model_weights_)
+                self.model_form(t, self.model_weights_)
                 for t in range(0, time_series.shape[0])
             ],
         )

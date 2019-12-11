@@ -26,9 +26,9 @@ class ShiftedPearsonCorrelation(CausalityTest):
     def __init__(
         self, max_shift: int = 10, target_col: str = "y", dropna: bool = False
     ):
-        self._max_shift = max_shift
-        self._target_col = target_col
-        self._dropna = dropna
+        self.max_shift = max_shift
+        self.target_col = target_col
+        self.dropna = dropna
 
     def fit(self, data: pd.DataFrame) -> "ShiftedPearsonCorrelation":
         """Create the dataframe of shifts of each time series which maximize
@@ -52,7 +52,7 @@ class ShiftedPearsonCorrelation(CausalityTest):
         )
 
         for x, y in product(data.columns, repeat=2):
-            res = self._get_max_corr_shift(data, self._max_shift, x=x, y=y)
+            res = self._get_max_corr_shift(data, self.max_shift, x=x, y=y)
 
             best_shift = res[1]
             max_corr = res[0]
@@ -96,10 +96,10 @@ class ShiftedPearsonCorrelation(CausalityTest):
 
         for col in shifted_data:
             shifted_data[col] = shifted_data[col].shift(
-                self.best_shifts_[col][self._target_col]
+                self.best_shifts_[col][self.target_col]
             )
 
-        if self._dropna:
+        if self.dropna:
             shifted_data = shifted_data.dropna()
 
         return shifted_data

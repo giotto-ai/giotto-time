@@ -4,11 +4,11 @@ import numpy as np
 import pandas as pd
 from pandas.testing import assert_series_equal
 
+from giottotime.time_series_preparation.base import count_not_none
 from giottotime.time_series_preparation.time_series_conversion import (
     SequenceToTimeIndexSeries,
     PandasSeriesToTimeIndexSeries,
     TimeIndexSeriesToPeriodIndexSeries,
-    count_not_none,
 )
 from giottotime.utils.testing_constants import DEFAULT_START, DEFAULT_FREQ
 
