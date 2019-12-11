@@ -1,6 +1,7 @@
 from hypothesis import given
 import pandas as pd
 from pandas.testing import assert_series_equal
+import numpy as np
 
 from giottotime.utils.hypothesis.time_indexes import (
     period_indexes,
@@ -75,6 +76,10 @@ class TestPeriodSeries:
     def test_period_series_no_nan(self, series: pd.Series):
         assert_series_equal(series, series.dropna())
 
+    @given(series_with_period_index(allow_infinity=False))
+    def test_period_series_no_infinity(self, series: pd.Series):
+        assert_series_equal(series, series.replace([np.inf, -np.inf], np.nan))
+
 
 class TestDatetimeIndex:
     @given(datetime_indexes())
@@ -135,6 +140,10 @@ class TestDatetimeSeries:
     def test_datetime_series_no_nan(self, series: pd.Series):
         assert_series_equal(series, series.dropna())
 
+    @given(series_with_datetime_index(allow_infinity=False))
+    def test_datetime_series_no_infinity(self, series: pd.Series):
+        assert_series_equal(series, series.replace([np.inf, -np.inf], np.nan))
+
 
 class TestTimedeltaIndex:
     @given(timedelta_indexes())
@@ -192,6 +201,10 @@ class TestTimedeltaSeries:
     @given(series_with_timedelta_index(allow_nan=False))
     def test_timedelta_series_no_nan(self, series: pd.Series):
         assert_series_equal(series, series.dropna())
+
+    @given(series_with_timedelta_index(allow_infinity=False))
+    def test_timedelta_series_no_infinity(self, series: pd.Series):
+        assert_series_equal(series, series.replace([np.inf, -np.inf], np.nan))
 
 
 class TestGeneric:
