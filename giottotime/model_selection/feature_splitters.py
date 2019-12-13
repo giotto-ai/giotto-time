@@ -59,7 +59,7 @@ class FeatureSplitter:
 
     def _get_train_test_indexes_from_y(self, y):
         last_train_index = self._last_non_nan_y_index(y)
-        train_indexes = y.index[:last_train_index]
+        train_indexes = y.loc[:last_train_index].index if last_train_index else []
         test_indexes = y.index.difference(train_indexes)
         return train_indexes, test_indexes
 
