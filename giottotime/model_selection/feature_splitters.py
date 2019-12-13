@@ -2,19 +2,45 @@ import numpy as np
 import pandas as pd
 
 
-class Splitter:
+class FeatureSplitter:
+    """Splits the feature matrices X and y in X_train, y_train, X_test, y_test.
+
+    X and y are the feature matrices obtained from the FeatureCreation class.
+
+    Parameters
+    ----------
+    drop_na_mode: ``str``, optional, (default=``"any"``)
+        only "any" is supported now
+    """
+
     def __init__(self, drop_na_mode: str = "any"):
+        if drop_na_mode != "any":
+            raise ValueError(
+                f'Only drop_na_mode="any" is supported. Detected: {drop_na_mode}'
+            )
         self.drop_na_mode = drop_na_mode
 
     def transform(
         self, X: pd.DataFrame, y: pd.DataFrame, **kwargs
     ) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame):
+        """Split the feature matrices X and y in X_train, y_train, X_test, y_test.
 
-        X, y = self._trim_nan(X, y)
+        X and y are the feature matrices obtained from the FeatureCreation class.
+
+        Parameters
+        ----------
+        X : ``pd.DataFrame``, required
+        y : ``pd.DataFrame``, required
+
+        Returns
+        -------
+        X_train, y_train, X_test, y_test : ``Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]``
+        """
+        X, y = self._drop_X_na(X, y)
         X_train, y_train, X_test, y_test = self._split_train_test(X, y)
         return X_train, y_train, X_test, y_test
 
-    def _trim_nan(
+    def _drop_X_na(
         self, X: pd.DataFrame, y: pd.DataFrame
     ) -> (pd.DataFrame, pd.DataFrame):
 
