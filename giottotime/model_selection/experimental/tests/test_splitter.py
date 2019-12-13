@@ -19,11 +19,6 @@ features_to_consider = [
 ]
 
 
-def test_splitter_is_abstract_class():
-    with pytest.raises(TypeError):
-        Splitter()
-
-
 # noinspection PyPep8Naming
 class TestDatetimeSplitter:
     def test_datetime_splitter_initialization(self):
