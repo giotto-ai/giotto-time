@@ -120,10 +120,11 @@ class PolynomialTrend(TrendModel):
             trans_freq = time_series.index[1] - time_series.index[0]
             #raise warning
 
-        ts = (time_series.index - self.t0_)/self.period_
+        ts = ( time_series.index - self.t0_ )/self.period_
 
         predictions = pd.Series(
-            index=time_series.index, data=[p(t) for t in ts ]
+            index=time_series.index,
+            data=[ p(t) for t in ts ]
         )
 
         return time_series.sub(predictions, axis=0)

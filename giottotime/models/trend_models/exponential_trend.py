@@ -115,10 +115,12 @@ class ExponentialTrend(TrendModel):
 
         ts = (time_series.index - self.t0_)/self.period_
 
-        predictions = pd.DataFrame(
+        predictions = pd.Series(
             index=time_series.index,
-            data=[
-                np.exp(t * self.model_exponent_) for t in ts
-            ],
+            data=[np.exp(t * self.model_exponent_) for t in ts],
         )
-        return time_series - predictions[0]
+
+        return time_series.sub(predictions, axis=0)
+
+
+#
