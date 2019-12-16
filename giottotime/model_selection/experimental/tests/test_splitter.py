@@ -4,7 +4,7 @@ from typing import Tuple
 from hypothesis import given, settings
 import pytest
 import pandas as pd
-from hypothesis._strategies import integers, datetimes, floats
+from hypothesis.strategies import integers, datetimes, floats
 from pandas.testing import assert_frame_equal
 
 from giottotime.feature_creation import ShiftFeature, MovingAverageFeature

@@ -2,7 +2,6 @@ from typing import Union, Tuple
 
 import hypothesis.strategies as st
 import pandas as pd
-from hypothesis.searchstrategy.lazy import LazyStrategy
 
 
 def initialize_start_date_end_date(
@@ -19,7 +18,7 @@ def initialize_start_timedelta_end_timedelta(start: pd.Timedelta, end: pd.Timede
     return start, end
 
 
-def order_pair(element1: LazyStrategy, element2: LazyStrategy):
+def order_pair(element1, element2):
     return st.builds(
         lambda start, end: (start, end), start=element1, end=element2
     ).filter(lambda x: x[0] < x[1])
