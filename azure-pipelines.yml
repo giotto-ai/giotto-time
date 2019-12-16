@@ -2,7 +2,7 @@
 
 jobs:
 - job: 'test_ubuntu1604'
-  condition: eq(variables['build_check'], 'false')
+  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -13,26 +13,14 @@ jobs:
         python.version: '3.7'
 
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
+  - template: build_tools/azure/test_preparation.yml
   - script: |
-      python -m pip install --upgrade pip setuptools
-      pip install wheel twine
-    displayName: 'Install tools'
-
-  - script: pip install -e ".[tests, doc]"
-    displayName: 'Install dev environment'
-
-  - script: |
-      pip install plotly matplotlib openml
-      pytest --cov giottotime --cov-report xml
+      pytest --cov giottotime --cov-report xml --hypothesis-profile dev
     displayName: 'Test with pytest'
 
 
 - job: 'test_macOS1014'
-  condition: eq(variables['build_check'], 'false')
+  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'macOS-10.14'
   strategy:
@@ -43,26 +31,14 @@ jobs:
         python.version: '3.7'
 
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
+  - template: build_tools/azure/test_preparation.yml
   - script: |
-      python -m pip install --upgrade pip setuptools
-      pip install wheel twine
-    displayName: 'Install tools'
-
-  - script: pip install -e ".[tests, doc]"
-    displayName: 'Install dev environment'
-
-  - script: |
-      pip install plotly matplotlib openml
-      pytest --cov giottotime --cov-report xml
+      pytest --cov giottotime --cov-report xml --hypothesis-profile dev
     displayName: 'Test with pytest'
 
 
 - job: 'test_win2016'
-  condition: eq(variables['build_check'], 'false')
+  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
@@ -73,27 +49,16 @@ jobs:
         python.version: '3.7'
 
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
+  - template: build_tools/azure/test_preparation.yml
   - script: |
-      python -m pip install --upgrade pip setuptools
-      pip install wheel twine
-    displayName: 'Install tools'
-
-  - script: pip install -e ".[tests, doc]"
-    displayName: 'Install dev environment'
-
-  - script: |
-      pip install plotly matplotlib openml
-      pytest --cov giottotime --cov-report xml
+      pytest --cov giottotime --cov-report xml --hypothesis-profile dev
     displayName: 'Test with pytest'
 
-# these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
+# these jobs are triggered manually and they test the code
+# and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
-  condition: eq(variables['build_check'], 'true')
+  condition: eq(variables['build_check'], 'false')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -147,7 +112,7 @@ jobs:
 
 
 - job: 'macOS1014'
-  condition: eq(variables['build_check'], 'true')
+  condition: eq(variables['build_check'], 'false')
   pool:
     vmImage: 'macOS-10.14'
   strategy:
@@ -215,7 +180,7 @@ jobs:
 
 
 - job: 'win2016'
-  condition: eq(variables['build_check'], 'true')
+  condition: eq(variables['build_check'], 'false')
   pool:
     vmImage: 'vs2017-win2016'
   strategy:

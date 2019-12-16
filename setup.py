@@ -3,14 +3,10 @@
 
 import os
 import codecs
-import re
-import sys
-import platform
-import subprocess
 
-from distutils.version import LooseVersion
-from setuptools import setup, Extension, find_packages
-from setuptools.command.build_ext import build_ext
+from setuptools import setup, find_packages
+
+from giottotime import __version__
 
 version_file = os.path.join("giottotime", "_version.py")
 with open(version_file) as f:
@@ -18,6 +14,10 @@ with open(version_file) as f:
 
 with open("requirements.txt") as f:
     requirements = f.read().splitlines()
+with open("doc-requirements.txt") as f:
+    doc_requirements = f.read().splitlines()
+with open("dev-requirements.txt") as f:
+    dev_requirements = f.read().splitlines()
 
 DISTNAME = "giotto-time"
 DESCRIPTION = "Toolbox for Time Series analysis and integration with Machine Learning."
@@ -29,7 +29,7 @@ MAINTAINER_EMAIL = "maintainers@giotto.ai"
 URL = "https://github.com/giotto-ai/giotto-time"
 LICENSE = "GPLv3"
 DOWNLOAD_URL = "https://github.com/giotto-ai/giotto-time/tarball/v0.0a0"
-VERSION = __version__  # noqa
+VERSION = __version__
 CLASSIFIERS = [
     "Intended Audience :: Science/Corporate",
     "Intended Audience :: Developers",
@@ -49,22 +49,9 @@ KEYWORDS = (
 )
 INSTALL_REQUIRES = requirements
 EXTRAS_REQUIRE = {
-    "tests": [
-        "pytest",
-        "pytest-cov",
-        "pytest-azurepipelines",
-        "pytest-benchmark",
-        "jupyter_contrib_nbextensions",
-        "flake8",
-    ],
-    "doc": [
-        "sphinx",
-        "sphinx-gallery",
-        "sphinx-issues",
-        "sphinx_rtd_theme",
-        "numpydoc",
-    ],
-    "examples": ["jupyter", "matplotlib", "plotly"],
+    "tests": dev_requirements,
+    "doc": doc_requirements,
+    "examples": [],
 }
 
 
