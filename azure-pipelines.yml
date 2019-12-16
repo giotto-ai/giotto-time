@@ -1,99 +1,23 @@
 # these jobs are triggered automatically and they test the code and the examples.
 
 jobs:
-- job: 'test_ubuntu1604'
-  condition: eq(variables['build_check'], 'false')
-  pool:
+- template: build_tools/azure/test_job.yml
+  parameters:
+    name: test_ubuntu1604
     vmImage: 'ubuntu-16.04'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
 
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - script: |
-      python -m pip install --upgrade pip setuptools
-      pip install wheel twine
-    displayName: 'Install tools'
-
-  - script: pip install -e ".[tests, doc]"
-    displayName: 'Install dev environment'
-
-  - script: |
-      pip install plotly matplotlib openml
-      pytest --cov giottotime --cov-report xml
-      flake8
-    displayName: 'Test with pytest, nbconvert and flake8'
-
-
-- job: 'test_macOS1014'
-  condition: eq(variables['build_check'], 'false')
-  pool:
+- template: build_tools/azure/test_job.yml
+  parameters:
+    name: test_macOS1014
     vmImage: 'macOS-10.14'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
 
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - script: |
-      python -m pip install --upgrade pip setuptools
-      pip install wheel twine
-    displayName: 'Install tools'
-
-  - script: pip install -e ".[tests, doc]"
-    displayName: 'Install dev environment'
-
-  - script: |
-      pip install plotly matplotlib openml
-      pytest --cov giottotime --cov-report xml
-      flake8
-    displayName: 'Test with pytest, nbconvert and flake8'
-
-
-- job: 'test_win2016'
-  condition: eq(variables['build_check'], 'false')
-  pool:
+- template: build_tools/azure/test_job.yml
+  parameters:
+    name: test_win2016
     vmImage: 'vs2017-win2016'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
 
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - script: |
-      python -m pip install --upgrade pip setuptools
-      pip install wheel twine
-    displayName: 'Install tools'
-
-  - script: pip install -e ".[tests, doc]"
-    displayName: 'Install dev environment'
-
-  - script: |
-      pip install plotly matplotlib openml
-      pytest --cov giottotime --cov-report xml
-      flake8
-    displayName: 'Test with pytest, nbconvert and flake8'
-
-# these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
+# these jobs are triggered manually and they test the code
+# and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
   condition: eq(variables['build_check'], 'true')
@@ -127,26 +51,11 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8
+      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark
     displayName: 'install pytest suite'
 
-  - script: |
-      pip install dist/*.whl
-      cd /tmp/
-      pytest --cov --pyargs giotto --cov-report xml
-    displayName: 'install and test the wheels'
-
-  - task: CopyFiles@2
-    displayName: 'copy files'
-    inputs:
-      contents: 'dist/*'
-      targetFolder: '$(Build.ArtifactStagingDirectory)'
-
-  - task: PublishBuildArtifacts@1
-    displayName: 'create download link'
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
+  - template: build_tools/azure/steps/test_wheels.yml
+  - template: build_tools/azure/steps/publish_artifact.yml
 
 
 - job: 'macOS1014'
@@ -161,33 +70,13 @@ jobs:
         python.version: '3.7'
 
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - script: python -m pip install --upgrade pip setuptools
-    displayName: 'Install tools'
-
-  - script: |
-      pip install -e ".[tests, doc]"
-      pip install wheel twine
-    displayName: 'Install dev environment'
-
-  - script: |
-      pip install plotly matplotlib openml
-      pip uninstall -y giotto-time
-      pytest --cov giottotime --cov-report xml
-      flake8
-    displayName: 'Test with pytest, nbconvert and flake8'
+  - template: build_tools/azure/steps/prepare_tests.yml
+  - template: build_tools/azure/steps/run_pytest.yml
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
 
-  - script: |
-      pip install dist/*.whl
-      cd /tmp/
-      pytest --cov --pyargs giottotime --cov-report xml
-    displayName: 'install and test the wheels'
+  - template: build_tools/azure/steps/test_wheels.yml
 
   - script: |
       cd doc/
@@ -205,17 +94,7 @@ jobs:
       replaceExistingArchive: true
     displayName: 'archive doc'
 
-  - task: CopyFiles@2
-    displayName: 'copy files'
-    inputs:
-      contents: 'dist/*'
-      targetFolder: '$(Build.ArtifactStagingDirectory)'
-
-  - task: PublishBuildArtifacts@1
-    displayName: 'create download link'
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
+  - template: build_tools/azure/steps/publish_artifact.yml
 
 
 - job: 'win2016'
@@ -230,44 +109,13 @@ jobs:
         python.version: '3.7'
 
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - script: python -m pip install --upgrade pip setuptools
-    displayName: 'Install tools'
-
-  - script: |
-      pip install -e ".[tests, doc]"
-      pip install wheel twine
-    displayName: 'Install dev environment'
-
-  - script: |
-      pip install plotly matplotlib openml
-      pip uninstall -y giotto-time
-      pytest --cov giottotime --cov-report xml
-      flake8
-    displayName: 'Test with pytest, nbconvert and flake8'
+  - template: build_tools/azure/steps/prepare_tests.yml
+  - template: build_tools/azure/steps/run_pytest.yml
 
   - bash: |
       sed -i $'s/\r$//' README.rst
       python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
 
-  - bash: |
-      pip install dist/*.whl
-      cd /tmp/
-      pytest --cov --pyargs giottotime --cov-report xml
-    displayName: 'install and test the wheels'
-
-  - task: CopyFiles@2
-    displayName: 'copy files'
-    inputs:
-      contents: 'dist/*'
-      targetFolder: '$(Build.ArtifactStagingDirectory)'
-
-  - task: PublishBuildArtifacts@1
-    displayName: 'create download link'
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
+  - template: build_tools/azure/steps/test_wheels.yml
+  - template: build_tools/azure/steps/publish_artifact.yml

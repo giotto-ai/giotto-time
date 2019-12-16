@@ -1,3 +1,4 @@
+hypothesis
 black
 pre-commit
 pytest

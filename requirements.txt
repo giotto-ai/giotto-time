@@ -2,6 +2,5 @@ scipy
 scikit-learn
 numpy
 pandas
-hypothesis
 giotto-learn
 workalendar>=7.1.1
