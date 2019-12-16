@@ -1,0 +1,4 @@
+steps:
+- script: |
+    pytest --cov giottotime --cov-report xml --hypothesis-profile dev
+  displayName: 'Test with pytest'

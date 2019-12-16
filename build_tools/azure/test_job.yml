@@ -1,0 +1,15 @@
+jobs:
+- job: ${{ parameters.name }}
+  condition: eq(variables['build_check'], 'false')
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - template: steps/prepare_tests.yml
+  - template: steps/run_pytest.yml
