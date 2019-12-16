@@ -2,7 +2,6 @@ import importlib
 import warnings
 from typing import Optional, Union
 
-import datetime
 import numpy as np
 import pandas as pd
 import workalendar
@@ -88,11 +87,18 @@ class CalendarFeature(IndexDependentFeature):
         super().__init__(output_name)
         self._region = region
         self._country = country
-        self._kernel = kernel
         self._start_date = start_date
         self._end_date = end_date
         self._reindex_method = reindex_method
         self._return_name_event = return_name_event
+
+        if len(kernel) == 0 or not np.isfinite(kernel).any():
+            raise ValueError(
+                "The kernel should be an array-like object, with at least "
+                "element and should only contains finite values, got "
+                f"{kernel} instead."
+            )
+        self._kernel = kernel
 
     # TODO: write the description of the transform method
     def transform(self, X: Optional[pd.DataFrame] = None) -> pd.DataFrame:
@@ -136,23 +142,24 @@ class CalendarFeature(IndexDependentFeature):
                 .rolling(klen, center=True)
                 .apply(apply_kernel, raw=False)
             )
-
         events_renamed = self._rename_columns(events)
 
         if X is not None:
-            freq = get_period(X)
-            events_renamed = events_renamed.resample(freq).sum()
-            print(events_renamed)
-            print(freq)
+            new_x_line = pd.DataFrame(
+                columns=X.columns, index=pd.PeriodIndex([X.index[-1] + 1])
+            )
+            X_to_cut = pd.concat([X, new_x_line], axis=0)
+            bins = pd.cut(events_renamed.index, X_to_cut.index.to_timestamp())
+            grouped_events = events_renamed.groupby(bins).mean().ffill()
 
-        events_renamed = events_renamed[str(self._start_date) : str(self._end_date)]
-        print("STRINGS")
-        print(str(self._start_date))
-        print(str(self._end_date))
-        if X is not None:
-            print(X)
-            events_renamed.index = X.index
+            grouped_events.index = pd.to_datetime(
+                grouped_events.index.map(lambda row_index: row_index.left)
+            )
+            X.index = X.index.to_timestamp()
 
+            events_renamed = pd.merge(
+                X, grouped_events, left_index=True, right_index=True, how="inner"
+            )
         return events_renamed
 
     def _initialize_start_end_date(self, X: pd.DataFrame):
@@ -163,18 +170,22 @@ class CalendarFeature(IndexDependentFeature):
             self._start_date = pd.Timestamp(self._start_date)
             self._end_date = pd.Timestamp(self._end_date)
 
-        slack_period = round(len(self._kernel) / 2)
+        slack_period = len(self._kernel)
         slack_days = np.timedelta64(slack_period, "D")
 
-        self.slacked_start_date_ = self._start_date - slack_days
-        self.slacked_end_date_ = self._end_date + slack_days
-        print("SLACKED")
+        slacked_start_date_ = self._start_date - slack_days
+        slacked_end_date_ = self._end_date + slack_days
 
-        if isinstance(self._start_date, pd.Period):
-            self.slacked_start_date_ = self.slacked_start_date_.to_timestamp()
-            self.slacked_end_date_ = self.slacked_end_date_.to_timestamp()
-        print(self.slacked_start_date_)
-        print(self.slacked_end_date_)
+        self.slacked_start_date_ = pd.datetime(
+            year=slacked_start_date_.year,
+            month=slacked_start_date_.month,
+            day=slacked_start_date_.day,
+        )
+        self.slacked_end_date_ = pd.datetime(
+            year=slacked_end_date_.year,
+            month=slacked_end_date_.month,
+            day=slacked_end_date_.day,
+        )
 
     def _get_holiday_events(self, country_mod):
         index = pd.date_range(
@@ -182,7 +193,6 @@ class CalendarFeature(IndexDependentFeature):
         )
         years = index.year.unique()
         events = pd.DataFrame()
-
         for year in years:
             events = events.append(country_mod.holidays(year))
 

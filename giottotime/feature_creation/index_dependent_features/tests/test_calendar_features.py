@@ -29,15 +29,15 @@ def test_unevenly_spaced_time_series():
         cal_feature.transform(unevenly_spaced_ts)
 
 
-@settings(deadline=pd.Timedelta(milliseconds=300), max_examples=10)
-@given(giotto_time_series(min_length=2))
+@settings(deadline=pd.Timedelta(milliseconds=1500), max_examples=50)
+@given(giotto_time_series(min_length=2, max_length=30))
 def test_correct_index_random_ts(ts):
     cal_feature = CalendarFeature(
         start_date="ignored",
         end_date="ignored",
         region="america",
         country="Brazil",
-        kernel=np.array([]),
+        kernel=np.array([1, 2]),
         output_name="cal",
         return_name_event=False,
     )
@@ -64,4 +64,3 @@ def test_calendar_transform_with_x_no_names():
         return_name_event=False,
     )
     Xt = cal_feature.transform(ts)
-    print(Xt)
