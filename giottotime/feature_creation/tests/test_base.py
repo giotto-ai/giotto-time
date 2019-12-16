@@ -6,7 +6,7 @@ from giottotime.feature_creation import MovingAverageFeature
 from giottotime.feature_creation.base import Feature
 
 
-class TestBaseFeature(Feature):
+class BaseFeature(Feature):
     def __init__(self, output_name):
         super().__init__(output_name=output_name)
 
@@ -20,7 +20,7 @@ def test_correct_renaming_single_col():
     df = testing.makeTimeDataFrame(freq="MS")
 
     output_name = "shift"
-    shift_feature = TestBaseFeature(output_name=output_name)
+    shift_feature = BaseFeature(output_name=output_name)
     df_renamed = shift_feature._rename_columns(df)
 
     assert df.shape == df_renamed.shape
@@ -36,7 +36,7 @@ def test_correct_renaming_series():
     df = testing.makeTimeSeries(freq="MS")
 
     output_name = "shift"
-    shift_feature = TestBaseFeature(output_name=output_name)
+    shift_feature = BaseFeature(output_name=output_name)
     df_renamed = shift_feature._rename_columns(df)
 
     assert df.shape[0] == df_renamed.shape[0]
@@ -53,7 +53,7 @@ def test_correct_renaming_multiple_columns():
     df = testing.makeTimeDataFrame(freq="MS")
 
     output_name = "shift"
-    shift_feature = TestBaseFeature(output_name=output_name)
+    shift_feature = BaseFeature(output_name=output_name)
     df_renamed = shift_feature._rename_columns(df)
 
     assert df.shape == df_renamed.shape
