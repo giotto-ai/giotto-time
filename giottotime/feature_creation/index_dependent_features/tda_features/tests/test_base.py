@@ -11,7 +11,7 @@ from giottotime.feature_creation.index_dependent_features.tda_features import (
 )
 
 
-class TestTDAFeature(TDAFeatures):
+class BaseTDAFeature(TDAFeatures):
     def __init__(
         self,
         output_name: str,
@@ -80,7 +80,7 @@ def test_correct_compute_n_points():
     takens_time_delay = 3
     n_windows = 9
 
-    tda_feature = TestTDAFeature(
+    tda_feature = BaseTDAFeature(
         output_name="ignored",
         sliding_stride=sliding_stride,
         sliding_window_width=sliding_window_width,
@@ -95,7 +95,7 @@ def test_correct_compute_n_points():
 
 
 def test_negative_or_zero_n_windows():
-    tda_feature = TestTDAFeature(output_name="ignored")
+    tda_feature = BaseTDAFeature(output_name="ignored")
 
     with pytest.raises(ValueError):
         tda_feature._compute_n_points(0)
@@ -120,7 +120,7 @@ def test_correct_n_points_random_ts_and_values(
     takens_dimension,
     takens_time_delay,
 ):
-    tda_feature = TestTDAFeature(
+    tda_feature = BaseTDAFeature(
         output_name="ignored",
         sliding_stride=sliding_stride,
         sliding_window_width=sliding_window_width,
@@ -138,7 +138,7 @@ def test_correct_persistence_diagrams():
     np.random.seed(0)
     df = pd.DataFrame(np.random.randint(0, 100, size=(13, 1)), columns=list("A"))
 
-    tda_feature = TestTDAFeature(output_name="ignored")
+    tda_feature = BaseTDAFeature(output_name="ignored")
     persistence_diagrams = tda_feature._compute_persistence_diagrams(df)
     expected_diagrams = np.array(
         [
