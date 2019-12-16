@@ -28,8 +28,7 @@ jobs:
   - script: |
       pip install plotly matplotlib openml
       pytest --cov giottotime --cov-report xml
-      flake8
-    displayName: 'Test with pytest, nbconvert and flake8'
+    displayName: 'Test with pytest'
 
 
 - job: 'test_macOS1014'
@@ -59,8 +58,7 @@ jobs:
   - script: |
       pip install plotly matplotlib openml
       pytest --cov giottotime --cov-report xml
-      flake8
-    displayName: 'Test with pytest, nbconvert and flake8'
+    displayName: 'Test with pytest'
 
 
 - job: 'test_win2016'
@@ -90,8 +88,7 @@ jobs:
   - script: |
       pip install plotly matplotlib openml
       pytest --cov giottotime --cov-report xml
-      flake8
-    displayName: 'Test with pytest, nbconvert and flake8'
+    displayName: 'Test with pytest'
 
 # these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
 
@@ -127,7 +124,7 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8
+      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark
     displayName: 'install pytest suite'
 
   - script: |
@@ -177,8 +174,7 @@ jobs:
       pip install plotly matplotlib openml
       pip uninstall -y giotto-time
       pytest --cov giottotime --cov-report xml
-      flake8
-    displayName: 'Test with pytest, nbconvert and flake8'
+    displayName: 'Test with pytest'
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
@@ -246,8 +242,7 @@ jobs:
       pip install plotly matplotlib openml
       pip uninstall -y giotto-time
       pytest --cov giottotime --cov-report xml
-      flake8
-    displayName: 'Test with pytest, nbconvert and flake8'
+    displayName: 'Test with pytest'
 
   - bash: |
       sed -i $'s/\r$//' README.rst
