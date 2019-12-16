@@ -63,7 +63,6 @@ class LinearRegressor:
             lm = LinearRegression(fit_intercept=True).fit(X, y)
             self.r2_seed = [lm.intercept_] + list(lm.coef_)
             kwargs["x0"] = self.r2_seed
-            print(kwargs["x0"])
             del kwargs["r2_seed"]
 
         if "x0" not in kwargs:
