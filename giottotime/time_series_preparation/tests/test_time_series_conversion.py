@@ -1,9 +1,10 @@
+from datetime import timedelta
 from typing import Union, List, Tuple
 
 import numpy as np
 import pandas as pd
 import pytest
-from hypothesis import given
+from hypothesis import given, settings, HealthCheck
 from hypothesis.extra.numpy import arrays
 from hypothesis.extra.pandas import series as pd_series
 from hypothesis.strategies import lists, datetimes, floats, integers
@@ -46,6 +47,7 @@ class TestListToTimeIndexSeries:
             list_, start=None, end=end, freq=freq
         )
 
+    @settings(suppress_health_check=(HealthCheck.too_slow,))
     @given(lists(floats()), pair_of_ordered_dates())
     def test_error_with_start_end_as_input(
         self, list_: List[float], start_end: Tuple[pd.Timestamp, pd.Timestamp],
@@ -166,6 +168,7 @@ class TestArrayToTimeIndexSeries:
             array, start=None, end=end, freq=None
         )
 
+    @settings(deadline=timedelta(milliseconds=400))
     @given(arrays(np.float64, integers(0, 1000)), available_freqs())
     def test_list_and_only_freq(
         self, array: np.ndarray, freq: pd.Timedelta,
@@ -271,6 +274,7 @@ class TestPandasSeriesToTimeIndexSeries:
         expected_series = datetime_index_series
         assert_series_equal(computed_series, expected_series)
 
+    @settings(deadline=timedelta(milliseconds=400))
     @given(series_with_period_index())
     def test_period_index_as_input(self, period_index_series: pd.Series):
         computed_series = transform_series_into_time_index_series(period_index_series)
@@ -279,6 +283,7 @@ class TestPandasSeriesToTimeIndexSeries:
 
 
 class TestTimeIndexSeriesToPeriodIndexSeries:
+    @settings(suppress_health_check=(HealthCheck.too_slow,))
     @given(series_with_period_index())
     def test_only_period_index_as_input(self, period_index_series: pd.Series):
         computed_series = transform_time_index_series_into_period_index_series(
@@ -287,6 +292,7 @@ class TestTimeIndexSeriesToPeriodIndexSeries:
         expected_series = period_index_series
         assert_series_equal(computed_series, expected_series)
 
+    @settings(deadline=timedelta(milliseconds=400))
     @given(series_with_period_index(), available_freqs())
     def test_period_index_and_freq_as_input(
         self, period_index_series: pd.Series, freq: pd.Timedelta
