@@ -6,8 +6,8 @@ from scipy.optimize import minimize
 import numpy as np
 import pandas as pd
 
-from giottotime.models.utils import check_is_fitted
-from giottotime.models.trend_models.base import TrendModel
+from ..utils import check_is_fitted
+from ..trend_models.base import TrendModel
 
 
 class PolynomialTrend(TrendModel):
@@ -25,12 +25,12 @@ class PolynomialTrend(TrendModel):
          accept y_true, y_pred and return a single real number.
 
     """
+
     def __init__(self, order: int, loss: Callable = mean_squared_error):
         self.order = order
         self.loss = loss
 
-    def fit(self, time_series: pd.DataFrame, method: str = 'BFGS') \
-            -> TrendModel:
+    def fit(self, time_series: pd.DataFrame, method: str = "BFGS") -> TrendModel:
         """Fit the model on the ``time_series``, with respect to the provided
         ``loss`` and using the provided ``method``. In order to see which
         methods are available, please check the 'scipy' `documentation
@@ -50,16 +50,18 @@ class PolynomialTrend(TrendModel):
             The fitted object.
 
         """
+
         def prediction_loss(weights: np.ndarray) -> float:
             p = np.poly1d(weights)
             predictions = [p(t) for t in range(0, time_series.shape[0])]
             return self.loss(time_series.values, predictions)
 
         model_weights = np.zeros(self.order)
-        res = minimize(prediction_loss, model_weights, method=method,
-                       options={'disp': False})
+        res = minimize(
+            prediction_loss, model_weights, method=method, options={"disp": False}
+        )
 
-        self.model_weights_ = res['x']
+        self.model_weights_ = res["x"]
         return self
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -101,7 +103,8 @@ class PolynomialTrend(TrendModel):
 
         """
         p = np.poly1d(self.model_weights_)
-        predictions = pd.DataFrame(index=time_series.index,
-                                   data=[p(t)
-                                         for t in range(0, time_series.shape[0])])
-        return time_series - predictions[0]
+        predictions = pd.Series(
+            index=time_series.index, data=[p(t) for t in range(0, time_series.shape[0])]
+        )
+
+        return time_series.sub(predictions, axis=0)

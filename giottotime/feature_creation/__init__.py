@@ -1,22 +1,35 @@
-from .calendar_features import CalendarFeature
-from .feature_creation import FeaturesCreation
-from .seasonal_features import PeriodicSeasonalFeature
-from .time_series_features import *
-from .trend_features import *
+from .feature_creation import FeatureCreation
+from .index_dependent_features import (
+    CalendarFeature,
+    DetrendedFeature,
+    RemovePolynomialTrend,
+    RemoveExponentialTrend,
+    RemoveFunctionTrend,
+    tda_features,
+)
+from .index_dependent_features import (
+    ShiftFeature,
+    MovingAverageFeature,
+    PolynomialFeature,
+    ExogenousFeature,
+)
+from .utils import trim_feature_nans
+
+from .standard_features import ConstantFeature, PeriodicSeasonalFeature, CustomFeature
 
 __all__ = [
-    'FeaturesCreation',
-    'ShiftFeature',
-    'MovingAverageFeature',
-    'ConstantFeature',
-    'PolynomialFeature',
-    'ExogenousFeature',
-    'CustomFeature',
-    'tda_features',
-    'CalendarFeature',
-    'PeriodicSeasonalFeature',
-    'DetrendedFeature',
-    'RemovePolynomialTrend',
-    'RemoveExponentialTrend',
-    'RemoveFunctionTrend'
+    "FeatureCreation",
+    "ShiftFeature",
+    "MovingAverageFeature",
+    "ConstantFeature",
+    "PolynomialFeature",
+    "ExogenousFeature",
+    "tda_features",
+    "trim_feature_nans",
+    "CalendarFeature",
+    "PeriodicSeasonalFeature",
+    "DetrendedFeature",
+    "RemovePolynomialTrend",
+    "RemoveExponentialTrend",
+    "RemoveFunctionTrend",
 ]

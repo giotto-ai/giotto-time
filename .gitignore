@@ -55,6 +55,7 @@ coverage.xml
 docs/_build/
 doc/build/
 doc/generated/
+doc/reference/generated/
 
 # PyBuilder
 target/

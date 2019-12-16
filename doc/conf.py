@@ -13,16 +13,17 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath("../"))
 
 # -- Project information -----------------------------------------------------
 
-project = 'giotto-time'
-copyright = '2019, L2F'
-author = 'Benjamin Russell, Stefano Savarè, Alessio Baccelli'
+project = "giotto-time"
+copyright = "2019, L2F"
+author = "Benjamin Russell, Stefano Savarè, Alessio Baccelli"
 
 # The full version, including alpha/beta/rc tags
 from giottotime import __version__
+
 release = __version__
 
 # -- General configuration ---------------------------------------------------
@@ -31,15 +32,15 @@ release = __version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'numpydoc',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "numpydoc",
     # 'sphinx.ext.linkcode', # need to be setup, not sure what it does
-    'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.imgconverter',
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.imgconverter",
     # 'sphinx_gallery.gen_gallery',
-    'sphinx_issues',
+    "sphinx_issues",
     # 'custom_references_resolver' # custom for sklearn, not sure what it does
 ]
 
@@ -49,36 +50,38 @@ numpydoc_class_members_toctree = False
 
 # For maths, use mathjax by default and svg if NO_MATHJAX env variable is set
 # (useful for viewing the doc offline)
-if os.environ.get('NO_MATHJAX'):
-    extensions.append('sphinx.ext.imgmath')
-    imgmath_image_format = 'svg'
+if os.environ.get("NO_MATHJAX"):
+    extensions.append("sphinx.ext.imgmath")
+    imgmath_image_format = "svg"
 else:
-    extensions.append('sphinx.ext.mathjax')
-    mathjax_path = ('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/'
-                    'MathJax.js?config=TeX-AMS_SVG')
+    extensions.append("sphinx.ext.mathjax")
+    mathjax_path = (
+        "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/"
+        "MathJax.js?config=TeX-AMS_SVG"
+    )
 
-autodoc_default_flags = ['members', 'inherited-members']
+autodoc_default_flags = ["members", "inherited-members"]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['templates']
+templates_path = ["templates"]
 
 # generate autosummary even if no references
 autosummary_generate = True
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The encoding of source files.
 # source_encoding = 'utf-8'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = [
-    '**neural_network**',
+    "**neural_network**",
 ]
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
@@ -93,7 +96,7 @@ add_function_parentheses = False
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -102,7 +105,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'nature'
+html_theme = "nature"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
