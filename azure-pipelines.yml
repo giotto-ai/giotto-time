@@ -1,64 +1,28 @@
 # these jobs are triggered automatically and they test the code and the examples.
 
 jobs:
-- job: 'test_ubuntu1604'
-  condition: eq(variables['build_check'], 'true')
-  pool:
-    vmImage: 'ubuntu-16.04'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
+- template: build_tools/azure/test_job.yml
+  parameters:
+    - name: 'test_ubuntu1604'
+    - vmImage: 'ubuntu-16.04'
 
-  steps:
-  - template: build_tools/azure/test_preparation.yml
-  - script: |
-      pytest --cov giottotime --cov-report xml --hypothesis-profile dev
-    displayName: 'Test with pytest'
+jobs:
+  - template: build_tools/azure/test_job.yml
+    parameters:
+      - name: 'test_macOS1014'
+      - vmImage: 'macOS-10.14'
 
-
-- job: 'test_macOS1014'
-  condition: eq(variables['build_check'], 'true')
-  pool:
-    vmImage: 'macOS-10.14'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-
-  steps:
-  - template: build_tools/azure/test_preparation.yml
-  - script: |
-      pytest --cov giottotime --cov-report xml --hypothesis-profile dev
-    displayName: 'Test with pytest'
-
-
-- job: 'test_win2016'
-  condition: eq(variables['build_check'], 'true')
-  pool:
-    vmImage: 'vs2017-win2016'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-
-  steps:
-  - template: build_tools/azure/test_preparation.yml
-  - script: |
-      pytest --cov giottotime --cov-report xml --hypothesis-profile dev
-    displayName: 'Test with pytest'
+jobs:
+  - template: build_tools/azure/test_job.yml
+    parameters:
+      - name: 'test_win2016'
+      - vmImage: 'vs2017-win2016'
 
 # these jobs are triggered manually and they test the code
 # and the examples and build the wheels and docs.
 
 - job: 'manylinux2010'
-  condition: eq(variables['build_check'], 'false')
+  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -92,27 +56,12 @@ jobs:
       pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark
     displayName: 'install pytest suite'
 
-  - script: |
-      pip install dist/*.whl
-      cd /tmp/
-      pytest --cov --pyargs giotto --cov-report xml
-    displayName: 'install and test the wheels'
-
-  - task: CopyFiles@2
-    displayName: 'copy files'
-    inputs:
-      contents: 'dist/*'
-      targetFolder: '$(Build.ArtifactStagingDirectory)'
-
-  - task: PublishBuildArtifacts@1
-    displayName: 'create download link'
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
+  - template: build_tools/azure/test_wheels.yml
+  - template: build_tools/azure/publish_artifact.yml
 
 
 - job: 'macOS1014'
-  condition: eq(variables['build_check'], 'false')
+  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'macOS-10.14'
   strategy:
@@ -123,32 +72,13 @@ jobs:
         python.version: '3.7'
 
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - script: python -m pip install --upgrade pip setuptools
-    displayName: 'Install tools'
-
-  - script: |
-      pip install -e ".[tests, doc]"
-      pip install wheel twine
-    displayName: 'Install dev environment'
-
-  - script: |
-      pip install plotly matplotlib openml
-      pip uninstall -y giotto-time
-      pytest --cov giottotime --cov-report xml
-    displayName: 'Test with pytest'
+  - template: build_tools/azure/prepare_tests.yml
+  - template: build_tools/azure/run_pytest.yml
 
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
 
-  - script: |
-      pip install dist/*.whl
-      cd /tmp/
-      pytest --cov --pyargs giottotime --cov-report xml
-    displayName: 'install and test the wheels'
+  - template: build_tools/azure/test_wheels.yml
 
   - script: |
       cd doc/
@@ -166,21 +96,11 @@ jobs:
       replaceExistingArchive: true
     displayName: 'archive doc'
 
-  - task: CopyFiles@2
-    displayName: 'copy files'
-    inputs:
-      contents: 'dist/*'
-      targetFolder: '$(Build.ArtifactStagingDirectory)'
-
-  - task: PublishBuildArtifacts@1
-    displayName: 'create download link'
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
+  - template: build_tools/azure/publish_artifact.yml
 
 
 - job: 'win2016'
-  condition: eq(variables['build_check'], 'false')
+  condition: eq(variables['build_check'], 'true')
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
@@ -191,43 +111,13 @@ jobs:
         python.version: '3.7'
 
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - script: python -m pip install --upgrade pip setuptools
-    displayName: 'Install tools'
-
-  - script: |
-      pip install -e ".[tests, doc]"
-      pip install wheel twine
-    displayName: 'Install dev environment'
-
-  - script: |
-      pip install plotly matplotlib openml
-      pip uninstall -y giotto-time
-      pytest --cov giottotime --cov-report xml
-    displayName: 'Test with pytest'
+  - template: build_tools/azure/prepare_tests.yml
+  - template: build_tools/azure/run_pytest.yml
 
   - bash: |
       sed -i $'s/\r$//' README.rst
       python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
 
-  - bash: |
-      pip install dist/*.whl
-      cd /tmp/
-      pytest --cov --pyargs giottotime --cov-report xml
-    displayName: 'install and test the wheels'
-
-  - task: CopyFiles@2
-    displayName: 'copy files'
-    inputs:
-      contents: 'dist/*'
-      targetFolder: '$(Build.ArtifactStagingDirectory)'
-
-  - task: PublishBuildArtifacts@1
-    displayName: 'create download link'
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'wheel_and_doc'
+  - template: build_tools/azure/test_wheels.yml
+  - template: build_tools/azure/publish_artifact.yml
