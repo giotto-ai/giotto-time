@@ -1,32 +1,273 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+# these jobs are triggered automatically and they test the code and the examples.
 
-trigger:
-- master
+jobs:
+- job: 'test_ubuntu1604'
+  condition: eq(variables['build_check'], 'false')
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
 
-pool:
-  vmImage: 'ubuntu-latest'
-strategy:
-  matrix:
-    Python36:
-      python.version: '3.6'
-    Python37:
-      python.version: '3.7'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install wheel twine
+    displayName: 'Install tools'
 
-- script: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
-  displayName: 'Install dependencies'
+  - script: pip install -e ".[tests, doc]"
+    displayName: 'Install dev environment'
 
-- script: |
-    pip install pytest pytest-azurepipelines
-    pytest --hypothesis-profile ci
-  displayName: 'pytest'
+  - script: |
+      pip install plotly matplotlib openml
+      pytest --cov giottotime --cov-report xml
+      flake8
+    displayName: 'Test with pytest, nbconvert and flake8'
+
+
+- job: 'test_macOS1014'
+  condition: eq(variables['build_check'], 'false')
+  pool:
+    vmImage: 'macOS-10.14'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install wheel twine
+    displayName: 'Install tools'
+
+  - script: pip install -e ".[tests, doc]"
+    displayName: 'Install dev environment'
+
+  - script: |
+      pip install plotly matplotlib openml
+      pytest --cov giottotime --cov-report xml
+      flake8
+    displayName: 'Test with pytest, nbconvert and flake8'
+
+
+- job: 'test_win2016'
+  condition: eq(variables['build_check'], 'false')
+  pool:
+    vmImage: 'vs2017-win2016'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install wheel twine
+    displayName: 'Install tools'
+
+  - script: pip install -e ".[tests, doc]"
+    displayName: 'Install dev environment'
+
+  - script: |
+      pip install plotly matplotlib openml
+      pytest --cov giottotime --cov-report xml
+      flake8
+    displayName: 'Test with pytest, nbconvert and flake8'
+
+# these jobs are triggered manually and they test the code and the examples and build the wheels and docs.
+
+- job: 'manylinux2010'
+  condition: eq(variables['build_check'], 'true')
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        arch: x86_64
+        plat: manylinux2010_x86_64
+        python_ver: '36'
+        python.version: '3.6'
+      Python37:
+        arch: x86_64
+        plat: manylinux2010_x86_64
+        python_ver: '37'
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - task: Bash@3
+    inputs:
+      filePath: .azure-ci/build_manylinux2010.sh
+      failOnStderr: false
+    env:
+      python_ver: $(python_ver)
+    displayName: 'Run the docker and open bash'
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark flake8
+    displayName: 'install pytest suite'
+
+  - script: |
+      pip install dist/*.whl
+      cd /tmp/
+      pytest --cov --pyargs giotto --cov-report xml
+    displayName: 'install and test the wheels'
+
+  - task: CopyFiles@2
+    displayName: 'copy files'
+    inputs:
+      contents: 'dist/*'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'create download link'
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'wheel_and_doc'
+
+
+- job: 'macOS1014'
+  condition: eq(variables['build_check'], 'true')
+  pool:
+    vmImage: 'macOS-10.14'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - script: python -m pip install --upgrade pip setuptools
+    displayName: 'Install tools'
+
+  - script: |
+      pip install -e ".[tests, doc]"
+      pip install wheel twine
+    displayName: 'Install dev environment'
+
+  - script: |
+      pip install plotly matplotlib openml
+      pip uninstall -y giotto-time
+      pytest --cov giottotime --cov-report xml
+      flake8
+    displayName: 'Test with pytest, nbconvert and flake8'
+
+  - script: python setup.py sdist bdist_wheel
+    displayName: 'build the wheels'
+
+  - script: |
+      pip install dist/*.whl
+      cd /tmp/
+      pytest --cov --pyargs giottotime --cov-report xml
+    displayName: 'install and test the wheels'
+
+  - script: |
+      cd doc/
+      make html
+      cd ..
+    displayName: 'Build sphinx doc'
+
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: doc/build
+      includeRootFolder: true
+      archiveType: 'zip'
+      tarCompression: 'gz'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      replaceExistingArchive: true
+    displayName: 'archive doc'
+
+  - task: CopyFiles@2
+    displayName: 'copy files'
+    inputs:
+      contents: 'dist/*'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'create download link'
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'wheel_and_doc'
+
+
+- job: 'win2016'
+  condition: eq(variables['build_check'], 'true')
+  pool:
+    vmImage: 'vs2017-win2016'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - script: python -m pip install --upgrade pip setuptools
+    displayName: 'Install tools'
+
+  - script: |
+      pip install -e ".[tests, doc]"
+      pip install wheel twine
+    displayName: 'Install dev environment'
+
+  - script: |
+      pip install plotly matplotlib openml
+      pip uninstall -y giotto-time
+      pytest --cov giottotime --cov-report xml
+      flake8
+    displayName: 'Test with pytest, nbconvert and flake8'
+
+  - bash: |
+      sed -i $'s/\r$//' README.rst
+      python setup.py sdist bdist_wheel
+    displayName: 'build the wheels'
+
+  - bash: |
+      pip install dist/*.whl
+      cd /tmp/
+      pytest --cov --pyargs giottotime --cov-report xml
+    displayName: 'install and test the wheels'
+
+  - task: CopyFiles@2
+    displayName: 'copy files'
+    inputs:
+      contents: 'dist/*'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'create download link'
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'wheel_and_doc'
