@@ -82,7 +82,6 @@ class CalendarFeature(IndexDependentFeature):
         start_date: str = "01/01/2018",
         end_date: str = "01/01/2020",
         reindex_method: str = "pad",
-        return_name_event: bool = False,
     ):
         super().__init__(output_name)
         self._region = region
@@ -90,9 +89,8 @@ class CalendarFeature(IndexDependentFeature):
         self._start_date = start_date
         self._end_date = end_date
         self._reindex_method = reindex_method
-        self._return_name_event = return_name_event
 
-        if len(kernel) == 0 or not np.isfinite(kernel).any():
+        if len(kernel) == 0 or not np.isfinite(kernel).all():
             raise ValueError(
                 "The kernel should be an array-like object, with at least "
                 "element and should only contains finite values, got "
@@ -203,12 +201,7 @@ class CalendarFeature(IndexDependentFeature):
         events = self._group_by_event_name(events)
 
         events = events.reindex(index)
-
-        if not self._return_name_event:
-            events = events.drop(columns=["events"])
-
-        else:
-            events["events"] = events["events"].fillna("No Event")
+        events = events.drop(columns=["events"])
 
         events["status"] = events["status"].fillna(0).astype(int)
         events = events.sort_index()
