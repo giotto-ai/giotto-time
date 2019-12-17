@@ -1,9 +1,7 @@
-from sklearn.metrics import mean_squared_error
-from scipy.optimize import minimize
 import numpy as np
 import pandas as pd
-
-from sklearn.linear_model import LinearRegression
+from scipy.optimize import minimize
+from sklearn.metrics import mean_squared_error
 
 from ..utils import check_is_fitted
 
