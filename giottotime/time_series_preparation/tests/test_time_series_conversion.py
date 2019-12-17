@@ -168,7 +168,6 @@ class TestArrayToTimeIndexSeries:
             array, start=None, end=end, freq=None
         )
 
-    @settings(deadline=timedelta(milliseconds=400))
     @given(arrays(np.float64, integers(0, 1000)), available_freqs())
     def test_list_and_only_freq(
         self, array: np.ndarray, freq: pd.Timedelta,
@@ -274,7 +273,6 @@ class TestPandasSeriesToTimeIndexSeries:
         expected_series = datetime_index_series
         assert_series_equal(computed_series, expected_series)
 
-    @settings(deadline=timedelta(milliseconds=400))
     @given(series_with_period_index())
     def test_period_index_as_input(self, period_index_series: pd.Series):
         computed_series = transform_series_into_time_index_series(period_index_series)
@@ -292,7 +290,6 @@ class TestTimeIndexSeriesToPeriodIndexSeries:
         expected_series = period_index_series
         assert_series_equal(computed_series, expected_series)
 
-    @settings(deadline=timedelta(milliseconds=400))
     @given(series_with_period_index(), available_freqs())
     def test_period_index_and_freq_as_input(
         self, period_index_series: pd.Series, freq: pd.Timedelta
