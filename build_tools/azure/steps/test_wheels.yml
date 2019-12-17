@@ -1,6 +1,7 @@
 steps:
 - bash: |
     pip install dist/*.whl
+    cp conftest.py /tmp/
     cd /tmp/
     pytest --cov --pyargs giottotime --cov-report xml --hypothesis-profile dev
   displayName: 'install and test the wheels'
