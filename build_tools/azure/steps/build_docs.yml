@@ -1,0 +1,15 @@
+steps:
+- script: |
+    cd doc/
+    make html
+    cd ..
+  displayName: 'Build sphinx doc'
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: doc/build
+    includeRootFolder: true
+    archiveType: 'zip'
+    tarCompression: 'gz'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    replaceExistingArchive: true
+  displayName: 'archive doc'

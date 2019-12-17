@@ -2,6 +2,6 @@ steps:
 - bash: |
     pip install dist/*.whl
     cd /tmp/
-    pytest --cov --pyargs giottotime --cov-report xml
+    pytest --cov --pyargs giottotime --cov-report xml --hypothesis-profile dev
   displayName: 'install and test the wheels'
 
