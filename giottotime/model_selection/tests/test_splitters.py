@@ -1,7 +1,7 @@
 import pytest
 
 import hypothesis.strategies as st
-from hypothesis import given
+from hypothesis import given, settings, HealthCheck
 
 from giottotime.feature_creation import ShiftFeature, MovingAverageFeature
 from giottotime.model_selection.feature_splitters import FeatureSplitter
@@ -24,6 +24,7 @@ class TestFeatureSplitter:
         with pytest.raises(ValueError):
             FeatureSplitter(drop_na_mode)
 
+    @settings(suppress_health_check=(HealthCheck.too_slow,))
     @given(
         X_y_matrices(
             horizon=4, time_series_features=features, allow_nan_infinity=False,

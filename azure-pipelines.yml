@@ -1,32 +1,121 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+# these jobs are triggered automatically and they test the code and the examples.
 
-trigger:
-- master
+jobs:
+- template: build_tools/azure/test_job.yml
+  parameters:
+    name: test_ubuntu1604
+    vmImage: 'ubuntu-16.04'
 
-pool:
-  vmImage: 'ubuntu-latest'
-strategy:
-  matrix:
-    Python36:
-      python.version: '3.6'
-    Python37:
-      python.version: '3.7'
+- template: build_tools/azure/test_job.yml
+  parameters:
+    name: test_macOS1014
+    vmImage: 'macOS-10.14'
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+- template: build_tools/azure/test_job.yml
+  parameters:
+    name: test_win2016
+    vmImage: 'vs2017-win2016'
 
-- script: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
-  displayName: 'Install dependencies'
+# these jobs are triggered manually and they test the code
+# and the examples and build the wheels and docs.
 
-- script: |
-    pip install pytest pytest-azurepipelines
-    pytest --hypothesis-profile ci
-  displayName: 'pytest'
+- job: 'manylinux2010'
+  condition: eq(variables['build_check'], 'true')
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        arch: x86_64
+        plat: manylinux2010_x86_64
+        python_ver: '36'
+        python.version: '3.6'
+      Python37:
+        arch: x86_64
+        plat: manylinux2010_x86_64
+        python_ver: '37'
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+
+  - task: Bash@3
+    inputs:
+      filePath: .azure-ci/build_manylinux2010.sh
+      failOnStderr: false
+    env:
+      python_ver: $(python_ver)
+    displayName: 'Run the docker and open bash'
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark
+    displayName: 'install pytest suite'
+
+  - template: build_tools/azure/steps/test_wheels.yml
+  - template: build_tools/azure/steps/publish_artifact.yml
+
+
+- job: 'macOS1014'
+  condition: eq(variables['build_check'], 'true')
+  pool:
+    vmImage: 'macOS-10.14'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - template: build_tools/azure/steps/prepare_tests.yml
+  - template: build_tools/azure/steps/run_pytest.yml
+
+  - script: python setup.py sdist bdist_wheel
+    displayName: 'build the wheels'
+
+  - template: build_tools/azure/steps/test_wheels.yml
+
+  - script: |
+      cd doc/
+      make html
+      cd ..
+    displayName: 'Build sphinx doc'
+
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: doc/build
+      includeRootFolder: true
+      archiveType: 'zip'
+      tarCompression: 'gz'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      replaceExistingArchive: true
+    displayName: 'archive doc'
+
+  - template: build_tools/azure/steps/publish_artifact.yml
+
+
+- job: 'win2016'
+  condition: eq(variables['build_check'], 'true')
+  pool:
+    vmImage: 'vs2017-win2016'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - template: build_tools/azure/steps/prepare_tests.yml
+  - template: build_tools/azure/steps/run_pytest.yml
+
+  - bash: |
+      sed -i $'s/\r$//' README.rst
+      python setup.py sdist bdist_wheel
+    displayName: 'build the wheels'
+
+  - template: build_tools/azure/steps/test_wheels.yml
+  - template: build_tools/azure/steps/publish_artifact.yml
