@@ -42,7 +42,7 @@ class PeriodicSeasonalFeature(StandardFeature):
 
     def __init__(
         self,
-        period: Union[pd.Timedelta, str] = "1 year",
+        period: Union[pd.Timedelta, str] = "365 days",
         amplitude: float = 0.5,
         output_name: str = "PeriodicSeasonalFeature",
         start_date: Optional[Union[pd.Timestamp, str]] = None,
@@ -50,11 +50,11 @@ class PeriodicSeasonalFeature(StandardFeature):
         index_period: Optional[Union[DatetimeIndex, int]] = None,
     ):
         super().__init__(output_name=output_name)
-        self._start_date = start_date
-        self._period = period
-        self._amplitude = amplitude
-        self._length = length
-        self._index_period = index_period
+        self.start_date = start_date
+        self.period = period
+        self.amplitude = amplitude
+        self.length = length
+        self.index_period = index_period
 
     def transform(self, X: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """Starting from the index of ``X``, generate a sinusoid,
@@ -88,71 +88,69 @@ class PeriodicSeasonalFeature(StandardFeature):
             periodic_feature = pd.DataFrame(index=X.index, data=periodic_feature_values)
 
         else:
-            periodic_feature = pd.DataFrame(
-                data=periodic_feature_values[: self._length]
-            )
+            periodic_feature = pd.DataFrame(data=periodic_feature_values[: self.length])
 
         periodic_feature = self._rename_columns(periodic_feature)
         return periodic_feature
 
     def _validate_input(self, X: pd.DataFrame) -> None:
         if X is None:
-            if self._start_date is None:
+            if self.start_date is None:
                 raise ValueError(
                     f"If X is not provided, the 'start_date' variable "
                     f"must be provided, but instead was "
-                    f"{self._start_date}."
+                    f"{self.start_date}."
                 )
-            if self._index_period is None:
+            if self.index_period is None:
                 raise ValueError(
                     f"If X is not provided, the 'index_period' variable "
                     f"must be provided, but instead was "
-                    f"{self._index_period}."
+                    f"{self.index_period}."
                 )
 
     def _transform_inputs(self, X: pd.DataFrame) -> None:
-        if isinstance(self._period, str):
-            self._period = pd.Timedelta(self._period)
+        if isinstance(self.period, str):
+            self.period = pd.to_timedelta(self.period)
 
         if X is not None:
-            self._start_date = X.index.values[0]
+            self.start_date = X.index.values[0]
         else:
-            if isinstance(self._start_date, str):
-                self._start_date = pd.to_datetime(self._start_date)
+            if isinstance(self.start_date, str):
+                self.start_date = pd.to_datetime(self.start_date)
 
     def _get_time_index(self, X: pd.DataFrame) -> pd.DatetimeIndex:
         if X is not None:
             datetime_index = X.index
-
         else:
-            if isinstance(self._index_period, int):
+            if isinstance(self.index_period, int):
                 datetime_index = pd.date_range(
-                    start=self._start_date, periods=self._index_period
+                    start=self.start_date, periods=self.index_period
                 )
             else:
-                datetime_index = self._index_period
+                datetime_index = self.index_period
 
-        return datetime_index
-
-    def _convert_index_to_datetime(self, index: pd.PeriodIndex) -> pd.DatetimeIndex:
-        datetime_index = index.to_timestamp()
         self._check_sampling_frequency(datetime_index)
+
         return datetime_index
 
     def _check_sampling_frequency(self, datetime_index: pd.DatetimeIndex) -> None:
-        sampling_frequency = pd.Timedelta(datetime_index.freq)
-        if sampling_frequency < 2 * self._period:
+        if isinstance(datetime_index, pd.PeriodIndex):
+            datetime_index = datetime_index.to_timestamp()
+        sampling_frequency = pd.Timedelta(datetime_index[1] - datetime_index[0])
+
+        if self.period < 2 * sampling_frequency:
             raise ValueError(
                 f"Sampling frequency must be at least two times"
                 f"the period to obtain meaningful results. "
                 f"Sampling frequency = {sampling_frequency},"
-                f"period = {self._period}."
+                f"period = {self.period}."
             )
 
     def _compute_periodic_feature(self, datetime_index: pd.DatetimeIndex):
+        print((datetime_index - self.start_date) / self.period)
         return (
-            np.sin(2 * pi * (datetime_index - self._start_date) / self._period)
-        ) * self._amplitude
+            np.sin(2 * pi * (datetime_index - self.start_date) / self.period)
+        ) * self.amplitude
 
 
 class ConstantFeature(StandardFeature):
