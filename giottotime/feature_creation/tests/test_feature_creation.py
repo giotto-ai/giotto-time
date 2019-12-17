@@ -67,7 +67,6 @@ class TestFeatureCreation:
 
         pd.testing.assert_frame_equal(expected_y_shifts, y_shifts)
 
-    @settings(deadline=duration(milliseconds=500), max_examples=20)
     @given(giotto_time_series(), st.integers(1, 10))
     def test_correct_y_shifts_random_ts(self, ts, horizon):
         feature_creation = FeatureCreation(horizon=horizon, time_series_features=[])
@@ -101,7 +100,6 @@ class TestFeatureCreation:
 
         pd.testing.assert_frame_equal(expected_x_shifts, x_shifts)
 
-    @settings(deadline=duration(milliseconds=500), max_examples=20)
     @given(giotto_time_series(), st.integers(1, 10))
     def test_correct_y_shifts_random_ts(self, ts, horizon):
         features = [
@@ -164,7 +162,6 @@ class TestFeatureCreation:
         expected_y.index = random_index
         pd.testing.assert_frame_equal(expected_y, y)
 
-    @settings(deadline=duration(milliseconds=500), max_examples=20)
     @given(giotto_time_series(min_length=1), st.integers(1, 10))
     def test_correct_fit_random_ts(self, ts, horizon):
         time_series_features = [

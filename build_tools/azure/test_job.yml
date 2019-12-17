@@ -1,6 +1,6 @@
 jobs:
 - job: ${{ parameters.name }}
-  condition: eq(variables['build_check'], 'false')
+  condition: eq(variables['run_automated_tests'], 'true')
   pool:
     vmImage: ${{ parameters.vmImage }}
   strategy:
