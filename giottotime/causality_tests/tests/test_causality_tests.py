@@ -14,9 +14,9 @@ class TestCausalityTest:
         testing.N, testing.K = 500, 1
         df = testing.makeTimeDataFrame(freq="D")
 
-        correct_shifts = [randint(2, 9) * 2 for _ in range(10)]
+        correct_shifts = [randint(2, 9) * 2 for _ in range(3)]
 
-        for sh, k in zip(correct_shifts, range(10)):
+        for sh, k in zip(correct_shifts, range(3)):
             df[f"shift_{k}"] = df["A"].shift(sh)
 
         df = df.dropna()
@@ -31,9 +31,9 @@ class TestCausalityTest:
         testing.N, testing.K = 500, 1
         df = testing.makeTimeDataFrame(freq="D")
 
-        correct_shifts = [randint(2, 9) * 2 for _ in range(10)]
+        correct_shifts = [randint(2, 9) * 2 for _ in range(3)]
 
-        for sh, k in zip(correct_shifts, range(10)):
+        for sh, k in zip(correct_shifts, range(3)):
             df[f"shift_{k}"] = df["A"].shift(sh)
 
         df = df.dropna()
@@ -50,9 +50,9 @@ class TestCausalityTest:
         testing.N, testing.K = 500, 1
         df = testing.makeTimeDataFrame(freq="D")
 
-        correct_shifts = [randint(2, 9) * 2 for _ in range(10)]
+        correct_shifts = [randint(2, 9) * 2 for _ in range(3)]
 
-        for sh, k in zip(correct_shifts, range(10)):
+        for sh, k in zip(correct_shifts, range(3)):
             df[f"shift_{k}"] = df["A"].shift(sh)
 
         df = df.dropna()
@@ -62,7 +62,7 @@ class TestCausalityTest:
 
         trans = shifted_test.transform(df)
 
-        for sh, k in zip(correct_shifts, range(10)):
+        for sh, k in zip(correct_shifts, range(3)):
             df[f"shift_{k}"] = df[f"shift_{k}"].shift(sh)
 
         df = df.dropna()
@@ -74,9 +74,9 @@ class TestCausalityTest:
         testing.N, testing.K = 500, 1
         df = testing.makeTimeDataFrame(freq="D")
 
-        correct_shifts = [randint(2, 9) * 2 for _ in range(10)]
+        correct_shifts = [randint(2, 9) * 2 for _ in range(3)]
 
-        for sh, k in zip(correct_shifts, range(10)):
+        for sh, k in zip(correct_shifts, range(3)):
             df[f"shift_{k}"] = df["A"].shift(sh)
 
         df = df.dropna()
@@ -86,7 +86,7 @@ class TestCausalityTest:
 
         trans = shifted_test.transform(df)
 
-        for sh, k in zip(correct_shifts, range(10)):
+        for sh, k in zip(correct_shifts, range(3)):
             df[f"shift_{k}"] = df[f"shift_{k}"].shift(sh)
 
         df = df.dropna()
