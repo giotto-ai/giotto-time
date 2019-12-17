@@ -58,6 +58,15 @@ class FunctionTrend(TrendModel):
         res = minimize(prediction_error, x0, method=method, options={"disp": False})
 
         self.model_weights_ = res["x"]
+
+        self.t0_ = time_series.index[0]
+        freq = time_series.index.freq
+        if freq is not None:
+            self.period_ = freq
+        else:
+            self.period_ = time_series.index[1] - time_series.index[0]
+            # raise warning
+
         return self
 
     def predict(self, t):
@@ -97,12 +106,12 @@ class FunctionTrend(TrendModel):
 
         """
         # check fit run
+
+        ts = (time_series.index - self.t0_) / self.period_
+
         predictions = pd.Series(
             index=time_series.index,
-            data=[
-                self.model_form(t, self.model_weights_)
-                for t in range(0, time_series.shape[0])
-            ],
+            data=[self.model_form(t, self.model_weights_) for t in ts],
         )
 
         return time_series.sub(predictions, axis=0)

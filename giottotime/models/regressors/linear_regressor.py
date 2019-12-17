@@ -1,9 +1,7 @@
-from sklearn.metrics import mean_squared_error
-from scipy.optimize import minimize
 import numpy as np
 import pandas as pd
-
-from sklearn.linear_model import LinearRegression
+from scipy.optimize import minimize
+from sklearn.metrics import mean_squared_error
 
 from ..utils import check_is_fitted
 
@@ -25,7 +23,7 @@ class LinearRegressor:
     ):  # weight_initialization_rule = lambda X, y: np.zeros(X.shape[1]) ):
         self.loss = loss
 
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame, disp: bool = False, **kwargs):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame, **kwargs):
         """Fit the linear model on ``X`` and ``y`` on the given loss function.
         To do the minimization, the ``scipy.optimize.minimize`` function is
         used. To have more details and check which kind of options are
@@ -59,21 +57,7 @@ class LinearRegressor:
             ]
             return self.loss(y, predictions)
 
-        if "r2_seed" in kwargs:
-            lm = LinearRegression(fit_intercept=True).fit(X, y)
-            self.r2_seed = [lm.intercept_] + list(lm.coef_)
-            kwargs["x0"] = self.r2_seed
-            print(kwargs["x0"])
-            del kwargs["r2_seed"]
-
-        if "x0" not in kwargs:
-            kwargs["x0"] = np.zeros(
-                X.shape[1] + 1
-            )  # weight_initialization_rule(X, y) np.zeros(X.shape[1]+1)
-        else:
-            kwargs["x0"] = kwargs["x0"] + [0] * (X.shape[1] + 1 - len(kwargs["x0"]))
-
-        res = minimize(prediction_error, options={"disp": disp}, **kwargs)
+        res = minimize(prediction_error, **kwargs)
 
         self.model_weights_ = res["x"]
 
