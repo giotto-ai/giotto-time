@@ -57,6 +57,15 @@ class ExponentialTrend(TrendModel):
         )
 
         self.model_exponent_ = res["x"][0]
+
+        self.t0_ = time_series.index[0]
+        freq = time_series.index.freq
+        if freq is not None:
+            self.period_ = freq
+        else:
+            self.period_ = time_series.index[1] - time_series.index[0]
+            # raise warning
+
         return self
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -96,10 +105,18 @@ class ExponentialTrend(TrendModel):
             The transformed time series, without the trend.
 
         """
+
+        trans_freq = time_series.index.freq
+        if trans_freq is not None:
+            trans_freq = trans_freq
+        else:
+            trans_freq = time_series.index[1] - time_series.index[0]
+            # raise warning
+
+        ts = (time_series.index - self.t0_) / self.period_
+
         predictions = pd.DataFrame(
             index=time_series.index,
-            data=[
-                np.exp(t * self.model_exponent_) for t in range(0, time_series.shape[0])
-            ],
+            data=[np.exp(t * self.model_exponent_) for t in ts],
         )
         return time_series - predictions[0]

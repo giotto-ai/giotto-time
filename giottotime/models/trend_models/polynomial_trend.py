@@ -57,11 +57,20 @@ class PolynomialTrend(TrendModel):
             return self.loss(time_series.values, predictions)
 
         model_weights = np.zeros(self.order)
+
         res = minimize(
             prediction_loss, model_weights, method=method, options={"disp": False}
         )
 
         self.model_weights_ = res["x"]
+        self.t0_ = time_series.index[0]
+        freq = time_series.index.freq
+        if freq is not None:
+            self.period_ = freq
+        else:
+            self.period_ = time_series.index[1] - time_series.index[0]
+            # raise warning
+
         return self
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -103,8 +112,16 @@ class PolynomialTrend(TrendModel):
 
         """
         p = np.poly1d(self.model_weights_)
-        predictions = pd.Series(
-            index=time_series.index, data=[p(t) for t in range(0, time_series.shape[0])]
-        )
+
+        trans_freq = time_series.index.freq
+        if trans_freq is not None:
+            trans_freq = trans_freq
+        else:
+            trans_freq = time_series.index[1] - time_series.index[0]
+            # raise warning
+
+        ts = (time_series.index - self.t0_) / self.period_
+
+        predictions = pd.Series(index=time_series.index, data=[p(t) for t in ts])
 
         return time_series.sub(predictions, axis=0)
