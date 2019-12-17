@@ -19,8 +19,9 @@ jobs:
 # these jobs are triggered manually and they test the code
 # and the examples and build the wheels and docs.
 
+
 - job: 'manylinux2010'
-  condition: eq(variables['build_check'], 'true')
+  condition: eq(variables['build_and_test_wheels'], 'true')
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -37,68 +38,23 @@ jobs:
         python.version: '3.7'
 
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - task: Bash@3
-    inputs:
-      filePath: .azure-ci/build_manylinux2010.sh
-      failOnStderr: false
-    env:
-      python_ver: $(python_ver)
-    displayName: 'Run the docker and open bash'
-
-  - script: |
-      python -m pip install --upgrade pip
-      pip install pytest pytest-cov pytest-azurepipelines pytest-benchmark
-    displayName: 'install pytest suite'
-
-  - template: build_tools/azure/steps/test_wheels.yml
-  - template: build_tools/azure/steps/publish_artifact.yml
-
-
-- job: 'macOS1014'
-  condition: eq(variables['build_check'], 'true')
-  pool:
-    vmImage: 'macOS-10.14'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-
-  steps:
   - template: build_tools/azure/steps/prepare_tests.yml
   - template: build_tools/azure/steps/run_pytest.yml
-
   - script: python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
-
   - template: build_tools/azure/steps/test_wheels.yml
-
-  - script: |
-      cd doc/
-      make html
-      cd ..
-    displayName: 'Build sphinx doc'
-
-  - task: ArchiveFiles@2
-    inputs:
-      rootFolderOrFile: doc/build
-      includeRootFolder: true
-      archiveType: 'zip'
-      tarCompression: 'gz'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-      replaceExistingArchive: true
-    displayName: 'archive doc'
-
   - template: build_tools/azure/steps/publish_artifact.yml
+
+    
+- template: build_tools/azure/build_wheel_job.yml
+  parameters:
+    name: macOS1014
+    vmImage: 'macOS-10.14'
+    build_docs: 'true'
 
 
 - job: 'win2016'
-  condition: eq(variables['build_check'], 'true')
+  condition: eq(variables['build_and_test_wheels'], 'true')
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
@@ -111,11 +67,9 @@ jobs:
   steps:
   - template: build_tools/azure/steps/prepare_tests.yml
   - template: build_tools/azure/steps/run_pytest.yml
-
   - bash: |
       sed -i $'s/\r$//' README.rst
       python setup.py sdist bdist_wheel
     displayName: 'build the wheels'
-
   - template: build_tools/azure/steps/test_wheels.yml
   - template: build_tools/azure/steps/publish_artifact.yml
