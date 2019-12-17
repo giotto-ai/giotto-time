@@ -47,8 +47,6 @@ class TestCausalityTest:
         shifted_test.fit(df)
 
         shifts = shifted_test.best_shifts_.loc['A'][1:].values
-        print(shifts)
-        print(correct_shifts)
         np.testing.assert_array_equal(shifts, correct_shifts)
 
     def test_causality_tests_shifts_shifted_pearson_correlation_transform(self):
