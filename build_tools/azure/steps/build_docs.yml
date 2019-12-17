@@ -16,4 +16,5 @@ steps:
     tarCompression: 'gz'
     archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
     replaceExistingArchive: true
-  displayName: 'archive doc'
+  displayName: 'Archive doc'
+  condition: eq(${{ parameters.build_docs }}, 'true')
