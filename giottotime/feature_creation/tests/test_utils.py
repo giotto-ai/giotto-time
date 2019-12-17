@@ -7,7 +7,7 @@ from giottotime.feature_creation.utils import _get_non_nan_values
 def test_correctly_remove_nan_values():
     testing.N, testing.K = 500, 50
 
-    df = testing.makeTimeDataFrame(freq='MS')
+    df = testing.makeTimeDataFrame(freq="MS")
     X = df.iloc[:, :40]
     y = df.iloc[:, 40:]
 
@@ -28,7 +28,7 @@ def test_correctly_remove_nan_values():
 def test_without_nan_values():
     testing.N, testing.K = 500, 50
 
-    df = testing.makeTimeDataFrame(freq='MS')
+    df = testing.makeTimeDataFrame(freq="MS")
     X = df.iloc[:, :40]
     y = df.iloc[:, 40:]
 
