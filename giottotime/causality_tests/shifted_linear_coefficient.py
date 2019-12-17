@@ -3,9 +3,9 @@ from itertools import product
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
+from sklearn.utils.validation import check_is_fitted
 
 from giottotime.causality_tests.base import CausalityTest
-from giottotime.models.utils import check_is_fitted
 
 
 class ShiftedLinearCoefficient(CausalityTest):
@@ -27,9 +27,9 @@ class ShiftedLinearCoefficient(CausalityTest):
     def __init__(
         self, max_shift: int = 10, target_col: str = "y", dropna: bool = False
     ):
-        self._max_shift = max_shift
-        self._target_col = target_col
-        self._dropna = dropna
+        self.max_shift = max_shift
+        self.target_col = target_col
+        self.dropna = dropna
 
     def fit(self, data: pd.DataFrame) -> "ShiftedLinearCoefficient":
         """Create the dataframe of shifts of each time series which maximize
@@ -53,7 +53,7 @@ class ShiftedLinearCoefficient(CausalityTest):
         )
 
         for x, y in product(data.columns, repeat=2):
-            res = self._get_max_coeff_shift(data, self._max_shift, x=x, y=y)
+            res = self._get_max_coeff_shift(data, self.max_shift, x=x, y=y)
 
             best_shift = res[1]
             max_corr = res[0]
@@ -92,16 +92,16 @@ class ShiftedLinearCoefficient(CausalityTest):
             fit coefficients between each timeseries. The shift is indicated in rows.
 
         """
-        check_is_fitted(self)
+        check_is_fitted(self, ["best_shifts_", "max_corrs_"])
         shifted_data = data.copy()
 
         for col in shifted_data:
-            if col != self._target_col:
+            if col != self.target_col:
                 shifted_data[col] = shifted_data[col].shift(
-                    self.best_shifts_[col][self._target_col]
+                    self.best_shifts_[col][self.target_col]
                 )
 
-        if self._dropna:
+        if self.dropna:
             shifted_data = shifted_data.dropna()
 
         return shifted_data

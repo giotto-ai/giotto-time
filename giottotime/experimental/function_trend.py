@@ -2,7 +2,8 @@ import pandas as pd
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
 
-from ..trend_models.base import TrendModel
+from giottotime.feature_creation import DetrendedFeature
+from giottotime.models.trend_models.base import TrendModel
 
 
 class FunctionTrend(TrendModel):
@@ -115,3 +116,11 @@ class FunctionTrend(TrendModel):
         )
 
         return time_series.sub(predictions, axis=0)
+
+
+class RemoveFunctionTrend(DetrendedFeature):
+    def __init__(
+        self, loss=mean_squared_error, output_name: str = "RemoveFunctionTrend"
+    ):
+        self.trend_model = ExponentialTrend(loss=loss)
+        super().__init__(trend_model=self.trend_model, output_name=output_name)

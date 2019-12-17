@@ -103,8 +103,8 @@ class AvgLifeTimeFeature(TDAFeatures):
 
     def __init__(
         self,
-        output_name: str,
         h_dim: int = 0,
+        output_name: str = "AvgLifeTimeFeature",
         takens_parameters_type: str = "search",
         takens_dimension: int = 5,
         takens_stride: int = 1,

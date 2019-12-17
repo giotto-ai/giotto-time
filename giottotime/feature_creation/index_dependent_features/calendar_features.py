@@ -75,13 +75,13 @@ class CalendarFeature(IndexDependentFeature):
 
     def __init__(
         self,
-        region: str,
-        country: str,
-        kernel: Union[np.array, list, pd.Series],
-        output_name: str,
+        region: str = "america",
+        country: str = "Brazil",
         start_date: str = "01/01/2018",
         end_date: str = "01/01/2020",
+        kernel: Optional[np.ndarray] = None,
         reindex_method: str = "pad",
+        output_name: str = "CalendarFeature",
     ):
         super().__init__(output_name)
         self._region = region

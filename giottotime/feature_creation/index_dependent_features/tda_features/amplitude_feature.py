@@ -138,8 +138,8 @@ class AmplitudeFeature(TDAFeatures):
 
     def __init__(
         self,
-        output_name: str,
         metric: str = "landscape",
+        output_name: str = "AmplitudeFeature",
         amplitude_metric_params: Optional[Dict] = None,
         amplitude_order: Dict = 2,
         amplitude_n_jobs: Optional[float] = None,

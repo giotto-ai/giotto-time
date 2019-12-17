@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
 
-from ..utils import check_is_fitted
+from sklearn.utils.validation import check_is_fitted
 
 
 class LinearRegressor:
@@ -77,6 +77,6 @@ class LinearRegressor:
             The predictions of the model
 
         """
-        check_is_fitted(self)
+        check_is_fitted(self, ["model_weights_"])
 
         return self.model_weights_[0] + np.dot(X, self.model_weights_[1:])

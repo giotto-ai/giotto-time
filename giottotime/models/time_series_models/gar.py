@@ -2,8 +2,7 @@ from copy import deepcopy
 from typing import Union, Optional
 
 import pandas as pd
-
-from ..utils import check_is_fitted
+from sklearn.utils.validation import check_is_fitted
 
 
 class GAR:
@@ -99,7 +98,7 @@ class GAR:
         length ``ts``.
 
         """
-        check_is_fitted(self)
+        check_is_fitted(self, ["models_per_predstep_", "train_features_"])
 
         test_features = X.copy()
 

@@ -1,3 +1,5 @@
+from typing import Callable
+
 from sklearn.metrics import mean_squared_error
 import pandas as pd
 
@@ -10,7 +12,6 @@ __all__ = [
     "DetrendedFeature",
     "RemovePolynomialTrend",
     "RemoveExponentialTrend",
-    "RemoveFunctionTrend",
 ]
 
 
@@ -27,7 +28,11 @@ class DetrendedFeature(IndexDependentFeature):
 
     """
 
-    def __init__(self, trend_model: TrendModel, output_name: str):
+    def __init__(
+        self,
+        trend_model: TrendModel = PolynomialTrend(),
+        output_name: str = "DetrendedFeature",
+    ):
         super().__init__(output_name)
         self.trend_model = trend_model
 
@@ -50,18 +55,21 @@ class DetrendedFeature(IndexDependentFeature):
 
 
 class RemovePolynomialTrend(DetrendedFeature):
-    def __init__(self, output_name: str, polynomial_order=1, loss=mean_squared_error):
+    def __init__(
+        self,
+        polynomial_order: int = 1,
+        loss: Callable = mean_squared_error,
+        output_name: str = "RemovePolynomialTrend",
+    ):
         self.trend_model = PolynomialTrend(order=polynomial_order, loss=loss)
         super().__init__(trend_model=self.trend_model, output_name=output_name)
 
 
 class RemoveExponentialTrend(DetrendedFeature):
-    def __init__(self, output_name: str, loss=mean_squared_error):
-        self.trend_model = ExponentialTrend(loss=loss)
-        super().__init__(trend_model=self.trend_model, output_name=output_name)
-
-
-class RemoveFunctionTrend(DetrendedFeature):
-    def __init__(self, output_name: str, loss=mean_squared_error):
+    def __init__(
+        self,
+        loss: Callable = mean_squared_error,
+        output_name: str = "RemoveExponentialTrend",
+    ):
         self.trend_model = ExponentialTrend(loss=loss)
         super().__init__(trend_model=self.trend_model, output_name=output_name)

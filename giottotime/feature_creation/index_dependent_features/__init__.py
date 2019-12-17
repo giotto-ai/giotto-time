@@ -11,5 +11,4 @@ from .trend_features import (
     DetrendedFeature,
     RemovePolynomialTrend,
     RemoveExponentialTrend,
-    RemoveFunctionTrend,
 )

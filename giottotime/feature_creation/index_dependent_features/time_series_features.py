@@ -26,7 +26,7 @@ class ShiftFeature(IndexDependentFeature):
 
     """
 
-    def __init__(self, shift: int, output_name: str):
+    def __init__(self, shift: int = 1, output_name: str = "ShiftFeature"):
         super().__init__(output_name)
         self.shift = shift
 
@@ -63,7 +63,7 @@ class MovingAverageFeature(IndexDependentFeature):
 
     """
 
-    def __init__(self, window_size: int, output_name: str):
+    def __init__(self, window_size: int = 1, output_name: str = "MovingAverageFeature"):
         super().__init__(output_name)
         self.window_size = window_size
 
@@ -101,7 +101,7 @@ class PolynomialFeature(IndexDependentFeature):
         The name of the output column.
     """
 
-    def __init__(self, degree: int, output_name: str):
+    def __init__(self, degree: int = 2, output_name: str = "PolynomialFeature"):
         super().__init__(output_name)
         self._degree = degree
 
@@ -151,11 +151,11 @@ class ExogenousFeature(IndexDependentFeature):
     def __init__(
         self,
         exogenous_time_series: pd.DataFrame,
-        output_name: str,
         method: Optional[str] = None,
+        output_name: str = "ExogenousFeature",
     ):
         super().__init__(output_name)
-        self._method = method
+        self.method = method
         self.exogenous_time_series = exogenous_time_series
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -174,7 +174,7 @@ class ExogenousFeature(IndexDependentFeature):
 
         """
         exog_feature = self.exogenous_time_series.reindex(
-            index=X.index, method=self._method
+            index=X.index, method=self.method
         )
         exog_feature_renamed = self._rename_columns(exog_feature)
         return exog_feature_renamed

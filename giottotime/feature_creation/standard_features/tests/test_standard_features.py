@@ -1,10 +1,30 @@
 import numpy as np
 import pandas as pd
+import pytest
 from hypothesis import given, strategies as st
 from pandas.util import testing as testing
 
 from giottotime.utils.hypothesis.time_indexes import giotto_time_series
-from giottotime.feature_creation import ConstantFeature, CustomFeature
+from giottotime.feature_creation import (
+    ConstantFeature,
+    CustomFeature,
+    PeriodicSeasonalFeature,
+)
+
+
+class TestPeriodicSesonalFeature:
+    def test_missing_start_date_or_period(self):
+        periodic_feature = PeriodicSeasonalFeature()
+        with pytest.raises(ValueError):
+            periodic_feature.transform()
+
+        periodic_feature = PeriodicSeasonalFeature(index_period=1)
+        with pytest.raises(ValueError):
+            periodic_feature.transform()
+
+        periodic_feature = PeriodicSeasonalFeature(start_date="2010-01-01")
+        with pytest.raises(ValueError):
+            periodic_feature.transform()
 
 
 class TestConstantFeature:

@@ -128,8 +128,8 @@ class BettiCurvesFeature(TDAFeatures):
 
     def __init__(
         self,
-        betti_mode: str,
-        output_name: str,
+        betti_mode: str = "mean",
+        output_name: str = "BettiCurvesFeature",
         betti_homology_dimensions: Iterable = (0, 1, 2),
         betti_n_values: int = 100,
         betti_rolling: int = 1,

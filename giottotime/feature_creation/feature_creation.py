@@ -34,11 +34,11 @@ class FeatureCreation:
 
     """
 
-    def __init__(self, horizon: int, time_series_features: List[Feature]):
+    def __init__(self, time_series_features: List[Feature], horizon: int = 5):
         _check_feature_names(time_series_features)
 
-        self._time_series_features = time_series_features
-        self._horizon = horizon
+        self.time_series_features = time_series_features
+        self.horizon = horizon
 
     def fit_transform(self, time_series: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
         """Create the X matrix by generating the feature_creation, starting
@@ -63,7 +63,7 @@ class FeatureCreation:
 
     def _create_y_shifts(self, time_series: pd.DataFrame) -> pd.DataFrame:
         y = pd.DataFrame(index=time_series.index)
-        for k in range(self._horizon):
+        for k in range(self.horizon):
             shift_feature = ShiftFeature(-k, f"shift_{k}")
             y[f"y_{k}"] = shift_feature.fit_transform(time_series)
 
@@ -71,7 +71,7 @@ class FeatureCreation:
 
     def _create_x_features(self, time_series: pd.DataFrame) -> pd.DataFrame:
         features = pd.DataFrame(index=time_series.index)
-        for time_series_feature in self._time_series_features:
+        for time_series_feature in self.time_series_features:
             x_transformed = time_series_feature.fit_transform(time_series)
             features = pd.concat([features, x_transformed], axis=1)
 

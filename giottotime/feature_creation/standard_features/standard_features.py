@@ -42,9 +42,9 @@ class PeriodicSeasonalFeature(StandardFeature):
 
     def __init__(
         self,
-        period: Union[pd.Timedelta, str],
-        amplitude: float,
-        output_name: str,
+        period: Union[pd.Timedelta, str] = "1 year",
+        amplitude: float = 0.5,
+        output_name: str = "PeriodicSeasonalFeature",
         start_date: Optional[Union[pd.Timestamp, str]] = None,
         length: Optional[int] = 50,
         index_period: Optional[Union[DatetimeIndex, int]] = None,
@@ -116,7 +116,6 @@ class PeriodicSeasonalFeature(StandardFeature):
 
         if X is not None:
             self._start_date = X.index.values[0]
-
         else:
             if isinstance(self._start_date, str):
                 self._start_date = pd.to_datetime(self._start_date)

@@ -3,9 +3,9 @@ from scipy.optimize import minimize
 
 import numpy as np
 import pandas as pd
+from sklearn.utils.validation import check_is_fitted
 
 from ..trend_models.base import TrendModel
-from ..utils import check_is_fitted
 
 
 class ExponentialTrend(TrendModel):
@@ -87,7 +87,7 @@ class ExponentialTrend(TrendModel):
             Raised if the model is not fitted yet.
 
         """
-        check_is_fitted(self)
+        check_is_fitted(self, ["model_exponent_"])
 
         return np.exp(X * self.model_exponent_)
 
