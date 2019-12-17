@@ -65,7 +65,7 @@ class FunctionTrend(TrendModel):
             self.period_ = freq
         else:
             self.period_ = time_series.index[1] - time_series.index[0]
-            #raise warning
+            # raise warning
 
         return self
 
@@ -107,14 +107,11 @@ class FunctionTrend(TrendModel):
         """
         # check fit run
 
-        ts = (time_series.index - self.t0_)/self.period_
+        ts = (time_series.index - self.t0_) / self.period_
 
         predictions = pd.Series(
             index=time_series.index,
-            data=[
-                self.model_form(t, self.model_weights_)
-                for t in ts
-            ],
+            data=[self.model_form(t, self.model_weights_) for t in ts],
         )
 
         return time_series.sub(predictions, axis=0)

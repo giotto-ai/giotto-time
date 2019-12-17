@@ -64,7 +64,7 @@ class ExponentialTrend(TrendModel):
             self.period_ = freq
         else:
             self.period_ = time_series.index[1] - time_series.index[0]
-            #raise warning
+            # raise warning
 
         return self
 
@@ -111,14 +111,12 @@ class ExponentialTrend(TrendModel):
             trans_freq = trans_freq
         else:
             trans_freq = time_series.index[1] - time_series.index[0]
-            #raise warning
+            # raise warning
 
-        ts = (time_series.index - self.t0_)/self.period_
+        ts = (time_series.index - self.t0_) / self.period_
 
         predictions = pd.DataFrame(
             index=time_series.index,
-            data=[
-                np.exp(t * self.model_exponent_) for t in ts
-            ],
+            data=[np.exp(t * self.model_exponent_) for t in ts],
         )
         return time_series - predictions[0]

@@ -96,7 +96,7 @@ class ShiftedLinearCoefficient(CausalityTest):
         shifted_data = data.copy()
 
         for col in shifted_data:
-            if col != self._target_col:            
+            if col != self._target_col:
                 shifted_data[col] = shifted_data[col].shift(
                     self.best_shifts_[col][self._target_col]
                 )

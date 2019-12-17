@@ -60,7 +60,7 @@ class LinearRegressor:
             return self.loss(y, predictions)
 
         res = minimize(prediction_error, **kwargs)
-        
+
         self.model_weights_ = res["x"]
 
         return self
