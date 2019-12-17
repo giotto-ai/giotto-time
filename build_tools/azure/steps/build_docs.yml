@@ -1,9 +1,13 @@
+parameters:
+  build_docs: 'true'
+
 steps:
 - script: |
     cd doc/
     make html
     cd ..
   displayName: 'Build sphinx doc'
+  condition: eq(${{ parameters.build_docs }}, 'true')
 - task: ArchiveFiles@2
   inputs:
     rootFolderOrFile: doc/build

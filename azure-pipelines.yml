@@ -46,25 +46,25 @@ jobs:
   - template: build_tools/azure/steps/publish_artifact.yml
 
 
-- job: 'macOS1014'
-  condition: eq(variables['build_and_test_wheels'], 'true')
-  pool:
-    vmImage: 'macOS-10.14'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-
-  steps:
-  - template: build_tools/azure/steps/prepare_tests.yml
-  - template: build_tools/azure/steps/run_pytest.yml
-  - script: python setup.py sdist bdist_wheel
-    displayName: 'build the wheels'
-  - template: build_tools/azure/steps/test_wheels.yml
-  - template: build_tools/azure/steps/build_docs.yml
-  - template: build_tools/azure/steps/publish_artifact.yml
+#- job: 'macOS1014'
+#  condition: eq(variables['build_and_test_wheels'], 'true')
+#  pool:
+#    vmImage: 'macOS-10.14'
+#  strategy:
+#    matrix:
+#      Python36:
+#        python.version: '3.6'
+#      Python37:
+#        python.version: '3.7'
+#
+#  steps:
+#  - template: build_tools/azure/steps/prepare_tests.yml
+#  - template: build_tools/azure/steps/run_pytest.yml
+#  - script: python setup.py sdist bdist_wheel
+#    displayName: 'build the wheels'
+#  - template: build_tools/azure/steps/test_wheels.yml
+#  - template: build_tools/azure/steps/build_docs.yml
+#  - template: build_tools/azure/steps/publish_artifact.yml
 
     
 - template: build_tools/azure/build_wheel_job.yml

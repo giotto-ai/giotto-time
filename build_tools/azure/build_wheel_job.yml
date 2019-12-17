@@ -22,6 +22,7 @@ jobs:
     displayName: 'build the wheels'
   - template: steps/test_wheels.yml
   - template: steps/build_docs.yml
-    condition: eq(${{ parameters.build_docs }}, 'true')
+    parameters:
+      build_docs: ${{ parameters.build_docs }}
   - template: steps/publish_artifact.yml
-    condition: succeededOrFailed()
+#    condition: succeededOrFailed()
