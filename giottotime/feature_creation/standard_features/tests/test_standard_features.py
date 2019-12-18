@@ -28,7 +28,7 @@ class TestPeriodicSesonalFeature:
 
     def test_string_period(self):
         testing.N, testing.K = 20, 1
-        ts = testing.makeTimeDataFrame(freq="MS")
+        ts = testing.makeTimeDataFrame(freq="s")
         periodic_feature = PeriodicSeasonalFeature(period="1 days")
         periodic_feature.transform(ts)
 
@@ -36,7 +36,7 @@ class TestPeriodicSesonalFeature:
 
     def test_correct_start_date(self):
         testing.N, testing.K = 20, 1
-        ts = testing.makeTimeDataFrame(freq="MS")
+        ts = testing.makeTimeDataFrame(freq="s")
         start_date = "2018-01-01"
         periodic_feature = PeriodicSeasonalFeature(
             period="1 days", start_date=start_date
@@ -46,14 +46,14 @@ class TestPeriodicSesonalFeature:
         assert periodic_feature.start_date == ts.index.values[0]
 
         periodic_feature = PeriodicSeasonalFeature(
-            period="1 days", index_period=1, start_date=start_date
+            period="3 days", index_period=10, start_date=start_date
         )
         periodic_feature.transform()
         assert periodic_feature.start_date == pd.to_datetime(start_date)
 
         start_date = pd.to_datetime("2018-01-01")
         periodic_feature = PeriodicSeasonalFeature(
-            period="1 days", index_period=1, start_date=start_date
+            period="3 days", index_period=10, start_date=start_date
         )
         periodic_feature.transform()
         assert periodic_feature.start_date == start_date

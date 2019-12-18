@@ -4,10 +4,18 @@ from typing import Optional, Union, List
 import numpy as np
 import pandas as pd
 
-from ..base.constants import DEFAULT_START, DEFAULT_FREQ
-
 PandasTimeIndex = Union[pd.DatetimeIndex, pd.PeriodIndex, pd.TimedeltaIndex]
 PandasDate = Union[pd.datetime, pd.Timestamp, str]
+
+DEFAULT_START = pd.Timestamp("1970-01-01")
+DEFAULT_END = pd.Timestamp("2020-01-01")
+DEFAULT_FREQ = pd.Timedelta("1D")
+
+__all__ = [
+    "SequenceToTimeIndexSeries",
+    "PandasSeriesToTimeIndexSeries",
+    "TimeIndexSeriesToPeriodIndexSeries",
+]
 
 
 def count_not_none(*args):
@@ -26,14 +34,20 @@ def check_period_range_parameters(
 
     Parameters
     ----------
-    start_date : ``PandasDate``, required
-    end_date : ``PandasDate``, required
-    periods : ``int``, required
+    start_date : PandasDate, required
+        The date to use as start date.
+
+    end_date : PandasDate, required
+        The date to use as end date.
+
+    periods : int, required
+        The number of periods.
 
     Raises
     ------
-    ``ValueError``  
+    ValueError
         Of the three parameters: start, end, and periods, exactly two must be specified.
+
     """
     if count_not_none(start_date, end_date, periods) != 2:
         raise ValueError(
@@ -49,17 +63,18 @@ class TimeSeriesConversion(ABC):
 
     Parameters
     ----------
-    start : ``PandasData``, optional, (default=``None``)
+    start : PandasData, optional, default: ``None``
         start date of the output time series. Not mandatory for all time series
         conversion.
 
-    end : ``PandasData``, optional, (default=``None``)
+    end : PandasData, optional, default: ``None``
         end date of the output time series. Not mandatory for all time series
         conversion.
 
-    freq : ``pd.Timedelta``, optional, (default=``None``)
-        frequency of the output time series. Not mandatory for all time series
+    freq : pd.Timedelta, optional, default: ``None``
+        The frequency of the output time series. Not mandatory for all time series
         conversion.
+
     """
 
     def __init__(
@@ -70,24 +85,25 @@ class TimeSeriesConversion(ABC):
     ) -> None:
         self._initialize_start_end_freq(start, end, freq)
 
-    def transform(self, X: Union[pd.Series, np.array, list]) -> pd.Series:
-        """Transforms an array-like object (list, np.array, pd.Series)
-        into a pd.Series with time index.
+    def transform(self, time_series: Union[pd.Series, np.array, list]) -> pd.Series:
+        """Transforms an array-like object (list, np.array, pd.Series) into a pd.Series
+        with time index.
 
         It calls internally the abstract methods `_get_index_from()` and
         `_get_values_from()`. These are implemented in the subclasses.
 
         Parameters
         ----------
-        X : ``Union[List, np.array, pd.Series]``, required.
+        time_series : Union[List, np.array, pd.Series], required
             It depends on the implementation of the subclasses.
 
         Returns
         -------
-        transformed series: ``pd.Series``
+        time_series_t: pd.Series
+
         """
-        index = self._get_index_from(X)
-        values = self._get_values_from(X)
+        index = self._get_index_from(time_series)
+        values = self._get_values_from(time_series)
         return pd.Series(data=values, index=index)
 
     @abstractmethod
@@ -158,17 +174,18 @@ class SequenceToTimeIndexSeries(TimeSeriesConversion):
 
     Parameters
     -----------
-    start : ``PandasDate``, optional, (default=``None``)
+    start : PandasDate, optional, default: ``None``
         start date of the output time series. Not mandatory for all time series
         conversion.
 
-    end : ``PandasDate``, optional, (default=``None``)
+    end : PandasDate, optional, default: ``None``
         end date of the output time series. Not mandatory for all time series
         conversion.
 
-    freq : ``pd.Timedelta``, optional, (default=``None``)
+    freq : pd.Timedelta, optional, default: ``None``
         frequency of the output time series. Not mandatory for all time series
         conversion.
+
     """
 
     def __init__(
@@ -196,9 +213,14 @@ class PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
 
     Parameters
     ----------
-    start : ``Union[pd.datetime, str]``, optional, (default=``None``)
-    end : ``Union[pd.datetime, str]``, optional, (default=``None``)
-    freq : ``pd.Timedelta``, optional, (default=``None``)
+    start: PandasDate, required
+        The date to use as start date.
+
+    end: PandasDate, required
+        The date to use as end date.
+
+    freq : pd.Timedelta``, optional, default: ``None``
+        The frequency of the time series.
 
     """
 
@@ -239,7 +261,9 @@ class TimeIndexSeriesToPeriodIndexSeries(TimeSeriesConversion):
 
     Parameters
     ----------
-    freq : ``pd.Timedelta``, optional, (default=``None``)
+    freq : pd.Timedelta, optional, default: ``None``
+        The frequency of the time series.
+
     """
 
     def __init__(self, freq: Optional[pd.Timedelta] = None):

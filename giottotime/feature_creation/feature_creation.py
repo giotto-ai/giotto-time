@@ -5,8 +5,6 @@ import pandas as pd
 from .base import Feature
 from .index_dependent_features import ShiftFeature
 
-__all__ = ["FeatureCreation"]
-
 
 def _check_feature_names(time_series_features: List[Feature]) -> None:
     feature_output_names = [feature.output_name for feature in time_series_features]
@@ -19,16 +17,16 @@ def _check_feature_names(time_series_features: List[Feature]) -> None:
 
 class FeatureCreation:
     """Class responsible for the generation of the feature_creation, starting
-    from a list of ``TimeSeriesFeature``.
+    from a list of TimeSeriesFeature.
 
     Parameters
     ----------
-    horizon : ``int``, required.
+    horizon : int, required.
         It represents how much into the future is necessary to predict. This
         corresponds to the number of shifts that are going to be performed
         on y.
 
-    time_series_features : ``List[TimeSeriesFeature]``, required.
+    time_series_features : List[TimeSeriesFeature], required.
         The list of ``TimeSeriesFeature`` from which to compute the
         feature_creation.
 
@@ -48,12 +46,13 @@ class FeatureCreation:
 
         Parameters
         ----------
-        time_series : ``pd.DataFrame``, required.
-            The time-series on which to compute the ``X`` and ``y`` matrices.
+        time_series : pd.DataFrame, shape (n_samples, 1), required.
+            The time series on which to compute the ``X`` and ``y`` matrices.
 
         Returns
         -------
-        x, y: ``(pd.DataFrame, pd.DataFrame)``
+        x, y: (pd.DataFrame, pd.DataFrame), shape ((n_samples, n_features), \
+            n_samples, horizon))
             A tuple containing the ``X`` and ``y`` matrices.
 
         """

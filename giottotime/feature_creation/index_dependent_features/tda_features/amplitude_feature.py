@@ -6,8 +6,6 @@ import pandas as pd
 
 from .base import TDAFeatures, align_indices
 
-__all__ = ["AmplitudeFeature"]
-
 
 class AmplitudeFeature(TDAFeatures):
     """Compute the list of average lifetime for each time window, starting from
@@ -15,22 +13,23 @@ class AmplitudeFeature(TDAFeatures):
 
     Parameters
     ----------
-    output_name: ``str``, required,
-        The name of the output column.
 
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
         ``'betti'`` | ``'heat'``, optional, (default=``'landscape'``)
-        Distance or dissimilarity function used to define the amplitude of
-        a subdiagram as its distance from the diagonal diagram:
+        Distance or dissimilarity function used to define the amplitude of a subdiagram
+        as its distance from the diagonal diagram:
         - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
           perfect-matching--based notions of distance.
-        - ``'landscape'`` refers to the :math:`L^p` distance between
-          persistence landscapes.
+        - ``'landscape'`` refers to the :math:`L^p` distance between persistence
+          landscapes.
         - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
-        - ``'heat'`` refers to the :math:`L^p` distance between
-          Gaussian-smoothed diagrams.
+        - ``'heat'`` refers to the :math:`L^p` distance between Gaussian-smoothed
+          diagrams.
 
-    amplitude_metric_params : ``Dict``, optional, (default=``None``)
+    output_name: str, optional, default: ``'AmplitudeFeature'``
+        The name of the output column.
+
+    amplitude_metric_params : Dict, optional, default: ``None``
         Additional keyword arguments for the metric function:
         - If ``metric == 'bottleneck'`` there are no available arguments.
         - If ``metric == 'wasserstein'`` the only argument is `p` (int,
@@ -44,95 +43,83 @@ class AmplitudeFeature(TDAFeatures):
           default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
           (int, default: ``100``).
 
-    amplitude_order : ``float``, optional, (default=``2.``)
-        If ``None``, :meth:`transform` returns for each diagram a vector of
-        amplitudes corresponding to the dimensions in
-        :attr:`homology_dimensions_`. Otherwise, the :math:`p`-norm of
-        these vectors with :math:`p` equal to `order` is taken.
+    amplitude_order : float, optional, default: ``2.``
+        If ``None``, :meth:`transform` returns for each diagram a vector of amplitudes
+        corresponding to the dimensions in :attr:`homology_dimensions_`. Otherwise, the
+        :math:`p`-norm of these vectors with :math:`p` equal to `order` is taken.
 
-    amplitude_n_jobs : ``int``, optional, (default=``None``)
-        The number of jobs to use for the computation. ``None`` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
-        processors.
+    amplitude_n_jobs : int, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless in a
+        :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
-    takens_parameters_type: ``'search'`` | ``'fixed'``, optional,
-        (default=``'search'``)
-        If set to ``'fixed'``, the values of `time_delay` and `dimension`
-        are used directly in :meth:`transform`. If set to ``'search'``,
-        those values are only used as upper bounds in a search as follows:
-        first, an optimal time delay is found by minimising the time delayed
-        mutual information; then, a heuristic based on an algorithm in [2]_ is
-        used to select an embedding dimension which, when increased, does not
-        reveal a large proportion of "false nearest neighbors".
+    takens_parameters_type: ``'search'`` | ``'fixed'``, optional, default: ``'search'``
+        If set to ``'fixed'``, the values of `time_delay` and `dimension are used
+        directly in :meth:`transform`. If set to ``'search'``, those values are only
+        used as upper bounds in a search as follows: first, an optimal time delay is
+        found by minimising the time delayed mutual information; then, a heuristic based
+        on an algorithm in [2]_ is used to select an embedding dimension which, when
+        increased, does not reveal a large proportion of "false nearest neighbors".
 
-    takens_time_delay : ``int``, optional, (default=``1``)
-        Time delay between two consecutive values for constructing one
-        embedded point. If `parameters_type` is ``'search'``,
-        it corresponds to the maximal embedding time delay that will be
-        considered.
+    takens_time_delay : int, optional, default: ``1``
+        Time delay between two consecutive values for constructing one embedded point.
+        If `parameters_type` is ``'search'``, it corresponds to the maximal embedding
+        time delay that will be considered.
 
-    takens_dimension : ``int``, optional, (default=``5``)
-        Dimension of the embedding space. If `parameters_type` is ``'search'``,
-        it corresponds to the maximum embedding dimension that will be
-        considered.
+    takens_dimension : int, optional, default: ``5``
+        Dimension of the embedding space. If `parameters_type` is ``'search'``, it
+        corresponds to the maximum embedding dimension that will be considered.
 
-    takens_stride : ``int``, optional, (default=``1``)
-        Stride duration between two consecutive embedded points. It defaults
-        to 1 as this is the usual value in the statement of Takens's embedding
-        theorem.
+    takens_stride : int, optional, default: ``1``
+        Stride duration between two consecutive embedded points. It defaults to 1 as
+        this is the usual value in the statement of Takens's embedding theorem.
 
-    takens_n_jobs : ``int``, optional, (default=``None``)
-        The number of jobs to use for the computation. ``None`` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
-        processors.
+    takens_n_jobs : int: , optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless in a
+        :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
-    sliding_window_width : ``int``, optional, (default=``10``)
-        Width of each sliding window. Each window contains ``width + 1``
-        objects from the original time series.
+    sliding_window_width : int, optional, default: ``10``
+        Width of each sliding window. Each window contains ``width + 1`` objects from
+        the original time series.
 
-    sliding_stride : ``int``, optional, (default=``1``)
+    sliding_stride : int, optional, default: ``1``
         Stride between consecutive windows.
 
-    diags_metric : ``Union[str, Callable]``, optional,
-    (default=``'euclidean'``)
-        If set to `'precomputed'`, input data is to be interpreted as a
-        collection of distance matrices. Otherwise, input data is to be
-        interpreted as a collection of point clouds (i.e. feature arrays),
-        and `metric` determines a rule with which to calculate distances
-        between pairs of instances (i.e. rows) in these arrays.
+    diags_metric : Union[str, Callable], optional, default: ``'euclidean'``
+        If set to `'precomputed'`, input data is to be interpreted as a collection of
+        distance matrices. Otherwise, input data is to be interpreted as a collection
+        of point clouds (i.e. feature arrays), and `metric` determines a rule with which
+        to calculate distances between pairs of instances (i.e. rows) in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
-        metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
-        including "euclidean", "manhattan", or "cosine".
-        If `metric` is a callable function, it is called on each pair of
-        instances and the resulting value recorded. The callable should take
-        two arrays from the entry in `X` as input, and return a value
-        indicating the distance between them.
+        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a metric listed
+        in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`, including "euclidean",
+        "manhattan", or "cosine". If `metric` is a callable function, it is called on
+        each pair of instances and the resulting value recorded. The callable should
+        take two arrays from the entry in `X` as input, and return a value indicating
+        the distance between them.
 
-    diags_homology_dimensions : ``Iterable``, optional, (default=``(0, 1)``)
-        Dimensions (non-negative integers) of the topological feature_creation
-        to be detected.
+    diags_homology_dimensions : Iterable, optional, default: ``(0, 1)``
+        Dimensions (non-negative integers) of the topological feature_creation to be
+        detected.
 
-    diags_coeff : ``int`` prime, optional, (default=``2``)
+    diags_coeff : int prime, optional, default: ``2``
         Compute homology with coefficients in the prime field
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
         :math:`p` equals `coeff`.
 
-    diags_max_edge_length : ``float``, optional, (default=``np.inf``)
-        Upper bound on the maximum value of the Vietoris-Rips filtration
-        parameter. Points whose distance is greater than this value will
-        never be connected by an edge, and topological feature_creation at
-        scales larger than this value will not be detected.
+    diags_max_edge_length : float, optional, default: ``np.inf``
+        Upper bound on the maximum value of the Vietoris-Rips filtration parameter.
+        Points whose distance is greater than this value will never be connected by an
+        edge, and topological feature_creation at scales larger than this value will not
+        be detected.
 
-    diags_infinity_values : ``float``, optional, (default=``None``)
-        Which death value to assign to feature_creation which are still alive
-        at filtration value `max_edge_length`. ``None`` has the same behaviour
-        as `max_edge_length`.
+    diags_infinity_values : float, optional, default: ``None``
+        Which death value to assign to feature_creation which are still alive at
+        filtration value `max_edge_length`. ``None`` has the same behaviour as
+        `max_edge_length`.
 
-    diags_n_jobs : ``int``, optional, (default=``None``)
-        The number of jobs to use for the computation. ``None`` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
-        processors.
+    diags_n_jobs : int, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless in a
+        :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
     """
 
@@ -173,45 +160,44 @@ class AmplitudeFeature(TDAFeatures):
             diags_infinity_values=diags_infinity_values,
             diags_n_jobs=diags_n_jobs,
         )
-        self._metric = metric
-        self._amplitude_metric_params = amplitude_metric_params
-        self._amplitude_order = amplitude_order
-        self._amplitude_n_jobs = amplitude_n_jobs
+        self.metric = metric
+        self.amplitude_metric_params = amplitude_metric_params
+        self.amplitude_order = amplitude_order
+        self.amplitude_n_jobs = amplitude_n_jobs
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """From the initial DataFrame ``X``, compute the persistence diagrams
-        and detect the average lifetime for a given homology dimension.
-        Then, assign a value to each initial data points.
+    def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
+        """From the initial DataFrame ``time_series``, compute the persistence diagrams
+        and detect the average lifetime for a given homology dimension. Then, assign a
+        value to each initial data points.
 
         Parameters
         ----------
-        X : ``pd.DataFrame``, required.
+        time_series : pd.DataFrame, shape (n_samples, 1), required
             The DataFrame on which to compute the feature_creation.
 
         Returns
         -------
-        X_renamed : ``pd.DataFrame``
-            A DataFrame containing, for each original data-point, the average
-            lifetime associated to it. If, given the initial parameters, a
-            point was excluded from the computation, its value is set to
-            ``Nan``.
+        time_series_t : pd.DataFrame, shape (n_samples, 1)
+            A DataFrame containing, for each original data-point, the average lifetime
+            associated to it. If, given the initial parameters, a point was excluded
+            from the computation, its value is set to ``Nan``.
 
         """
-        persistence_diagrams = self._compute_persistence_diagrams(X)
+        persistence_diagrams = self._compute_persistence_diagrams(time_series)
         amplitudes = self._calculate_amplitude_feature(persistence_diagrams)
 
         original_points = self._compute_n_points(len(amplitudes))
 
-        X_aligned = align_indices(X, original_points, amplitudes)
-        X_renamed = self._rename_columns(X_aligned)
+        time_series_aligned = align_indices(time_series, original_points, amplitudes)
+        time_series_t = self._rename_columns(time_series_aligned)
 
-        return X_renamed
+        return time_series_t
 
     def _calculate_amplitude_feature(self, diagrams: np.ndarray) -> np.ndarray:
         amplitude = diag.Amplitude(
-            metric=self._metric,
-            order=self._amplitude_order,
-            metric_params=self._amplitude_metric_params,
-            n_jobs=self._amplitude_n_jobs,
+            metric=self.metric,
+            order=self.amplitude_order,
+            metric_params=self.amplitude_metric_params,
+            n_jobs=self.amplitude_n_jobs,
         )
         return amplitude.fit_transform(diagrams)

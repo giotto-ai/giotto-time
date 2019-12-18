@@ -3,8 +3,7 @@ import random
 import numpy as np
 import pandas.util.testing as testing
 import pytest
-from hypothesis import given, strategies as st, settings
-from hypothesis._settings import duration
+from hypothesis import given, strategies as st
 from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression
 
@@ -19,7 +18,9 @@ from giottotime.models.time_series_models.gar import GAR
 
 
 class TestInputs:
-    @pytest.mark.parametrize("base_model", [None, FeatureCreation(1, [])])
+    @pytest.mark.parametrize(
+        "base_model", [None, FeatureCreation(horizon=1, time_series_features=[])]
+    )
     def test_invalid_base_model(self, base_model):
         with pytest.raises(TypeError):
             GAR(base_model=base_model, feed_forward=False)
@@ -69,7 +70,9 @@ class TestFitPredict:
     @given(st.builds(arbitrary_features, st.integers(1, 50)))
     def test_correct_features_dimension(self, time_series, features):
         horizon = 4
-        feature_creation = FeatureCreation(horizon, features)
+        feature_creation = FeatureCreation(
+            horizon=horizon, time_series_features=features
+        )
         base_model = LinearRegression()
 
         x, y = feature_creation.fit_transform(time_series)
@@ -89,7 +92,9 @@ class TestFitPredict:
     @given(st.builds(arbitrary_features, st.integers(1, 50)))
     def test_correct_fit_date(self, time_series, features):
         horizon = 4
-        feature_creation = FeatureCreation(horizon, features)
+        feature_creation = FeatureCreation(
+            horizon=horizon, time_series_features=features
+        )
         base_model = LinearRegression()
 
         x, y = feature_creation.fit_transform(time_series)

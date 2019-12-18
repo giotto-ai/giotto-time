@@ -18,10 +18,10 @@ class ShiftFeature(IndexDependentFeature):
 
     Parameters
     ----------
-    shift : ``int``, required.
+    shift : int, optional, default: ``1``
         How much to shift.
 
-    output_name : ``str``, required.
+    output_name : str, optional, default: ``'ShiftFeature'``
         The name of the output column.
 
     """
@@ -30,35 +30,35 @@ class ShiftFeature(IndexDependentFeature):
         super().__init__(output_name)
         self.shift = shift
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Create a shifted version of ``X``.
+    def transform(self, ts: pd.DataFrame) -> pd.DataFrame:
+        """Create a shifted version of ``ts``.
 
         Parameters
         ----------
-        X : ``pd.DataFrame``, required.
+        ts : pd.DataFrame, shape (n_samples, 1), required
             The DataFrame to shift.
 
         Returns
         -------
-        X_shifted_renamed : ``pd.DataFrame``
-            The shifted version of the original ``X``.
+        ts_t : pd.DataFrame, shape (n_samples, 1)
+            The shifted version of the original ``ts``.
 
         """
-        X_shifted = X.shift(self.shift)
-        X_shifted_renamed = self._rename_columns(X_shifted)
-        return X_shifted_renamed
+        ts_t = ts.shift(self.shift)
+        ts_t = self._rename_columns(ts_t)
+        return ts_t
 
 
 class MovingAverageFeature(IndexDependentFeature):
-    """For each row in ``X``, compute the moving average of the previous
+    """For each row in ``ts``, compute the moving average of the previous
      ``window_size`` rows. If there are not enough rows, the value is Nan.
 
     Parameters
     ----------
-    window_size : ``int``, required.
+    window_size : int, optional, default: ``1``
         The number of previous points on which to compute the moving average
 
-    output_name : ``str``, required.
+    output_name : str, optional, default: ``'MovingAverageFeature'``
         The name of the output column.
 
     """
@@ -67,25 +67,25 @@ class MovingAverageFeature(IndexDependentFeature):
         super().__init__(output_name)
         self.window_size = window_size
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Compute the moving average, for every row of ``X``, of the previous
+    def transform(self, ts: pd.DataFrame) -> pd.DataFrame:
+        """Compute the moving average, for every row of ``ts``, of the previous
         ``window_size`` elements.
 
         Parameters
         ----------
-        X : ``pd.DataFrame``, required.
+        ts : pd.DataFrame, shape (n_samples, 1), required
             The DataFrame on which to compute the rolling moving average
 
         Returns
         -------
-        X_mov_avg_renamed : ``pd.DataFrame``
-            A DataFrame, with the same length as ``X``, containing the rolling
+        ts_t : pd.DataFrame, shape (n_samples, 1)
+            A DataFrame, with the same length as ``ts``, containing the rolling
             moving average for each element.
 
         """
-        X_mov_avg = X.rolling(self.window_size).mean().shift(1)
-        X_mov_avg_renamed = self._rename_columns(X_mov_avg)
-        return X_mov_avg_renamed
+        ts_t = ts.rolling(self.window_size).mean().shift(1)
+        ts_t = self._rename_columns(ts_t)
+        return ts_t
 
 
 class PolynomialFeature(IndexDependentFeature):
@@ -94,58 +94,60 @@ class PolynomialFeature(IndexDependentFeature):
 
     Parameters
     ----------
-    degree: ``int``, required.
+    degree: int, optional, default: ``2``
         The degree of the polynomial feature_creation.
 
-    output_name : ``str``, required.
+    output_name : str, optional, default: ``'PolynomialFeature'``
         The name of the output column.
+
     """
 
     def __init__(self, degree: int = 2, output_name: str = "PolynomialFeature"):
         super().__init__(output_name)
-        self._degree = degree
+        self.degree = degree
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Compute the polynomial feature_creation of ``X``, up to a degree
+    def transform(self, ts: pd.DataFrame) -> pd.DataFrame:
+        """Compute the polynomial feature_creation of ``ts``, up to a degree
         equal to ``degree``.
 
         Parameters
         ----------
-        X : ``pd.DataFrame``, required.
+        ts : pd.DataFrame, shape (n_samples, 1), required
             The input DataFrame. Used only for its index.
 
         Returns
         -------
-        pol_of_X_renamed : ``pd.DataFrame``
+        ts_t : pd.DataFrame, shape (n_samples, 1)
             The computed polynomial feature_creation.
 
         """
-        pol_feature = PolynomialFeatures(self._degree)
-        pol_of_X_array = pol_feature.fit_transform(X)
-        pol_of_X = pd.DataFrame(pol_of_X_array, index=X.index)
+        pol_feature = PolynomialFeatures(self.degree)
+        pol_of_X_array = pol_feature.fit_transform(ts)
+        pol_of_X = pd.DataFrame(pol_of_X_array, index=ts.index)
 
-        pol_of_X_renamed = self._rename_columns(pol_of_X)
+        ts_t = self._rename_columns(pol_of_X)
 
-        return pol_of_X_renamed
+        return ts_t
 
 
 class ExogenousFeature(IndexDependentFeature):
-    """Reindex ``exogenous_time_series`` with the index of ``X``. To check the
+    """Reindex ``exogenous_time_series`` with the index of ``ts``. To check the
     documentation of ``pandas.DataFrame.reindex`` and to see which type of
     ``method`` are available, please refer to the pandas `documentation
     <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.reindex.html>`_.
 
     Parameters
     ----------
-    exogenous_time_series : ``pd.DataFrame``, required.
-        The time-series to reindex
-        None, ‘backfill’/’bfill’, ‘pad’/’ffill’, ‘nearest’
-    output_name : ``str``, required.
-        The name of the output column.
+    exogenous_time_series : pd.DataFrame, shape (n_samples, 1), required
+        The time series to reindex
 
-    method : ``str``, optional, (default=``None``).
+    method : str, optional, default: ``None``
         The method used to re-index. This must be a method used by the
         ``pandas.DataFrame.reindex`` method.
+
+    output_name : str, optional, default: ``'ExogenousFeature'``
+        The name of the output column.
+
     """
 
     def __init__(
@@ -158,23 +160,23 @@ class ExogenousFeature(IndexDependentFeature):
         self.method = method
         self.exogenous_time_series = exogenous_time_series
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Reindex the ``exogenous_time_series`` with the index of ``X``.
+    def transform(self, ts: pd.DataFrame) -> pd.DataFrame:
+        """Reindex the ``exogenous_time_series`` with the index of ``ts``.
 
         Parameters
         ----------
-        X : ``pd.DataFrame``, required.
+        ts : pd.DataFrame, shape (n_samples, 1), required
             The input DataFrame. Used only for its index.
 
         Returns
         -------
-        exog_feature_renamed : ``pd.DataFrame``
+        ts_t :  pd.DataFrame, shape (n_samples, 1)
             The original ``exogenous_time_series``, re-indexed with the index
-            of ``X``.
+            of ``ts``.
 
         """
         exog_feature = self.exogenous_time_series.reindex(
-            index=X.index, method=self.method
+            index=ts.index, method=self.method
         )
-        exog_feature_renamed = self._rename_columns(exog_feature)
-        return exog_feature_renamed
+        ts_t = self._rename_columns(exog_feature)
+        return ts_t

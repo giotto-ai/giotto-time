@@ -8,8 +8,6 @@ import workalendar
 
 from .base import IndexDependentFeature
 
-__all__ = ["CalendarFeature"]
-
 
 def check_index(time_series: pd.DataFrame) -> None:
     index_series = pd.Series(time_series.index)
@@ -21,15 +19,11 @@ def check_index(time_series: pd.DataFrame) -> None:
             "meaningful results."
         )
 
-
-def get_period(X):
-    if isinstance(X.index, pd.PeriodIndex):
-        freq = X.index.freqstr
-    else:
-        warnings.warn("Frequency inferred from X.")
-        freq = pd.Timedelta(X.index.values[1] - X.index.values[0])
-
-    return freq
+    if not isinstance(time_series.index, pd.PeriodIndex):
+        raise ValueError(
+            "The input time series should have a index of type "
+            f"PeriodIndex, got {type(time_series.index)} instead."
+        )
 
 
 class CalendarFeature(IndexDependentFeature):
@@ -41,26 +35,23 @@ class CalendarFeature(IndexDependentFeature):
     Parameters
     ----------
 
-    region : ``str``, required.
+    region : str, optional, default: ``'america'``
         The region in which the ``country`` is located.
 
-    country : ``str``, required.
+    country : str, optional, default: ``'Brazil'``
         The name of the country from which to retrieve the holidays. The country must be
          located in the given ``region``.
 
-    kernel : ``np.ndarray``, required.
-        The kernel to use when creating the feature.
-
-    output_name : ``str``, required.
-        The name of the output column.+
-
-    start_date : ``str``, optional, (default=``'01/01/2018'``).
+    start_date : str, optional, default: ``'01/01/2019'``
         The date starting from which to retrieve the holidays.
 
-    end_date : ``str``, optional, (default=``'01/01/2020'``).
+    end_date : str, optional, default: ``'01/01/2020'``
         The date until which to retrieve the holidays.
 
-    reindex_method : ``str``, optional, (default=``pad``).
+    kernel : np.ndarray or None, optional, default: ``None``
+        The kernel to use when creating the feature.
+
+    reindex_method : str, optional, default: ``pad``
         Used only if X is passed in the ``transform`` method. It is used as the method
         with which to reindex the holiday events with the index of X. This method
         should be compatible with the reindex methods provided by pandas. Please refer
@@ -68,8 +59,8 @@ class CalendarFeature(IndexDependentFeature):
         https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.reindex.html`_
         for further details.
 
-    return_name_event : ``bool``, optional, (default=``False``)
-        If ``True``, also return a column containing the name of the event.
+    output_name : str, optional, default: ``'CalendarFeature'``
+        The name of the output column.
 
     """
 
@@ -84,11 +75,11 @@ class CalendarFeature(IndexDependentFeature):
         output_name: str = "CalendarFeature",
     ):
         super().__init__(output_name)
-        self._region = region
-        self._country = country
-        self._start_date = start_date
-        self._end_date = end_date
-        self._reindex_method = reindex_method
+        self.region = region
+        self.country = country
+        self.start_date = start_date
+        self.end_date = end_date
+        self.reindex_method = reindex_method
 
         if len(kernel) == 0 or not np.isfinite(kernel).all():
             raise ValueError(
@@ -96,15 +87,15 @@ class CalendarFeature(IndexDependentFeature):
                 "element and should only contains finite values, got "
                 f"{kernel} instead."
             )
-        self._kernel = kernel
+        self.kernel = kernel
 
     # TODO: write the description of the transform method
-    def transform(self, X: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+    def transform(self, ts: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """
 
         Parameters
         ----------
-        X : ``pd.DataFrame``, optional, (default=``None``).
+        ts : pd.DataFrame, shape (n_samples, 1), optional, default: ``None``
             If provided, both ``start_date`` and ``end_date`` are going to be
             overwritten with the start and end date of the index of ``X``. Also, if
             provided the output DataFrame is going to be re-indexed with the index of
@@ -112,67 +103,40 @@ class CalendarFeature(IndexDependentFeature):
 
         Returns
         -------
-        events : ``pd.DataFrame``
+        events : pd.DataFrame, shape (length, 1)
             A DataFrame containing the events.
 
         """
-        if X is not None:
-            check_index(X)
+        if ts is not None:
+            check_index(ts)
 
-        self._initialize_start_end_date(X)
+        self._initialize_start_end_date(ts)
 
-        workalendar_region = importlib.import_module(f".{self._region}", "workalendar")
-        workalendar_country = getattr(workalendar_region, self._country)()
+        workalendar_region = importlib.import_module(f".{self.region}", "workalendar")
+        workalendar_country = getattr(workalendar_region, self.country)()
 
         events = self._get_holiday_events(workalendar_country)
+        if self.kernel is not None:
+            events = self._apply_kernel(events)
 
-        if self._kernel is not None:
-            klen = len(self._kernel)
-
-            def apply_kernel(w):
-                if sum(w) != 0:
-                    return np.dot(w, self._kernel) / sum(w)
-                else:
-                    return 0
-
-            events["status"] = (
-                events["status"]
-                .rolling(klen, center=True)
-                .apply(apply_kernel, raw=False)
-            )
         events_renamed = self._rename_columns(events)
+        aligned_events = self._align_event_indices(ts, events_renamed)
 
-        if X is not None:
-            new_x_line = pd.DataFrame(
-                columns=X.columns, index=pd.PeriodIndex([X.index[-1] + 1])
-            )
-            X_to_cut = pd.concat([X, new_x_line], axis=0)
-            bins = pd.cut(events_renamed.index, X_to_cut.index.to_timestamp())
-            grouped_events = events_renamed.groupby(bins).mean().ffill()
-
-            grouped_events.index = pd.to_datetime(
-                grouped_events.index.map(lambda row_index: row_index.left)
-            )
-            X.index = X.index.to_timestamp()
-
-            events_renamed = pd.merge(
-                X, grouped_events, left_index=True, right_index=True, how="inner"
-            )
-        return events_renamed
+        return aligned_events
 
     def _initialize_start_end_date(self, X: pd.DataFrame):
         if X is not None:
-            self._start_date = X.index.values[0]
-            self._end_date = X.index.values[-1]
+            self.start_ = X.index.values[0]
+            self.end_ = X.index.values[-1]
         else:
-            self._start_date = pd.Timestamp(self._start_date)
-            self._end_date = pd.Timestamp(self._end_date)
+            self.start_ = pd.Timestamp(self.start_date)
+            self.end_ = pd.Timestamp(self.end_date)
 
-        slack_period = len(self._kernel)
+        slack_period = len(self.kernel)
         slack_days = np.timedelta64(slack_period, "D")
 
-        slacked_start_date_ = self._start_date - slack_days
-        slacked_end_date_ = self._end_date + slack_days
+        slacked_start_date_ = self.start_ - slack_days
+        slacked_end_date_ = self.end_ + slack_days
 
         self.slacked_start_date_ = pd.datetime(
             year=slacked_start_date_.year,
@@ -218,3 +182,45 @@ class CalendarFeature(IndexDependentFeature):
             aggregate_events_same_day
         )
         return grouped_events
+
+    def _apply_kernel(self, events):
+        kernel_events = events.copy()
+        klen = len(self.kernel)
+
+        def apply_kernel(w):
+            if sum(w) != 0:
+                return np.dot(w, self.kernel) / sum(w)
+            else:
+                return 0
+
+        kernel_events["status"] = (
+            kernel_events["status"]
+            .rolling(klen, center=True)
+            .apply(apply_kernel, raw=False)
+        )
+        return kernel_events
+
+    def _align_event_indices(self, ts, events):
+        if ts is not None:
+            X = ts.copy()
+            new_x_line = pd.DataFrame(
+                columns=X.columns, index=pd.PeriodIndex([X.index[-1] + 1])
+            )
+            X_to_cut = pd.concat([X, new_x_line], axis=0)
+            bins = pd.cut(events.index, X_to_cut.index.to_timestamp())
+
+            grouped_events = events.groupby(bins).mean().ffill()
+
+            grouped_events.index = pd.to_datetime(
+                grouped_events.index.map(lambda row_index: row_index.left)
+            )
+            X.index = X.index.to_timestamp()
+
+            events_renamed = pd.merge(
+                X, grouped_events, left_index=True, right_index=True, how="inner"
+            )
+            events_renamed.index = ts.index
+        else:
+            events_renamed = events[self.start_ : self.end_]
+
+        return events_renamed

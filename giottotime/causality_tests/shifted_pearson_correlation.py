@@ -16,7 +16,8 @@ class ShiftedPearsonCorrelation(CausalityTest):
     max_shift : ``int``, optional, (default=``10``).
 
     target_col : ``str``, optional, (default=``'y'``).
-            The column to use as the a reference (i.e., the columns which is not shifted).
+            The column to use as the a reference (i.e., the columns which is not
+            shifted).
 
     dropna : ``bool``, optional, (default=False).
         Determines if the Nan values created by shifting are retained or dropped.
@@ -36,10 +37,9 @@ class ShiftedPearsonCorrelation(CausalityTest):
 
         Parameters
         ----------
-        data : ``pd.DataFrame``, required.
-            The time-series on which to compute the shifted colleations.
-
-        max_shift : ``int``, optional, (default=10).
+        data : pd.DataFrame, shape (n_samples, n_time_series), required.
+            The DataFrame containing the time series on which to compute the shifted
+            correlations.
 
         Returns
         -------
@@ -76,34 +76,33 @@ class ShiftedPearsonCorrelation(CausalityTest):
         return self
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Shifts each input timeseries but the amount which optimizes
-        correlation with the selected 'y' colums.
+        """Shifts each input timeseries but the amount which optimizes correlation with
+        the selected 'y' colums.
 
         Parameters
         ----------
-        data : ``pd.DataFrame``, required.
-            The time-series on which to perform the transformation.
+        data : pd.DataFrame, shape (n_samples, n_time_series), required.
+            The DataFrame containing the time series on which to perform the
+            transformation.
 
         Returns
         -------
-        shifted_data : ``pd.DataFrame``
+        data_t : pd.DataFrame, shape (n_samples, n_time_series)
             The dataframe (Pivot table) of the shifts which maximize the correlation
             between each timeseries The shift is indicated in rows.
 
         """
         check_is_fitted(self, ["best_shifts_", "max_corrs_"])
-        shifted_data = data.copy()
+        data_t = data.copy()
 
-        for col in shifted_data:
+        for col in data_t:
             if col != self.target_col:
-                shifted_data[col] = shifted_data[col].shift(
-                    self.best_shifts_[col][self.target_col]
-                )
+                data_t[col] = data_t[col].shift(self.best_shifts_[col][self.target_col])
 
         if self.dropna:
-            shifted_data = shifted_data.dropna()
+            data_t = data_t.dropna()
 
-        return shifted_data
+        return data_t
 
     def _get_max_corr_shift(
         self, data: pd.DataFrame, max_shift: int, x: str = "x", y: str = "y"

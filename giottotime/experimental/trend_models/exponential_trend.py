@@ -1,3 +1,5 @@
+from typing import Callable
+
 from sklearn.metrics import mean_squared_error
 from scipy.optimize import minimize
 
@@ -9,37 +11,38 @@ from ..trend_models.base import TrendModel
 
 
 class ExponentialTrend(TrendModel):
-    """A model for fitting, predicting and removing an exponential trend from a
-     time series.
+    """A model for fitting, predicting and removing an exponential trend from a time
+    series.
 
     Parameters
     ----------
-    loss : ``Callable``, optional, (default=``mean_squared_error``).
-        The loss function to use when fitting the model. The loss function must
-        accept y_true, y_pred and return a single real number.
+    loss : Callable, optional, default: ``mean_squared_error``
+        The loss function to use when fitting the model. The loss function must accept
+        y_true, y_pred and return a single real number.
+
+    method : str, optional, default: ``'BFGS``
+            The method to use in order to minimize the loss function.
 
     """
 
-    def __init__(self, loss=mean_squared_error):
+    def __init__(self, loss: Callable = mean_squared_error, method: str = "BFGS"):
         self.loss = loss
+        self.method = method
 
-    def fit(self, time_series: pd.DataFrame, method: str = "BFGS") -> TrendModel:
-        """Fit the model on the ``time_series``, with respect to the provided
-        ``loss`` and using the provided ``method``. In order to see which
-        methods are available, please check the 'scipy' `documentation
+    def fit(self, time_series: pd.DataFrame) -> TrendModel:
+        """Fit the model on the ``time_series``, with respect to the provided ``loss``
+        and using the provided ``method``. In order to see which methods are available,
+        please check the 'scipy' `documentation
         <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html>`_.
 
         Parameters
         ----------
-        time_series : ``pd.DataFrame``, required.
+        time_series: pd.DataFrame, shape (n_samples, 1), required
             The time series on which to fit the model.
-
-        method : ``str``, optional, (default=``'BFGS``).
-            The method to use in order to minimize the loss function.
 
         Returns
         -------
-        self : ``TrendModel``
+        self : TrendModel
             The fitted object.
 
         """
@@ -52,7 +55,7 @@ class ExponentialTrend(TrendModel):
         res = minimize(
             prediction_error,
             np.array([model_exponent]),
-            method=method,
+            method=self.method,
             options={"disp": False},
         )
 
@@ -68,28 +71,29 @@ class ExponentialTrend(TrendModel):
 
         return self
 
-    def predict(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Using the fitted model, predict the value starting from ``X``.
+    def predict(self, time_series: pd.DataFrame) -> pd.DataFrame:
+        """Using the fitted model, predict the value starting from ``time_series``.
 
         Parameters
         ----------
-        X : ``pd.DataFrame``, required.
+        time_series: pd.DataFrame, shape (n_samples, 1), required
             The time series on which to predict.
 
         Returns
         -------
-        predictions : ``pd.DataFrame``
+        predictions : pd.DataFrame, shape (n_samples, 1)
             The output predictions.
 
         Raises
         ------
-        ``NotFittedError``
+        NotFittedError
             Raised if the model is not fitted yet.
 
         """
         check_is_fitted(self, ["model_exponent_"])
 
-        return np.exp(X * self.model_exponent_)
+        predictions = np.exp(time_series * self.model_exponent_)
+        return predictions
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """Transform the ``time_series`` by removing the trend.

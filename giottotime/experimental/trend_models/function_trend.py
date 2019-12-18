@@ -1,36 +1,32 @@
-from typing import Callable
-
-from sklearn.metrics import mean_squared_error
-from scipy.optimize import minimize
-
-import numpy as np
 import pandas as pd
-from sklearn.utils.validation import check_is_fitted
+from scipy.optimize import minimize
+from sklearn.metrics import mean_squared_error
 
-from ..trend_models.base import TrendModel
+from giottotime.feature_creation import DetrendedFeature
+from giottotime.experimental.trend_models.base import TrendModel
 
 
-class PolynomialTrend(TrendModel):
-    """
-    A model for fitting, predicting and removing an polynomial trend from a
-    time series.
+class FunctionTrend(TrendModel):
+    """A model for fitting, predicting and removing an custom functional trend
+    from a time series. The transformed time series created will be trend
+    stationary with respect to the specific function. To have more details,
+    you can check this `link <https://en.wikipedia.org/wiki/Trend_stationary>`_.
 
     Parameters
     ----------
-    order : ``int``, required.
-        The order of the polynomial.
-
     loss : ``Callable``, optional, (default=``mean_squared_error``).
         The loss function to use when fitting the model. The loss function must
-         accept y_true, y_pred and return a single real number.
+        accept y_true, y_pred and return a single real number.
 
     """
 
-    def __init__(self, order: int = 2, loss: Callable = mean_squared_error):
-        self.order = order
+    def __init__(self, model_form, loss=mean_squared_error):
+        self.model_form = model_form
         self.loss = loss
 
-    def fit(self, time_series: pd.DataFrame, method: str = "BFGS") -> TrendModel:
+    def fit(
+        self, time_series: pd.DataFrame, x0: list, method: str = "BFGS"
+    ) -> TrendModel:
         """Fit the model on the ``time_series``, with respect to the provided
         ``loss`` and using the provided ``method``. In order to see which
         methods are available, please check the 'scipy' `documentation
@@ -40,6 +36,8 @@ class PolynomialTrend(TrendModel):
         ----------
         time_series : ``pd.DataFrame``, required.
             The time series on which to fit the model.
+
+        x0 : ``list``.
 
         method : ``str``, optional, (default=``'BFGS``).
             The method to use in order to minimize the loss function.
@@ -51,18 +49,17 @@ class PolynomialTrend(TrendModel):
 
         """
 
-        def prediction_loss(weights: np.ndarray) -> float:
-            p = np.poly1d(weights)
-            predictions = [p(t) for t in range(0, time_series.shape[0])]
+        def prediction_error(model_weights):
+            predictions = [
+                self.model_form(t, model_weights)
+                for t in range(0, time_series.shape[0])
+            ]
             return self.loss(time_series.values, predictions)
 
-        model_weights = np.zeros(self.order)
-
-        res = minimize(
-            prediction_loss, model_weights, method=method, options={"disp": False}
-        )
+        res = minimize(prediction_error, x0, method=method, options={"disp": False})
 
         self.model_weights_ = res["x"]
+
         self.t0_ = time_series.index[0]
         freq = time_series.index.freq
         if freq is not None:
@@ -73,8 +70,8 @@ class PolynomialTrend(TrendModel):
 
         return self
 
-    def predict(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Using the fitted polynomial, predict the values starting from ``X``.
+    def predict(self, t):
+        """Using the fitted model, predict the values starting from ``X``.
 
         Parameters
         ----------
@@ -92,12 +89,10 @@ class PolynomialTrend(TrendModel):
             Raised if the model is not fitted yet.
 
         """
-        check_is_fitted(self, ["model_weights_"])
+        # check fit run
+        return self.model_form(t, self.model_weights_)
 
-        p = np.poly1d(self.model_weights_)
-        return p(X.values)
-
-    def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
+    def transform(self, time_series):
         """Transform the ``time_series`` by removing the trend.
 
         Parameters
@@ -111,17 +106,21 @@ class PolynomialTrend(TrendModel):
             The transformed time series, without the trend.
 
         """
-        p = np.poly1d(self.model_weights_)
-
-        trans_freq = time_series.index.freq
-        if trans_freq is not None:
-            trans_freq = trans_freq
-        else:
-            trans_freq = time_series.index[1] - time_series.index[0]
-            # raise warning
+        # check fit run
 
         ts = (time_series.index - self.t0_) / self.period_
 
-        predictions = pd.Series(index=time_series.index, data=[p(t) for t in ts])
+        predictions = pd.Series(
+            index=time_series.index,
+            data=[self.model_form(t, self.model_weights_) for t in ts],
+        )
 
         return time_series.sub(predictions, axis=0)
+
+
+class RemoveFunctionTrend(DetrendedFeature):
+    def __init__(
+        self, loss=mean_squared_error, output_name: str = "RemoveFunctionTrend"
+    ):
+        self.trend_model = ExponentialTrend(loss=loss)
+        super().__init__(trend_model=self.trend_model, output_name=output_name)

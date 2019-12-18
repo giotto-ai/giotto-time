@@ -14,12 +14,14 @@ class ShiftedLinearCoefficient(CausalityTest):
 
     Parameters
     ----------
-    max_shift : ``int``, optional, (default=``10``).
+    max_shift : int, optional, default: ``10``
+        The maximum number of shifts to check for.
 
-    target_col : ``str``, optional, (default='y').
-            The column to use as the a reference (i.e., the columns which is not shifted).
+    target_col : str, optional, default: ``'y'``
+            The column to use as the a reference (i.e., the columns which is not
+            shifted).
 
-    dropna : ``bool``, optional, (default=False).
+    dropna : bool, optional, default: ``False``
         Determines if the Nan values created by shifting are retained or dropped.
 
     """
@@ -32,15 +34,14 @@ class ShiftedLinearCoefficient(CausalityTest):
         self.dropna = dropna
 
     def fit(self, data: pd.DataFrame) -> "ShiftedLinearCoefficient":
-        """Create the dataframe of shifts of each time series which maximize
-        the shifted linear fit coefficients.
+        """Create the dataframe of shifts of each time series which maximize the shifted
+         linear fit coefficients.
 
         Parameters
         ----------
-        data : ``pd.DataFrame``, required.
-            The time-series on which to compute the shifted linear fit coefficients.
-
-        max_shift : ``int``, optional, (default=10).
+        data : pd.DataFrame, shape (n_samples, n_time_series), required.
+            The DataFrame containing the time-series on which to compute the shifted
+            linear fit coefficients.
 
         Returns
         -------
@@ -77,34 +78,33 @@ class ShiftedLinearCoefficient(CausalityTest):
         return self
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Shifts each input timeseries but the amount which maximizes
-        shifted linear fit coefficients with the selected 'y' colums.
+        """Shifts each input timeseries but the amount which maximizes shifted linear
+        fit coefficients with the selected 'y' columns.
 
         Parameters
         ----------
-        data : ``pd.DataFrame``, required.
-            The time-series on which to perform the transformation.
+        data : pd.DataFrame, shape (n_samples, n_time_series), required.
+            The DataFrame containing the time series on which to perform the
+            transformation.
 
         Returns
         -------
-        shifted_data : ``pd.DataFrame``
-            The dataframe (Pivot table) of the shifts which maximize the shifted linear
+        data_t : pd.DataFrame, shape (n_samples, n_time_series)
+            The DataFrame (Pivot table) of the shifts which maximize the shifted linear
             fit coefficients between each timeseries. The shift is indicated in rows.
 
         """
         check_is_fitted(self, ["best_shifts_", "max_corrs_"])
-        shifted_data = data.copy()
+        data_t = data.copy()
 
-        for col in shifted_data:
+        for col in data_t:
             if col != self.target_col:
-                shifted_data[col] = shifted_data[col].shift(
-                    self.best_shifts_[col][self.target_col]
-                )
+                data_t[col] = data_t[col].shift(self.best_shifts_[col][self.target_col])
 
         if self.dropna:
-            shifted_data = shifted_data.dropna()
+            data_t = data_t.dropna()
 
-        return shifted_data
+        return data_t
 
     def _get_max_coeff_shift(
         self, data: pd.DataFrame, max_shift: int, x: str = "x", y: str = "y"
