@@ -31,7 +31,7 @@ LICENSE = "GPLv3"
 DOWNLOAD_URL = "https://github.com/giotto-ai/giotto-time/tarball/v0.0a0"
 VERSION = __version__
 CLASSIFIERS = [
-    "Intended Audience :: Science/Corporate",
+    "Intended Audience :: Information Technology",
     "Intended Audience :: Developers",
     "License :: OSI Approved",
     "Programming Language :: Python",
