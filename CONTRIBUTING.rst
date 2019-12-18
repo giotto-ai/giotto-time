@@ -96,12 +96,17 @@ You can use `flake8` on your python code via the following instructions:
 
 Git pre-commit hook
 -------------------
-We provide a pre-commit git hook to prevent accidental commits to the master branch. To activate, run
+We provide a pre-commit git hook to prevent accidental commits to the master branch and automatically formats the code
+using `black`. To activate, install the `pre-commit` library.
 
-.. code-block:: bash
+Development requirements
+------------------------
+In order to contributing to giottotime, some additional python packages are required with respect to the standard
+requirements. To install them, do
 
-    cd .git/hooks
-    ln -s ../../tools/git-pre-commit pre-commit
+.. code-block:: python
+
+    pip install -r dev-requirements.txt
 
 Running unit tests
 ------------------
