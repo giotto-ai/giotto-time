@@ -1,0 +1,36 @@
+parameters:
+  name: ''
+  vmImage: ''
+  build_docs: 'false'
+  is_windows: 'false'
+  arch: x86_64
+  plat: manylinux2010_x86_64
+
+jobs:
+- job: ${{ parameters.name }}
+  condition: eq(variables['build_and_test_wheels'], 'true')
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  strategy:
+    matrix:
+      Python36:
+        arch: ${{ parameters.arch }}
+        plat: ${{ parameters.plat }}
+        python_ver: '36'
+        python.version: '3.6'
+      Python37:
+        arch: ${{ parameters.arch }}
+        plat: ${{ parameters.plat }}
+        python_ver: '37'
+        python.version: '3.7'
+
+  steps:
+  - template: steps/prepare_tests.yml
+  - template: steps/build_linux_wheels.yml
+  - template: steps/install_wheels.yml
+  - template: steps/test_wheels.yml
+  - template: steps/build_docs.yml
+    parameters:
+      build_docs: ${{ parameters.build_docs }}
+  - template: steps/publish_artifact.yml
+
