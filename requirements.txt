@@ -1,6 +1,3 @@
-scipy
-scikit-learn
-numpy
-pandas
-giotto-learn
+pandas>=0.25.3
+giotto-learn>=0.1.3
 workalendar>=7.1.1
