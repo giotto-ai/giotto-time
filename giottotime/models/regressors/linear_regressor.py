@@ -74,7 +74,7 @@ class LinearRegressor:
             The predictions of the model
 
         """
-        check_is_fitted(self, ["model_weights_"])
+        check_is_fitted(self)
 
         predictions = self.model_weights_[0] + np.dot(X, self.model_weights_[1:])
         return predictions

@@ -95,7 +95,7 @@ class PolynomialTrend(TrendModel):
             Raised if the model is not fitted yet.
 
         """
-        check_is_fitted(self, ["model_weights_"])
+        check_is_fitted(self)
 
         p = np.poly1d(self.model_weights_)
         predictions = p(ts.values)

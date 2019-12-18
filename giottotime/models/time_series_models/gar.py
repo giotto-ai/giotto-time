@@ -25,8 +25,8 @@ class GAR:
                 f"{base_model} must implement both 'fit' " f"and 'predict' methods"
             )
 
-        self._base_model = base_model
-        self._feed_forward = feed_forward
+        self.base_model = base_model
+        self.feed_forward = feed_forward
 
     def fit(self, X: pd.DataFrame, y: pd.DataFrame, **kwargs: object) -> "GAR":
         """Fit the GAR model according to the training data.
@@ -49,13 +49,13 @@ class GAR:
 
         """
         features = X.copy()
-        models_per_predstep = [deepcopy(self._base_model) for _ in range(y.shape[1])]
+        models_per_predstep = [deepcopy(self.base_model) for _ in range(y.shape[1])]
 
         for pred_step, model_for_pred_step in enumerate(models_per_predstep):
             target_y = y[f"y_{pred_step}"]
             model_for_pred_step.fit(features, target_y, **kwargs)
 
-            if self._feed_forward:
+            if self.feed_forward:
                 predictions = model_for_pred_step.predict(features)
                 features[f"preds_{pred_step}"] = predictions
 
@@ -83,7 +83,7 @@ class GAR:
             Thrown if the model has not been previously fitted.
 
         """
-        check_is_fitted(self, ["models_per_predstep_", "train_features_"])
+        check_is_fitted(self)
 
         test_features = X.copy()
 
@@ -93,7 +93,7 @@ class GAR:
             model_predictions = model_for_pred_step.predict(test_features)
             predictions[f"y_{pred_step}"] = model_predictions
 
-            if self._feed_forward:
+            if self.feed_forward:
                 test_features[f"preds_{pred_step}"] = model_predictions
 
         return predictions

@@ -94,7 +94,7 @@ class ShiftedLinearCoefficient(CausalityTest):
             fit coefficients between each timeseries. The shift is indicated in rows.
 
         """
-        check_is_fitted(self, ["best_shifts_", "max_corrs_"])
+        check_is_fitted(self)
         data_t = data.copy()
 
         for col in data_t:

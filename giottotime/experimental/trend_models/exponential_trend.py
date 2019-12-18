@@ -90,7 +90,7 @@ class ExponentialTrend(TrendModel):
             Raised if the model is not fitted yet.
 
         """
-        check_is_fitted(self, ["model_exponent_"])
+        check_is_fitted(self)
 
         predictions = np.exp(time_series * self.model_exponent_)
         return predictions

@@ -180,7 +180,7 @@ class ConstantFeature(StandardFeature):
         self, constant: int = 2, length: int = 50, output_name: str = "ConstantFeature"
     ):
         super().__init__(output_name)
-        self._length = length
+        self.length = length
         self.constant = constant
 
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
@@ -204,7 +204,7 @@ class ConstantFeature(StandardFeature):
                 data=self.constant, index=time_series.index
             ).to_frame()
         else:
-            constant_series = pd.Series(data=[self.constant] * self._length).to_frame()
+            constant_series = pd.Series(data=[self.constant] * self.length).to_frame()
 
         constant_series_renamed = self._rename_columns(constant_series)
         return constant_series_renamed
