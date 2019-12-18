@@ -1,3 +1,8 @@
+"""
+The :mod:`giottotime.feature_creation` module deals with the creation of features
+starting from a time series.
+"""
+
 from .feature_creation import FeatureCreation
 from .index_dependent_features import (
     CalendarFeature,
