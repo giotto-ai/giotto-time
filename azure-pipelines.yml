@@ -1,36 +1,37 @@
 # these jobs are triggered when the variable run_automated_tests is 'true'
 
 jobs:
-- template: build_tools/azure/test_job.yml
+- template: build_tools/azure/pytest.yml
   parameters:
     name: test_ubuntu1604
     vmImage: 'ubuntu-16.04'
 
-- template: build_tools/azure/test_job.yml
+- template: build_tools/azure/pytest.yml
   parameters:
     name: test_macOS1014
     vmImage: 'macOS-10.14'
 
-- template: build_tools/azure/test_job.yml
+- template: build_tools/azure/pytest.yml
   parameters:
     name: test_win2016
     vmImage: 'vs2017-win2016'
 
 # these jobs are triggered when the variable run_automated_tests is 'true'
 
-- template: build_tools/azure/build_wheel_job.yml
+- template: build_tools/azure/build_and_test_wheel_linux.yml
   parameters:
     name: manylinux2010
     vmImage: 'ubuntu-16.04'
     build_docs: 'false'
 
-- template: build_tools/azure/build_wheel_job.yml
+- template: build_tools/azure/build_and_test_wheel.yml
   parameters:
     name: macOS1014
     vmImage: 'macOS-10.14'
     build_docs: 'true'
+    is_windows: 'false'
 
-- template: build_tools/azure/build_wheel_job.yml
+- template: build_tools/azure/build_and_test_wheel.yml
   parameters:
     name: win2016
     vmImage: 'vs2017-win2016'

@@ -1,0 +1,8 @@
+steps:
+- task: Bash@3
+  inputs:
+    filePath: build_tools/azure/steps/pypi_docker/build_docker.sh
+    failOnStderr: false
+  env:
+    python_ver: $(python_ver)
+  displayName: 'Run the docker and open bash'
