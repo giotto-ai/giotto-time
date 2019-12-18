@@ -3,24 +3,14 @@
 jobs:
 - template: build_tools/azure/pytest.yml
   parameters:
-    name: test_ubuntu1604
+    name: pytest_ubuntu
     vmImage: 'ubuntu-16.04'
 
-- template: build_tools/azure/pytest.yml
-  parameters:
-    name: test_macOS1014
-    vmImage: 'macOS-10.14'
-
-- template: build_tools/azure/pytest.yml
-  parameters:
-    name: test_win2016
-    vmImage: 'vs2017-win2016'
-
-# these jobs are triggered when the variable run_automated_tests is 'true'
+# these jobs are triggered when the variable build_and_test_wheel is 'true'
 
 - template: build_tools/azure/build_and_test_wheel.yml
   parameters:
-    name: macOS1014
+    name: build_and_test_wheel
     vmImage: 'macOS-10.14'
     build_docs: 'true'
     is_windows: 'false'
