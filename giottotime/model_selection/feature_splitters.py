@@ -9,8 +9,9 @@ class FeatureSplitter:
 
     Parameters
     ----------
-    drop_na_mode: ``str``, optional, (default=``"any"``)
-        only "any" is supported now
+    drop_na_mode: str, optional, default: ``'any'``
+        Only 'any' is supported now
+
     """
 
     def __init__(self, drop_na_mode: str = "any"):
@@ -21,7 +22,7 @@ class FeatureSplitter:
         self.drop_na_mode = drop_na_mode
 
     def transform(
-        self, X: pd.DataFrame, y: pd.DataFrame, **kwargs
+        self, X: pd.DataFrame, y: pd.DataFrame
     ) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame):
         """Split the feature matrices X and y in X_train, y_train, X_test, y_test.
 
@@ -29,12 +30,18 @@ class FeatureSplitter:
 
         Parameters
         ----------
-        X : ``pd.DataFrame``, required
-        y : ``pd.DataFrame``, required
+        X : pd.DataFrame, shape (n_samples, n_features), required
+            The feature matrix.
+
+        y : ``pd.DataFrame``, shape (n_samples, horizon), required
+            The y matrix.
 
         Returns
         -------
-        X_train, y_train, X_test, y_test : ``Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]``
+        X_train, y_train, X_test, y_test : ``Tuple[pd.DataFrame, pd.DataFrame, \
+            pd.DataFrame, pd.DataFrame]``
+            The X and y, split between train and test.
+
         """
         X, y = self._drop_X_na(X, y)
         X_train, y_train, X_test, y_test = self._split_train_test(X, y)

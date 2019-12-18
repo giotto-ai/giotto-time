@@ -14,16 +14,16 @@ def trim_feature_nans(
 
     Parameters
     ----------
-    X : ``pd.DataFrame``, required.
+    X : pd.DataFrame, shape (n_samples, n_features), required.
         The ``pd.DataFrame`` containing ``X``.
 
-    y : ``pd.DataFrame``, required.
+    y : pd.DataFrame, shape (n_samples, horizon), required.
         The ``pd.DataFrame`` containing ``y``.
 
     Returns
     -------
-    X_train, y_train, X_test, y_test : ``Tuple[pd.DataFrame, pd.DataFrame,
-    pd.DataFrame, pd.DataFrame]``
+    X_train, y_train, X_test, y_test : Tuple[pd.DataFrame, pd.DataFrame,
+    pd.DataFrame, pd.DataFrame]
         The ``X`` and ``y``, split in train and test set according to the
         ``split_percentage``.
 

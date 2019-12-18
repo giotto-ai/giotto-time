@@ -63,8 +63,8 @@ class BaseTDAFeature(TDAFeatures):
         X_embedded = self._takens_embedding.fit_transform(X,)
         self.X_embedded_dims_ = X_embedded.shape
 
-        X_windows = self._sliding_window.fit_transform(X_embedded,)
-        X_diagrams = self._vietoris_rips_persistence.fit_transform(X_windows,)
+        X_windows = self.sliding_window.fit_transform(X_embedded,)
+        X_diagrams = self.vietoris_rips_persistence.fit_transform(X_windows,)
 
         diagram_scaler = diag.Scaler()
         diagram_scaler.fit(X_diagrams)

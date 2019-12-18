@@ -28,15 +28,15 @@ def smape(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 
     Parameters
     ----------
-    y_true : ``np.ndarray``, required.
+    y_true : np.ndarray, shape (length, 1), required
         The first vector.
 
-    y_pred : ``np.ndarray``, required.
+    y_pred : np.ndarray, shape (length, 1), required
         The second vector.
 
     Returns
     -------
-    smape : ``float``
+    smape : float
         The smape between the two input vectors.
 
     """
@@ -58,15 +58,15 @@ def max_error(
 
     Parameters
     ----------
-    y_true : ``Union[List, np.ndarray]``, required.
+    y_true : Union[List, np.ndarray], shape (length, 1), required
         The first vector
 
-    y_pred : ``Union[List, np.ndarray]``, required.
+    y_pred : Union[List, np.ndarray], shape (length, 1), required
         The second vector
 
     Returns
     -------
-    error : ``float``
+    error : float
         The maximum error between the two vectors.
 
     """

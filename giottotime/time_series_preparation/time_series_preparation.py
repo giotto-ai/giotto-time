@@ -23,23 +23,34 @@ class TimeSeriesPreparation:
     Here is what happens:
     - if a `list` or `np.array` is passed, the PeriodIndex is built using the parameters
         `start`, `end` and `freq`
-    - if a `pd.Series` is passed, it checks if the index is a time index (`DatetimeIndex`,
-        `TimedeltaIndex`, `PeriodIndex`) or not. If not the index is built as if it were
-        a `list` or `np.array. If yes the index is converted to PeriodIndex.
+    - if a `pd.Series` is passed, it checks if the index is a time index
+       (`DatetimeIndex`, `TimedeltaIndex`, `PeriodIndex`) or not. If not the index is
+       built as if it were a `list` or `np.array. If yes the index is converted to
+       PeriodIndex.
 
     Parameters
     ----------
-    start : ``pd.datetime``, optional, (default=``None``)
-    end : ``pd.datetime``, optional, (default=``None``)
-    freq : ``pd.Timedelta``, optional, (default=``None``)
-    resample_if_not_equispaced : ``bool``, optional, (default=``False``)
-        not supported yet, leave it as True
-    output_name : ``str``, optional, (default=``"time_series"``)
-        column name of the output `pd.DataFrame`
+    start : pd.datetime, optional, default: ``None``
+        The date to use as start date.
+
+    end : pd.datetime, optional, default: ``None``
+        The date to use as end date.
+
+    freq : pd.Timedelta, optional, default: ``None``
+        The frequency of the output time series. Not mandatory for all time series
+        conversion.
+
+    resample_if_not_equispaced : bool, optional, default: ``False``
+        Not supported yet, leave it as True
+
+    output_name : str, optional, default: ``'time_series'``
+        The name of the output column
+
     Raises
     ------
-    ``ValueError``
+    ValueError
         Of the three parameters: start, end, and periods, exactly two must be specified.
+
     """
 
     def __init__(
@@ -67,20 +78,22 @@ class TimeSeriesPreparation:
             self.freq
         )
 
-    def transform(self, X: Union[List, np.array, pd.Series]) -> pd.DataFrame:
+    def transform(self, time_series: Union[List, np.array, pd.Series]) -> pd.DataFrame:
         """Transforms an array-like sequence in a period-index DataFrame with a single
         column.
 
         Parameters
         ----------
-        X : ``Union[List, np.array, pd.Series]``, required
+        time_series : Union[List, np.array, pd.Series], required
+            The input time series.
 
         Returns
         -------
-        period_index_dataframe : ``pd.DataFrame``
-            the output dataframe with a period index.
+        period_index_dataframe : pd.DataFrame
+            The output dataframe with a period index.
+
         """
-        pandas_time_series = self._to_time_index_series(X)
+        pandas_time_series = self._to_time_index_series(time_series)
         equispaced_time_series = self._to_equispaced_time_series(pandas_time_series)
         period_index_time_series = self._to_period_index_time_series(
             equispaced_time_series

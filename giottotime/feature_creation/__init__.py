@@ -4,7 +4,6 @@ from .index_dependent_features import (
     DetrendedFeature,
     RemovePolynomialTrend,
     RemoveExponentialTrend,
-    RemoveFunctionTrend,
     tda_features,
 )
 from .index_dependent_features import (
@@ -31,5 +30,4 @@ __all__ = [
     "DetrendedFeature",
     "RemovePolynomialTrend",
     "RemoveExponentialTrend",
-    "RemoveFunctionTrend",
 ]

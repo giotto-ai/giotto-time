@@ -5,8 +5,8 @@ from scipy.optimize import minimize
 
 import numpy as np
 import pandas as pd
+from sklearn.utils.validation import check_is_fitted
 
-from ..utils import check_is_fitted
 from ..trend_models.base import TrendModel
 
 
@@ -24,104 +24,108 @@ class PolynomialTrend(TrendModel):
         The loss function to use when fitting the model. The loss function must
          accept y_true, y_pred and return a single real number.
 
+    method : ``str``, optional, (default=``'BFGS``).
+        The method to use in order to minimize the loss function.
+
     """
 
-    def __init__(self, order: int, loss: Callable = mean_squared_error):
+    def __init__(
+        self, order: int = 2, loss: Callable = mean_squared_error, method: str = "BFGS"
+    ):
         self.order = order
         self.loss = loss
+        self.method = method
 
-    def fit(self, time_series: pd.DataFrame, method: str = "BFGS") -> TrendModel:
-        """Fit the model on the ``time_series``, with respect to the provided
-        ``loss`` and using the provided ``method``. In order to see which
-        methods are available, please check the 'scipy' `documentation
+    def fit(self, ts: pd.DataFrame,) -> TrendModel:
+        """Fit the model on the ``time_series``, with respect to the provided ``loss``
+        and using the provided ``method``. In order to see which methods are available,
+        please check the 'scipy' `documentation
         <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html>`_.
 
         Parameters
         ----------
-        time_series : ``pd.DataFrame``, required.
+        ts: pd.DataFrame, shape (n_samples, n_features), required
             The time series on which to fit the model.
-
-        method : ``str``, optional, (default=``'BFGS``).
-            The method to use in order to minimize the loss function.
 
         Returns
         -------
-        self : ``TrendModel``
+        self : TrendModel
             The fitted object.
 
         """
 
         def prediction_loss(weights: np.ndarray) -> float:
             p = np.poly1d(weights)
-            predictions = [p(t) for t in range(0, time_series.shape[0])]
-            return self.loss(time_series.values, predictions)
+            predictions = [p(t) for t in range(0, ts.shape[0])]
+            return self.loss(ts.values, predictions)
 
         model_weights = np.zeros(self.order)
 
         res = minimize(
-            prediction_loss, model_weights, method=method, options={"disp": False}
+            prediction_loss, model_weights, method=self.method, options={"disp": False}
         )
 
         self.model_weights_ = res["x"]
-        self.t0_ = time_series.index[0]
-        freq = time_series.index.freq
+        self.t0_ = ts.index[0]
+        freq = ts.index.freq
         if freq is not None:
             self.period_ = freq
         else:
-            self.period_ = time_series.index[1] - time_series.index[0]
+            self.period_ = ts.index[1] - ts.index[0]
             # raise warning
 
         return self
 
-    def predict(self, X: pd.DataFrame) -> pd.DataFrame:
+    def predict(self, ts: pd.DataFrame) -> pd.DataFrame:
         """Using the fitted polynomial, predict the values starting from ``X``.
 
         Parameters
         ----------
-        X : ``pd.DataFrame``, required.
+        ts: pd.DataFrame, shape (n_samples, 1), required
             The time series on which to predict.
 
         Returns
         -------
-        predictions : ``pd.DataFrame``
+        predictions : pd.DataFrame, shape (n_samples, 1)
             The output predictions.
 
         Raises
         ------
-        ``NotFittedError``
+        NotFittedError
             Raised if the model is not fitted yet.
 
         """
-        check_is_fitted(self)
+        check_is_fitted(self, ["model_weights_"])
 
         p = np.poly1d(self.model_weights_)
-        return p(X.values)
+        predictions = p(ts.values)
+        return predictions
 
-    def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
+    def transform(self, ts: pd.DataFrame) -> pd.DataFrame:
         """Transform the ``time_series`` by removing the trend.
 
         Parameters
         ----------
-        time_series : ``pd.DataFrame``, required.
+        ts: pd.DataFrame, shape (n_samples, 1), required
             The time series to transform.
 
         Returns
         -------
-        transformed_time_series : ``pd.DataFrame``
+        ts_t : pd.DataFrame, shape (n_samples, n_features)
             The transformed time series, without the trend.
 
         """
         p = np.poly1d(self.model_weights_)
 
-        trans_freq = time_series.index.freq
+        trans_freq = ts.index.freq
         if trans_freq is not None:
             trans_freq = trans_freq
         else:
-            trans_freq = time_series.index[1] - time_series.index[0]
+            trans_freq = ts.index[1] - ts.index[0]
             # raise warning
 
-        ts = (time_series.index - self.t0_) / self.period_
+        ts = (ts.index - self.t0_) / self.period_
 
-        predictions = pd.Series(index=time_series.index, data=[p(t) for t in ts])
+        predictions = pd.Series(index=ts.index, data=[p(t) for t in ts])
 
-        return time_series.sub(predictions, axis=0)
+        return ts.sub(predictions, axis=0)

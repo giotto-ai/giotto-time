@@ -97,13 +97,13 @@ class TDAFeatures(IndexDependentFeature, metaclass=ABCMeta):
         self.takens_time_delay = takens_time_delay
         self.takens_dimension = takens_dimension
 
-        self._sliding_window = SlidingWindow(
+        self.sliding_window = SlidingWindow(
             width=sliding_window_width, stride=sliding_stride
         )
         self.sliding_window_width = sliding_window_width
         self.sliding_stride = sliding_stride
 
-        self._vietoris_rips_persistence = hl.VietorisRipsPersistence(
+        self.vietoris_rips_persistence = hl.VietorisRipsPersistence(
             metric=diags_metric,
             coeff=diags_coeff,
             max_edge_length=diags_max_edge_length,
@@ -112,7 +112,7 @@ class TDAFeatures(IndexDependentFeature, metaclass=ABCMeta):
             n_jobs=diags_n_jobs,
         )
 
-    def fit(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None):
+    def fit(self, time_series: pd.DataFrame, y: Optional[pd.DataFrame] = None):
         return self
 
     def _compute_n_points(self, n_windows: int) -> int:
@@ -136,8 +136,8 @@ class TDAFeatures(IndexDependentFeature, metaclass=ABCMeta):
         X_embedded = self._takens_embedding.fit_transform(X)
         self.X_embedded_dims_ = X_embedded.shape
 
-        X_windows = self._sliding_window.fit_transform(X_embedded)
-        X_diagrams = self._vietoris_rips_persistence.fit_transform(X_windows)
+        X_windows = self.sliding_window.fit_transform(X_embedded)
+        X_diagrams = self.vietoris_rips_persistence.fit_transform(X_windows)
 
         diagram_scaler = diag.Scaler()
         diagram_scaler.fit(X_diagrams)

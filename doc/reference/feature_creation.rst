@@ -12,7 +12,7 @@
    :toctree: generated/
    :template: class.rst
 
-   feature_creation.FeaturesCreation
+   feature_creation.FeatureCreation
    feature_creation.ShiftFeature
    feature_creation.MovingAverageFeature
    feature_creation.ConstantFeature
@@ -43,4 +43,3 @@
    feature_creation.tda_features.AvgLifeTimeFeature
    feature_creation.tda_features.BettiCurvesFeature
    feature_creation.tda_features.NumberOfRelevantHolesFeature
-

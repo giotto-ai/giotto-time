@@ -5,8 +5,6 @@ from .base import TDAFeatures, align_indices
 import pandas as pd
 import numpy as np
 
-__all__ = ["AvgLifeTimeFeature"]
-
 
 class AvgLifeTimeFeature(TDAFeatures):
     """Compute the list of average lifetime for each time window, starting
@@ -14,97 +12,87 @@ class AvgLifeTimeFeature(TDAFeatures):
 
     Parameters
     ----------
-    output_name : ``str``, required.
-        The name of the output column.
-
-    h_dim : ``int``, optional, (default=``0``)
+    h_dim : int, optional, default: ``0``
         The homology dimension on which to compute the average lifetime.
 
-    takens_parameters_type: ``'search'`` | ``'fixed'``, optional,
-        (default=``'search'``)
-        If set to ``'fixed'``, the values of `time_delay` and `dimension`
-        are used directly in :meth:`transform`. If set to ``'search'``,
-        those values are only used as upper bounds in a search as follows:
-        first, an optimal time delay is found by minimising the time delayed
-        mutual information; then, a heuristic based on an algorithm in [2]_ is
-        used to select an embedding dimension which, when increased, does not
-        reveal a large proportion of "false nearest neighbors".
+    output_name : str, optional, default: ``'AvgLifeTimeFeature'``
+        The name of the output column.
 
-    takens_time_delay : ``int``, optional, (default=``1``)
-        Time delay between two consecutive values for constructing one
-        embedded point. If `parameters_type` is ``'search'``,
-        it corresponds to the maximal embedding time delay that will be
-        considered.
+    takens_parameters_type: ``'search'`` | ``'fixed'``, optional, default: ``'search'``
+        If set to ``'fixed'``, the values of `time_delay` and `dimension are used
+        directly in :meth:`transform`. If set to ``'search'``, those values are only
+        used as upper bounds in a search as follows: first, an optimal time delay is
+        found by minimising the time delayed mutual information; then, a heuristic based
+        on an algorithm in [2]_ is used to select an embedding dimension which, when
+        increased, does not reveal a large proportion of "false nearest neighbors".
 
-    takens_dimension : ``int``, optional, (default=``5``)
-        Dimension of the embedding space. If `parameters_type` is ``'search'``,
-        it corresponds to the maximum embedding dimension that will be
-        considered.
+    takens_time_delay : int, optional, default: ``1``
+        Time delay between two consecutive values for constructing one embedded point.
+        If `parameters_type` is ``'search'``, it corresponds to the maximal embedding
+        time delay that will be considered.
 
-    takens_stride : ``int``, optional, (default=``1``)
-        Stride duration between two consecutive embedded points. It defaults
-        to 1 as this is the usual value in the statement of Takens's embedding
-        theorem.
+    takens_dimension : int, optional, default: ``5``
+        Dimension of the embedding space. If `parameters_type` is ``'search'``, it
+        corresponds to the maximum embedding dimension that will be considered.
 
-    takens_n_jobs : ``int``, optional, (default=``None``)
-        The number of jobs to use for the computation. ``None`` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
-        processors.
+    takens_stride : int, optional, default: ``1``
+        Stride duration between two consecutive embedded points. It defaults to 1 as
+        this is the usual value in the statement of Takens's embedding theorem.
 
-    sliding_window_width : ``int``, optional, (default=``10``)
-        Width of each sliding window. Each window contains ``width + 1``
-        objects from the original time series.
+    takens_n_jobs : int: , optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless in a
+        :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
-    sliding_stride : ``int``, optional, (default=``1``)
+    sliding_window_width : int, optional, default: ``10``
+        Width of each sliding window. Each window contains ``width + 1`` objects from
+        the original time series.
+
+    sliding_stride : int, optional, default: ``1``
         Stride between consecutive windows.
 
-    diags_metric : ``Union[str, Callable]``, optional,
-    (default=``'euclidean'``)
-        If set to `'precomputed'`, input data is to be interpreted as a
-        collection of distance matrices. Otherwise, input data is to be
-        interpreted as a collection of point clouds (i.e. feature arrays),
-        and `metric` determines a rule with which to calculate distances
-        between pairs of instances (i.e. rows) in these arrays.
+    diags_metric : Union[str, Callable], optional, default: ``'euclidean'``
+        If set to `'precomputed'`, input data is to be interpreted as a collection of
+        distance matrices. Otherwise, input data is to be interpreted as a collection
+        of point clouds (i.e. feature arrays), and `metric` determines a rule with which
+        to calculate distances between pairs of instances (i.e. rows) in these arrays.
         If `metric` is a string, it must be one of the options allowed by
-        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a
-        metric listed in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`,
-        including "euclidean", "manhattan", or "cosine".
-        If `metric` is a callable function, it is called on each pair of
-        instances and the resulting value recorded. The callable should take
-        two arrays from the entry in `X` as input, and return a value
-        indicating the distance between them.
+        :obj:`scipy.spatial.distance.pdist` for its metric parameter, or a metric listed
+        in :obj:`sklearn.pairwise.PAIRWISE_DISTANCE_FUNCTIONS`, including "euclidean",
+        "manhattan", or "cosine". If `metric` is a callable function, it is called on
+        each pair of instances and the resulting value recorded. The callable should
+        take two arrays from the entry in `X` as input, and return a value indicating
+        the distance between them.
 
-    diags_homology_dimensions : ``Iterable``, optional, (default=``(0, 1)``)
-        Dimensions (non-negative integers) of the topological feature_creation
-        to be detected.
+    diags_homology_dimensions : Iterable, optional, default: ``(0, 1)``
+        Dimensions (non-negative integers) of the topological feature_creation to be
+        detected.
 
-    diags_coeff : ``int`` prime, optional, (default=``2``)
+    diags_coeff : int prime, optional, default: ``2``
         Compute homology with coefficients in the prime field
         :math:`\\mathbb{F}_p = \\{ 0, \\ldots, p - 1 \\}` where
         :math:`p` equals `coeff`.
 
-    diags_max_edge_length : ``float``, optional, (default=``np.inf``)
-        Upper bound on the maximum value of the Vietoris-Rips filtration
-        parameter. Points whose distance is greater than this value will
-        never be connected by an edge, and topological feature_creation at
-        scales larger than this value will not be detected.
+    diags_max_edge_length : float, optional, default: ``np.inf``
+        Upper bound on the maximum value of the Vietoris-Rips filtration parameter.
+        Points whose distance is greater than this value will never be connected by an
+        edge, and topological feature_creation at scales larger than this value will not
+        be detected.
 
-    diags_infinity_values : ``float``, optional, (default=``None``)
-        Which death value to assign to feature_creation which are still alive
-        at filtration value `max_edge_length`. ``None`` has the same behaviour
-        as `max_edge_length`.
+    diags_infinity_values : float, optional, default: ``None``
+        Which death value to assign to feature_creation which are still alive at
+        filtration value `max_edge_length`. ``None`` has the same behaviour as
+        `max_edge_length`.
 
-    diags_n_jobs : ``int``, optional, (default=``None``)
-        The number of jobs to use for the computation. ``None`` means 1 unless
-        in a :obj:`joblib.parallel_backend` context. ``-1`` means using all
-        processors.
+    diags_n_jobs : int, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless in a
+        :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
     """
 
     def __init__(
         self,
-        output_name: str,
         h_dim: int = 0,
+        output_name: str = "AvgLifeTimeFeature",
         takens_parameters_type: str = "search",
         takens_dimension: int = 5,
         takens_stride: int = 1,
@@ -135,35 +123,34 @@ class AvgLifeTimeFeature(TDAFeatures):
             diags_infinity_values=diags_infinity_values,
             diags_n_jobs=diags_n_jobs,
         )
-        self._h_dim = h_dim
+        self.h_dim = h_dim
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """From the initial DataFrame ``X``, compute the persistence diagrams
-        and detect the average lifetime for a given homology dimension.
-        Then, assign a value to each initial data points.
+    def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
+        """From the initial DataFrame ``time_series``, compute the persistence diagrams and detect
+        the average lifetime for a given homology dimension. Then, assign a value to
+        each initial data points.
 
         Parameters
         ----------
-        X : ``pd.DataFrame``, required.
+        time_series : pd.DataFrame, shape (n_samples, 1), required
             The DataFrame on which to compute the feature_creation.
 
         Returns
         -------
-        X_renamed : ``pd.DataFrame``
-            A DataFrame containing, for each original data-point, the average
-            lifetime associated to it. If, given the initial parameters, a
-            point was excluded from the computation, its value is set to
-            ``Nan``.
+        time_series_t : pd.DataFrame, shape (n_samples, 1)
+            A DataFrame containing, for each original data-point, the average lifetime
+            associated to it. If, given the initial parameters, a point was excluded
+            from the computation, its value is set to ``Nan``.
 
         """
-        persistence_diagrams = self._compute_persistence_diagrams(X)
+        persistence_diagrams = self._compute_persistence_diagrams(time_series)
         avg_lifetime = self._compute_average_lifetime(persistence_diagrams)
         original_points = self._compute_n_points(len(avg_lifetime))
 
-        X_aligned = align_indices(X, original_points, avg_lifetime)
-        X_renamed = self._rename_columns(X_aligned)
+        time_series_aligned = align_indices(time_series, original_points, avg_lifetime)
+        time_series_t = self._rename_columns(time_series_aligned)
 
-        return X_renamed
+        return time_series_t
 
     def _compute_average_lifetime(self, persistence_diagrams: np.ndarray) -> List:
         avg_lifetime = []
@@ -176,7 +163,7 @@ class AvgLifeTimeFeature(TDAFeatures):
                 persistence_table["death"] - persistence_table["birth"]
             )
             avg_lifetime.append(
-                persistence_table[persistence_table["homology"] == self._h_dim][
+                persistence_table[persistence_table["homology"] == self.h_dim][
                     "lifetime"
                 ].mean()
             )

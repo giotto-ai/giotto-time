@@ -1,16 +1,16 @@
-from sklearn.metrics import mean_squared_error
-from scipy.optimize import minimize
-
-import numpy as np
 import pandas as pd
+from scipy.optimize import minimize
+from sklearn.metrics import mean_squared_error
 
-from ..trend_models.base import TrendModel
-from ..utils import check_is_fitted
+from giottotime.feature_creation import DetrendedFeature
+from giottotime.experimental.trend_models.base import TrendModel
 
 
-class ExponentialTrend(TrendModel):
-    """A model for fitting, predicting and removing an exponential trend from a
-     time series.
+class FunctionTrend(TrendModel):
+    """A model for fitting, predicting and removing an custom functional trend
+    from a time series. The transformed time series created will be trend
+    stationary with respect to the specific function. To have more details,
+    you can check this `link <https://en.wikipedia.org/wiki/Trend_stationary>`_.
 
     Parameters
     ----------
@@ -20,10 +20,13 @@ class ExponentialTrend(TrendModel):
 
     """
 
-    def __init__(self, loss=mean_squared_error):
+    def __init__(self, model_form, loss=mean_squared_error):
+        self.model_form = model_form
         self.loss = loss
 
-    def fit(self, time_series: pd.DataFrame, method: str = "BFGS") -> TrendModel:
+    def fit(
+        self, time_series: pd.DataFrame, x0: list, method: str = "BFGS"
+    ) -> TrendModel:
         """Fit the model on the ``time_series``, with respect to the provided
         ``loss`` and using the provided ``method``. In order to see which
         methods are available, please check the 'scipy' `documentation
@@ -33,6 +36,8 @@ class ExponentialTrend(TrendModel):
         ----------
         time_series : ``pd.DataFrame``, required.
             The time series on which to fit the model.
+
+        x0 : ``list``.
 
         method : ``str``, optional, (default=``'BFGS``).
             The method to use in order to minimize the loss function.
@@ -44,19 +49,16 @@ class ExponentialTrend(TrendModel):
 
         """
 
-        def prediction_error(exponent):
-            predictions = [np.exp(t * exponent) for t in range(0, time_series.shape[0])]
+        def prediction_error(model_weights):
+            predictions = [
+                self.model_form(t, model_weights)
+                for t in range(0, time_series.shape[0])
+            ]
             return self.loss(time_series.values, predictions)
 
-        model_exponent = 0
-        res = minimize(
-            prediction_error,
-            np.array([model_exponent]),
-            method=method,
-            options={"disp": False},
-        )
+        res = minimize(prediction_error, x0, method=method, options={"disp": False})
 
-        self.model_exponent_ = res["x"][0]
+        self.model_weights_ = res["x"]
 
         self.t0_ = time_series.index[0]
         freq = time_series.index.freq
@@ -68,8 +70,8 @@ class ExponentialTrend(TrendModel):
 
         return self
 
-    def predict(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Using the fitted model, predict the value starting from ``X``.
+    def predict(self, t):
+        """Using the fitted model, predict the values starting from ``X``.
 
         Parameters
         ----------
@@ -87,11 +89,10 @@ class ExponentialTrend(TrendModel):
             Raised if the model is not fitted yet.
 
         """
-        check_is_fitted(self)
+        # check fit run
+        return self.model_form(t, self.model_weights_)
 
-        return np.exp(X * self.model_exponent_)
-
-    def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
+    def transform(self, time_series):
         """Transform the ``time_series`` by removing the trend.
 
         Parameters
@@ -105,18 +106,21 @@ class ExponentialTrend(TrendModel):
             The transformed time series, without the trend.
 
         """
-
-        trans_freq = time_series.index.freq
-        if trans_freq is not None:
-            trans_freq = trans_freq
-        else:
-            trans_freq = time_series.index[1] - time_series.index[0]
-            # raise warning
+        # check fit run
 
         ts = (time_series.index - self.t0_) / self.period_
 
-        predictions = pd.DataFrame(
+        predictions = pd.Series(
             index=time_series.index,
-            data=[np.exp(t * self.model_exponent_) for t in ts],
+            data=[self.model_form(t, self.model_weights_) for t in ts],
         )
-        return time_series - predictions[0]
+
+        return time_series.sub(predictions, axis=0)
+
+
+class RemoveFunctionTrend(DetrendedFeature):
+    def __init__(
+        self, loss=mean_squared_error, output_name: str = "RemoveFunctionTrend"
+    ):
+        self.trend_model = ExponentialTrend(loss=loss)
+        super().__init__(trend_model=self.trend_model, output_name=output_name)
