@@ -51,7 +51,7 @@ class GAR:
         features = X.copy()
         models_per_predstep = [deepcopy(self.base_model) for _ in range(y.shape[1])]
 
-        for pred_step, model_for_pred_step in enumerate(models_per_predstep):
+        for pred_step, model_for_pred_step in enumerate(models_per_predstep, 1):
             target_y = y[f"y_{pred_step}"]
             model_for_pred_step.fit(features, target_y, **kwargs)
 
@@ -89,7 +89,7 @@ class GAR:
 
         predictions = pd.DataFrame(index=test_features.index)
 
-        for pred_step, model_for_pred_step in enumerate(self.models_per_predstep_):
+        for pred_step, model_for_pred_step in enumerate(self.models_per_predstep_, 1):
             model_predictions = model_for_pred_step.predict(test_features)
             predictions[f"y_{pred_step}"] = model_predictions
 

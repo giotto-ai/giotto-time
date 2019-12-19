@@ -91,11 +91,11 @@ class MovingAverageFeature(IndexDependentFeature):
     >>> mv_avg_feature.transform(ts)
        MovingAverageFeature
     0                   NaN
-    1                   NaN
-    2                   0.5
-    3                   1.5
-    4                   2.5
-    5                   3.5
+    1                   0.5
+    2                   1.5
+    3                   2.5
+    4                   3.5
+    5                   4.5
 
     """
 
@@ -119,7 +119,7 @@ class MovingAverageFeature(IndexDependentFeature):
             moving average for each element.
 
         """
-        time_series_mvg_avg = time_series.rolling(self.window_size).mean().shift(1)
+        time_series_mvg_avg = time_series.rolling(self.window_size).mean()
         time_series_t = self._rename_columns(time_series_mvg_avg)
         return time_series_t
 

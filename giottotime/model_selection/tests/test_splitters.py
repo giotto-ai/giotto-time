@@ -8,11 +8,13 @@ from giottotime.model_selection.feature_splitters import FeatureSplitter
 from giottotime.utils.hypothesis.feature_matrices import X_y_matrices
 
 
-features = [
+FEATURES = [
+    ShiftFeature(0, "0"),
     ShiftFeature(1, "1"),
-    ShiftFeature(2, "2"),
     MovingAverageFeature(3, "3"),
 ]
+
+HORIZON = 4
 
 
 class TestFeatureSplitter:
@@ -27,7 +29,7 @@ class TestFeatureSplitter:
     @settings(suppress_health_check=(HealthCheck.too_slow,))
     @given(
         X_y_matrices(
-            horizon=4, time_series_features=features, allow_nan_infinity=False,
+            horizon=HORIZON, time_series_features=FEATURES, allow_nan_infinity=False,
         )
     )
     def test_transform(self, X_y):
@@ -35,7 +37,7 @@ class TestFeatureSplitter:
         feature_splitter = FeatureSplitter()
         X_train, y_train, X_test, y_test = feature_splitter.transform(X, y)
 
-        assert X_train.shape[0] == max(0, X.shape[0] - 3 - 3)
-        assert y_train.shape[0] == max(0, X.shape[0] - 3 - 3)
-        assert X_test.shape[0] == min(max(0, X.shape[0] - 3), 3)
-        assert y_test.shape[0] == min(max(0, X.shape[0] - 3), 3)
+        assert X_train.shape[0] == max(0, X.shape[0] - 2 - HORIZON)
+        assert y_train.shape[0] == X_train.shape[0]
+        assert X_test.shape[0] == min(max(0, X.shape[0] - 2), HORIZON)
+        assert y_test.shape[0] == X_test.shape[0]

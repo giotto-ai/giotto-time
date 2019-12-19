@@ -36,7 +36,7 @@ class TestFeatureCreation:
 
     def _correct_y(self, ts, horizon):
         y = pd.DataFrame(index=ts.index)
-        for k in range(horizon):
+        for k in range(1, horizon + 1):
             shift_feature = ShiftFeature(-k, f"shift_{k}")
             y[f"y_{k}"] = shift_feature.fit_transform(ts)
         return y
@@ -59,8 +59,8 @@ class TestFeatureCreation:
         y_shifts = feature_creation._create_y_shifts(ts)
         expected_y_shifts = pd.DataFrame.from_dict(
             {
-                "y_0": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                 "y_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.nan],
+                "y_2": [2, 3, 4, 5, 6, 7, 8, 9, np.nan, np.nan],
             }
         )
         expected_y_shifts.index = ts.index
@@ -91,8 +91,8 @@ class TestFeatureCreation:
         x_shifts = feature_creation._create_x_features(ts)
         expected_x_shifts = pd.DataFrame.from_dict(
             {
-                "mov_avg_2": [np.nan, np.nan, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5,],
-                "mov_avg_5": [np.nan, np.nan, np.nan, np.nan, np.nan, 2, 3, 4, 5, 6,],
+                "mov_avg_2": [np.nan, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5,],
+                "mov_avg_5": [np.nan, np.nan, np.nan, np.nan, 2, 3, 4, 5, 6, 7,],
                 "shift_3": [np.nan, np.nan, np.nan, 0, 1, 2, 3, 4, 5, 6,],
             }
         )
@@ -154,9 +154,9 @@ class TestFeatureCreation:
 
         expected_y = pd.DataFrame.from_dict(
             {
-                "y_0": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,],
                 "y_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.nan,],
                 "y_2": [2, 3, 4, 5, 6, 7, 8, 9, np.nan, np.nan,],
+                "y_3": [3, 4, 5, 6, 7, 8, 9, np.nan, np.nan, np.nan,],
             }
         )
         expected_y.index = random_index
