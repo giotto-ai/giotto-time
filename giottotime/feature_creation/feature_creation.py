@@ -41,29 +41,29 @@ class FeatureCreation:
     ...                                                          mv_avg_feature])
     >>> X, y = feature_creation.fit_transform(ts)
     >>> X
-        ShiftFeature  MovingAverageFeature
+       ShiftFeature  MovingAverageFeature
     0           NaN                   NaN
-    1           0.0                   NaN
-    2           1.0                   0.5
-    3           2.0                   1.5
-    4           3.0                   2.5
-    5           4.0                   3.5
-    6           5.0                   4.5
-    7           6.0                   5.5
-    8           7.0                   6.5
-    9           8.0                   7.5
+    1           0.0                   0.5
+    2           1.0                   1.5
+    3           2.0                   2.5
+    4           3.0                   3.5
+    5           4.0                   4.5
+    6           5.0                   5.5
+    7           6.0                   6.5
+    8           7.0                   7.5
+    9           8.0                   8.5
     >>> y
-         y_0  y_1  y_2
-    0    0  1.0  2.0
-    1    1  2.0  3.0
-    2    2  3.0  4.0
-    3    3  4.0  5.0
-    4    4  5.0  6.0
-    5    5  6.0  7.0
-    6    6  7.0  8.0
-    7    7  8.0  9.0
-    8    8  9.0  NaN
-    9    9  NaN  NaN
+       y_1  y_2  y_3
+    0  1.0  2.0  3.0
+    1  2.0  3.0  4.0
+    2  3.0  4.0  5.0
+    3  4.0  5.0  6.0
+    4  5.0  6.0  7.0
+    5  6.0  7.0  8.0
+    6  7.0  8.0  9.0
+    7  8.0  9.0  NaN
+    8  9.0  NaN  NaN
+    9  NaN  NaN  NaN
     """
 
     def __init__(self, time_series_features: List[Feature], horizon: int = 5):
@@ -96,7 +96,7 @@ class FeatureCreation:
 
     def _create_y_shifts(self, time_series: pd.DataFrame) -> pd.DataFrame:
         y = pd.DataFrame(index=time_series.index)
-        for k in range(self.horizon):
+        for k in range(1, self.horizon + 1):
             shift_feature = ShiftFeature(-k, f"shift_{k}")
             y[f"y_{k}"] = shift_feature.fit_transform(time_series)
 

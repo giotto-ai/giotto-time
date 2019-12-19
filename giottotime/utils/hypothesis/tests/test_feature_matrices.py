@@ -11,8 +11,8 @@ from giottotime.utils.hypothesis.feature_matrices import (
 )
 
 features = [
+    ShiftFeature(0, "0"),
     ShiftFeature(1, "1"),
-    ShiftFeature(2, "2"),
     MovingAverageFeature(3, "3"),
 ]
 
@@ -36,7 +36,7 @@ class TestXyMatrices:
     @given(X_y_matrices(horizon=3, time_series_features=features))
     def test_X_column_names(self, X_y: Tuple[pd.DataFrame, pd.DataFrame]):
         X, y = X_y
-        assert list(X.columns) == ["1", "2", "3"]
+        assert list(X.columns) == ["0", "1", "3"]
 
     @given(X_y_matrices(horizon=3, time_series_features=features))
     def test_X_shape_correct(self, X_y: Tuple[pd.DataFrame, pd.DataFrame]):
@@ -46,7 +46,7 @@ class TestXyMatrices:
     @given(X_y_matrices(horizon=3, time_series_features=features))
     def test_y_column_names(self, X_y: Tuple[pd.DataFrame, pd.DataFrame]):
         X, y = X_y
-        assert list(y.columns) == ["y_0", "y_1", "y_2"]
+        assert list(y.columns) == ["y_1", "y_2", "y_3"]
 
     @given(X_y_matrices(horizon=3, time_series_features=features))
     def test_shape_consistent(self, X_y: Tuple[pd.DataFrame, pd.DataFrame]):
@@ -58,8 +58,8 @@ class TestXyMatrices:
     )
     def test_allow_nan_false(self, X_y: Tuple[pd.DataFrame, pd.DataFrame]):
         X, y = X_y
-        assert X.dropna(axis=0, how="any").shape[0] == max(X.shape[0] - 3, 0)
-        assert y.dropna(axis=0, how="any").shape[0] == max(y.shape[0] - 2, 0)
+        assert X.dropna(axis=0, how="any").shape[0] == max(X.shape[0] - 2, 0)
+        assert y.dropna(axis=0, how="any").shape[0] == max(y.shape[0] - 3, 0)
 
 
 class TestXMatrices:
@@ -69,11 +69,11 @@ class TestXMatrices:
 
     @given(X_matrices(time_series_features=features))
     def test_X_column_names(self, X: pd.DataFrame):
-        assert list(X.columns) == ["1", "2", "3"]
+        assert list(X.columns) == ["0", "1", "3"]
 
     @given(X_matrices(time_series_features=features, allow_nan_infinity=False))
     def test_allow_nan_false(self, X: pd.DataFrame):
-        assert X.dropna(axis=0, how="any").shape[0] == max(X.shape[0] - 3, 0)
+        assert X.dropna(axis=0, how="any").shape[0] == max(X.shape[0] - 2, 0)
 
 
 class TestYMatrices:
@@ -91,8 +91,8 @@ class TestYMatrices:
 
     @given(y_matrices(horizon=3))
     def test_y_column_names(self, y: pd.DataFrame):
-        assert list(y.columns) == ["y_0", "y_1", "y_2"]
+        assert list(y.columns) == ["y_1", "y_2", "y_3"]
 
     @given(y_matrices(horizon=3, allow_nan_infinity=False))
     def test_allow_nan_false(self, y: pd.DataFrame):
-        assert y.dropna(axis=0, how="any").shape[0] == max(y.shape[0] - 2, 0)
+        assert y.dropna(axis=0, how="any").shape[0] == max(y.shape[0] - 3, 0)

@@ -85,7 +85,7 @@ class TestShiftFeature:
 
 class TestMovingAverageFeature:
     def _correct_ma(self, df: pd.DataFrame, window_size: int) -> pd.DataFrame:
-        return df.rolling(window_size).mean().shift(1)
+        return df.rolling(window_size).mean()
 
     def test_invalid_window_size(self):
         output_name = "moving_average"
@@ -108,7 +108,7 @@ class TestMovingAverageFeature:
         )
         df_ma = ma_feature.fit_transform(df)
         expected_df_ma = pd.DataFrame.from_dict(
-            {output_name: [np.nan, np.nan, 0.5, 1.5, 2.5, 3.5]}
+            {output_name: [np.nan, 0.5, 1.5, 2.5, 3.5, 4.5]}
         )
 
         testing.assert_frame_equal(expected_df_ma, df_ma)
@@ -126,8 +126,8 @@ class TestMovingAverageFeature:
         df_ma = ma_feature.fit_transform(df)
         expected_df_ma = pd.DataFrame.from_dict(
             {
-                f"{output_name}_0": [np.nan, np.nan, 0.5, 1.5, 2.5, 3.5],
-                f"{output_name}_1": [np.nan, np.nan, 7.5, 8.5, 9.5, 10.5],
+                f"{output_name}_0": [np.nan, 0.5, 1.5, 2.5, 3.5, 4.5],
+                f"{output_name}_1": [np.nan, 7.5, 8.5, 9.5, 10.5, 11.5],
             }
         )
 
