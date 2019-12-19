@@ -78,13 +78,15 @@ class TimeSeriesPreparation:
             self.freq
         )
 
-    def transform(self, time_series: Union[List, np.array, pd.Series]) -> pd.DataFrame:
+    def transform(
+        self, time_series: Union[List, np.array, pd.Series, pd.DataFrame]
+    ) -> pd.DataFrame:
         """Transforms an array-like sequence in a period-index DataFrame with a single
         column.
 
         Parameters
         ----------
-        time_series : Union[List, np.array, pd.Series], required
+        time_series : Union[List, np.array, pd.Series, pd.DataFrame], required
             The input time series.
 
         Returns
@@ -104,9 +106,11 @@ class TimeSeriesPreparation:
         return period_index_dataframe
 
     def _to_time_index_series(
-        self, array_like_object: Union[List, np.array, pd.Series]
+        self, array_like_object: Union[List, np.array, pd.Series, pd.DataFrame]
     ) -> pd.Series:
-        if isinstance(array_like_object, pd.Series):
+        if isinstance(array_like_object, pd.DataFrame):
+            return self.pandas_converter.transform(array_like_object.iloc[:, 0])
+        elif isinstance(array_like_object, pd.Series):
             return self.pandas_converter.transform(array_like_object)
         elif any(
             isinstance(array_like_object, type_) for type_ in SUPPORTED_SEQUENCE_TYPES
