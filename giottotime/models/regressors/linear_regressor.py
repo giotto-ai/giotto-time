@@ -31,6 +31,7 @@ class LinearRegressor:
     >>> x0 = [0]*11
     >>> lr.fit(X_train, y_train, x0=x0)
     >>> y_pred = lr.predict(X_test)
+
     """
 
     def __init__(self, loss=mean_squared_error):
