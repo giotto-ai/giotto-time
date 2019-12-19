@@ -16,19 +16,17 @@ def _check_feature_names(time_series_features: List[Feature]) -> None:
 
 
 class FeatureCreation:
-    """Class responsible for the generation of the feature_creation, starting
-    from a list of TimeSeriesFeature.
+    """Class responsible for the generation of the feature_creation, starting from a
+    list of TimeSeriesFeature.
 
     Parameters
     ----------
-    horizon : int, required.
-        It represents how much into the future is necessary to predict. This
-        corresponds to the number of shifts that are going to be performed
-        on y.
+    time_series_features : List[TimeSeriesFeature], required
+        The list of ``TimeSeriesFeature`` from which to compute the feature_creation.
 
-    time_series_features : List[TimeSeriesFeature], required.
-        The list of ``TimeSeriesFeature`` from which to compute the
-        feature_creation.
+    horizon : int, optional, default: ``5``
+        It represents how much into the future is necessary to predict. This corresponds
+        to the number of shifts that are going to be performed on y.
 
     """
 
@@ -39,14 +37,14 @@ class FeatureCreation:
         self.horizon = horizon
 
     def fit_transform(self, time_series: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
-        """Create the X matrix by generating the feature_creation, starting
-        from the original ``time_series`` and using the list of
-        ``time_series_features``. Also create the y matrix, by generating
-        ``horizon`` number of shifts of the ``time_series``.
+        """Create the X matrix by generating the feature_creation, starting from the
+        original ``time_series`` and using the list of ``time_series_features``. Also
+        create the y matrix, by generating ``horizon`` number of shifts of the
+         ``time_series``.
 
         Parameters
         ----------
-        time_series : pd.DataFrame, shape (n_samples, 1), required.
+        time_series : pd.DataFrame, shape (n_samples, 1), required
             The time series on which to compute the ``X`` and ``y`` matrices.
 
         Returns

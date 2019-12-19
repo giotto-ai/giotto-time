@@ -1,14 +1,14 @@
 from typing import Iterable, List, Optional, Callable, Union
 
-from .base import TDAFeatures, align_indices
+from .base import TDAFeatures, _align_indices
 
 import pandas as pd
 import numpy as np
 
 
 class AvgLifeTimeFeature(TDAFeatures):
-    """Compute the list of average lifetime for each time window, starting
-    from the persistence diagrams.
+    """Compute the list of average lifetime for each time window, starting from the
+    persistence diagrams.
 
     Parameters
     ----------
@@ -126,9 +126,9 @@ class AvgLifeTimeFeature(TDAFeatures):
         self.h_dim = h_dim
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
-        """From the initial DataFrame ``time_series``, compute the persistence diagrams and detect
-        the average lifetime for a given homology dimension. Then, assign a value to
-        each initial data points.
+        """From the initial DataFrame ``time_series``, compute the persistence diagrams
+        and detect the average lifetime for a given homology dimension. Then, assign a
+        value to each initial data points.
 
         Parameters
         ----------
@@ -147,7 +147,7 @@ class AvgLifeTimeFeature(TDAFeatures):
         avg_lifetime = self._compute_average_lifetime(persistence_diagrams)
         original_points = self._compute_n_points(len(avg_lifetime))
 
-        time_series_aligned = align_indices(time_series, original_points, avg_lifetime)
+        time_series_aligned = _align_indices(time_series, original_points, avg_lifetime)
         time_series_t = self._rename_columns(time_series_aligned)
 
         return time_series_t

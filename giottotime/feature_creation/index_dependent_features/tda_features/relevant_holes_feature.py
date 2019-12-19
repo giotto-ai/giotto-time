@@ -3,12 +3,12 @@ from typing import Iterable, List, Optional, Union, Callable
 import numpy as np
 import pandas as pd
 
-from .base import TDAFeatures, align_indices
+from .base import TDAFeatures, _align_indices
 
 
 class NumberOfRelevantHolesFeature(TDAFeatures):
-    """Compute the list of average lifetime for each time window, starting
-    from the persistence diagrams.
+    """Compute the list of average lifetime for each time window, starting from the
+    persistence diagrams.
 
     Parameters
     ----------
@@ -154,7 +154,7 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         n_holes = self._compute_num_relevant_holes(persistence_diagrams)
         n_points = self._compute_n_points(len(n_holes))
 
-        time_series_aligned = align_indices(time_series, n_points, n_holes)
+        time_series_aligned = _align_indices(time_series, n_points, n_holes)
         time_series_t = self._rename_columns(time_series_aligned)
 
         return time_series_t

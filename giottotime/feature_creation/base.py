@@ -5,6 +5,10 @@ import pandas as pd
 
 
 class Feature:
+    """Base class for all the features defined in this package.
+
+    """
+
     @abstractmethod
     def __init__(self, output_name):
         self.output_name = output_name

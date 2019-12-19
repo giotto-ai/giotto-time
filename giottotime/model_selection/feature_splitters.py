@@ -10,7 +10,8 @@ class FeatureSplitter:
     Parameters
     ----------
     drop_na_mode: str, optional, default: ``'any'``
-        Only 'any' is supported now
+        How to drop the Nan contained in the ``X`` and ``y`` matrices. Only 'any' is
+        supported for the moment.
 
     """
 
@@ -26,7 +27,8 @@ class FeatureSplitter:
     ) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame):
         """Split the feature matrices X and y in X_train, y_train, X_test, y_test.
 
-        X and y are the feature matrices obtained from the FeatureCreation class.
+        ``X`` and ``y`` are the feature matrices obtained from the FeatureCreation
+        class.
 
         Parameters
         ----------

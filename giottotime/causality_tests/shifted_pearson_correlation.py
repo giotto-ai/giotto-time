@@ -13,13 +13,13 @@ class ShiftedPearsonCorrelation(CausalityTest):
 
     Parameters
     ----------
-    max_shift : ``int``, optional, (default=``10``).
+    max_shift : int, optional, default: ``10``
 
-    target_col : ``str``, optional, (default=``'y'``).
+    target_col : str, optional, default: ``'y'``
             The column to use as the a reference (i.e., the columns which is not
             shifted).
 
-    dropna : ``bool``, optional, (default=False).
+    dropna : bool, optional, default: ``False``
         Determines if the Nan values created by shifting are retained or dropped.
 
     """
@@ -32,12 +32,12 @@ class ShiftedPearsonCorrelation(CausalityTest):
         self.dropna = dropna
 
     def fit(self, data: pd.DataFrame) -> "ShiftedPearsonCorrelation":
-        """Create the dataframe of shifts of each time series which maximize
-        the Pearson correlation (PPMCC).
+        """Create the dataframe of shifts of each time series which maximize the
+         Pearson correlation (PPMCC).
 
         Parameters
         ----------
-        data : pd.DataFrame, shape (n_samples, n_time_series), required.
+        data : pd.DataFrame, shape (n_samples, n_time_series), required
             The DataFrame containing the time series on which to compute the shifted
             correlations.
 
@@ -76,20 +76,20 @@ class ShiftedPearsonCorrelation(CausalityTest):
         return self
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Shifts each input timeseries but the amount which optimizes correlation with
-        the selected 'y' colums.
+        """Shifts each input time series by the amount which optimizes correlation with
+        the selected 'y' column.
 
         Parameters
         ----------
-        data : pd.DataFrame, shape (n_samples, n_time_series), required.
+        data : pd.DataFrame, shape (n_samples, n_time_series), required
             The DataFrame containing the time series on which to perform the
             transformation.
 
         Returns
         -------
         data_t : pd.DataFrame, shape (n_samples, n_time_series)
-            The dataframe (Pivot table) of the shifts which maximize the correlation
-            between each timeseries The shift is indicated in rows.
+            The DataFrame (Pivot table) of the shifts which maximize the correlation
+            between each time series The shift is indicated in rows.
 
         """
         check_is_fitted(self)

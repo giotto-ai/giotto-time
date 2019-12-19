@@ -28,7 +28,7 @@ def check_period_range_parameters(
     start_date: PandasDate, end_date: PandasDate, periods: int
 ) -> None:
     """Check if the period range parameters given as input are compatible with the
-    `pd.period_range` method.
+    ``pd.period_range`` method.
 
     Of the three parameters: start, end, and periods, exactly two must be specified.
 

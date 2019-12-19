@@ -23,8 +23,8 @@ def _check_input(y_true: np.ndarray, y_pred: np.ndarray) -> None:
 
 
 def smape(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    """Compute the 'Symmetric mean absolute percentage error' (SMAPE) between
-    two vectors.
+    """Compute the 'Symmetric mean absolute percentage error' (SMAPE) between two
+    vectors.
 
     Parameters
     ----------
@@ -53,7 +53,6 @@ def smape(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 def max_error(
     y_true: Union[List, np.ndarray], y_pred: Union[List, np.ndarray]
 ) -> float:
-
     """Compute the maximum error between two vectors.
 
     Parameters

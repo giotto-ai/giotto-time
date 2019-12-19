@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import giotto.diagrams as diag
 
-from .base import TDAFeatures, align_indices
+from .base import TDAFeatures, _align_indices
 
 
 def _find_mean_nonzero(g):
@@ -15,8 +15,8 @@ def _find_mean_nonzero(g):
 
 
 class BettiCurvesFeature(TDAFeatures):
-    """Compute the list of average lifetime for each time window, starting
-    from the persistence diagrams.
+    """Compute the list of average lifetime for each time window, starting from the
+    persistence diagrams.
 
     Parameters
     ----------
@@ -186,7 +186,7 @@ class BettiCurvesFeature(TDAFeatures):
             original_points = self._compute_n_points(len(betti_feature))
 
             output_dfs.append(
-                align_indices(time_series, original_points, betti_feature)
+                _align_indices(time_series, original_points, betti_feature)
             )
 
         time_series_aligned = pd.concat(output_dfs, axis=1)

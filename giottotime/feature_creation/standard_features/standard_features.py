@@ -23,9 +23,6 @@ class PeriodicSeasonalFeature(StandardFeature):
     amplitude : float, optional, default: ``0.5``
         The amplitude of the time series.
 
-    output_name : str, optional, default: ``"PeriodicSeasonalFeature"``
-        The name of the output column.
-
     start_date : Union[pd.Timestamp, str], optional, default: ``None``
         The date from which to start generating the feature. This is used only if X is
         not passed in the ``transform`` method, otherwise the start date is inferred
@@ -40,16 +37,19 @@ class PeriodicSeasonalFeature(StandardFeature):
         not passed in the ``transform`` method, otherwise the index period is taken
         from it.
 
+    output_name : str, optional, default: ``"PeriodicSeasonalFeature"``
+        The name of the output column.
+
     """
 
     def __init__(
         self,
         period: Union[pd.Timedelta, str] = "365 days",
         amplitude: float = 0.5,
-        output_name: str = "PeriodicSeasonalFeature",
         start_date: Optional[Union[pd.Timestamp, str]] = None,
         length: Optional[int] = 50,
         index_period: Optional[Union[DatetimeIndex, int]] = None,
+        output_name: str = "PeriodicSeasonalFeature",
     ):
         super().__init__(output_name=output_name)
         self.start_date = start_date
@@ -59,15 +59,18 @@ class PeriodicSeasonalFeature(StandardFeature):
         self.index_period = index_period
 
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
-        """Starting from the index of ``time_series``, generate a sinusoid, with the
-        given ``period`` and ``amplitude``.
+        """Generate a sinusoid, with the given ``period``, ``amplitude`` and ``length``,
+        starting from the selected ``start_date``. If ``time_series`` is not ``None``,
+        the ``start_date`` is replaced by the start date of the time series and the
+        output sinusoid will have the same index as ``time_series``.
 
         Parameters
         ----------
         time_series : pd.DataFrame, shape (n_samples, 1), optional, default: ``None``
-            The input DataFrame, used only for its index. If is not passed, then the
-            ``start_date`` and ``index_period`` must have been passed in the constructor
-            when the object was instantiated.
+            The input DataFrame, If passed, the output DataFrame is going to have the
+            same index as ``time_series``. If is not passed, then the ``start_date`` and
+             ``index_period`` must have been passed in the constructor when the object
+             was instantiated.
 
         Returns
         -------
@@ -158,14 +161,13 @@ class PeriodicSeasonalFeature(StandardFeature):
 
 
 class ConstantFeature(StandardFeature):
-    """Generate a ``pd.DataFrame`` with one column, of the same length as the
-    input ``X`` and containing the value ``constant`` across the whole column.
+    """Generate a ``pd.DataFrame`` with one column, of the same length as the input
+     ``X`` and containing the value ``constant`` across the whole column.
 
     Parameters
     ----------
     constant : int, optional, default: ``2``
-        The value to use to generate the constant column of the
-        ``pd.DataFrame``.
+        The value to use to generate the constant column of the ``pd.DataFrame``.
 
     length: int, optional, default: ``50``
         The length of the DataFrame to generate. This is used only if X is not passed in
@@ -191,7 +193,8 @@ class ConstantFeature(StandardFeature):
         Parameters
         ----------
         time_series : pd.DataFrame, shape (n_samples, 1), optional, default: ``None``
-            The input DataFrame. If passed, is used only for its index.
+            The input DataFrame. If passed, the output DataFrame is going to have the
+            same index as ``time_series``.
 
         Returns
         -------
@@ -217,8 +220,7 @@ class CustomFeature(StandardFeature):
     Parameters
     ----------
     custom_feature_function`: Callable, required.
-        The function to use to generate a ``pd.DataFrame`` containing the
-        feature.
+        The function to use to generate a ``pd.DataFrame`` containing the feature.
 
     output_name: str, optional, default: ``'CustomFeature'``.
         The name of the output column.
@@ -245,12 +247,19 @@ class CustomFeature(StandardFeature):
         Parameters
         ----------
         time_series : pd.DataFrame, shape (n_samples, 1), optional, default: ``None``
-            The DataFrame from which to generate the feature_creation
+            The DataFrame on which to apply the the custom function.
 
         Returns
         -------
         custom_feature_renamed : pd.DataFrame, shape (length, 1)
             A DataFrame containing the generated feature_creation.
+
+        Notes
+        -----
+        In order to use the ``CustomFeature`` class inside a
+        ``giottotime.feature_creation.FeatureCreation`` class, the output of  the custom
+         function should be a ``pd.DataFrame`` and have the same index as
+         ``time_series``.
 
         """
         custom_feature = self.custom_feature_function(time_series, **self.kwargs)

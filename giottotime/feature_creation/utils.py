@@ -6,18 +6,17 @@ import pandas as pd
 def trim_feature_nans(
     X: pd.DataFrame, y: pd.DataFrame
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Split the ``X`` and ``y`` in train and test set. First, the rows of
-    ``X`` that contain a ``Nan`` value are dropped, as well as the
-    corresponding rows of ``y``. Then, the training set is composed of all the
-    rows that don't have any ``Nan`` values in the ``y``, while the remaining
-    rows are used as test set.
+    """Split ``X`` and ``y`` in train and test set. First, the rows of ``X`` that
+    contain a ``Nan`` value are dropped, as well as the corresponding rows of ``y``.
+    Then, the training set is composed of all the rows that don't have any ``Nan``
+    values in the ``y``, while the remaining rows are used as test set.
 
     Parameters
     ----------
-    X : pd.DataFrame, shape (n_samples, n_features), required.
+    X : pd.DataFrame, shape (n_samples, n_features), required
         The ``pd.DataFrame`` containing ``X``.
 
-    y : pd.DataFrame, shape (n_samples, horizon), required.
+    y : pd.DataFrame, shape (n_samples, horizon), required
         The ``pd.DataFrame`` containing ``y``.
 
     Returns

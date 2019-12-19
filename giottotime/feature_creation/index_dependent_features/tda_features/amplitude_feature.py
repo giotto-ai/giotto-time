@@ -4,16 +4,15 @@ import giotto.diagrams as diag
 import numpy as np
 import pandas as pd
 
-from .base import TDAFeatures, align_indices
+from .base import TDAFeatures, _align_indices
 
 
 class AmplitudeFeature(TDAFeatures):
-    """Compute the list of average lifetime for each time window, starting from
-    the persistence diagrams.
+    """Compute the list of average lifetime for each time window, starting from the
+    persistence diagrams.
 
     Parameters
     ----------
-
     metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
         ``'betti'`` | ``'heat'``, optional, (default=``'landscape'``)
         Distance or dissimilarity function used to define the amplitude of a subdiagram
@@ -188,7 +187,7 @@ class AmplitudeFeature(TDAFeatures):
 
         original_points = self._compute_n_points(len(amplitudes))
 
-        time_series_aligned = align_indices(time_series, original_points, amplitudes)
+        time_series_aligned = _align_indices(time_series, original_points, amplitudes)
         time_series_t = self._rename_columns(time_series_aligned)
 
         return time_series_t

@@ -8,7 +8,6 @@ from giottotime.feature_creation.base import Feature
 class IndexDependentFeature(Feature, metaclass=ABCMeta):
     """Base class for all the feature classes in this package.
 
-    Parameters documentation is in the derived classes.
     """
 
     def fit(self, X, y=None):

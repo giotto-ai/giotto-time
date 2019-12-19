@@ -56,7 +56,8 @@ class DetrendedFeature(IndexDependentFeature):
 
 
 class RemovePolynomialTrend(DetrendedFeature):
-    """Apply a de-trend transformation to a time series.
+    """Apply a de-trend transformation to a time series using a polynomial with a given
+    degree.
 
     Parameters
     ----------
@@ -82,7 +83,7 @@ class RemovePolynomialTrend(DetrendedFeature):
 
 
 class RemoveExponentialTrend(DetrendedFeature):
-    """Apply a de-trend transformation to a time series.
+    """Apply a de-trend transformation to a time series using an exponential function.
 
     Parameters
     ----------

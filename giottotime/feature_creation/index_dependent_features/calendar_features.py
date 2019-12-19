@@ -1,6 +1,5 @@
 import importlib
-import warnings
-from typing import Optional, Union
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -34,7 +33,6 @@ class CalendarFeature(IndexDependentFeature):
 
     Parameters
     ----------
-
     region : str, optional, default: ``'america'``
         The region in which the ``country`` is located.
 
@@ -89,17 +87,17 @@ class CalendarFeature(IndexDependentFeature):
             )
         self.kernel = kernel
 
-    # TODO: write the description of the transform method
-    def transform(self, ts: Optional[pd.DataFrame] = None) -> pd.DataFrame:
-        """
+    def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+        """Generate a DataFrame containing the events associated to the holidays of the
+        selected ``country``.
 
         Parameters
         ----------
-        ts : pd.DataFrame, shape (n_samples, 1), optional, default: ``None``
+        time_series : pd.DataFrame, shape (n_samples, 1), optional, default: ``None``
             If provided, both ``start_date`` and ``end_date`` are going to be
-            overwritten with the start and end date of the index of ``X``. Also, if
-            provided the output DataFrame is going to be re-indexed with the index of
-            ``X``, using the chosen ``reindex_method``.
+            overwritten with the start and end date of the index of ``time_series``.
+            Also, if provided the output DataFrame is going to be re-indexed with the
+            index of ``time_series``, using the chosen ``reindex_method``.
 
         Returns
         -------
@@ -107,10 +105,10 @@ class CalendarFeature(IndexDependentFeature):
             A DataFrame containing the events.
 
         """
-        if ts is not None:
-            check_index(ts)
+        if time_series is not None:
+            check_index(time_series)
 
-        self._initialize_start_end_date(ts)
+        self._initialize_start_end_date(time_series)
 
         workalendar_region = importlib.import_module(f".{self.region}", "workalendar")
         workalendar_country = getattr(workalendar_region, self.country)()
@@ -120,7 +118,7 @@ class CalendarFeature(IndexDependentFeature):
             events = self._apply_kernel(events)
 
         events_renamed = self._rename_columns(events)
-        aligned_events = self._align_event_indices(ts, events_renamed)
+        aligned_events = self._align_event_indices(time_series, events_renamed)
 
         return aligned_events
 
