@@ -26,6 +26,46 @@ def trim_feature_nans(
         The ``X`` and ``y``, split in train and test set according to the
         ``split_percentage``.
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> from giottotime.feature_creation import trim_feature_nans
+    >>> X = pd.DataFrame.from_dict({"feature_0": [np.nan, 0, 1, 2, 3, 4, 5, 6, 7, 8],
+    ...                             "feature_1": [np.nan, np.nan, 0.5, 1.5, 2.5, 3.5,
+    ...                                            4.5, 5.5, 6.5, 7.5, ]
+    ...                            })
+    >>> y = pd.DataFrame.from_dict({"y_0": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    ...                             "y_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.nan],
+    ...                             "y_2": [2, 3, 4, 5, 6, 7, 8, 9, np.nan, np.nan]
+    ...                            })
+    >>> X_train, y_train, X_test, y_test = trim_feature_nans(X, y)
+    >>> X_train
+           feature_0            feature_1
+    2           1.0                   0.5
+    3           2.0                   1.5
+    4           3.0                   2.5
+    5           4.0                   3.5
+    6           5.0                   4.5
+    7           6.0                   5.5
+    >>> y_train
+       y_0  y_1  y_2
+    2    2  3.0  4.0
+    3    3  4.0  5.0
+    4    4  5.0  6.0
+    5    5  6.0  7.0
+    6    6  7.0  8.0
+    7    7  8.0  9.0
+    >>> X_test
+          feature_0             feature_1
+    7           6.0                   5.5
+    8           7.0                   6.5
+    9           8.0                   7.5
+    >>> y_test
+       y_0  y_1  y_2
+    7    7  8.0  9.0
+    8    8  9.0  NaN
+    9    9  NaN  NaN
     """
     X_non_nans, y_non_nans = _get_non_nan_values(X, y)
     last_valid_y_index = y.iloc[:, -1].last_valid_index()

@@ -1,5 +1,5 @@
 import importlib
-from typing import Optional
+from typing import Optional, Union, List
 
 import numpy as np
 import pandas as pd
@@ -46,7 +46,7 @@ class CalendarFeature(IndexDependentFeature):
     end_date : str, optional, default: ``'01/01/2020'``
         The date until which to retrieve the holidays.
 
-    kernel : np.ndarray or None, optional, default: ``None``
+    kernel : list or np.ndarray, optional, default: ``None``
         The kernel to use when creating the feature.
 
     reindex_method : str, optional, default: ``pad``
@@ -60,6 +60,23 @@ class CalendarFeature(IndexDependentFeature):
     output_name : str, optional, default: ``'CalendarFeature'``
         The name of the output column.
 
+    Examples
+    --------
+    >>> from giottotime.feature_creation import CalendarFeature
+    >>> cal_feature = CalendarFeature(region="europe", country="Italy", kernel=[3, 2])
+    >>> cal_feature.transform()
+                CalendarFeature
+    2018-01-01              2.0
+    2018-01-02              3.0
+    2018-01-03              0.0
+    2018-01-04              0.0
+    2018-01-05              0.0
+    ...                     ...
+    2019-12-28              0.0
+    2019-12-29              0.0
+    2019-12-30              0.0
+    2019-12-31              0.0
+    2020-01-01              2.0
     """
 
     def __init__(
@@ -68,7 +85,7 @@ class CalendarFeature(IndexDependentFeature):
         country: str = "Brazil",
         start_date: str = "01/01/2018",
         end_date: str = "01/01/2020",
-        kernel: Optional[np.ndarray] = None,
+        kernel: Union[List, np.ndarray] = None,
         reindex_method: str = "pad",
         output_name: str = "CalendarFeature",
     ):
@@ -79,11 +96,10 @@ class CalendarFeature(IndexDependentFeature):
         self.end_date = end_date
         self.reindex_method = reindex_method
 
-        if len(kernel) == 0 or not np.isfinite(kernel).all():
+        if not kernel or not np.isfinite(kernel).all():
             raise ValueError(
-                "The kernel should be an array-like object, with at least "
-                "element and should only contains finite values, got "
-                f"{kernel} instead."
+                "The kernel should be an array-like object, with at least 1 element "
+                f"and should only contains finite values, got {kernel} instead."
             )
         self.kernel = kernel
 

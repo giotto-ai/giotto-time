@@ -30,6 +30,21 @@ class ShiftFeature(IndexDependentFeature):
     used carefully, since if the resulting feature is used for training or testing it
     might generate a leak from the feature.
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.feature_creation import ShiftFeature
+    >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
+    >>> shift_feature = ShiftFeature(shift=3)
+    >>> shift_feature.transform(ts)
+       ShiftFeature
+    0           NaN
+    1           NaN
+    2           NaN
+    3           0.0
+    4           1.0
+    5           2.0
+
     """
 
     def __init__(self, shift: int = 1, output_name: str = "ShiftFeature"):
@@ -66,6 +81,21 @@ class MovingAverageFeature(IndexDependentFeature):
 
     output_name : str, optional, default: ``'MovingAverageFeature'``
         The name of the output column.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.feature_creation import MovingAverageFeature
+    >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
+    >>> mv_avg_feature = MovingAverageFeature(window_size=2)
+    >>> mv_avg_feature.transform(ts)
+       MovingAverageFeature
+    0                   NaN
+    1                   NaN
+    2                   0.5
+    3                   1.5
+    4                   2.5
+    5                   3.5
 
     """
 
@@ -105,6 +135,21 @@ class PolynomialFeature(IndexDependentFeature):
 
     output_name : str, optional, default: ``'PolynomialFeature'``
         The name of the output column.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.feature_creation import PolynomialFeature
+    >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
+    >>> pol_feature = PolynomialFeature(degree=3, output_name="pol")
+    >>> pol_feature.transform(ts)
+       pol_0  pol_1  pol_2  pol_3
+    0    1.0    0.0    0.0    0.0
+    1    1.0    1.0    1.0    1.0
+    2    1.0    2.0    4.0    8.0
+    3    1.0    3.0    9.0   27.0
+    4    1.0    4.0   16.0   64.0
+    5    1.0    5.0   25.0  125.0
 
     """
 
@@ -154,6 +199,31 @@ class ExogenousFeature(IndexDependentFeature):
     output_name : str, optional, default: ``'ExogenousFeature'``
         The name of the output column.
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.feature_creation import ExogenousFeature
+    >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5], index=[3, 4, 5, 6, 7, 8])
+    >>> exog_ts = pd.DataFrame([10, 8, 1, 3, 2, 7])
+    >>> exog_feature = ExogenousFeature(exog_ts)
+    >>> exog_feature.transform(ts)
+       ExogenousFeature
+    3               3.0
+    4               2.0
+    5               7.0
+    6               NaN
+    7               NaN
+    8               NaN
+
+    >>> exog_feature = ExogenousFeature(exog_ts, method="nearest")
+    >>> exog_feature.transform(ts)
+       ExogenousFeature
+    3                 3
+    4                 2
+    5                 7
+    6                 7
+    7                 7
+    8                 7
     """
 
     def __init__(
