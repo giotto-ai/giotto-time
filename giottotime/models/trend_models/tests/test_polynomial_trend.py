@@ -27,7 +27,7 @@ class TestPolynomialTrend:
 
         assert np.allclose(tm.model_weights_, [0.0] * len(tm.model_weights_))
 
-    @settings(deadline=None)
+    @settings(deadline=None, max_examples=2)
     @given(arrays(dtype=float, shape=(500,), elements=floats(-10, 10)))
     def test_polynomial_trend_multiple(self, random_array):
         testing.N, testing.K = 500, 1
