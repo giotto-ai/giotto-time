@@ -26,6 +26,7 @@ import scipy; print("SciPy", scipy.__version__)
 import joblib; print("joblib", joblib.__version__)
 import sklearn; print("Scikit-Learn", sklearn.__version__)
 import giotto; print("giotto-Learn", giotto.__version__)
+import giottotime; print("giotto-time", giottotime.__version__)
 -->
 
 

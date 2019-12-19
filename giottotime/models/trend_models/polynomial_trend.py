@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from sklearn.utils.validation import check_is_fitted
 
-from ..trend_models.base import TrendModel
+from .base import TrendModel
 
 
 class PolynomialTrend(TrendModel):
@@ -73,7 +73,6 @@ class PolynomialTrend(TrendModel):
         else:
             self.period_ = ts.index[1] - ts.index[0]
             # raise warning
-
         return self
 
     def predict(self, ts: pd.DataFrame) -> pd.DataFrame:
@@ -117,15 +116,8 @@ class PolynomialTrend(TrendModel):
         """
         p = np.poly1d(self.model_weights_)
 
-        trans_freq = ts.index.freq
-        if trans_freq is not None:
-            trans_freq = trans_freq
-        else:
-            trans_freq = ts.index[1] - ts.index[0]
-            # raise warning
+        time_steps = (ts.index - self.t0_) / self.period_
 
-        ts = (ts.index - self.t0_) / self.period_
-
-        predictions = pd.Series(index=ts.index, data=[p(t) for t in ts])
+        predictions = pd.Series(index=ts.index, data=[p(t) for t in time_steps])
 
         return ts.sub(predictions, axis=0)

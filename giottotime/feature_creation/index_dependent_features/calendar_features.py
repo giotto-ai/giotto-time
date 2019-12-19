@@ -96,7 +96,7 @@ class CalendarFeature(IndexDependentFeature):
         self.end_date = end_date
         self.reindex_method = reindex_method
 
-        if not kernel or not np.isfinite(kernel).all():
+        if kernel is None or len(kernel) == 0 or not np.isfinite(kernel).all():
             raise ValueError(
                 "The kernel should be an array-like object, with at least 1 element "
                 f"and should only contains finite values, got {kernel} instead."

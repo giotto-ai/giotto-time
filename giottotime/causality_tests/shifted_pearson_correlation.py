@@ -22,6 +22,27 @@ class ShiftedPearsonCorrelation(CausalityTest):
     dropna : bool, optional, default: ``False``
         Determines if the Nan values created by shifting are retained or dropped.
 
+    Examples
+    --------
+    >>> from giottotime.causality_tests.shifted_pearson_correlation import ShiftedPearsonCorrelation
+    >>> import pandas.util.testing as testing
+    >>> data = testing.makeTimeDataFrame(freq="s")
+    >>> spc = ShiftedPearsonCorrelation(target_col="A")
+    >>> spc.fit(data)
+    >>> spc.best_shifts_
+    y  A  B  C  D
+    x
+    A  8  9  6  5
+    B  7  4  4  6
+    C  3  4  9  9
+    D  7  1  9  1
+    >>> spc.max_corrs_
+    y         A         B         C         D
+    x
+    A  0.383800  0.260627  0.343628  0.360151
+    B  0.311608  0.307203  0.255969  0.298523
+    C  0.373613  0.267335  0.211913  0.140034
+    D  0.496535  0.204770  0.402473  0.310065
     """
 
     def __init__(

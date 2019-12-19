@@ -112,6 +112,30 @@ class BettiCurvesFeature(TDAFeatures):
         The number of jobs to use for the computation. ``None`` means 1 unless in a
         :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.feature_creation import BettiCurvesFeature
+    >>> X = pd.DataFrame(range(0, 15))
+    >>> betti_feature = BettiCurvesFeature()
+    >>> betti_feature.transform(X)
+        BettiCurvesFeature_0  BettiCurvesFeature_1  BettiCurvesFeature_2
+    0                   49.0                   0.0                   0.0
+    1                   49.0                   0.0                   0.0
+    2                   49.0                   0.0                   0.0
+    3                   49.0                   0.0                   0.0
+    4                   49.0                   0.0                   0.0
+    5                   49.0                   0.0                   0.0
+    6                   49.0                   0.0                   0.0
+    7                   49.0                   0.0                   0.0
+    8                   49.0                   0.0                   0.0
+    9                   49.0                   0.0                   0.0
+    10                  49.0                   0.0                   0.0
+    11                  49.0                   0.0                   0.0
+    12                  49.0                   0.0                   0.0
+    13                  49.0                   0.0                   0.0
+    14                  49.0                   0.0                   0.0
+
     """
 
     def __init__(

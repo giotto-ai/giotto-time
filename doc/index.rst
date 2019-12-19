@@ -1,13 +1,121 @@
-giottotime: Time Series forecasting library
-============================================
+.. giotto documentation master file, created by
+   sphinx-quickstart on Mon Jun  3 11:56:46 2019.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
 
-.. toctree::
-    :maxdepth: 3
-    :hidden:
+Welcome to giotto-time's API reference!
+========================================
 
-    reference/index
-    release_notes/index
+:mod:`giottotime.causality_tests`: Causality Tests
+==================================================
+
+.. automodule:: giottotime.causality_tests
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   causality_tests.ShiftedLinearCoefficient
+   causality_tests.ShiftedPearsonCorrelation
 
 
-* :doc:`reference/index`
-* :doc:`release_notes/index`
+:mod:`giottotime.feature_creation`: Feature Creation
+====================================================
+
+.. automodule:: giottotime.feature_creation
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   feature_creation.FeatureCreation
+   feature_creation.ShiftFeature
+   feature_creation.MovingAverageFeature
+   feature_creation.ConstantFeature
+   feature_creation.PolynomialFeature
+   feature_creation.ExogenousFeature
+   feature_creation.CustomFeature
+   feature_creation.CalendarFeature
+   feature_creation.PeriodicSeasonalFeature
+   feature_creation.DetrendedFeature
+   feature_creation.RemovePolynomialTrend
+   feature_creation.RemoveExponentialTrend
+   feature_creation.RemoveFunctionTrend
+
+
+:mod:`giottotime.loss_functions`: Loss Functions
+====================================================
+
+.. automodule:: giottotime.loss_functions
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+   loss_functions.smape
+   loss_functions.max_error
+
+
+:mod:`giottotime.model_selection`: Model Selection
+====================================================
+
+.. automodule:: giottotime.model_selection
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   model_selection.FeatureSplitter
+
+
+:mod:`giottotime.models`: Models
+====================================================
+
+.. automodule:: giottotime.models
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   models.GAR
+   models.LinearRegressor
+
+
+:mod:`giottotime.time_series_preparation`: Time Series Preparation
+====================================================================
+
+.. automodule:: giottotime.time_series_preparation
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   time_series_preparation.SequenceToTimeIndexSeries
+   time_series_preparation.PandasSeriesToTimeIndexSeries
+   time_series_preparation.TimeIndexSeriesToPeriodIndexSeries
+   time_series_preparation.TimeSeriesPreparation
+   time_series_preparation.TimeSeriesResampler

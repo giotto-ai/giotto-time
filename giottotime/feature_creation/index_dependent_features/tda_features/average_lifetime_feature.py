@@ -87,6 +87,30 @@ class AvgLifeTimeFeature(TDAFeatures):
         The number of jobs to use for the computation. ``None`` means 1 unless in a
         :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.feature_creation import AvgLifeTimeFeature
+    >>> X = pd.DataFrame(range(0, 15))
+    >>> avg_lifetime_feature = AvgLifeTimeFeature()
+    >>> avg_lifetime_feature.transform(X)
+        AvgLifeTimeFeature
+    0             1.414214
+    1             1.414214
+    2             1.414214
+    3             1.414214
+    4             1.414214
+    5             1.414214
+    6             1.414214
+    7             1.414214
+    8             1.414214
+    9             1.414214
+    10            1.414214
+    11            1.414214
+    12            1.414214
+    13            1.414214
+    14            1.414214
+
     """
 
     def __init__(

@@ -90,6 +90,30 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         The number of jobs to use for the computation. ``None`` means 1 unless in a
         :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.feature_creation import NumberOfRelevantHolesFeature
+    >>> X = pd.DataFrame(range(0, 15))
+    >>> relevant_holes = NumberOfRelevantHolesFeature()
+    >>> relevant_holes.transform(X)
+        NumberOfRelevantHolesFeature
+    0                           10.0
+    1                           10.0
+    2                           10.0
+    3                           10.0
+    4                           10.0
+    5                           10.0
+    6                           10.0
+    7                           10.0
+    8                           10.0
+    9                           10.0
+    10                          10.0
+    11                          10.0
+    12                          10.0
+    13                          10.0
+    14                          10.0
+
     """
 
     def __init__(

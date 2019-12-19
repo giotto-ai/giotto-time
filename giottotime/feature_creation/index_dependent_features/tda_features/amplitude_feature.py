@@ -120,6 +120,30 @@ class AmplitudeFeature(TDAFeatures):
         The number of jobs to use for the computation. ``None`` means 1 unless in a
         :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.feature_creation import AmplitudeFeature
+    >>> X = pd.DataFrame(range(0, 15))
+    >>> ampl_feature = AmplitudeFeature()
+    >>> ampl_feature.transform(X)
+        AmplitudeFeature
+    0           0.485467
+    1           0.485467
+    2           0.485467
+    3           0.485467
+    4           0.485467
+    5           0.485467
+    6           0.485467
+    7           0.485467
+    8           0.485467
+    9           0.485467
+    10          0.485467
+    11          0.485467
+    12          0.485467
+    13          0.485467
+    14          0.485467
+
     """
 
     def __init__(

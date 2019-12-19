@@ -16,6 +16,10 @@ from .index_dependent_features import (
     MovingAverageFeature,
     PolynomialFeature,
     ExogenousFeature,
+    AmplitudeFeature,
+    AvgLifeTimeFeature,
+    BettiCurvesFeature,
+    NumberOfRelevantHolesFeature,
 )
 from .utils import trim_feature_nans
 
@@ -35,4 +39,8 @@ __all__ = [
     "DetrendedFeature",
     "RemovePolynomialTrend",
     "RemoveExponentialTrend",
+    "AmplitudeFeature",
+    "AvgLifeTimeFeature",
+    "BettiCurvesFeature",
+    "NumberOfRelevantHolesFeature",
 ]

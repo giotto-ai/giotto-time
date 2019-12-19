@@ -17,12 +17,34 @@ class ShiftedLinearCoefficient(CausalityTest):
         The maximum number of shifts to check for.
 
     target_col : str, optional, default: ``'y'``
-            The column to use as the a reference (i.e., the column which is not
-            shifted).
+        The column to use as the a reference (i.e., the column which is not
+        shifted).
 
     dropna : bool, optional, default: ``False``
         Determines if the Nan values created by shifting are retained or dropped.
 
+    Examples
+    --------
+
+    >>> from giottotime.causality_tests.shifted_linear_coefficient import ShiftedLinearCoefficient
+    >>> import pandas.util.testing as testing
+    >>> data = testing.makeTimeDataFrame(freq="s")
+    >>> slc = ShiftedLinearCoefficient(target_col="A")
+    >>> slc.fit(data)
+    >>> slc.best_shifts_
+    y  A  B  C  D
+    x
+    A  3  6  8  5
+    B  9  9  4  1
+    C  8  2  4  9
+    D  3  9  4  3
+    >>> slc.max_corrs_
+    y         A         B         C         D
+    x
+    A  0.460236  0.420005  0.339370  0.267143
+    B  0.177856  0.300350  0.367150  0.550490
+    C  0.484860  0.263036  0.456046  0.251342
+    D  0.580068  0.344688  0.253626  0.256220
     """
 
     def __init__(
