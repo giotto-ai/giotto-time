@@ -25,7 +25,7 @@ class ShiftedLinearCoefficient(CausalityTest):
     Examples
     --------
 
-    >>> from giottotime.causality_tests.shifted_pearson_correlation import ShiftedPearsonCorrelation
+    >>> from giottotime.causality_tests.shifted_linear_coefficient import ShiftedLinearCoefficient
     >>> import pandas.util.testing as testing
     >>> data = testing.makeTimeDataFrame(freq="s")
     >>> slc = ShiftedPearsonCorrelation(target_col="A")
