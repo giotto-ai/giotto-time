@@ -5,12 +5,12 @@ from sklearn.utils.validation import check_is_fitted
 
 
 class GAR:
-    """This class implements the Generalized Auto Regression model.
+    """Implementation of the Generalized Auto Regression model.
 
     Parameters
     ----------
     base_model: object, required
-        The model used to make the predictions step by step. This class must have a
+        The model used to make the predictions step by step. This object must have a
         ``fit``and ``predict`` method.
 
     feed_forward: bool, optional, default: ``False``

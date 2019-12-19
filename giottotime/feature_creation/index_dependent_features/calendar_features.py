@@ -1,6 +1,5 @@
 import importlib
-import warnings
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 import numpy as np
 import pandas as pd
@@ -34,7 +33,6 @@ class CalendarFeature(IndexDependentFeature):
 
     Parameters
     ----------
-
     region : str, optional, default: ``'america'``
         The region in which the ``country`` is located.
 
@@ -48,7 +46,7 @@ class CalendarFeature(IndexDependentFeature):
     end_date : str, optional, default: ``'01/01/2020'``
         The date until which to retrieve the holidays.
 
-    kernel : np.ndarray or None, optional, default: ``None``
+    kernel : list or np.ndarray, optional, default: ``None``
         The kernel to use when creating the feature.
 
     reindex_method : str, optional, default: ``pad``
@@ -62,6 +60,23 @@ class CalendarFeature(IndexDependentFeature):
     output_name : str, optional, default: ``'CalendarFeature'``
         The name of the output column.
 
+    Examples
+    --------
+    >>> from giottotime.feature_creation import CalendarFeature
+    >>> cal_feature = CalendarFeature(region="europe", country="Italy", kernel=[3, 2])
+    >>> cal_feature.transform()
+                CalendarFeature
+    2018-01-01              2.0
+    2018-01-02              3.0
+    2018-01-03              0.0
+    2018-01-04              0.0
+    2018-01-05              0.0
+    ...                     ...
+    2019-12-28              0.0
+    2019-12-29              0.0
+    2019-12-30              0.0
+    2019-12-31              0.0
+    2020-01-01              2.0
     """
 
     def __init__(
@@ -70,7 +85,7 @@ class CalendarFeature(IndexDependentFeature):
         country: str = "Brazil",
         start_date: str = "01/01/2018",
         end_date: str = "01/01/2020",
-        kernel: Optional[np.ndarray] = None,
+        kernel: Union[List, np.ndarray] = None,
         reindex_method: str = "pad",
         output_name: str = "CalendarFeature",
     ):
@@ -81,25 +96,24 @@ class CalendarFeature(IndexDependentFeature):
         self.end_date = end_date
         self.reindex_method = reindex_method
 
-        if len(kernel) == 0 or not np.isfinite(kernel).all():
+        if kernel is None or len(kernel) == 0 or not np.isfinite(kernel).all():
             raise ValueError(
-                "The kernel should be an array-like object, with at least "
-                "element and should only contains finite values, got "
-                f"{kernel} instead."
+                "The kernel should be an array-like object, with at least 1 element "
+                f"and should only contains finite values, got {kernel} instead."
             )
         self.kernel = kernel
 
-    # TODO: write the description of the transform method
-    def transform(self, ts: Optional[pd.DataFrame] = None) -> pd.DataFrame:
-        """
+    def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+        """Generate a DataFrame containing the events associated to the holidays of the
+        selected ``country``.
 
         Parameters
         ----------
-        ts : pd.DataFrame, shape (n_samples, 1), optional, default: ``None``
+        time_series : pd.DataFrame, shape (n_samples, 1), optional, default: ``None``
             If provided, both ``start_date`` and ``end_date`` are going to be
-            overwritten with the start and end date of the index of ``X``. Also, if
-            provided the output DataFrame is going to be re-indexed with the index of
-            ``X``, using the chosen ``reindex_method``.
+            overwritten with the start and end date of the index of ``time_series``.
+            Also, if provided the output DataFrame is going to be re-indexed with the
+            index of ``time_series``, using the chosen ``reindex_method``.
 
         Returns
         -------
@@ -107,10 +121,10 @@ class CalendarFeature(IndexDependentFeature):
             A DataFrame containing the events.
 
         """
-        if ts is not None:
-            check_index(ts)
+        if time_series is not None:
+            check_index(time_series)
 
-        self._initialize_start_end_date(ts)
+        self._initialize_start_end_date(time_series)
 
         workalendar_region = importlib.import_module(f".{self.region}", "workalendar")
         workalendar_country = getattr(workalendar_region, self.country)()
@@ -120,7 +134,7 @@ class CalendarFeature(IndexDependentFeature):
             events = self._apply_kernel(events)
 
         events_renamed = self._rename_columns(events)
-        aligned_events = self._align_event_indices(ts, events_renamed)
+        aligned_events = self._align_event_indices(time_series, events_renamed)
 
         return aligned_events
 

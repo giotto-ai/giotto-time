@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import giotto.diagrams as diag
 
-from .base import TDAFeatures, align_indices
+from .base import TDAFeatures, _align_indices
 
 
 def _find_mean_nonzero(g):
@@ -15,8 +15,8 @@ def _find_mean_nonzero(g):
 
 
 class BettiCurvesFeature(TDAFeatures):
-    """Compute the list of average lifetime for each time window, starting
-    from the persistence diagrams.
+    """Compute the list of average lifetime for each time window, starting from the
+    persistence diagrams.
 
     Parameters
     ----------
@@ -112,6 +112,30 @@ class BettiCurvesFeature(TDAFeatures):
         The number of jobs to use for the computation. ``None`` means 1 unless in a
         :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.feature_creation import BettiCurvesFeature
+    >>> X = pd.DataFrame(range(0, 15))
+    >>> betti_feature = BettiCurvesFeature()
+    >>> betti_feature.transform(X)
+        BettiCurvesFeature_0  BettiCurvesFeature_1  BettiCurvesFeature_2
+    0                   49.0                   0.0                   0.0
+    1                   49.0                   0.0                   0.0
+    2                   49.0                   0.0                   0.0
+    3                   49.0                   0.0                   0.0
+    4                   49.0                   0.0                   0.0
+    5                   49.0                   0.0                   0.0
+    6                   49.0                   0.0                   0.0
+    7                   49.0                   0.0                   0.0
+    8                   49.0                   0.0                   0.0
+    9                   49.0                   0.0                   0.0
+    10                  49.0                   0.0                   0.0
+    11                  49.0                   0.0                   0.0
+    12                  49.0                   0.0                   0.0
+    13                  49.0                   0.0                   0.0
+    14                  49.0                   0.0                   0.0
+
     """
 
     def __init__(
@@ -186,7 +210,7 @@ class BettiCurvesFeature(TDAFeatures):
             original_points = self._compute_n_points(len(betti_feature))
 
             output_dfs.append(
-                align_indices(time_series, original_points, betti_feature)
+                _align_indices(time_series, original_points, betti_feature)
             )
 
         time_series_aligned = pd.concat(output_dfs, axis=1)

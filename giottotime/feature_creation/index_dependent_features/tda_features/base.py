@@ -10,35 +10,12 @@ import pandas as pd
 
 from ..base import IndexDependentFeature
 
-__all__ = ["TDAFeatures", "align_indices"]
+__all__ = ["TDAFeatures"]
 
 
-def align_indices(
+def _align_indices(
     X: pd.DataFrame, n_points: int, tda_feature_values: Union[List, np.ndarray]
 ) -> pd.DataFrame:
-    """Given ``X`` of length ``n_samples``, set the first
-    ``n_samples - n_points`` to ``np.nan``. Then, split the remaining points in
-    ``len(tda_feature_values)`` chunks and, to each data-point in a chunk, set
-    its value to the corresponding value in ``tda_feature_values``.
-
-    Parameters
-    ----------
-    X : ``pd.DataFrame``, required.
-        The input DataFrame. Only the indices of the DataFrame are used.
-
-    n_points : ``int``, required.
-        The number of points on which to apply the values.
-
-    tda_feature_values : ``Union[List, np.ndarray]``, required.
-        The List or np.ndarray containing the values to put in ``output_X``.
-
-    Returns
-    -------
-    output_X : ``pd.DataFrame``
-        A ``pd.DataFrame`` with the same index as ``X`` and with the values
-        set according to ``n_points`` and ``tda_feature_values``.
-
-    """
     output_X = X.copy()
 
     output_X.iloc[:-n_points] = np.nan
@@ -61,7 +38,6 @@ def align_indices(
 
 class TDAFeatures(IndexDependentFeature, metaclass=ABCMeta):
     """Base class for all the TDA feature_creation contained in the package.
-    Parameter documentation is in the derived classes.
 
     """
 

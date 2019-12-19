@@ -3,12 +3,12 @@ from typing import Iterable, List, Optional, Union, Callable
 import numpy as np
 import pandas as pd
 
-from .base import TDAFeatures, align_indices
+from .base import TDAFeatures, _align_indices
 
 
 class NumberOfRelevantHolesFeature(TDAFeatures):
-    """Compute the list of average lifetime for each time window, starting
-    from the persistence diagrams.
+    """Compute the list of average lifetime for each time window, starting from the
+    persistence diagrams.
 
     Parameters
     ----------
@@ -90,6 +90,30 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         The number of jobs to use for the computation. ``None`` means 1 unless in a
         :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.feature_creation import NumberOfRelevantHolesFeature
+    >>> X = pd.DataFrame(range(0, 15))
+    >>> relevant_holes = NumberOfRelevantHolesFeature()
+    >>> relevant_holes.transform(X)
+        NumberOfRelevantHolesFeature
+    0                           10.0
+    1                           10.0
+    2                           10.0
+    3                           10.0
+    4                           10.0
+    5                           10.0
+    6                           10.0
+    7                           10.0
+    8                           10.0
+    9                           10.0
+    10                          10.0
+    11                          10.0
+    12                          10.0
+    13                          10.0
+    14                          10.0
+
     """
 
     def __init__(
@@ -154,7 +178,7 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         n_holes = self._compute_num_relevant_holes(persistence_diagrams)
         n_points = self._compute_n_points(len(n_holes))
 
-        time_series_aligned = align_indices(time_series, n_points, n_holes)
+        time_series_aligned = _align_indices(time_series, n_points, n_holes)
         time_series_t = self._rename_columns(time_series_aligned)
 
         return time_series_t

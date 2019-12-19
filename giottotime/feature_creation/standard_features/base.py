@@ -9,7 +9,6 @@ from giottotime.feature_creation.base import Feature
 class StandardFeature(Feature):
     """Base class for all the feature classes in this package.
 
-    Parameters documentation is in the derived classes.
     """
 
     def fit(self, X, y=None):

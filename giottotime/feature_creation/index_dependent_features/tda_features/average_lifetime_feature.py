@@ -1,14 +1,14 @@
 from typing import Iterable, List, Optional, Callable, Union
 
-from .base import TDAFeatures, align_indices
+from .base import TDAFeatures, _align_indices
 
 import pandas as pd
 import numpy as np
 
 
 class AvgLifeTimeFeature(TDAFeatures):
-    """Compute the list of average lifetime for each time window, starting
-    from the persistence diagrams.
+    """Compute the list of average lifetime for each time window, starting from the
+    persistence diagrams.
 
     Parameters
     ----------
@@ -87,6 +87,30 @@ class AvgLifeTimeFeature(TDAFeatures):
         The number of jobs to use for the computation. ``None`` means 1 unless in a
         :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.feature_creation import AvgLifeTimeFeature
+    >>> X = pd.DataFrame(range(0, 15))
+    >>> avg_lifetime_feature = AvgLifeTimeFeature()
+    >>> avg_lifetime_feature.transform(X)
+        AvgLifeTimeFeature
+    0             1.414214
+    1             1.414214
+    2             1.414214
+    3             1.414214
+    4             1.414214
+    5             1.414214
+    6             1.414214
+    7             1.414214
+    8             1.414214
+    9             1.414214
+    10            1.414214
+    11            1.414214
+    12            1.414214
+    13            1.414214
+    14            1.414214
+
     """
 
     def __init__(
@@ -126,9 +150,9 @@ class AvgLifeTimeFeature(TDAFeatures):
         self.h_dim = h_dim
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
-        """From the initial DataFrame ``time_series``, compute the persistence diagrams and detect
-        the average lifetime for a given homology dimension. Then, assign a value to
-        each initial data points.
+        """From the initial DataFrame ``time_series``, compute the persistence diagrams
+        and detect the average lifetime for a given homology dimension. Then, assign a
+        value to each initial data points.
 
         Parameters
         ----------
@@ -147,7 +171,7 @@ class AvgLifeTimeFeature(TDAFeatures):
         avg_lifetime = self._compute_average_lifetime(persistence_diagrams)
         original_points = self._compute_n_points(len(avg_lifetime))
 
-        time_series_aligned = align_indices(time_series, original_points, avg_lifetime)
+        time_series_aligned = _align_indices(time_series, original_points, avg_lifetime)
         time_series_t = self._rename_columns(time_series_aligned)
 
         return time_series_t
