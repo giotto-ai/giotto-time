@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from sklearn.utils.validation import check_is_fitted
 
-from ..trend_models.base import TrendModel
+from .base import TrendModel
 
 
 class ExponentialTrend(TrendModel):
@@ -67,7 +67,6 @@ class ExponentialTrend(TrendModel):
             self.period_ = freq
         else:
             self.period_ = time_series.index[1] - time_series.index[0]
-            # raise warning
 
         return self
 
@@ -109,18 +108,11 @@ class ExponentialTrend(TrendModel):
             The transformed time series, without the trend.
 
         """
-
-        trans_freq = time_series.index.freq
-        if trans_freq is not None:
-            trans_freq = trans_freq
-        else:
-            trans_freq = time_series.index[1] - time_series.index[0]
-            # raise warning
-
         ts = (time_series.index - self.t0_) / self.period_
 
-        predictions = pd.DataFrame(
+        predictions = pd.Series(
             index=time_series.index,
             data=[np.exp(t * self.model_exponent_) for t in ts],
         )
-        return time_series - predictions[0]
+
+        return time_series.sub(predictions, axis=0)

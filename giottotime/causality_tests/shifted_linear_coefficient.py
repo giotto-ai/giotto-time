@@ -7,6 +7,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from giottotime.causality_tests.base import CausalityTest
 
+
 class ShiftedLinearCoefficient(CausalityTest):
     """Test the shifted linear fit coefficients between two or more time series.
 
