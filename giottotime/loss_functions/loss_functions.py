@@ -1,9 +1,16 @@
 from typing import Union, List
 
 import numpy as np
+import pandas as pd
 
 
 def _check_input(y_true: np.ndarray, y_pred: np.ndarray) -> None:
+    if isinstance(y_pred, pd.DataFrame):
+        y_pred = y_pred.values
+
+    if isinstance(y_true, pd.DataFrame):
+        y_true = y_true.values
+
     if len(y_pred) != len(y_true):
         raise ValueError(
             f"The arrays must have the same length, but they "

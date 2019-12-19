@@ -13,6 +13,10 @@ class FeatureSplitter:
         How to drop the Nan contained in the ``X`` and ``y`` matrices. Only 'any' is
         supported for the moment.
 
+    Examples
+    --------
+    >>> 
+
     """
 
     def __init__(self, drop_na_mode: str = "any"):

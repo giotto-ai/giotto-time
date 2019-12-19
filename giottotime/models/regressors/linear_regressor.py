@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
 
@@ -16,6 +17,20 @@ class LinearRegressor:
         The loss function to use when fitting the model. The loss function must accept
         y_true, y_pred and return a single real number.
 
+    Examples
+    --------
+    >>> from giottotime.models.regressors.linear_regressor import LinearRegressor
+    >>> from giottotime.loss_functions import max_error
+    >>> import numpy as np
+    >>> import pandas as pd
+    >>> X = np.random.random((100, 10))
+    >>> y = np.random.random(100)
+    >>> lr = LinearRegressor(loss=max_error)
+    >>> X_train, y_train = X[:90], y[:90]
+    >>> X_test, y_test = X[90:], y[90:]
+    >>> x0 = [0]*11
+    >>> lr.fit(X_train, y_train, x0=x0)
+    >>> y_pred = lr.predict(X_test)
     """
 
     def __init__(self, loss=mean_squared_error):
@@ -46,9 +61,15 @@ class LinearRegressor:
 
         """
 
+        if isinstance(X, pd.DataFrame):
+            X = X.values
+
+        if isinstance(y, pd.DataFrame):
+            y = y.values
+
         def prediction_error(model_weights):
             predictions = [
-                model_weights[0] + np.dot(model_weights[1:], row) for row in X.values
+                model_weights[0] + np.dot(model_weights[1:], row) for row in X
             ]
             return self.loss(y, predictions)
 
