@@ -52,6 +52,7 @@ class DetrendedFeature(IndexDependentFeature):
         """
         self.trend_model.fit(time_series)
         time_series_t = self.trend_model.transform(time_series)
+        time_series_t = self._rename_columns(time_series_t)
         return time_series_t
 
 

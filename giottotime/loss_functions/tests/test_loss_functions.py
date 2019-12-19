@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pytest
 from hypothesis import given
 from hypothesis.extra.numpy import arrays
@@ -38,9 +39,27 @@ class TestSmape:
         with pytest.raises(ValueError):
             smape(y_true, y_pred)
 
-    def test_correct_smape(self):
+    def test_correct_smape_array(self):
         y_true = np.array([0, 1, 2, 3, 4, 5])
         y_pred = np.array([3, 2, 4, 3, 5, 7])
+
+        error = smape(y_true, y_pred)
+        expected_error = (1 + 1 / 3 + 1 / 3 + 0 + 1 / 9 + 1 / 6) * (2 / 6)
+
+        assert expected_error == error
+
+    def test_correct_smape_dataframe(self):
+        y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
+        y_pred = pd.DataFrame([3, 2, 4, 3, 5, 7])
+
+        error = smape(y_true, y_pred)
+        expected_error = (1 + 1 / 3 + 1 / 3 + 0 + 1 / 9 + 1 / 6) * (2 / 6)
+
+        assert expected_error == error
+
+    def test_correct_smape_list(self):
+        y_true = [0, 1, 2, 3, 4, 5]
+        y_pred = [3, 2, 4, 3, 5, 7]
 
         error = smape(y_true, y_pred)
         expected_error = (1 + 1 / 3 + 1 / 3 + 0 + 1 / 9 + 1 / 6) * (2 / 6)
@@ -103,9 +122,27 @@ class TestMaxError:
         with pytest.raises(ValueError):
             max_error(y_true, y_pred)
 
-    def test_max_error(self):
+    def test_max_error_list(self):
         y_true = [0, 1, 2, 3, 4, 5]
         y_pred = [-1, 4, 5, 10, 4, 1]
+
+        error = max_error(y_pred, y_true)
+        expected_max_error = 7
+
+        assert expected_max_error, error
+
+    def test_max_error_array(self):
+        y_true = np.array([0, 1, 2, 3, 4, 5])
+        y_pred = np.array([-1, 4, 5, 10, 4, 1])
+
+        error = max_error(y_pred, y_true)
+        expected_max_error = 7
+
+        assert expected_max_error, error
+
+    def test_max_error_dataframe(self):
+        y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
+        y_pred = pd.DataFrame([-1, 4, 5, 10, 4, 1])
 
         error = max_error(y_pred, y_true)
         expected_max_error = 7

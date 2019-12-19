@@ -1,15 +1,11 @@
 import numpy as np
 import pandas as pd
-
-from hypothesis import given, settings, strategies as st
-
+from hypothesis import given, settings
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats
-
 from pandas.util import testing as testing
-from giottotime.models.trend_models.exponential_trend import ExponentialTrend
 
-from random import randint
+from giottotime.models.trend_models.exponential_trend import ExponentialTrend
 
 
 class TestExponentialTrend:
@@ -31,7 +27,7 @@ class TestExponentialTrend:
 
         assert np.allclose(tm.model_exponent_, 0.0)
 
-    @settings(deadline=None)
+    @settings(deadline=None, max_examples=2)
     @given(arrays(dtype=float, shape=(500,), elements=floats(-10, 10)))
     def test_exponential_trend_multiple(self, random_array):
         testing.N, testing.K = 500, 1

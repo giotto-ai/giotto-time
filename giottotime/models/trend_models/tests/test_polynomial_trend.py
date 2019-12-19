@@ -46,6 +46,3 @@ class TestPolynomialTrend:
         tm.fit(detrended)
 
         assert np.allclose(tm.model_weights_, [0.0] * len(tm.model_weights_))
-
-
-#
