@@ -9,8 +9,7 @@ from giottotime.causality_tests.base import CausalityTest
 
 
 class ShiftedLinearCoefficient(CausalityTest):
-    """Class responsible for assessing the shifted linear fit coefficients between two
-    or more series.
+    """Test the shifted linear fit coefficients between two or more time series.
 
     Parameters
     ----------
@@ -18,12 +17,34 @@ class ShiftedLinearCoefficient(CausalityTest):
         The maximum number of shifts to check for.
 
     target_col : str, optional, default: ``'y'``
-            The column to use as the a reference (i.e., the columns which is not
-            shifted).
+        The column to use as the a reference (i.e., the column which is not
+        shifted).
 
     dropna : bool, optional, default: ``False``
         Determines if the Nan values created by shifting are retained or dropped.
 
+    Examples
+    --------
+
+    >>> from giottotime.causality_tests.shifted_linear_coefficient import ShiftedLinearCoefficient
+    >>> import pandas.util.testing as testing
+    >>> data = testing.makeTimeDataFrame(freq="s")
+    >>> slc = ShiftedLinearCoefficient(target_col="A")
+    >>> slc.fit(data)
+    >>> slc.best_shifts_
+    y  A  B  C  D
+    x
+    A  3  6  8  5
+    B  9  9  4  1
+    C  8  2  4  9
+    D  3  9  4  3
+    >>> slc.max_corrs_
+    y         A         B         C         D
+    x
+    A  0.460236  0.420005  0.339370  0.267143
+    B  0.177856  0.300350  0.367150  0.550490
+    C  0.484860  0.263036  0.456046  0.251342
+    D  0.580068  0.344688  0.253626  0.256220
     """
 
     def __init__(
@@ -34,12 +55,12 @@ class ShiftedLinearCoefficient(CausalityTest):
         self.dropna = dropna
 
     def fit(self, data: pd.DataFrame) -> "ShiftedLinearCoefficient":
-        """Create the dataframe of shifts of each time series which maximize the shifted
+        """Create the DataFrame of shifts of each time series which maximize the shifted
          linear fit coefficients.
 
         Parameters
         ----------
-        data : pd.DataFrame, shape (n_samples, n_time_series), required.
+        data : pd.DataFrame, shape (n_samples, n_time_series), required
             The DataFrame containing the time-series on which to compute the shifted
             linear fit coefficients.
 
@@ -78,12 +99,12 @@ class ShiftedLinearCoefficient(CausalityTest):
         return self
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Shifts each input timeseries but the amount which maximizes shifted linear
-        fit coefficients with the selected 'y' columns.
+        """Shifts each input time series by the amount which maximizes shifted linear
+        fit coefficients with the selected 'y' column.
 
         Parameters
         ----------
-        data : pd.DataFrame, shape (n_samples, n_time_series), required.
+        data : pd.DataFrame, shape (n_samples, n_time_series), required
             The DataFrame containing the time series on which to perform the
             transformation.
 
@@ -91,7 +112,7 @@ class ShiftedLinearCoefficient(CausalityTest):
         -------
         data_t : pd.DataFrame, shape (n_samples, n_time_series)
             The DataFrame (Pivot table) of the shifts which maximize the shifted linear
-            fit coefficients between each timeseries. The shift is indicated in rows.
+            fit coefficients between each time series. The shift is indicated in rows.
 
         """
         check_is_fitted(self)

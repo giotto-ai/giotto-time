@@ -1,3 +1,8 @@
+"""
+The :mod:`giottotime.feature_creation` module deals with the preparation of time series
+data, such as index conversions and resampling.
+"""
+
 from .time_series_conversion import (
     SequenceToTimeIndexSeries,
     PandasSeriesToTimeIndexSeries,
@@ -5,12 +10,10 @@ from .time_series_conversion import (
 )
 
 from .time_series_preparation import TimeSeriesPreparation
-from .time_series_resampling import TimeSeriesResampler
 
 __all__ = [
     "SequenceToTimeIndexSeries",
     "PandasSeriesToTimeIndexSeries",
     "TimeIndexSeriesToPeriodIndexSeries",
     "TimeSeriesPreparation",
-    "TimeSeriesResampler",
 ]

@@ -11,6 +11,12 @@ from .trend_features import (
     RemovePolynomialTrend,
     RemoveExponentialTrend,
 )
+from .tda_features import (
+    AmplitudeFeature,
+    AvgLifeTimeFeature,
+    BettiCurvesFeature,
+    NumberOfRelevantHolesFeature,
+)
 
 __all__ = [
     "IndexDependentFeature",
@@ -22,4 +28,8 @@ __all__ = [
     "DetrendedFeature",
     "RemovePolynomialTrend",
     "RemoveExponentialTrend",
+    "AmplitudeFeature",
+    "AvgLifeTimeFeature",
+    "BettiCurvesFeature",
+    "NumberOfRelevantHolesFeature",
 ]
