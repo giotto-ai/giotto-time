@@ -8,8 +8,8 @@ class CausalityTest(metaclass=ABCMeta):
 
     @abstractmethod
     def fit(self, data_matrix):
-        pass
+        raise NotImplementedError  # to exclude from pytest coverage
 
     @abstractmethod
     def transform(self, time_series):
-        pass
+        raise NotImplementedError  # to exclude from pytest coverage
