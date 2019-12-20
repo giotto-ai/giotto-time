@@ -128,6 +128,39 @@ class TestToTimeIndexSeries:
         with pytest.raises(TypeError):
             time_series_preparation._to_time_index_series(wrong_input)
 
+    @given(series_with_period_index(), st.datetimes(), available_freqs())
+    def test_period_index_dataframe_unchanged(
+        self, period_index_series: pd.Series, start: pd.datetime, freq: pd.Timedelta,
+    ):
+        period_index_dataframe = pd.DataFrame(period_index_series)
+        time_series_preparation = TimeSeriesPreparation(start=start, freq=freq)
+        computed_time_series = time_series_preparation._to_time_index_series(
+            period_index_dataframe
+        )
+        assert_series_equal(computed_time_series, period_index_series)
+
+    @given(series_with_datetime_index(), st.datetimes(), available_freqs())
+    def test_datetime_index_dataframe_unchanged(
+        self, datetime_index_series: pd.Series, start: pd.datetime, freq: pd.Timedelta,
+    ):
+        datetime_index_dataframe = pd.DataFrame(datetime_index_series)
+        time_series_preparation = TimeSeriesPreparation(start=start, freq=freq)
+        computed_time_series = time_series_preparation._to_time_index_series(
+            datetime_index_dataframe
+        )
+        assert_series_equal(computed_time_series, datetime_index_series)
+
+    @given(series_with_timedelta_index(), st.datetimes(), available_freqs())
+    def test_timedelta_index_dataframe_unchanged(
+        self, timedelta_index_series: pd.Series, start: pd.datetime, freq: pd.Timedelta,
+    ):
+        timedelta_index_dataframe = pd.DataFrame(timedelta_index_series)
+        time_series_preparation = TimeSeriesPreparation(start=start, freq=freq)
+        computed_time_series = time_series_preparation._to_time_index_series(
+            timedelta_index_dataframe
+        )
+        assert_series_equal(computed_time_series, timedelta_index_series)
+
 
 class TestToEquispacedTimeSeries:
     @given(

@@ -186,6 +186,19 @@ class SequenceToTimeIndexSeries(TimeSeriesConversion):
         frequency of the output time series. Not mandatory for all time series
         conversion.
 
+    Examples
+    --------
+    >>> from giottotime.time_series_preparation import SequenceToTimeIndexSeries
+    >>> time_series = [1,2,3,5,5,7]
+    >>> sequence_to_time_index = SequenceToTimeIndexSeries(start='01-01-2010', freq='10D')
+    >>> sequence_to_time_index.transform(time_series)
+    2010-01-01    1
+    2010-01-11    2
+    2010-01-21    3
+    2010-01-31    5
+    2010-02-10    5
+    2010-02-20    7
+    Freq: 10D, dtype: int64
     """
 
     def __init__(
@@ -209,7 +222,7 @@ class SequenceToTimeIndexSeries(TimeSeriesConversion):
 
 class PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
     """Returns a Pandas Series with time index (DatetimeIndex, TimedeltaIndex or
-    PeriodIndex from a standard Pandas Series
+    PeriodIndex) from a standard Pandas Series
 
     Parameters
     ----------
@@ -222,6 +235,20 @@ class PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
     freq : pd.Timedelta``, optional, default: ``None``
         The frequency of the time series.
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.time_series_preparation import PandasSeriesToTimeIndexSeries
+    >>> time_series = pd.Series([1,2,3,5,5,7])
+    >>> sequence_to_time_index = PandasSeriesToTimeIndexSeries(start='01-01-2010', freq='10D')
+    >>> sequence_to_time_index.transform(time_series)
+    2010-01-01    1
+    2010-01-11    2
+    2010-01-21    3
+    2010-01-31    5
+    2010-02-10    5
+    2010-02-20    7
+    Freq: 10D, dtype: int64
     """
 
     def __init__(
@@ -255,7 +282,8 @@ class PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
 
 
 class TimeIndexSeriesToPeriodIndexSeries(TimeSeriesConversion):
-    """Converts a series with a time index to a series with a PeriodIndex.
+    """Converts a series with a time index (DatetimeIndex, TimedeltaIndex or
+    PeriodIndex) to a series with a PeriodIndex.
 
     It may be necessary to specify a `freq` if not already provided.
 
@@ -264,6 +292,47 @@ class TimeIndexSeriesToPeriodIndexSeries(TimeSeriesConversion):
     freq : pd.Timedelta, optional, default: ``None``
         The frequency of the time series.
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.time_series_preparation import TimeIndexSeriesToPeriodIndexSeries
+    >>> period_index_time_series = pd.Series(
+    ...     index = pd.period_range(start='01-01-2010', freq='10D', periods=6),
+    ...     data=[1,2,3,5,5,7]
+    ... )
+    >>> datetime_index_time_series = pd.Series(
+    ...     index = pd.date_range(start='01-01-2010', freq='10D', periods=6),
+    ...     data=[1,2,3,5,5,7]
+    ... )
+    >>> timedelta_index_time_series = pd.Series(
+    ...     index = pd.timedelta_range(start=pd.Timedelta(days=1), freq='10D', periods=6),
+    ...     data=[1,2,3,5,5,7]
+    ... )
+    >>> sequence_to_time_index = TimeIndexSeriesToPeriodIndexSeries()
+    >>> sequence_to_time_index.transform(period_index_time_series)
+    2010-01-01    1
+    2010-01-11    2
+    2010-01-21    3
+    2010-01-31    5
+    2010-02-10    5
+    2010-02-20    7
+    freq: 10d, dtype: int64
+    >>> sequence_to_time_index.transform(datetime_index_time_series)
+    2010-01-01    1
+    2010-01-11    2
+    2010-01-21    3
+    2010-01-31    5
+    2010-02-10    5
+    2010-02-20    7
+    freq: 10d, dtype: int64
+    >>> sequence_to_time_index.transform(timedelta_index_time_series)
+    1970-01-02    1
+    1970-01-12    2
+    1970-01-22    3
+    1970-02-01    5
+    1970-02-11    5
+    1970-02-21    7
+    Freq: D, dtype: int64
     """
 
     def __init__(self, freq: Optional[pd.Timedelta] = None):

@@ -1,6 +1,6 @@
 """
 The :mod:`giottotime.feature_creation` module deals with the preparation of time series
-data, such as index conversions and resampling.
+data, such as conversion to `pandas.DataFrame` with a `PeriodIndex`.
 """
 
 from .time_series_conversion import (
