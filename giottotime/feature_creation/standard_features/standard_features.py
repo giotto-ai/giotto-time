@@ -204,14 +204,14 @@ class ConstantFeature(StandardFeature):
     Examples
     --------
     >>> from giottotime.feature_creation import ConstantFeature
-    >>> constant_feature = ConstantFeature(constant=3, length=5, output_name="constant")
+    >>> constant_feature = ConstantFeature(constant=3, length=5)
     >>> constant_feature.transform()
-       constant
-    0         3
-    1         3
-    2         3
-    3         3
-    4         3
+      ConstantFeature
+    0               3
+    1               3
+    2               3
+    3               3
+    4               3
 
     """
 

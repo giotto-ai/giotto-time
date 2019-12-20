@@ -48,8 +48,6 @@ Welcome to giotto-time's API reference!
    feature_creation.DetrendedFeature
    feature_creation.RemovePolynomialTrend
    feature_creation.RemoveExponentialTrend
-   feature_creation.RemoveFunctionTrend
-
 
 :mod:`giottotime.loss_functions`: Loss Functions
 ====================================================
@@ -118,4 +116,3 @@ Welcome to giotto-time's API reference!
    time_series_preparation.PandasSeriesToTimeIndexSeries
    time_series_preparation.TimeIndexSeriesToPeriodIndexSeries
    time_series_preparation.TimeSeriesPreparation
-   time_series_preparation.TimeSeriesResampler
