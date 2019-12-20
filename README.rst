@@ -31,11 +31,10 @@ Time Series Forecasting Model
 
 Giotto-time provide the GAR class (Generalize Auto Regressive model). It operates in a similar way to the standard AR, but with an arbitrary number of features and with an arbitrary underlying regression model.
 
-.. raw:: html
 
-   <p align="center">
-     <img width="600" src="https://storage.googleapis.com/l2f-open-models/giotto-time/images/gar.png">
-   </p>
+.. image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/gar.png
+  :width: 600
+
 
 This model allows the full force of machine learning regressors (compatible with the fit-transform framework ok scikit-learn) to be combined with advanced feature creation stratagies to forecast time series in a convienent api.
 
@@ -123,14 +122,13 @@ Specifically, giotto-time includes ExponentialTrend, PolynomialTrend model class
 >>> detrended.plot(figsize=(10, 10))
 >>> plt.show()
 
-.. raw:: html
+|imga| |imgb|
 
-   <table style="width:100%">
-     <tr>
-       <th><img width="460" src="https://storage.googleapis.com/l2f-open-models/giotto-time/images/trend.png"></th>
-       <th><img width="460" src="https://storage.googleapis.com/l2f-open-models/giotto-time/images/no_trend.png"></th> 
-     </tr>
-   </table>
+.. |imga| image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/trend.png
+   :width: 450
+
+.. |imgb| image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/no_trend.png
+   :width: 450
 
 Before the detrending tranformer, a clear quadratic trend is present in the data. For additional information on trend stationarity, see: Trend stationarity: Wikipedia - https://en.wikipedia.org/wiki/Trend_stationary.
 
@@ -138,12 +136,8 @@ Custom Regressors
 =================
 
 LinearRegressor is a linear regressor class that minimizes a custom loss function (compatitble with all scikit-learn metrics).
-
-.. raw:: html
-
-   <p align="center">
-     <img width="800" src="https://storage.googleapis.com/l2f-open-models/giotto-time/images/custom_error.png">
-   </p>
+   
+.. image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/custom_error.png
 
 In time series forecasting, it can be essential to minimize error metrics other than the standard R squared. Using this regressor class, it is possible to fit smape, max error and a range of other time series forecasting metrics easily with a simple interface via the GAR class.
 
