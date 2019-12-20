@@ -183,6 +183,6 @@ B  0.177856  0.300350  0.367150  0.550490
 C  0.484860  0.263036  0.456046  0.251342
 D  0.580068  0.344688  0.253626  0.256220
 
-The target-col input variable to the constructor is used in the transform method. It determins which set of shifts are applied to all inputs. For example, if 'A' is selected, each column will be transform by a shift corresponding to the 'A' row of the bests_shifts_ pivot table.
+The target-col input variable to the constructor is used in the transform method. It determins which set of shifts are applied to all inputs. For example, if 'A' is selected, each column will be transform by a shift corresponding to the 'A' row of the *bests_shifts* pivot table.
 
 
