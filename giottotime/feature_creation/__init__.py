@@ -21,7 +21,6 @@ from .index_dependent_features import (
     BettiCurvesFeature,
     NumberOfRelevantHolesFeature,
 )
-from .utils import trim_feature_nans
 
 from .standard_features import ConstantFeature, PeriodicSeasonalFeature, CustomFeature
 
@@ -33,7 +32,6 @@ __all__ = [
     "PolynomialFeature",
     "ExogenousFeature",
     "tda_features",
-    "trim_feature_nans",
     "CalendarFeature",
     "PeriodicSeasonalFeature",
     "DetrendedFeature",

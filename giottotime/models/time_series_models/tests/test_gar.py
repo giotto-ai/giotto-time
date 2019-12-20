@@ -13,7 +13,7 @@ from giottotime.feature_creation import (
     ShiftFeature,
 )
 from giottotime.feature_creation.feature_creation import FeatureCreation
-from giottotime.feature_creation.utils import trim_feature_nans
+from giottotime.model_selection import FeatureSplitter
 from giottotime.models.time_series_models.gar import GAR
 
 
@@ -77,7 +77,8 @@ class TestFitPredict:
 
         x, y = feature_creation.fit_transform(time_series)
 
-        x_train, y_train, x_test, y_test = trim_feature_nans(x, y)
+        feature_splitter = FeatureSplitter()
+        x_train, y_train, x_test, y_test = feature_splitter.transform(x, y)
 
         gar_no_feedforward = GAR(base_model=base_model, feed_forward=False)
 
@@ -99,7 +100,8 @@ class TestFitPredict:
 
         x, y = feature_creation.fit_transform(time_series)
 
-        x_train, y_train, x_test, y_test = trim_feature_nans(x, y)
+        feature_splitter = FeatureSplitter()
+        x_train, y_train, x_test, y_test = feature_splitter.transform(x, y)
 
         gar_no_feedforward = GAR(base_model=base_model, feed_forward=False)
 
