@@ -15,7 +15,7 @@ class IndexDependentFeature(Feature, metaclass=ABCMeta):
 
     @abstractmethod
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        pass
+        raise NotImplementedError  # to exclude from pytest coverage
 
     def fit_transform(self, X, y=None):
         self.fit(X, y)

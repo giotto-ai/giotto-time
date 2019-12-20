@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import hypothesis.strategies as st
 import numpy as np
 import pandas as pd
@@ -119,6 +121,12 @@ class TestToTimeIndexSeries:
             timedelta_index_series
         )
         assert_series_equal(computed_time_series, timedelta_index_series)
+
+    @given(st.tuples())
+    def test_wrong_input_type(self, wrong_input: Tuple):
+        time_series_preparation = TimeSeriesPreparation()
+        with pytest.raises(TypeError):
+            time_series_preparation._to_time_index_series(wrong_input)
 
 
 class TestToEquispacedTimeSeries:

@@ -110,13 +110,13 @@ class TimeSeriesConversion(ABC):
     def _get_index_from(
         self, array_like_object: Union[pd.Series, np.ndarray, list]
     ) -> PandasTimeIndex:
-        pass
+        raise NotImplementedError  # To exclude it from pytest coverage
 
     @abstractmethod
     def _get_values_from(
         self, array_like_object: Union[pd.Series, np.array, list]
     ) -> np.ndarray:
-        pass
+        raise NotImplementedError  # To exclude it from pytest coverage
 
     def _initialize_start_end_freq(
         self, start: PandasDate, end: PandasDate, freq: pd.Timedelta
