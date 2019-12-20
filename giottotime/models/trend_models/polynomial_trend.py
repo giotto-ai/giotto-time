@@ -58,7 +58,7 @@ class PolynomialTrend(TrendModel):
             predictions = [p(t) for t in range(0, ts.shape[0])]
             return self.loss(ts.values, predictions)
 
-        model_weights = np.zeros(self.order)
+        model_weights = np.zeros(self.order + 1)
 
         res = minimize(
             prediction_loss, model_weights, method=self.method, options={"disp": False}
@@ -114,8 +114,9 @@ class PolynomialTrend(TrendModel):
             The transformed time series, without the trend.
 
         """
-        p = np.poly1d(self.model_weights_)
+        check_is_fitted(self)
 
+        p = np.poly1d(self.model_weights_)
         time_steps = (ts.index - self.t0_) / self.period_
 
         predictions = pd.Series(index=ts.index, data=[p(t) for t in time_steps])
