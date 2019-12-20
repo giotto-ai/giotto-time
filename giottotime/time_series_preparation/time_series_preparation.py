@@ -51,6 +51,55 @@ class TimeSeriesPreparation:
     ValueError
         Of the three parameters: start, end, and periods, exactly two must be specified.
 
+    Examples
+    --------
+    >>> time_series = [1,2,3,5,5,7]
+    >>> period_index_time_series = pd.Series(
+    ...     index = pd.period_range(start='01-01-2010', freq='10D', periods=6),
+    ...     data=[1,2,3,5,5,7]
+    ... )
+    >>> datetime_index_time_series = pd.Series(
+    ...     index = pd.date_range(start='01-01-2010', freq='10D', periods=6),
+    ...     data=[1,2,3,5,5,7]
+    ... )
+    >>> timedelta_index_time_series = pd.Series(
+    ...     index = pd.timedelta_range(start=pd.Timedelta(days=1), freq='10D', periods=6),
+    ...     data=[1,2,3,5,5,7]
+    ... )
+    >>> time_series_preparation = TimeSeriesPreparation()
+    >>> time_series_preparation.transform(time_series)
+                time_series
+    1970-01-01            1
+    1970-01-02            2
+    1970-01-03            3
+    1970-01-04            5
+    1970-01-05            5
+    1970-01-06            7
+    >>> time_series_preparation.transform(period_index_time_series)
+                time_series
+    2010-01-01            1
+    2010-01-11            2
+    2010-01-21            3
+    2010-01-31            5
+    2010-02-10            5
+    2010-02-20            7
+    >>> time_series_preparation.transform(datetime_index_time_series)
+                time_series
+    2010-01-01            1
+    2010-01-11            2
+    2010-01-21            3
+    2010-01-31            5
+    2010-02-10            5
+    2010-02-20            7
+    >>> time_series_preparation.transform(timedelta_index_time_series)
+                time_series
+    1970-01-02            1
+    1970-01-12            2
+    1970-01-22            3
+    1970-02-01            5
+    1970-02-11            5
+    1970-02-21            7
+
     """
 
     def __init__(

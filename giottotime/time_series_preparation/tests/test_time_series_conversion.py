@@ -332,6 +332,20 @@ class TestTimeIndexSeriesToPeriodIndexSeries:
         )
         assert_series_equal(computed_series, expected_series)
 
+    def test_basic_timedelta_index_as_input(self):
+        timedelta_index_series = pd.Series(
+            index=pd.timedelta_range(start=pd.Timedelta(days=1), freq="10D", periods=3),
+            data=[1, 2, 3],
+        )
+        expected_series = pd.Series(
+            index=pd.PeriodIndex(["1970-01-02", "1970-01-12", "1970-01-22"], freq="D"),
+            data=[1, 2, 3],
+        )
+        computed_series = transform_time_index_series_into_period_index_series(
+            timedelta_index_series
+        )
+        assert_series_equal(computed_series, expected_series)
+
     @given(series_with_timedelta_index(), available_freqs())
     def test_timedelta_index_and_freq_as_input(
         self, timedelta_index_series: pd.Series, freq: pd.Timedelta
