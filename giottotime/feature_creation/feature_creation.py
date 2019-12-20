@@ -72,7 +72,25 @@ class FeatureCreation:
         self.time_series_features = time_series_features
         self.horizon = horizon
 
-    def fit_transform(self, time_series: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
+    def fit(self, time_series: pd.DataFrame) -> "FeatureCreation":
+        """Fit the all the features inside ``time_series_features``.
+
+        Parameters
+        ----------
+        time_series : pd.DataFrame, required
+            The time series on which to fit the data.
+
+        Returns
+        -------
+        self: FeatureCreation
+            The FeatureCreation object itself, containing the fitted features.
+
+        """
+        for time_series_feature in self.time_series_features:
+            time_series_feature.fit(time_series)
+        return self
+
+    def transform(self, time_series: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
         """Create the X matrix by generating the feature_creation, starting from the
         original ``time_series`` and using the list of ``time_series_features``. Also
         create the y matrix, by generating ``horizon`` number of shifts of the
@@ -85,27 +103,46 @@ class FeatureCreation:
 
         Returns
         -------
-        x, y: (pd.DataFrame, pd.DataFrame), shape ((n_samples, n_features), \
+        X, y: (pd.DataFrame, pd.DataFrame), shape ((n_samples, n_features), \
             n_samples, horizon))
             A tuple containing the ``X`` and ``y`` matrices.
 
         """
-        x = self._create_x_features(time_series)
+        X = self._create_x_features(time_series)
         y = self._create_y_shifts(time_series)
-        return x, y
+        return X, y
 
     def _create_y_shifts(self, time_series: pd.DataFrame) -> pd.DataFrame:
         y = pd.DataFrame(index=time_series.index)
         for k in range(1, self.horizon + 1):
             shift_feature = ShiftFeature(-k, f"shift_{k}")
-            y[f"y_{k}"] = shift_feature.fit_transform(time_series)
+            y[f"y_{k}"] = shift_feature.transform(time_series)
 
         return y
 
     def _create_x_features(self, time_series: pd.DataFrame) -> pd.DataFrame:
         features = pd.DataFrame(index=time_series.index)
         for time_series_feature in self.time_series_features:
-            x_transformed = time_series_feature.fit_transform(time_series)
+            x_transformed = time_series_feature.transform(time_series)
             features = pd.concat([features, x_transformed], axis=1)
 
         return features
+
+    def fit_transform(self, time_series: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
+        """Fit and then transform on the same time series.
+
+        Parameters
+        ----------
+        time_series : pd.DataFrame, required
+            The time series on which to fit and to transform.
+
+        Returns
+        -------
+        X, y: (pd.DataFrame, pd.DataFrame), shape ((n_samples, n_features), \
+            n_samples, horizon))
+            A tuple containing the ``X`` and ``y`` matrices.
+
+        """
+        self.fit(time_series)
+        X, y = self.transform(time_series)
+        return X, y

@@ -11,20 +11,19 @@ from .base import TrendModel
 
 
 class PolynomialTrend(TrendModel):
-    """
-    A model for fitting, predicting and removing an polynomial trend from a
-    time series.
+    """A model for fitting, predicting and removing an polynomial trend from a time
+    series.
 
     Parameters
     ----------
-    order : ``int``, required.
+    order : int, required
         The order of the polynomial.
 
-    loss : ``Callable``, optional, (default=``mean_squared_error``).
+    loss : Callable, optional, default: ``mean_squared_error``
         The loss function to use when fitting the model. The loss function must
          accept y_true, y_pred and return a single real number.
 
-    method : ``str``, optional, (default=``'BFGS``).
+    method : str, optional, default: ``'BFGS``
         The method to use in order to minimize the loss function.
 
     """
@@ -36,7 +35,7 @@ class PolynomialTrend(TrendModel):
         self.loss = loss
         self.method = method
 
-    def fit(self, ts: pd.DataFrame,) -> TrendModel:
+    def fit(self, ts: pd.DataFrame,) -> "PolynomialTrend":
         """Fit the model on the ``time_series``, with respect to the provided ``loss``
         and using the provided ``method``. In order to see which methods are available,
         please check the 'scipy' `documentation
@@ -68,11 +67,12 @@ class PolynomialTrend(TrendModel):
         self.model_weights_ = res["x"]
         self.t0_ = ts.index[0]
         freq = ts.index.freq
+
         if freq is not None:
             self.period_ = freq
         else:
             self.period_ = ts.index[1] - ts.index[0]
-            # raise warning
+
         return self
 
     def predict(self, ts: pd.DataFrame) -> pd.DataFrame:
