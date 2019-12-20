@@ -60,6 +60,14 @@ def smape(
     smape : float
         The smape between the two input vectors.
 
+    Examples
+    --------
+    >>> from giottotime.loss_functions import smape
+    >>> y_true = [0, 1, 2, 3, 4, 5]
+    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> smape(y_true, y_pred)
+    0.7864893577539014
+
     """
     y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
     _check_input(y_true, y_pred)
@@ -90,6 +98,14 @@ def max_error(
     -------
     error : float
         The maximum error between the two vectors.
+
+    Examples
+    --------
+    >>> from giottotime.loss_functions import max_error
+    >>> y_true = [0, 1, 2, 3, 4, 5]
+    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> max_error(y_true, y_pred)
+    1.6
 
     """
     y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
