@@ -20,23 +20,23 @@ def X_y_matrices(
     Parameters
     ----------
     horizon : ``int``, required
-        the number of steps to forecast in the future. It affects the y shape.
+        The number of steps to forecast in the future. It affects the y shape.
 
     time_series_features : ``List[TimeSeriesFeature]``, required
-        the list of TimeSeriesFeature that is given as input to the
-        FeaturesCreation
+        The list of TimeSeriesFeature that is given as input to the FeaturesCreation
 
     min_length : ``int``, optional, (default=``None``)
-        minimum length of the matrices
+        Minimum length of the matrices
 
     allow_nan_infinity : ``bool``, optional, (default=``True``)
-        allow nan and infinity in the starting time series
+        Allow nan and infinity in the starting time series
 
     Returns
     -------
-    X : ``pd.DataFrame``
+    X : pd.DataFrame
         X feature matrix
-    y : ``pd.DataFrame``
+
+    y : pd.DataFrame
         y feature matrix
     """
     min_length = min_length if min_length is not None else 1
