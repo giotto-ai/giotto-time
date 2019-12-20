@@ -1,4 +1,5 @@
-from hypothesis import given
+import pytest
+from hypothesis import given, assume
 import pandas as pd
 from pandas.testing import assert_series_equal
 import numpy as np
@@ -14,7 +15,11 @@ from giottotime.utils.hypothesis.time_indexes import (
     positive_bounded_integers,
     pair_of_ordered_timedeltas,
     pair_of_ordered_dates,
+    samples_from,
 )
+from giottotime.utils.hypothesis.utils import freq_to_timedelta
+
+NON_UNIFORM_FREQS = ["B", "Q", "A"]
 
 
 class TestPeriodIndex:
@@ -223,3 +228,8 @@ class TestGeneric:
     @given(pair_of_ordered_dates())
     def test_pair_of_ordered_dates_is_ordered(self, pair):
         assert pair[0] < pair[1]
+
+    @given(samples_from(NON_UNIFORM_FREQS))
+    def test_freq_to_timedelta(self, freq: str):
+        with pytest.raises(ValueError):
+            freq_to_timedelta(freq, approximate_if_non_uniform=False)

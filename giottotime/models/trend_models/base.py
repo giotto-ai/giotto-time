@@ -5,15 +5,15 @@ from abc import ABCMeta, abstractmethod
 class TrendModel(metaclass=ABCMeta):
     @abstractmethod
     def fit(self, time_series):
-        pass
+        raise NotImplementedError  # to exclude from pytest coverage
 
     @abstractmethod
     def predict(self, t):
-        pass
+        raise NotImplementedError  # to exclude from pytest coverage
 
     @abstractmethod
     def transform(self, time_series):
-        pass
+        raise NotImplementedError  # to exclude from pytest coverage
 
     def __repr__(self):
         constructor_attributes = inspect.getfullargspec(self.__init__).args

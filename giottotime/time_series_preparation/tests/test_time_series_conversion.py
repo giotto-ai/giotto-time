@@ -343,3 +343,8 @@ class TestTimeIndexSeriesToPeriodIndexSeries:
             timedelta_index_series, freq=freq
         )
         assert_series_equal(computed_series, expected_series)
+
+    @given(pd_series(dtype=float))
+    def test_non_time_index_input(self, series: pd.Series):
+        with pytest.raises(ValueError):
+            transform_time_index_series_into_period_index_series(series)
