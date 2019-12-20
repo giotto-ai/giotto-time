@@ -5,13 +5,16 @@ from giottotime.feature_creation import (
 )
 import pandas as pd
 
+from giottotime.models import PolynomialTrend
+
 
 def test_correct_index_features():
     output_name = "detrended_feature"
     time_index = pd.date_range(start="2020-01-01", end="2020-01-20")
     ts = pd.DataFrame(range(0, 20), index=time_index)
+    model = PolynomialTrend()
 
-    detrend_feature = DetrendedFeature(output_name=output_name)
+    detrend_feature = DetrendedFeature(trend_model=model, output_name=output_name)
     ts_t = detrend_feature.transform(ts)
     expected_ts = pd.DataFrame(
         [
