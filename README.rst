@@ -32,7 +32,7 @@ Time Series Forecasting Model
 Giotto-time provide the GAR class (Generalize Auto Regressive model). It operates in a similar way to the standard AR, but with an arbitrary number of features and with an arbitrary underlying regression model.
 
 
-.. image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/gar.png
+.. image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/gar.png?v=400&s=200
   :width: 600
 
 
