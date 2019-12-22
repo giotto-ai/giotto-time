@@ -127,10 +127,6 @@ Specifically, giotto-time includes ExponentialTrend, PolynomialTrend model class
 .. |imga| image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/trend.png
    :width: 450
 
-.. raw:: html
-
-   <img width=50 size=10 src="https://storage.googleapis.com/l2f-open-models/giotto-time/images/trend.png">
-
 .. |imgb| image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/no_trend.png
    :width: 450
 
