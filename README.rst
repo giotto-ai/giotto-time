@@ -156,7 +156,7 @@ Causality Tests
 
 We provide two tests: ShiftedLinearCoefficient and ShiftedPearsonCorrelation.
 
-These tests (which are implemented as scikit-learn compatible transformers) determine which shift of each time series maximizes the correlation to each other input time series. This is a very similar construction tothe granger test.
+These tests (which are implemented as scikit-learn compatible transformers) determine which shift of each time series maximizes the correlation to each other input time series. This is a very similar construction to the granger test.
 
 .. image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/granger.png
   :width: 600
