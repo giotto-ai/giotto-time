@@ -182,4 +182,6 @@ D  0.580068  0.344688  0.253626  0.256220
 
 The target-col input variable to the constructor is used in the transform method. It determins which set of shifts are applied to all inputs. For example, if 'A' is selected, each column will be transform by a shift corresponding to the 'A' row of the *best_shifts* pivot table.
 
+.. image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/granger.png
+  :width: 600
 
