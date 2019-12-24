@@ -124,10 +124,7 @@ Specifically, giotto-time includes ExponentialTrend, PolynomialTrend model class
 
 |imga| |imgb|
 
-.. |imga| image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/trend.png
-   :width: 450
-
-.. |imgb| image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/no_trend.png
+.. |imga| image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/trends.png
    :width: 450
 
 Before the detrending tranformer, a clear quadratic trend is present in the data. For additional information on trend stationarity, see: Trend stationarity: Wikipedia - https://en.wikipedia.org/wiki/Trend_stationary.
