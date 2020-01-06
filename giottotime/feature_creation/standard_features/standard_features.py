@@ -194,9 +194,9 @@ class ConstantFeature(StandardFeature):
     constant : int, optional, default: ``2``
         The value to use to generate the constant column of the ``pd.DataFrame``.
 
-    length: int, optional, default: ``50``
+    length : int, optional, default: ``50``
         The length of the DataFrame to generate. This is used only if X is not passed in
-         the ``transform`` method, otherwise the length is inferred from it.
+        the ``transform`` method, otherwise the length is inferred from it.
 
     output_name : str, optional, default: ``'ConstantFeature'``
         The name of the output column.
@@ -256,7 +256,7 @@ class CustomFeature(StandardFeature):
 
     Parameters
     ----------
-    custom_feature_function`: Callable, required.
+    custom_feature_function : Callable, required.
         The function to use to generate a ``pd.DataFrame`` containing the feature.
 
     output_name: str, optional, default: ``'CustomFeature'``.
