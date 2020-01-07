@@ -3,7 +3,7 @@ from typing import List
 import pandas as pd
 
 from .base import Feature
-from .index_dependent_features import ShiftFeature
+from .time_series_features import ShiftFeature
 
 
 def _check_feature_names(time_series_features: List[Feature]) -> None:
@@ -16,13 +16,13 @@ def _check_feature_names(time_series_features: List[Feature]) -> None:
 
 
 class FeatureCreation:
-    """Class responsible for the generation of the feature_creation, starting from a
+    """Class responsible for the generation of the feature_extraction, starting from a
     list of TimeSeriesFeature.
 
     Parameters
     ----------
     time_series_features : List[TimeSeriesFeature], required
-        The list of ``TimeSeriesFeature`` from which to compute the feature_creation.
+        The list of ``TimeSeriesFeature`` from which to compute the feature_extraction.
 
     horizon : int, optional, default: ``5``
         It represents how much into the future is necessary to predict. This corresponds
@@ -31,15 +31,15 @@ class FeatureCreation:
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_creation import FeatureCreation
-    >>> from giottotime.feature_creation import ShiftFeature, MovingAverageFeature
+    >>> from giottotime.feature_extraction import FeatureCreation
+    >>> from giottotime.feature_extraction import ShiftFeature, MovingAverageFeature
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
     >>> shift_feature = ShiftFeature(shift=1)
     >>> mv_avg_feature = MovingAverageFeature(window_size=2)
-    >>> feature_creation = FeatureCreation(horizon=3,
+    >>> feature_extraction = FeatureCreation(horizon=3,
     ...                                    time_series_features=[shift_feature,
     ...                                                          mv_avg_feature])
-    >>> X, y = feature_creation.fit_transform(ts)
+    >>> X, y = feature_extraction.fit_transform(ts)
     >>> X
        ShiftFeature  MovingAverageFeature
     0           NaN                   NaN
@@ -91,7 +91,7 @@ class FeatureCreation:
         return self
 
     def transform(self, time_series: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
-        """Create the X matrix by generating the feature_creation, starting from the
+        """Create the X matrix by generating the feature_extraction, starting from the
         original ``time_series`` and using the list of ``time_series_features``. Also
         create the y matrix, by generating ``horizon`` number of shifts of the
          ``time_series``.

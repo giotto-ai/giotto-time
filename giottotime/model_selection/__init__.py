@@ -1,5 +1,5 @@
 """
-The :mod:`giottotime.feature_creation` module deals with model selection.
+The :mod:`giottotime.feature_extraction` module deals with model selection.
 """
 
 from .feature_splitters import FeatureSplitter

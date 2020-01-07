@@ -30,7 +30,7 @@ class DetrendedFeature(IndexDependentFeature):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_creation import DetrendedFeature
+    >>> from giottotime.feature_extraction import DetrendedFeature
     >>> from giottotime.models import PolynomialTrend
     >>> model = PolynomialTrend(order=2)
     >>> detrend_feature = DetrendedFeature(trend_model=model)
@@ -95,7 +95,7 @@ class RemovePolynomialTrend(DetrendedFeature):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_creation import RemovePolynomialTrend
+    >>> from giottotime.feature_extraction import RemovePolynomialTrend
     >>> detrend_feature = RemovePolynomialTrend(polynomial_order=4)
     >>> time_index = pd.date_range("2020-01-01", "2020-01-10")
     >>> X = pd.DataFrame(range(0, 10), index=time_index)
@@ -138,7 +138,7 @@ class RemoveExponentialTrend(DetrendedFeature):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_creation import RemoveExponentialTrend
+    >>> from giottotime.feature_extraction import RemoveExponentialTrend
     >>> detrend_feature = RemoveExponentialTrend()
     >>> time_index = pd.date_range("2020-01-01", "2020-01-10")
     >>> X = pd.DataFrame(range(0, 10), index=time_index)

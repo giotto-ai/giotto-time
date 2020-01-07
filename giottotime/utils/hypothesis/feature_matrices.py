@@ -2,8 +2,8 @@ from typing import List, Optional
 
 import hypothesis.strategies as st
 
-from giottotime.feature_creation import FeatureCreation
-from giottotime.feature_creation.base import Feature
+from giottotime.feature_extraction import FeatureCreation
+from giottotime.feature_extraction.base import Feature
 from .time_indexes import giotto_time_series
 
 

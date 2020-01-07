@@ -37,7 +37,7 @@ def _align_indices(
 
 
 class TDAFeatures(IndexDependentFeature, metaclass=ABCMeta):
-    """Base class for all the TDA feature_creation contained in the package.
+    """Base class for all the TDA feature_extraction contained in the package.
 
     """
 

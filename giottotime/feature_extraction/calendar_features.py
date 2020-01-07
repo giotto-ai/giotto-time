@@ -62,7 +62,7 @@ class CalendarFeature(IndexDependentFeature):
 
     Examples
     --------
-    >>> from giottotime.feature_creation import CalendarFeature
+    >>> from giottotime.feature_extraction import CalendarFeature
     >>> cal_feature = CalendarFeature(region="europe", country="Italy", kernel=[3, 2])
     >>> cal_feature.transform()
                 CalendarFeature

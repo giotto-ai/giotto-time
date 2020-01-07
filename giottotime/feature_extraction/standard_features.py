@@ -6,7 +6,8 @@ from pandas import DatetimeIndex
 
 from math import pi
 
-from giottotime.feature_creation.standard_features.base import StandardFeature
+from giottotime.feature_extraction.base import Feature
+from giottotime.feature_extraction.base import StandardFeature
 
 __all__ = ["PeriodicSeasonalFeature", "ConstantFeature", "CustomFeature"]
 
@@ -42,7 +43,7 @@ class PeriodicSeasonalFeature(StandardFeature):
 
     Examples
     --------
-    >>> from giottotime.feature_creation import PeriodicSeasonalFeature
+    >>> from giottotime.feature_extraction import PeriodicSeasonalFeature
     >>> period_feature = PeriodicSeasonalFeature(start_date="2020-01-01",
     ...                                          index_period=10)
     >>> period_feature.transform()
@@ -203,7 +204,7 @@ class ConstantFeature(StandardFeature):
 
     Examples
     --------
-    >>> from giottotime.feature_creation import ConstantFeature
+    >>> from giottotime.feature_extraction import ConstantFeature
     >>> constant_feature = ConstantFeature(constant=3, length=5)
     >>> constant_feature.transform()
       ConstantFeature
@@ -268,7 +269,7 @@ class CustomFeature(StandardFeature):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_creation import CustomFeature
+    >>> from giottotime.feature_extraction import CustomFeature
     >>> def custom_function(X, power):
     ...     return X**power
     >>> X = pd.DataFrame([0, 1, 2, 3, 4, 5])
@@ -306,12 +307,12 @@ class CustomFeature(StandardFeature):
         Returns
         -------
         custom_feature_renamed : pd.DataFrame, shape (length, 1)
-            A DataFrame containing the generated feature_creation.
+            A DataFrame containing the generated feature_extraction.
 
         Notes
         -----
         In order to use the ``CustomFeature`` class inside a
-        ``giottotime.feature_creation.FeatureCreation`` class, the output of  the custom
+        ``giottotime.feature_extraction.FeatureCreation`` class, the output of  the custom
          function should be a ``pd.DataFrame`` and have the same index as
          ``time_series``.
 

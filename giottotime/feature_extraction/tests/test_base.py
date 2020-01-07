@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 import pandas.util.testing as testing
 
-from giottotime.feature_creation import MovingAverageFeature
-from giottotime.feature_creation.base import Feature
+from giottotime.feature_extraction import MovingAverageFeature
+from giottotime.feature_extraction.base import Feature
 
 
 class BaseFeature(Feature):

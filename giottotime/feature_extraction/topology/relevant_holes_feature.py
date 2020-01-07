@@ -1,47 +1,25 @@
-from typing import Iterable, List, Optional, Callable, Union
+from typing import Iterable, List, Optional, Union, Callable
 
-import pandas as pd
 import numpy as np
-import giotto.diagrams as diag
+import pandas as pd
 
 from .base import TDAFeatures, _align_indices
 
 
-def _find_mean_nonzero(g):
-    if g.to_numpy().nonzero()[1].any():
-        return g.to_numpy().nonzero()[1].mean()
-    else:
-        return 0
-
-
-class BettiCurvesFeature(TDAFeatures):
+class NumberOfRelevantHolesFeature(TDAFeatures):
     """Compute the list of average lifetime for each time window, starting from the
     persistence diagrams.
 
     Parameters
     ----------
-    betti_mode : ``'mean'`` | ``'arg_max'``, optional, default: ``'mean'``
-        If ``mean``, compute the mean.
+    h_dim: int, optional, default: ``0``
+        The homology dimension on which to compute the average lifetime.
 
-    output_name : str, optional, default: ``'BettiCurvesFeature'``
+    theta: float, optional, default: ``0.7``
+        Constant used to set the threshold in the computation of the holes
+
+    output_name : str, optional, default: ``'NumberOfRelevantHolesFeature'``
         The name of the output column.
-
-    betti_homology_dimensions : ``Iterable`, optional, (default=``(0, 1)``)
-        Dimensions (non-negative integers) of the topological feature_creation
-        to be detected.
-
-    betti_n_values : int, optional, default: ``100``
-        The number of filtration parameter values, per available homology
-        dimension, to sample during :meth:`fit`.
-
-    betti_rolling : int, optional, default: ``1``
-        Used only if ``betti_mode`` is set to ``mean``. When computing the
-        betti surfaces, used to set the rolling parameter.
-
-    betti_n_jobs : int, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1
-        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
-        using all processors.
 
     takens_parameters_type: ``'search'`` | ``'fixed'``, optional, default: ``'search'``
         If set to ``'fixed'``, the values of `time_delay` and `dimension are used
@@ -89,7 +67,7 @@ class BettiCurvesFeature(TDAFeatures):
         the distance between them.
 
     diags_homology_dimensions : Iterable, optional, default: ``(0, 1)``
-        Dimensions (non-negative integers) of the topological feature_creation to be
+        Dimensions (non-negative integers) of the topological feature_extraction to be
         detected.
 
     diags_coeff : int prime, optional, default: ``2``
@@ -100,11 +78,11 @@ class BettiCurvesFeature(TDAFeatures):
     diags_max_edge_length : float, optional, default: ``np.inf``
         Upper bound on the maximum value of the Vietoris-Rips filtration parameter.
         Points whose distance is greater than this value will never be connected by an
-        edge, and topological feature_creation at scales larger than this value will not
+        edge, and topological feature_extraction at scales larger than this value will not
         be detected.
 
     diags_infinity_values : float, optional, default: ``None``
-        Which death value to assign to feature_creation which are still alive at
+        Which death value to assign to feature_extraction which are still alive at
         filtration value `max_edge_length`. ``None`` has the same behaviour as
         `max_edge_length`.
 
@@ -115,37 +93,34 @@ class BettiCurvesFeature(TDAFeatures):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_creation import BettiCurvesFeature
+    >>> from giottotime.feature_extraction import NumberOfRelevantHolesFeature
     >>> X = pd.DataFrame(range(0, 15))
-    >>> betti_feature = BettiCurvesFeature()
-    >>> betti_feature.transform(X)
-        BettiCurvesFeature_0  BettiCurvesFeature_1  BettiCurvesFeature_2
-    0                   49.0                   0.0                   0.0
-    1                   49.0                   0.0                   0.0
-    2                   49.0                   0.0                   0.0
-    3                   49.0                   0.0                   0.0
-    4                   49.0                   0.0                   0.0
-    5                   49.0                   0.0                   0.0
-    6                   49.0                   0.0                   0.0
-    7                   49.0                   0.0                   0.0
-    8                   49.0                   0.0                   0.0
-    9                   49.0                   0.0                   0.0
-    10                  49.0                   0.0                   0.0
-    11                  49.0                   0.0                   0.0
-    12                  49.0                   0.0                   0.0
-    13                  49.0                   0.0                   0.0
-    14                  49.0                   0.0                   0.0
+    >>> relevant_holes = NumberOfRelevantHolesFeature()
+    >>> relevant_holes.transform(X)
+        NumberOfRelevantHolesFeature
+    0                           10.0
+    1                           10.0
+    2                           10.0
+    3                           10.0
+    4                           10.0
+    5                           10.0
+    6                           10.0
+    7                           10.0
+    8                           10.0
+    9                           10.0
+    10                          10.0
+    11                          10.0
+    12                          10.0
+    13                          10.0
+    14                          10.0
 
     """
 
     def __init__(
         self,
-        betti_mode: str = "mean",
-        output_name: str = "BettiCurvesFeature",
-        betti_homology_dimensions: Iterable = (0, 1, 2),
-        betti_n_values: int = 100,
-        betti_rolling: int = 1,
-        betti_n_jobs: Optional[int] = None,
+        h_dim: int = 0,
+        theta: float = 0.7,
+        output_name: str = "NumberOfRelevantHolesFeature",
         takens_parameters_type: str = "search",
         takens_dimension: int = 5,
         takens_stride: int = 1,
@@ -176,98 +151,66 @@ class BettiCurvesFeature(TDAFeatures):
             diags_infinity_values=diags_infinity_values,
             diags_n_jobs=diags_n_jobs,
         )
-        self.betti_mode = betti_mode
-        self.betti_homology_dimensions = betti_homology_dimensions
-        self.betti_n_values = betti_n_values
-        self.betti_n_jobs = betti_n_jobs
-        self.betti_rolling = betti_rolling
+        self._validate_inputs(h_dim=h_dim, theta=theta)
+
+        self.h_dim = h_dim
+        self.theta = theta
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``time_series``, compute the persistence diagrams
-        and detect the average lifetime for a given homology dimension. Then, assign a
-        value to each initial data points.
+        and detect the relevant number of holes. Then, assign a value to each initial
+        data points.
 
         Parameters
         ----------
         time_series : pd.DataFrame, shape (n_samples, 1), required
-            The DataFrame on which to compute the feature_creation.
+            The DataFrame on which to compute the feature_extraction.
 
         Returns
         -------
         time_series_t : pd.DataFrame, shape (n_samples, 1)
-            A DataFrame containing, for each original data-point, the average lifetime
-            associated to it. If, given the initial parameters, a point was excluded
-            from the computation, its value is set to ``Nan``.
+            A DataFrame containing, for each original data-point, the relevant number of
+            holes associated to it. If, given the initial parameters, a point was
+            excluded from the computation, its value is set to ``Nan``.
 
         """
         persistence_diagrams = self._compute_persistence_diagrams(time_series)
-        betti_curves = self._compute_betti_curves(persistence_diagrams)
+        n_holes = self._compute_num_relevant_holes(persistence_diagrams)
+        n_points = self._compute_n_points(len(n_holes))
 
-        betti_features = self._compute_betti_features(betti_curves)
-
-        output_dfs = []
-        for betti_feature in betti_features:
-            original_points = self._compute_n_points(len(betti_feature))
-
-            output_dfs.append(
-                _align_indices(time_series, original_points, betti_feature)
-            )
-
-        time_series_aligned = pd.concat(output_dfs, axis=1)
+        time_series_aligned = _align_indices(time_series, n_points, n_holes)
         time_series_t = self._rename_columns(time_series_aligned)
 
         return time_series_t
 
-    def _compute_betti_curves(self, diagrams: np.ndarray) -> List:
-        betti_curves = diag.BettiCurve()
-        betti_curves.fit(diagrams)
-        X_betti_curves = betti_curves.transform(diagrams)
+    def _compute_num_relevant_holes(self, persistence_diagrams: np.ndarray) -> List:
+        n_rel_holes = []
+        for i in range(persistence_diagrams.shape[0]):
+            pers_table = pd.DataFrame(
+                persistence_diagrams[i], columns=["birth", "death", "homology"]
+            )
 
-        betti_curves = []
-        for h_dim in self.betti_homology_dimensions:
-            betti_curves.append(pd.DataFrame(X_betti_curves[:, h_dim, :]))
+            pers_table["lifetime"] = pers_table["death"] - pers_table["birth"]
+            threshold = (
+                pers_table[pers_table["homology"] == self.h_dim]["lifetime"].max()
+                * self.theta
+            )
+            n_rel_holes.append(
+                pers_table[
+                    (pers_table["lifetime"] > threshold)
+                    & (pers_table["homology"] == self.h_dim)
+                ].shape[0]
+            )
 
-        return betti_curves
+        return n_rel_holes
 
-    def _compute_betti_features(
-        self, betti_curves: List[pd.DataFrame]
-    ) -> List[np.ndarray]:
-        if self.betti_mode == "mean":
-            betti_features = self._compute_betti_mean(betti_curves)
-
-        elif self.betti_mode == "arg_max":
-            betti_features = self._compute_arg_max_by_time(betti_curves)
-
-        else:
+    def _validate_inputs(self, h_dim: int, theta: float) -> None:
+        if h_dim != 0 and h_dim != 1 and h_dim != 2:
             raise ValueError(
-                f"The valid values for 'betti_mode' are 'mean' "
-                f"or 'arg_max', instead has value "
-                f"{self.betti_mode}."
+                f"'h_dim' must have be either 0, 1 or 2, " f"but has value {h_dim}."
             )
 
-        return betti_features
-
-    def _compute_betti_mean(
-        self, betti_surfaces: List[pd.DataFrame]
-    ) -> List[pd.DataFrame]:
-        betti_means = []
-        for betti_surface in betti_surfaces:
-            betti_means.append(
-                betti_surface.groupby(betti_surface.index)
-                .apply(lambda g: _find_mean_nonzero(g))
-                .rolling(self.betti_rolling)
-                .mean()
-                .values
+        if not theta > 0:
+            raise ValueError(
+                f"'theta' must be greater than 0, but instead " f"has value {theta}."
             )
-
-        return betti_means
-
-    def _compute_arg_max_by_time(
-        self, betti_surfaces: List[pd.DataFrame]
-    ) -> List[np.ndarray]:
-        betti_arg_maxes = []
-        for betti_surface in betti_surfaces:
-            arg_max = np.argmax(np.array(betti_surface), axis=1)
-            betti_arg_maxes.append(arg_max)
-
-        return betti_arg_maxes

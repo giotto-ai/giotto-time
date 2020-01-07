@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 from hypothesis import given, settings
 
-from giottotime.feature_creation import CalendarFeature
+from giottotime.feature_extraction import CalendarFeature
 from giottotime.utils.hypothesis.time_indexes import giotto_time_series
 
 

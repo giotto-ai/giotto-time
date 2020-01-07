@@ -1,25 +1,55 @@
-from typing import Iterable, List, Optional, Union, Callable
+from typing import Iterable, Dict, Optional, Union, Callable
 
+import giotto.diagrams as diag
 import numpy as np
 import pandas as pd
 
 from .base import TDAFeatures, _align_indices
 
 
-class NumberOfRelevantHolesFeature(TDAFeatures):
+class AmplitudeFeature(TDAFeatures):
     """Compute the list of average lifetime for each time window, starting from the
     persistence diagrams.
 
     Parameters
     ----------
-    h_dim: int, optional, default: ``0``
-        The homology dimension on which to compute the average lifetime.
+    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
+        ``'betti'`` | ``'heat'``, optional, (default=``'landscape'``)
+        Distance or dissimilarity function used to define the amplitude of a subdiagram
+        as its distance from the diagonal diagram:
+        - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
+          perfect-matching--based notions of distance.
+        - ``'landscape'`` refers to the :math:`L^p` distance between persistence
+          landscapes.
+        - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
+        - ``'heat'`` refers to the :math:`L^p` distance between Gaussian-smoothed
+          diagrams.
 
-    theta: float, optional, default: ``0.7``
-        Constant used to set the threshold in the computation of the holes
-
-    output_name : str, optional, default: ``'NumberOfRelevantHolesFeature'``
+    output_name: str, optional, default: ``'AmplitudeFeature'``
         The name of the output column.
+
+    amplitude_metric_params : Dict, optional, default: ``None``
+        Additional keyword arguments for the metric function:
+        - If ``metric == 'bottleneck'`` there are no available arguments.
+        - If ``metric == 'wasserstein'`` the only argument is `p` (int,
+          default: ``2``).
+        - If ``metric == 'betti'`` the available arguments are `p` (float,
+          default: ``2.``) and `n_values` (int, default: ``100``).
+        - If ``metric == 'landscape'`` the available arguments are `p`
+          (float, default: ``2.``), `n_values` (int, default: ``100``) and
+          `n_layers` (int, default: ``1``).
+        - If ``metric == 'heat'`` the available arguments are `p` (float,
+          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
+          (int, default: ``100``).
+
+    amplitude_order : float, optional, default: ``2.``
+        If ``None``, :meth:`transform` returns for each diagram a vector of amplitudes
+        corresponding to the dimensions in :attr:`homology_dimensions_`. Otherwise, the
+        :math:`p`-norm of these vectors with :math:`p` equal to `order` is taken.
+
+    amplitude_n_jobs : int, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1 unless in a
+        :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
 
     takens_parameters_type: ``'search'`` | ``'fixed'``, optional, default: ``'search'``
         If set to ``'fixed'``, the values of `time_delay` and `dimension are used
@@ -67,7 +97,7 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
         the distance between them.
 
     diags_homology_dimensions : Iterable, optional, default: ``(0, 1)``
-        Dimensions (non-negative integers) of the topological feature_creation to be
+        Dimensions (non-negative integers) of the topological feature_extraction to be
         detected.
 
     diags_coeff : int prime, optional, default: ``2``
@@ -78,11 +108,11 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
     diags_max_edge_length : float, optional, default: ``np.inf``
         Upper bound on the maximum value of the Vietoris-Rips filtration parameter.
         Points whose distance is greater than this value will never be connected by an
-        edge, and topological feature_creation at scales larger than this value will not
+        edge, and topological feature_extraction at scales larger than this value will not
         be detected.
 
     diags_infinity_values : float, optional, default: ``None``
-        Which death value to assign to feature_creation which are still alive at
+        Which death value to assign to feature_extraction which are still alive at
         filtration value `max_edge_length`. ``None`` has the same behaviour as
         `max_edge_length`.
 
@@ -93,34 +123,36 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_creation import NumberOfRelevantHolesFeature
+    >>> from giottotime.feature_extraction import AmplitudeFeature
     >>> X = pd.DataFrame(range(0, 15))
-    >>> relevant_holes = NumberOfRelevantHolesFeature()
-    >>> relevant_holes.transform(X)
-        NumberOfRelevantHolesFeature
-    0                           10.0
-    1                           10.0
-    2                           10.0
-    3                           10.0
-    4                           10.0
-    5                           10.0
-    6                           10.0
-    7                           10.0
-    8                           10.0
-    9                           10.0
-    10                          10.0
-    11                          10.0
-    12                          10.0
-    13                          10.0
-    14                          10.0
+    >>> ampl_feature = AmplitudeFeature()
+    >>> ampl_feature.transform(X)
+        AmplitudeFeature
+    0           0.485467
+    1           0.485467
+    2           0.485467
+    3           0.485467
+    4           0.485467
+    5           0.485467
+    6           0.485467
+    7           0.485467
+    8           0.485467
+    9           0.485467
+    10          0.485467
+    11          0.485467
+    12          0.485467
+    13          0.485467
+    14          0.485467
 
     """
 
     def __init__(
         self,
-        h_dim: int = 0,
-        theta: float = 0.7,
-        output_name: str = "NumberOfRelevantHolesFeature",
+        metric: str = "landscape",
+        output_name: str = "AmplitudeFeature",
+        amplitude_metric_params: Optional[Dict] = None,
+        amplitude_order: Dict = 2,
+        amplitude_n_jobs: Optional[float] = None,
         takens_parameters_type: str = "search",
         takens_dimension: int = 5,
         takens_stride: int = 1,
@@ -151,66 +183,44 @@ class NumberOfRelevantHolesFeature(TDAFeatures):
             diags_infinity_values=diags_infinity_values,
             diags_n_jobs=diags_n_jobs,
         )
-        self._validate_inputs(h_dim=h_dim, theta=theta)
-
-        self.h_dim = h_dim
-        self.theta = theta
+        self.metric = metric
+        self.amplitude_metric_params = amplitude_metric_params
+        self.amplitude_order = amplitude_order
+        self.amplitude_n_jobs = amplitude_n_jobs
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``time_series``, compute the persistence diagrams
-        and detect the relevant number of holes. Then, assign a value to each initial
-        data points.
+        and detect the average lifetime for a given homology dimension. Then, assign a
+        value to each initial data points.
 
         Parameters
         ----------
         time_series : pd.DataFrame, shape (n_samples, 1), required
-            The DataFrame on which to compute the feature_creation.
+            The DataFrame on which to compute the feature_extraction.
 
         Returns
         -------
         time_series_t : pd.DataFrame, shape (n_samples, 1)
-            A DataFrame containing, for each original data-point, the relevant number of
-            holes associated to it. If, given the initial parameters, a point was
-            excluded from the computation, its value is set to ``Nan``.
+            A DataFrame containing, for each original data-point, the average lifetime
+            associated to it. If, given the initial parameters, a point was excluded
+            from the computation, its value is set to ``Nan``.
 
         """
         persistence_diagrams = self._compute_persistence_diagrams(time_series)
-        n_holes = self._compute_num_relevant_holes(persistence_diagrams)
-        n_points = self._compute_n_points(len(n_holes))
+        amplitudes = self._calculate_amplitude_feature(persistence_diagrams)
 
-        time_series_aligned = _align_indices(time_series, n_points, n_holes)
+        original_points = self._compute_n_points(len(amplitudes))
+
+        time_series_aligned = _align_indices(time_series, original_points, amplitudes)
         time_series_t = self._rename_columns(time_series_aligned)
 
         return time_series_t
 
-    def _compute_num_relevant_holes(self, persistence_diagrams: np.ndarray) -> List:
-        n_rel_holes = []
-        for i in range(persistence_diagrams.shape[0]):
-            pers_table = pd.DataFrame(
-                persistence_diagrams[i], columns=["birth", "death", "homology"]
-            )
-
-            pers_table["lifetime"] = pers_table["death"] - pers_table["birth"]
-            threshold = (
-                pers_table[pers_table["homology"] == self.h_dim]["lifetime"].max()
-                * self.theta
-            )
-            n_rel_holes.append(
-                pers_table[
-                    (pers_table["lifetime"] > threshold)
-                    & (pers_table["homology"] == self.h_dim)
-                ].shape[0]
-            )
-
-        return n_rel_holes
-
-    def _validate_inputs(self, h_dim: int, theta: float) -> None:
-        if h_dim != 0 and h_dim != 1 and h_dim != 2:
-            raise ValueError(
-                f"'h_dim' must have be either 0, 1 or 2, " f"but has value {h_dim}."
-            )
-
-        if not theta > 0:
-            raise ValueError(
-                f"'theta' must be greater than 0, but instead " f"has value {theta}."
-            )
+    def _calculate_amplitude_feature(self, diagrams: np.ndarray) -> np.ndarray:
+        amplitude = diag.Amplitude(
+            metric=self.metric,
+            order=self.amplitude_order,
+            metric_params=self.amplitude_metric_params,
+            n_jobs=self.amplitude_n_jobs,
+        )
+        return amplitude.fit_transform(diagrams)

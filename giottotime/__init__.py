@@ -11,7 +11,7 @@ from giottotime._version import __version__
 
 __all__ = [
     "causality_tests",
-    "feature_creation",
+    "feature_extraction",
     "loss_functions",
     "model_selection",
     "models",

@@ -1,4 +1,4 @@
-from giottotime.feature_creation import (
+from giottotime.feature_extraction import (
     DetrendedFeature,
     RemovePolynomialTrend,
     RemoveExponentialTrend,

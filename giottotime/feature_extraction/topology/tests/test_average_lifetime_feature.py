@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from giottotime.feature_creation.index_dependent_features.tda_features import (
+from giottotime.feature_extraction.topology import (
     AvgLifeTimeFeature,
 )
 

@@ -1,5 +1,5 @@
 """
-The :mod:`giottotime.feature_creation` module contains a collection of different loss
+The :mod:`giottotime.feature_extraction` module contains a collection of different loss
 functions.
 """
 

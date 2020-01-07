@@ -33,7 +33,7 @@ class ShiftFeature(IndexDependentFeature):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_creation import ShiftFeature
+    >>> from giottotime.feature_extraction import ShiftFeature
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
     >>> shift_feature = ShiftFeature(shift=3)
     >>> shift_feature.transform(ts)
@@ -85,7 +85,7 @@ class MovingAverageFeature(IndexDependentFeature):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_creation import MovingAverageFeature
+    >>> from giottotime.feature_extraction import MovingAverageFeature
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
     >>> mv_avg_feature = MovingAverageFeature(window_size=2)
     >>> mv_avg_feature.transform(ts)
@@ -125,13 +125,13 @@ class MovingAverageFeature(IndexDependentFeature):
 
 
 class PolynomialFeature(IndexDependentFeature):
-    """Compute the polynomial feature_creation, of a degree equal to the input
+    """Compute the polynomial feature_extraction, of a degree equal to the input
     ``degree``.
 
     Parameters
     ----------
     degree: int, optional, default: ``2``
-        The degree of the polynomial feature_creation.
+        The degree of the polynomial feature_extraction.
 
     output_name : str, optional, default: ``'PolynomialFeature'``
         The name of the output column.
@@ -139,7 +139,7 @@ class PolynomialFeature(IndexDependentFeature):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_creation import PolynomialFeature
+    >>> from giottotime.feature_extraction import PolynomialFeature
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
     >>> pol_feature = PolynomialFeature(degree=3, output_name="pol")
     >>> pol_feature.transform(ts)
@@ -158,7 +158,7 @@ class PolynomialFeature(IndexDependentFeature):
         self.degree = degree
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
-        """Compute the polynomial feature_creation of ``time_series``, up to a degree
+        """Compute the polynomial feature_extraction of ``time_series``, up to a degree
         equal to ``degree``.
 
         Parameters
@@ -169,7 +169,7 @@ class PolynomialFeature(IndexDependentFeature):
         Returns
         -------
         time_series_t : pd.DataFrame, shape (n_samples, 1)
-            The computed polynomial feature_creation.
+            The computed polynomial feature_extraction.
 
         """
         pol_feature = PolynomialFeatures(self.degree)
@@ -202,7 +202,7 @@ class ExogenousFeature(IndexDependentFeature):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_creation import ExogenousFeature
+    >>> from giottotime.feature_extraction import ExogenousFeature
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5], index=[3, 4, 5, 6, 7, 8])
     >>> exog_ts = pd.DataFrame([10, 8, 1, 3, 2, 7])
     >>> exog_feature = ExogenousFeature(exog_ts)

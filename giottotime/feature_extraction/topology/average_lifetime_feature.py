@@ -64,7 +64,7 @@ class AvgLifeTimeFeature(TDAFeatures):
         the distance between them.
 
     diags_homology_dimensions : Iterable, optional, default: ``(0, 1)``
-        Dimensions (non-negative integers) of the topological feature_creation to be
+        Dimensions (non-negative integers) of the topological feature_extraction to be
         detected.
 
     diags_coeff : int prime, optional, default: ``2``
@@ -75,11 +75,11 @@ class AvgLifeTimeFeature(TDAFeatures):
     diags_max_edge_length : float, optional, default: ``np.inf``
         Upper bound on the maximum value of the Vietoris-Rips filtration parameter.
         Points whose distance is greater than this value will never be connected by an
-        edge, and topological feature_creation at scales larger than this value will not
+        edge, and topological feature_extraction at scales larger than this value will not
         be detected.
 
     diags_infinity_values : float, optional, default: ``None``
-        Which death value to assign to feature_creation which are still alive at
+        Which death value to assign to feature_extraction which are still alive at
         filtration value `max_edge_length`. ``None`` has the same behaviour as
         `max_edge_length`.
 
@@ -90,7 +90,7 @@ class AvgLifeTimeFeature(TDAFeatures):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_creation import AvgLifeTimeFeature
+    >>> from giottotime.feature_extraction import AvgLifeTimeFeature
     >>> X = pd.DataFrame(range(0, 15))
     >>> avg_lifetime_feature = AvgLifeTimeFeature()
     >>> avg_lifetime_feature.transform(X)
@@ -157,7 +157,7 @@ class AvgLifeTimeFeature(TDAFeatures):
         Parameters
         ----------
         time_series : pd.DataFrame, shape (n_samples, 1), required
-            The DataFrame on which to compute the feature_creation.
+            The DataFrame on which to compute the feature_extraction.
 
         Returns
         -------

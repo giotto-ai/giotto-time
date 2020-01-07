@@ -3,7 +3,7 @@ import pytest
 import hypothesis.strategies as st
 from hypothesis import given, settings, HealthCheck
 
-from giottotime.feature_creation import ShiftFeature, MovingAverageFeature
+from giottotime.feature_extraction import ShiftFeature, MovingAverageFeature
 from giottotime.model_selection.feature_splitters import FeatureSplitter
 from giottotime.utils.hypothesis.feature_matrices import X_y_matrices
 

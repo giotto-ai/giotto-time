@@ -7,12 +7,12 @@ from hypothesis import given, strategies as st
 from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression
 
-from giottotime.feature_creation import (
+from giottotime.feature_extraction import (
     MovingAverageFeature,
     ConstantFeature,
     ShiftFeature,
 )
-from giottotime.feature_creation.feature_creation import FeatureCreation
+from giottotime.feature_extraction.feature_creation import FeatureCreation
 from giottotime.model_selection import FeatureSplitter
 from giottotime.models.time_series_models.gar import GAR
 

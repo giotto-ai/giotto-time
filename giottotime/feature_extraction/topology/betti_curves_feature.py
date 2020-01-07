@@ -1,55 +1,47 @@
-from typing import Iterable, Dict, Optional, Union, Callable
+from typing import Iterable, List, Optional, Callable, Union
 
-import giotto.diagrams as diag
-import numpy as np
 import pandas as pd
+import numpy as np
+import giotto.diagrams as diag
 
 from .base import TDAFeatures, _align_indices
 
 
-class AmplitudeFeature(TDAFeatures):
+def _find_mean_nonzero(g):
+    if g.to_numpy().nonzero()[1].any():
+        return g.to_numpy().nonzero()[1].mean()
+    else:
+        return 0
+
+
+class BettiCurvesFeature(TDAFeatures):
     """Compute the list of average lifetime for each time window, starting from the
     persistence diagrams.
 
     Parameters
     ----------
-    metric : ``'bottleneck'`` | ``'wasserstein'`` | ``'landscape'`` | \
-        ``'betti'`` | ``'heat'``, optional, (default=``'landscape'``)
-        Distance or dissimilarity function used to define the amplitude of a subdiagram
-        as its distance from the diagonal diagram:
-        - ``'bottleneck'`` and ``'wasserstein'`` refer to the identically named
-          perfect-matching--based notions of distance.
-        - ``'landscape'`` refers to the :math:`L^p` distance between persistence
-          landscapes.
-        - ``'betti'`` refers to the :math:`L^p` distance between Betti curves.
-        - ``'heat'`` refers to the :math:`L^p` distance between Gaussian-smoothed
-          diagrams.
+    betti_mode : ``'mean'`` | ``'arg_max'``, optional, default: ``'mean'``
+        If ``mean``, compute the mean.
 
-    output_name: str, optional, default: ``'AmplitudeFeature'``
+    output_name : str, optional, default: ``'BettiCurvesFeature'``
         The name of the output column.
 
-    amplitude_metric_params : Dict, optional, default: ``None``
-        Additional keyword arguments for the metric function:
-        - If ``metric == 'bottleneck'`` there are no available arguments.
-        - If ``metric == 'wasserstein'`` the only argument is `p` (int,
-          default: ``2``).
-        - If ``metric == 'betti'`` the available arguments are `p` (float,
-          default: ``2.``) and `n_values` (int, default: ``100``).
-        - If ``metric == 'landscape'`` the available arguments are `p`
-          (float, default: ``2.``), `n_values` (int, default: ``100``) and
-          `n_layers` (int, default: ``1``).
-        - If ``metric == 'heat'`` the available arguments are `p` (float,
-          default: ``2.``), `sigma` (float, default: ``1.``) and `n_values`
-          (int, default: ``100``).
+    betti_homology_dimensions : ``Iterable`, optional, (default=``(0, 1)``)
+        Dimensions (non-negative integers) of the topological feature_extraction
+        to be detected.
 
-    amplitude_order : float, optional, default: ``2.``
-        If ``None``, :meth:`transform` returns for each diagram a vector of amplitudes
-        corresponding to the dimensions in :attr:`homology_dimensions_`. Otherwise, the
-        :math:`p`-norm of these vectors with :math:`p` equal to `order` is taken.
+    betti_n_values : int, optional, default: ``100``
+        The number of filtration parameter values, per available homology
+        dimension, to sample during :meth:`fit`.
 
-    amplitude_n_jobs : int, optional, default: ``None``
-        The number of jobs to use for the computation. ``None`` means 1 unless in a
-        :obj:`joblib.parallel_backend` context. ``-1`` means using all processors.
+    betti_rolling : int, optional, default: ``1``
+        Used only if ``betti_mode`` is set to ``mean``. When computing the
+        betti surfaces, used to set the rolling parameter.
+
+    betti_n_jobs : int, optional, default: ``None``
+        The number of jobs to use for the computation. ``None`` means 1
+        unless in a :obj:`joblib.parallel_backend` context. ``-1`` means
+        using all processors.
 
     takens_parameters_type: ``'search'`` | ``'fixed'``, optional, default: ``'search'``
         If set to ``'fixed'``, the values of `time_delay` and `dimension are used
@@ -97,7 +89,7 @@ class AmplitudeFeature(TDAFeatures):
         the distance between them.
 
     diags_homology_dimensions : Iterable, optional, default: ``(0, 1)``
-        Dimensions (non-negative integers) of the topological feature_creation to be
+        Dimensions (non-negative integers) of the topological feature_extraction to be
         detected.
 
     diags_coeff : int prime, optional, default: ``2``
@@ -108,11 +100,11 @@ class AmplitudeFeature(TDAFeatures):
     diags_max_edge_length : float, optional, default: ``np.inf``
         Upper bound on the maximum value of the Vietoris-Rips filtration parameter.
         Points whose distance is greater than this value will never be connected by an
-        edge, and topological feature_creation at scales larger than this value will not
+        edge, and topological feature_extraction at scales larger than this value will not
         be detected.
 
     diags_infinity_values : float, optional, default: ``None``
-        Which death value to assign to feature_creation which are still alive at
+        Which death value to assign to feature_extraction which are still alive at
         filtration value `max_edge_length`. ``None`` has the same behaviour as
         `max_edge_length`.
 
@@ -123,36 +115,37 @@ class AmplitudeFeature(TDAFeatures):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_creation import AmplitudeFeature
+    >>> from giottotime.feature_extraction import BettiCurvesFeature
     >>> X = pd.DataFrame(range(0, 15))
-    >>> ampl_feature = AmplitudeFeature()
-    >>> ampl_feature.transform(X)
-        AmplitudeFeature
-    0           0.485467
-    1           0.485467
-    2           0.485467
-    3           0.485467
-    4           0.485467
-    5           0.485467
-    6           0.485467
-    7           0.485467
-    8           0.485467
-    9           0.485467
-    10          0.485467
-    11          0.485467
-    12          0.485467
-    13          0.485467
-    14          0.485467
+    >>> betti_feature = BettiCurvesFeature()
+    >>> betti_feature.transform(X)
+        BettiCurvesFeature_0  BettiCurvesFeature_1  BettiCurvesFeature_2
+    0                   49.0                   0.0                   0.0
+    1                   49.0                   0.0                   0.0
+    2                   49.0                   0.0                   0.0
+    3                   49.0                   0.0                   0.0
+    4                   49.0                   0.0                   0.0
+    5                   49.0                   0.0                   0.0
+    6                   49.0                   0.0                   0.0
+    7                   49.0                   0.0                   0.0
+    8                   49.0                   0.0                   0.0
+    9                   49.0                   0.0                   0.0
+    10                  49.0                   0.0                   0.0
+    11                  49.0                   0.0                   0.0
+    12                  49.0                   0.0                   0.0
+    13                  49.0                   0.0                   0.0
+    14                  49.0                   0.0                   0.0
 
     """
 
     def __init__(
         self,
-        metric: str = "landscape",
-        output_name: str = "AmplitudeFeature",
-        amplitude_metric_params: Optional[Dict] = None,
-        amplitude_order: Dict = 2,
-        amplitude_n_jobs: Optional[float] = None,
+        betti_mode: str = "mean",
+        output_name: str = "BettiCurvesFeature",
+        betti_homology_dimensions: Iterable = (0, 1, 2),
+        betti_n_values: int = 100,
+        betti_rolling: int = 1,
+        betti_n_jobs: Optional[int] = None,
         takens_parameters_type: str = "search",
         takens_dimension: int = 5,
         takens_stride: int = 1,
@@ -183,10 +176,11 @@ class AmplitudeFeature(TDAFeatures):
             diags_infinity_values=diags_infinity_values,
             diags_n_jobs=diags_n_jobs,
         )
-        self.metric = metric
-        self.amplitude_metric_params = amplitude_metric_params
-        self.amplitude_order = amplitude_order
-        self.amplitude_n_jobs = amplitude_n_jobs
+        self.betti_mode = betti_mode
+        self.betti_homology_dimensions = betti_homology_dimensions
+        self.betti_n_values = betti_n_values
+        self.betti_n_jobs = betti_n_jobs
+        self.betti_rolling = betti_rolling
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """From the initial DataFrame ``time_series``, compute the persistence diagrams
@@ -196,7 +190,7 @@ class AmplitudeFeature(TDAFeatures):
         Parameters
         ----------
         time_series : pd.DataFrame, shape (n_samples, 1), required
-            The DataFrame on which to compute the feature_creation.
+            The DataFrame on which to compute the feature_extraction.
 
         Returns
         -------
@@ -207,20 +201,73 @@ class AmplitudeFeature(TDAFeatures):
 
         """
         persistence_diagrams = self._compute_persistence_diagrams(time_series)
-        amplitudes = self._calculate_amplitude_feature(persistence_diagrams)
+        betti_curves = self._compute_betti_curves(persistence_diagrams)
 
-        original_points = self._compute_n_points(len(amplitudes))
+        betti_features = self._compute_betti_features(betti_curves)
 
-        time_series_aligned = _align_indices(time_series, original_points, amplitudes)
+        output_dfs = []
+        for betti_feature in betti_features:
+            original_points = self._compute_n_points(len(betti_feature))
+
+            output_dfs.append(
+                _align_indices(time_series, original_points, betti_feature)
+            )
+
+        time_series_aligned = pd.concat(output_dfs, axis=1)
         time_series_t = self._rename_columns(time_series_aligned)
 
         return time_series_t
 
-    def _calculate_amplitude_feature(self, diagrams: np.ndarray) -> np.ndarray:
-        amplitude = diag.Amplitude(
-            metric=self.metric,
-            order=self.amplitude_order,
-            metric_params=self.amplitude_metric_params,
-            n_jobs=self.amplitude_n_jobs,
-        )
-        return amplitude.fit_transform(diagrams)
+    def _compute_betti_curves(self, diagrams: np.ndarray) -> List:
+        betti_curves = diag.BettiCurve()
+        betti_curves.fit(diagrams)
+        X_betti_curves = betti_curves.transform(diagrams)
+
+        betti_curves = []
+        for h_dim in self.betti_homology_dimensions:
+            betti_curves.append(pd.DataFrame(X_betti_curves[:, h_dim, :]))
+
+        return betti_curves
+
+    def _compute_betti_features(
+        self, betti_curves: List[pd.DataFrame]
+    ) -> List[np.ndarray]:
+        if self.betti_mode == "mean":
+            betti_features = self._compute_betti_mean(betti_curves)
+
+        elif self.betti_mode == "arg_max":
+            betti_features = self._compute_arg_max_by_time(betti_curves)
+
+        else:
+            raise ValueError(
+                f"The valid values for 'betti_mode' are 'mean' "
+                f"or 'arg_max', instead has value "
+                f"{self.betti_mode}."
+            )
+
+        return betti_features
+
+    def _compute_betti_mean(
+        self, betti_surfaces: List[pd.DataFrame]
+    ) -> List[pd.DataFrame]:
+        betti_means = []
+        for betti_surface in betti_surfaces:
+            betti_means.append(
+                betti_surface.groupby(betti_surface.index)
+                .apply(lambda g: _find_mean_nonzero(g))
+                .rolling(self.betti_rolling)
+                .mean()
+                .values
+            )
+
+        return betti_means
+
+    def _compute_arg_max_by_time(
+        self, betti_surfaces: List[pd.DataFrame]
+    ) -> List[np.ndarray]:
+        betti_arg_maxes = []
+        for betti_surface in betti_surfaces:
+            arg_max = np.argmax(np.array(betti_surface), axis=1)
+            betti_arg_maxes.append(arg_max)
+
+        return betti_arg_maxes
