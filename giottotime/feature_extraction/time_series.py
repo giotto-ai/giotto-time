@@ -2,6 +2,7 @@ from typing import Optional
 
 import pandas as pd
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.base import BaseEstimator, TransformerMixin
 
 from .base import IndexDependentFeature
 
@@ -70,7 +71,7 @@ class ShiftFeature(IndexDependentFeature):
         return time_series_t
 
 
-class MovingAverageFeature(IndexDependentFeature):
+class MovingAverageFeature(BaseEstimator, TransformerMixin):
     """For each row in ``time_series``, compute the moving average of the previous
      ``window_size`` rows. If there are not enough rows, the value is Nan.
 
@@ -99,9 +100,26 @@ class MovingAverageFeature(IndexDependentFeature):
 
     """
 
-    def __init__(self, window_size: int = 1, output_name: str = "MovingAverageFeature"):
-        super().__init__(output_name)
+    def __init__(self, window_size: int = 1):
+        super().__init__()
         self.window_size = window_size
+
+    def fit(self, X, y=None):
+        """A reference implementation of a fitting function for a transformer.
+        Parameters
+        ----------
+        X : {array-like, sparse matrix}, shape (n_samples, n_features)
+            The training input samples.
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+
+        return self
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """Compute the moving average, for every row of ``time_series``, of the previous
@@ -120,8 +138,9 @@ class MovingAverageFeature(IndexDependentFeature):
 
         """
         time_series_mvg_avg = time_series.rolling(self.window_size).mean()
-        time_series_t = self._rename_columns(time_series_mvg_avg)
-        return time_series_t
+        # FIXME : column renaming
+        # time_series_t = self._rename_columns(time_series_mvg_avg)
+        return time_series_mvg_avg
 
 
 class PolynomialFeature(IndexDependentFeature):
