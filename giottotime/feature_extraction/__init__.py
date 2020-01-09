@@ -4,8 +4,8 @@ starting from a time series.
 """
 
 from .feature_creation import FeatureCreation
-from .calendar_features import CalendarFeature
-from .time_series_features import (
+from .calendar import CalendarFeature
+from .time_series import (
     ShiftFeature,
     MovingAverageFeature,
     PolynomialFeature,
@@ -15,10 +15,10 @@ from .time_series_features import (
 from .topology import AmplitudeFeature, AvgLifeTimeFeature, \
     BettiCurvesFeature, NumberOfRelevantHolesFeature
 
-from .standard_features import ConstantFeature, PeriodicSeasonalFeature, \
+from .standard import ConstantFeature, PeriodicSeasonalFeature, \
     CustomFeature
 
-from .trend_features import (
+from .trend import (
     DetrendedFeature,
     RemovePolynomialTrend,
     RemoveExponentialTrend)

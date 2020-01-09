@@ -3,7 +3,7 @@ from typing import List
 import pandas as pd
 
 from .base import Feature
-from .time_series_features import ShiftFeature
+from .time_series import ShiftFeature
 
 
 def _check_feature_names(time_series_features: List[Feature]) -> None:
