@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pandas.util.testing as testing
 
-from giottotime.feature_extraction import MovingAverageFeature
+from giottotime.feature_extraction import MovingAverage
 from giottotime.feature_extraction.base import Feature
 
 
@@ -69,7 +69,7 @@ def test_correct_fit_transform():
     df = testing.makeTimeDataFrame(freq="MS")
 
     output_name = "shift"
-    ma_feature = MovingAverageFeature(window_size=2, output_name=output_name)
+    ma_feature = MovingAverage(window_size=2)
 
     fit_transform_res = ma_feature.fit_transform(df)
 

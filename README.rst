@@ -39,7 +39,7 @@ Giotto-time provide the GAR class (Generalize Auto Regressive model). It operate
 This model allows the full force of machine learning regressors (compatible with the fit-transform framework of scikit-learn) to be combined with advanced feature creation strategies to forecast time series in a convienent api.
 
 >>> from giottotime.feature_creation import FeaturesCreation
->>> from giottotime.feature_creation.index_independent_features import ShiftFeature, MovingAverageFeature
+>>> from giottotime.feature_creation.index_independent_features import Shift, MovingAverage
 >>> from giottotime.model_selection.train_test_splitter import TrainTestSplitter
 >>> from giottotime.regressors import LinearRegressor
 >>> from giottotime.models.time_series_models import GAR
@@ -48,7 +48,7 @@ This model allows the full force of machine learning regressors (compatible with
 >>> 
 >>> features_creation = FeaturesCreation(
 >>>     horizon=4,
->>>     features = [ShiftFeature(1), ShiftFeature(2), MovingAverageFeature(5)]
+>>>     features = [Shift(1), Shift(2), MovingAverage(5)]
 >>> )
 >>>
 >>> train_test_splitter = TrainTestSplitter()
@@ -79,11 +79,11 @@ The following time series features are currently supported:
 
 * CalendarFeature
 * PeriodicSeasonalFeature
-* ShiftFeature
-* MovingAverageFeature
+* Shift
+* MovingAverage
 * ConstantFeature
-* PolynomialFeature
-* ExogenousFeature
+* Polynomial
+* Exogenous
 * CustomFeature
 
 These features all have a scikit-learn-like interface and behave as transformers.

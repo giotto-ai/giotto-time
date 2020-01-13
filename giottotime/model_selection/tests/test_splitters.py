@@ -3,15 +3,15 @@ import pytest
 import hypothesis.strategies as st
 from hypothesis import given, settings, HealthCheck
 
-from giottotime.feature_extraction import ShiftFeature, MovingAverageFeature
+from giottotime.feature_extraction import Shift, MovingAverage
 from giottotime.model_selection.feature_splitters import FeatureSplitter
 from giottotime.utils.hypothesis.feature_matrices import X_y_matrices
 
 
 FEATURES = [
-    ShiftFeature(0, "0"),
-    ShiftFeature(1, "1"),
-    MovingAverageFeature(3, "3"),
+    Shift(0),
+    Shift(1),
+    MovingAverage(3),
 ]
 
 HORIZON = 4

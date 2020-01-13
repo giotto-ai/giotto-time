@@ -8,10 +8,10 @@ from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression
 
 from giottotime.feature_extraction import (
-    MovingAverageFeature,
-    ConstantFeature,
-    ShiftFeature,
+    MovingAverage,
+    Shift,
 )
+from giottotime.feature_generation import ConstantFeature
 from giottotime.feature_extraction.feature_creation import FeatureCreation
 from giottotime.model_selection import FeatureSplitter
 from giottotime.models.time_series_models.gar import GAR
@@ -36,7 +36,7 @@ def time_series():
 
 
 def arbitrary_features(feature_length):
-    possible_features = [MovingAverageFeature, ConstantFeature, ShiftFeature]
+    possible_features = [MovingAverage, ConstantFeature, Shift]
     random_features = []
     random_params = random.sample(range(1, 100), feature_length)
 

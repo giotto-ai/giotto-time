@@ -4,17 +4,19 @@ import pandas as pd
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from .base import IndexDependentFeature
-
 __all__ = [
-    "ShiftFeature",
-    "MovingAverageFeature",
-    "PolynomialFeature",
-    "ExogenousFeature",
+    "Shift",
+    "MovingAverage",
+    "Polynomial",
+    "Exogenous",
 ]
 
+from sklearn.utils.validation import check_is_fitted
 
-class ShiftFeature(IndexDependentFeature):
+from ..base import FeatureMixin
+
+
+class Shift(BaseEstimator, TransformerMixin, FeatureMixin):
     """Perform a shift of a DataFrame of size equal to ``shift``.
 
     Parameters
@@ -22,21 +24,19 @@ class ShiftFeature(IndexDependentFeature):
     shift : int, optional, default: ``1``
         How much to shift.
 
-    output_name : str, optional, default: ``'ShiftFeature'``
-        The name of the output column.
-
     Notes
     -----
     The ``shift`` parameter can also accept negative values. However, this should be
     used carefully, since if the resulting feature is used for training or testing it
     might generate a leak from the feature.
 
+    # FIXME : rewrite example
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_extraction import ShiftFeature
+    >>> from giottotime.feature_extraction import Shift
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
-    >>> shift_feature = ShiftFeature(shift=3)
+    >>> shift_feature = Shift(shift=3)
     >>> shift_feature.transform(ts)
        ShiftFeature
     0           NaN
@@ -48,9 +48,29 @@ class ShiftFeature(IndexDependentFeature):
 
     """
 
-    def __init__(self, shift: int = 1, output_name: str = "ShiftFeature"):
-        super().__init__(output_name)
+    def __init__(self, shift: int = 1):
+        super().__init__()
         self.shift = shift
+
+    def fit(self, X, y=None):
+        """Fit the estimator.
+
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+        self.columns_ = X.columns.values
+        return self
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """Create a shifted version of ``time_series``.
@@ -66,12 +86,13 @@ class ShiftFeature(IndexDependentFeature):
             The shifted version of the original ``time_series``.
 
         """
-        time_series_shifted = time_series.shift(self.shift)
-        time_series_t = self._rename_columns(time_series_shifted)
-        return time_series_t
+        check_is_fitted(self)
+
+        time_series_shifted = time_series.shift(self.shift).add_suffix('__' + self.__class__.__name__)
+        return time_series_shifted
 
 
-class MovingAverageFeature(BaseEstimator, TransformerMixin):
+class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
     """For each row in ``time_series``, compute the moving average of the previous
      ``window_size`` rows. If there are not enough rows, the value is Nan.
 
@@ -80,15 +101,12 @@ class MovingAverageFeature(BaseEstimator, TransformerMixin):
     window_size : int, optional, default: ``1``
         The number of previous points on which to compute the moving average
 
-    output_name : str, optional, default: ``'MovingAverageFeature'``
-        The name of the output column.
-
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_extraction import MovingAverageFeature
+    >>> from giottotime.feature_extraction import MovingAverage
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
-    >>> mv_avg_feature = MovingAverageFeature(window_size=2)
+    >>> mv_avg_feature = MovingAverage(window_size=2)
     >>> mv_avg_feature.transform(ts)
        MovingAverageFeature
     0                   NaN
@@ -105,20 +123,23 @@ class MovingAverageFeature(BaseEstimator, TransformerMixin):
         self.window_size = window_size
 
     def fit(self, X, y=None):
-        """A reference implementation of a fitting function for a transformer.
+        """Fit the estimator.
+
         Parameters
         ----------
-        X : {array-like, sparse matrix}, shape (n_samples, n_features)
-            The training input samples.
+        X : pd.DataFrame, shape (n_samples, n_features)
+            Input data.
+
         y : None
             There is no need of a target in a transformer, yet the pipeline API
             requires this parameter.
+
         Returns
         -------
         self : object
             Returns self.
         """
-
+        self.columns_ = X.columns.values
         return self
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
@@ -137,13 +158,14 @@ class MovingAverageFeature(BaseEstimator, TransformerMixin):
             moving average for each element.
 
         """
-        time_series_mvg_avg = time_series.rolling(self.window_size).mean()
-        # FIXME : column renaming
-        # time_series_t = self._rename_columns(time_series_mvg_avg)
+        check_is_fitted(self)
+
+        time_series_mvg_avg = time_series.rolling(self.window_size).mean().add_suffix('__' + self.__class__.__name__)
+
         return time_series_mvg_avg
 
 
-class PolynomialFeature(IndexDependentFeature):
+class Polynomial(BaseEstimator, TransformerMixin, FeatureMixin):
     """Compute the polynomial feature_extraction, of a degree equal to the input
     ``degree``.
 
@@ -158,9 +180,9 @@ class PolynomialFeature(IndexDependentFeature):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_extraction import PolynomialFeature
+    >>> from giottotime.feature_extraction import Polynomial
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
-    >>> pol_feature = PolynomialFeature(degree=3, output_name="pol")
+    >>> pol_feature = Polynomial(degree=3, output_name="pol")
     >>> pol_feature.transform(ts)
        pol_0  pol_1  pol_2  pol_3
     0    1.0    0.0    0.0    0.0
@@ -172,7 +194,7 @@ class PolynomialFeature(IndexDependentFeature):
 
     """
 
-    def __init__(self, degree: int = 2, output_name: str = "PolynomialFeature"):
+    def __init__(self, degree: int = 2, output_name: str = "Polynomial"):
         super().__init__(output_name)
         self.degree = degree
 
@@ -200,7 +222,7 @@ class PolynomialFeature(IndexDependentFeature):
         return time_series_t
 
 
-class ExogenousFeature(IndexDependentFeature):
+class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
     """Reindex ``exogenous_time_series`` with the index of ``time_series``. To check the
     documentation of ``pandas.DataFrame.reindex`` and to see which type of
     ``method`` are available, please refer to the pandas `documentation
@@ -221,10 +243,10 @@ class ExogenousFeature(IndexDependentFeature):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_extraction import ExogenousFeature
+    >>> from giottotime.feature_extraction import Exogenous
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5], index=[3, 4, 5, 6, 7, 8])
     >>> exog_ts = pd.DataFrame([10, 8, 1, 3, 2, 7])
-    >>> exog_feature = ExogenousFeature(exog_ts)
+    >>> exog_feature = Exogenous(exog_ts)
     >>> exog_feature.transform(ts)
        ExogenousFeature
     3               3.0
@@ -234,7 +256,7 @@ class ExogenousFeature(IndexDependentFeature):
     7               NaN
     8               NaN
 
-    >>> exog_feature = ExogenousFeature(exog_ts, method="nearest")
+    >>> exog_feature = Exogenous(exog_ts, method="nearest")
     >>> exog_feature.transform(ts)
        ExogenousFeature
     3                 3
@@ -249,7 +271,7 @@ class ExogenousFeature(IndexDependentFeature):
         self,
         exogenous_time_series: pd.DataFrame,
         method: Optional[str] = None,
-        output_name: str = "ExogenousFeature",
+        output_name: str = "Exogenous",
     ):
         super().__init__(output_name)
         self.method = method

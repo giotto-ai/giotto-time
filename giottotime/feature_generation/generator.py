@@ -6,13 +6,17 @@ from pandas import DatetimeIndex
 
 from math import pi
 
-from giottotime.feature_extraction.base import Feature
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils.validation import check_is_fitted
+
+from giottotime.base import FeatureMixin
 from giottotime.feature_extraction.base import StandardFeature
 
 __all__ = ["PeriodicSeasonalFeature", "ConstantFeature", "CustomFeature"]
 
 
-class PeriodicSeasonalFeature(StandardFeature):
+# TODO : refactor to something like 'make_periodic_feature' or 'make_sinusoid'
+class PeriodicSeasonalFeature(BaseEstimator, FeatureMixin):
     """Create a sinusoid from a given date and with a given period and
     amplitude.
 
@@ -69,20 +73,38 @@ class PeriodicSeasonalFeature(StandardFeature):
     """
 
     def __init__(
-        self,
-        period: Union[pd.Timedelta, str] = "365 days",
-        amplitude: float = 0.5,
-        start_date: Optional[Union[pd.Timestamp, str]] = None,
-        length: Optional[int] = 50,
-        index_period: Optional[Union[DatetimeIndex, int]] = None,
-        output_name: str = "PeriodicSeasonalFeature",
+            self,
+            period: Union[pd.Timedelta, str] = "365 days",
+            amplitude: float = 0.5,
+            start_date: Optional[Union[pd.Timestamp, str]] = None,
+            length: Optional[int] = 50,
+            index_period: Optional[Union[DatetimeIndex, int]] = None,
     ):
-        super().__init__(output_name=output_name)
         self.start_date = start_date
         self.period = period
         self.amplitude = amplitude
         self.length = length
         self.index_period = index_period
+
+    def fit(self, X, y=None):
+        """Fit the estimator.
+
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+        self.columns_ = X.columns.values
+        return self
 
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """Generate a sinusoid, with the given ``period``, ``amplitude`` and ``length``,
@@ -123,8 +145,7 @@ class PeriodicSeasonalFeature(StandardFeature):
         else:
             periodic_feature = pd.DataFrame(data=periodic_feature_values[: self.length])
 
-        periodic_feature = self._rename_columns(periodic_feature)
-        return periodic_feature
+        return periodic_feature.add_suffix('__' + self.__class__.__name__)
 
     def _validate_input(self, X: pd.DataFrame) -> None:
         if X is None:
@@ -182,8 +203,8 @@ class PeriodicSeasonalFeature(StandardFeature):
     def _compute_periodic_feature(self, datetime_index: pd.DatetimeIndex):
         print((datetime_index - self.start_date) / self.period)
         return (
-            np.sin(2 * pi * (datetime_index - self.start_date) / self.period)
-        ) * self.amplitude
+                   np.sin(2 * pi * (datetime_index - self.start_date) / self.period)
+               ) * self.amplitude
 
 
 class ConstantFeature(StandardFeature):
@@ -217,7 +238,7 @@ class ConstantFeature(StandardFeature):
     """
 
     def __init__(
-        self, constant: int = 2, length: int = 50, output_name: str = "ConstantFeature"
+            self, constant: int = 2, length: int = 50, output_name: str = "ConstantFeature"
     ):
         super().__init__(output_name)
         self.length = length
@@ -286,10 +307,10 @@ class CustomFeature(StandardFeature):
     """
 
     def __init__(
-        self,
-        custom_feature_function: Callable,
-        output_name: str = "CustomFeature",
-        **kwargs: object,
+            self,
+            custom_feature_function: Callable,
+            output_name: str = "CustomFeature",
+            **kwargs: object,
     ):
         super().__init__(output_name)
         self.custom_feature_function = custom_feature_function

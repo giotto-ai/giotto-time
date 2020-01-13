@@ -3,7 +3,7 @@ from typing import Tuple
 import pandas as pd
 from hypothesis import given
 
-from giottotime.feature_extraction import ShiftFeature, MovingAverageFeature
+from giottotime.feature_extraction import Shift, MovingAverage
 from giottotime.utils.hypothesis.feature_matrices import (
     X_y_matrices,
     X_matrices,
@@ -11,9 +11,9 @@ from giottotime.utils.hypothesis.feature_matrices import (
 )
 
 features = [
-    ShiftFeature(0, "0"),
-    ShiftFeature(1, "1"),
-    MovingAverageFeature(3, "3"),
+    Shift(0),
+    Shift(1),
+    MovingAverage(3),
 ]
 
 

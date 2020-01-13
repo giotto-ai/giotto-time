@@ -1,11 +1,10 @@
-from hypothesis import given, strategies as st, settings
+from hypothesis import given, strategies as st
 import pandas as pd
 import pytest
 import numpy as np
-from hypothesis._settings import duration
 
 from giottotime.utils.hypothesis.time_indexes import giotto_time_series
-from giottotime.feature_extraction import ShiftFeature, MovingAverageFeature
+from giottotime.feature_extraction import Shift, MovingAverage
 from giottotime.feature_extraction.feature_creation import (
     _check_feature_names,
     FeatureCreation,
@@ -13,8 +12,8 @@ from giottotime.feature_extraction.feature_creation import (
 
 
 def test_wrong_feature_naming():
-    features = [ShiftFeature(k, output_name=f"{k}") for k in range(50)]
-    features_same_name = ShiftFeature(shift=100, output_name="1")
+    features = [Shift(k) for k in range(50)]
+    features_same_name = Shift(shift=100)
     features.append(features_same_name)
 
     with pytest.raises(ValueError):
@@ -22,7 +21,7 @@ def test_wrong_feature_naming():
 
 
 def test_correct_feature_names():
-    features = [ShiftFeature(k, output_name=f"{k}") for k in range(50)]
+    features = [Shift(k) for k in range(50)]
     _check_feature_names(features)
 
 
@@ -37,14 +36,14 @@ class TestFeatureCreation:
     def _correct_y(self, ts, horizon):
         y = pd.DataFrame(index=ts.index)
         for k in range(1, horizon + 1):
-            shift_feature = ShiftFeature(-k, f"shift_{k}")
+            shift_feature = Shift(-k)
             y[f"y_{k}"] = shift_feature.fit_transform(ts)
         return y
 
     def test_wrong_feature_naming(self):
         time_series_features = [
-            ShiftFeature(shift=2, output_name="same_name"),
-            ShiftFeature(shift=5, output_name="same_name"),
+            Shift(shift=2),
+            Shift(shift=5),
         ]
 
         with pytest.raises(ValueError):
@@ -80,9 +79,9 @@ class TestFeatureCreation:
         ts = pd.DataFrame.from_dict({"ignored": range(10)})
         ts.index = np.random.random(len(ts))
         features = [
-            MovingAverageFeature(window_size=2, output_name="mov_avg_2"),
-            MovingAverageFeature(window_size=5, output_name="mov_avg_5"),
-            ShiftFeature(shift=3, output_name="shift_3"),
+            MovingAverage(window_size=2),
+            MovingAverage(window_size=5),
+            Shift(shift=3),
         ]
 
         feature_creation = FeatureCreation(
@@ -103,9 +102,9 @@ class TestFeatureCreation:
     @given(giotto_time_series(), st.integers(1, 10))
     def test_correct_y_shifts_random_ts(self, ts, horizon):
         features = [
-            MovingAverageFeature(window_size=2, output_name="mov_avg_2"),
-            MovingAverageFeature(window_size=5, output_name="mov_avg_5"),
-            ShiftFeature(shift=3, output_name="shift_3"),
+            MovingAverage(window_size=2),
+            MovingAverage(window_size=5),
+            Shift(shift=3),
         ]
 
         feature_creation = FeatureCreation(
@@ -125,8 +124,8 @@ class TestFeatureCreation:
         ts.index = random_index
 
         time_series_features = [
-            ShiftFeature(shift=2, output_name="shift_2"),
-            ShiftFeature(shift=-5, output_name="shift_5"),
+            Shift(shift=2),
+            Shift(shift=-5),
         ]
 
         fc = FeatureCreation(horizon=horizon, time_series_features=time_series_features)
@@ -165,8 +164,8 @@ class TestFeatureCreation:
     @given(giotto_time_series(min_length=1), st.integers(1, 10))
     def test_correct_fit_random_ts(self, ts, horizon):
         time_series_features = [
-            ShiftFeature(shift=2, output_name="shift_2"),
-            ShiftFeature(shift=-5, output_name="shift_5"),
+            Shift(shift=2),
+            Shift(shift=-5),
         ]
 
         fc = FeatureCreation(horizon=horizon, time_series_features=time_series_features)

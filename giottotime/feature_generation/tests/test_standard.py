@@ -5,12 +5,11 @@ from hypothesis import given, strategies as st
 from pandas.util import testing as testing
 
 from giottotime.utils.hypothesis.time_indexes import giotto_time_series
-from giottotime.feature_extraction import (
+from giottotime.feature_generation import (
     ConstantFeature,
     CustomFeature,
     PeriodicSeasonalFeature,
 )
-
 
 class TestPeriodicSesonalFeature:
     def test_missing_start_date_or_period(self):
@@ -116,7 +115,7 @@ class TestPeriodicSesonalFeature:
         )
         expected_df = pd.DataFrame.from_dict(
             {
-                "PeriodicSeasonalFeature": [
+                f"0__{periodic_feature.__class__.__name__}": [
                     0.0,
                     0.25433547,
                     0.42938198,
