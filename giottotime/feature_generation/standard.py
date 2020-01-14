@@ -42,9 +42,6 @@ class PeriodicSeasonalFeature(BaseEstimator, FeatureMixin):
         not passed in the ``transform`` method, otherwise the index period is taken
         from it.
 
-    output_name : str, optional, default: ``"PeriodicSeasonalFeature"``
-        The name of the output column.
-
     Examples
     --------
     >>> from giottotime.feature_extraction import PeriodicSeasonalFeature
@@ -202,9 +199,7 @@ class PeriodicSeasonalFeature(BaseEstimator, FeatureMixin):
 
     def _compute_periodic_feature(self, datetime_index: pd.DatetimeIndex):
         print((datetime_index - self.start_date) / self.period)
-        return (
-                   np.sin(2 * pi * (datetime_index - self.start_date) / self.period)
-               ) * self.amplitude
+        return (np.sin(2 * pi * (datetime_index - self.start_date) / self.period)) * self.amplitude
 
 
 class ConstantFeature(StandardFeature):

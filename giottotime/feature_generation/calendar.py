@@ -4,8 +4,9 @@ from typing import Optional, Union, List
 import numpy as np
 import pandas as pd
 import workalendar
+from sklearn.base import BaseEstimator, TransformerMixin
 
-from .base import IndexDependentFeature
+from giottotime.base import FeatureMixin
 
 
 def check_index(time_series: pd.DataFrame) -> None:
@@ -25,7 +26,8 @@ def check_index(time_series: pd.DataFrame) -> None:
         )
 
 
-class CalendarFeature(IndexDependentFeature):
+# TODO: rename
+class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
     """Create a feature based on the national holidays of a specific country, based on
     a given kernel (if provided). The interface for this is based on the one of
     'workalendar'. To see which regions and countries are available, check the
@@ -62,8 +64,8 @@ class CalendarFeature(IndexDependentFeature):
 
     Examples
     --------
-    >>> from giottotime.feature_extraction import CalendarFeature
-    >>> cal_feature = CalendarFeature(region="europe", country="Italy", kernel=[3, 2])
+    >>> from giottotime.feature_extraction import Calendar
+    >>> cal_feature = Calendar(region="europe", country="Italy", kernel=[3, 2])
     >>> cal_feature.transform()
                 CalendarFeature
     2018-01-01              2.0
@@ -80,16 +82,15 @@ class CalendarFeature(IndexDependentFeature):
     """
 
     def __init__(
-        self,
-        region: str = "america",
-        country: str = "Brazil",
-        start_date: str = "01/01/2018",
-        end_date: str = "01/01/2020",
-        kernel: Union[List, np.ndarray] = None,
-        reindex_method: str = "pad",
-        output_name: str = "CalendarFeature",
+            self,
+            region: str = "america",
+            country: str = "Brazil",
+            start_date: str = "01/01/2018",
+            end_date: str = "01/01/2020",
+            kernel: Union[List, np.ndarray] = None,
+            reindex_method: str = "pad",
     ):
-        super().__init__(output_name)
+        super().__init__()
         self.region = region
         self.country = country
         self.start_date = start_date
@@ -102,6 +103,26 @@ class CalendarFeature(IndexDependentFeature):
                 f"and should only contains finite values, got {kernel} instead."
             )
         self.kernel = kernel
+
+    def fit(self, X, y=None):
+        """Fit the estimator.
+
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+        self.columns_ = X.columns.values
+        return self
 
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """Generate a DataFrame containing the events associated to the holidays of the
@@ -133,7 +154,7 @@ class CalendarFeature(IndexDependentFeature):
         if self.kernel is not None:
             events = self._apply_kernel(events)
 
-        events_renamed = self._rename_columns(events)
+        events_renamed = events.add_suffix('__' + self.__class__.__name__)
         aligned_events = self._align_event_indices(time_series, events_renamed)
 
         return aligned_events
@@ -209,8 +230,8 @@ class CalendarFeature(IndexDependentFeature):
 
         kernel_events["status"] = (
             kernel_events["status"]
-            .rolling(klen, center=True)
-            .apply(apply_kernel, raw=False)
+                .rolling(klen, center=True)
+                .apply(apply_kernel, raw=False)
         )
         return kernel_events
 
@@ -235,6 +256,6 @@ class CalendarFeature(IndexDependentFeature):
             )
             events_renamed.index = ts.index
         else:
-            events_renamed = events[self.start_ : self.end_]
+            events_renamed = events[self.start_: self.end_]
 
         return events_renamed

@@ -4,7 +4,7 @@ starting from a time series.
 """
 
 from .feature_creation import FeatureCreation
-from .calendar import CalendarFeature
+from giottotime.feature_generation.calendar import Calendar
 from .time_series import (
     Shift,
     MovingAverage,
@@ -27,7 +27,7 @@ __all__ = [
     "Polynomial",
     "Exogenous",
     "topology",
-    "CalendarFeature",
+    "Calendar",
     "DetrendedFeature",
     "RemovePolynomialTrend",
     "RemoveExponentialTrend",

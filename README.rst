@@ -77,7 +77,7 @@ Feature Creation
 
 The following time series features are currently supported:
 
-* CalendarFeature
+* Calendar
 * PeriodicSeasonalFeature
 * Shift
 * MovingAverage

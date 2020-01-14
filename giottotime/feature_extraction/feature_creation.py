@@ -3,11 +3,11 @@ from typing import List
 import pandas as pd
 
 from .base import Feature
-from .time_series import ShiftFeature
+from .time_series import Shift
 
 
 def _check_feature_names(time_series_features: List[Feature]) -> None:
-    feature_output_names = [feature.output_name for feature in time_series_features]
+    feature_output_names = [feature.__class__.__name__ for feature in time_series_features]
     if len(set(feature_output_names)) != len(feature_output_names):
         raise ValueError(
             "The input features should all have different names, instead "
@@ -32,13 +32,13 @@ class FeatureCreation:
     --------
     >>> import pandas as pd
     >>> from giottotime.feature_extraction import FeatureCreation
-    >>> from giottotime.feature_extraction import ShiftFeature, MovingAverageFeature
+    >>> from giottotime.feature_extraction import Shift, MovingAverage
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-    >>> shift_feature = ShiftFeature(shift=1)
-    >>> mv_avg_feature = MovingAverageFeature(window_size=2)
+    >>> shift_feature = Shift(shift=1)
+    >>> mv_avg_feature = MovingAverage(window_size=2)
     >>> feature_extraction = FeatureCreation(horizon=3,
-    ...                                    time_series_features=[shift_feature,
-    ...                                                          mv_avg_feature])
+    ...                                      time_series_features=[shift_feature,
+    ...                                                            mv_avg_feature])
     >>> X, y = feature_extraction.fit_transform(ts)
     >>> X
        ShiftFeature  MovingAverageFeature
@@ -115,8 +115,8 @@ class FeatureCreation:
     def _create_y_shifts(self, time_series: pd.DataFrame) -> pd.DataFrame:
         y = pd.DataFrame(index=time_series.index)
         for k in range(1, self.horizon + 1):
-            shift_feature = ShiftFeature(-k, f"shift_{k}")
-            y[f"y_{k}"] = shift_feature.transform(time_series)
+            shift_feature = Shift(-k)
+            y[f"y_{k}"] = shift_feature.fit_transform(time_series)
 
         return y
 

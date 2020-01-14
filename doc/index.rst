@@ -37,13 +37,13 @@ Welcome to giotto-time's API reference!
    :template: class.rst
 
    feature_creation.FeatureCreation
-   feature_creation.ShiftFeature
-   feature_creation.MovingAverageFeature
+   feature_creation.Shift
+   feature_creation.MovingAverage
    feature_creation.ConstantFeature
-   feature_creation.PolynomialFeature
-   feature_creation.ExogenousFeature
+   feature_creation.Polynomial
+   feature_creation.Exogenous
    feature_creation.CustomFeature
-   feature_creation.CalendarFeature
+   feature_creation.Calendar
    feature_creation.PeriodicSeasonalFeature
    feature_creation.DetrendedFeature
    feature_creation.RemovePolynomialTrend

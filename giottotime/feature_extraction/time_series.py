@@ -16,6 +16,9 @@ from sklearn.utils.validation import check_is_fitted
 from ..base import FeatureMixin
 
 
+# FIXME: rewrite example for all transformers
+# TODO: check array..
+
 class Shift(BaseEstimator, TransformerMixin, FeatureMixin):
     """Perform a shift of a DataFrame of size equal to ``shift``.
 
@@ -30,7 +33,6 @@ class Shift(BaseEstimator, TransformerMixin, FeatureMixin):
     used carefully, since if the resulting feature is used for training or testing it
     might generate a leak from the feature.
 
-    # FIXME : rewrite example
     Examples
     --------
     >>> import pandas as pd
@@ -161,7 +163,6 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
         check_is_fitted(self)
 
         time_series_mvg_avg = time_series.rolling(self.window_size).mean().add_suffix('__' + self.__class__.__name__)
-
         return time_series_mvg_avg
 
 
@@ -173,9 +174,6 @@ class Polynomial(BaseEstimator, TransformerMixin, FeatureMixin):
     ----------
     degree: int, optional, default: ``2``
         The degree of the polynomial feature_extraction.
-
-    output_name : str, optional, default: ``'PolynomialFeature'``
-        The name of the output column.
 
     Examples
     --------
@@ -194,9 +192,29 @@ class Polynomial(BaseEstimator, TransformerMixin, FeatureMixin):
 
     """
 
-    def __init__(self, degree: int = 2, output_name: str = "Polynomial"):
-        super().__init__(output_name)
+    def __init__(self, degree: int = 2):
+        super().__init__()
         self.degree = degree
+
+    def fit(self, X, y=None):
+        """Fit the estimator.
+
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+        self.columns_ = X.columns.values
+        return self
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """Compute the polynomial feature_extraction of ``time_series``, up to a degree
@@ -213,13 +231,14 @@ class Polynomial(BaseEstimator, TransformerMixin, FeatureMixin):
             The computed polynomial feature_extraction.
 
         """
+        check_is_fitted(self)
+
         pol_feature = PolynomialFeatures(self.degree)
+        # FIXME: fit_transform in transform ?
         pol_of_X_array = pol_feature.fit_transform(time_series)
-        pol_of_X = pd.DataFrame(pol_of_X_array, index=time_series.index)
+        pol_of_X = pd.DataFrame(pol_of_X_array, index=time_series.index).add_suffix('__' + self.__class__.__name__)
 
-        time_series_t = self._rename_columns(pol_of_X)
-
-        return time_series_t
+        return pol_of_X
 
 
 class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
@@ -236,9 +255,6 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
     method : str, optional, default: ``None``
         The method used to re-index. This must be a method used by the
         ``pandas.DataFrame.reindex`` method.
-
-    output_name : str, optional, default: ``'ExogenousFeature'``
-        The name of the output column.
 
     Examples
     --------
@@ -268,14 +284,33 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
     """
 
     def __init__(
-        self,
-        exogenous_time_series: pd.DataFrame,
-        method: Optional[str] = None,
-        output_name: str = "Exogenous",
+            self,
+            exogenous_time_series: pd.DataFrame,
+            method: Optional[str] = None,
     ):
-        super().__init__(output_name)
+        super().__init__()
         self.method = method
         self.exogenous_time_series = exogenous_time_series
+
+    def fit(self, X, y=None):
+        """Fit the estimator.
+
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+        self.columns_ = X.columns.values
+        return self
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """Reindex the ``exogenous_time_series`` with the index of ``time_series``.
@@ -292,8 +327,10 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
             of ``time_series``.
 
         """
+        check_is_fitted(self)
+
         exog_feature = self.exogenous_time_series.reindex(
             index=time_series.index, method=self.method
-        )
-        time_series_t = self._rename_columns(exog_feature)
-        return time_series_t
+        ).add_suffix('__' + self.__class__.__name__)
+
+        return exog_feature
