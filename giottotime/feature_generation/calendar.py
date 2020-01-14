@@ -59,9 +59,6 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
         https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.reindex.html`_
         for further details.
 
-    output_name : str, optional, default: ``'CalendarFeature'``
-        The name of the output column.
-
     Examples
     --------
     >>> from giottotime.feature_extraction import Calendar
@@ -155,6 +152,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
             events = self._apply_kernel(events)
 
         events_renamed = events.add_suffix('__' + self.__class__.__name__)
+        # FIXME: remove base ts after merging
         aligned_events = self._align_event_indices(time_series, events_renamed)
 
         return aligned_events
