@@ -3,13 +3,12 @@ from typing import Optional, Union, List
 
 import numpy as np
 import pandas as pd
-import workalendar
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from giottotime.base import FeatureMixin
 
 
-def check_index(time_series: pd.DataFrame) -> None:
+def _check_index(time_series: pd.DataFrame) -> None:
     index_series = pd.Series(time_series.index)
     unique_differences = pd.unique(index_series.diff().dropna().values)
 
@@ -26,7 +25,6 @@ def check_index(time_series: pd.DataFrame) -> None:
         )
 
 
-# TODO: rename
 class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
     """Create a feature based on the national holidays of a specific country, based on
     a given kernel (if provided). The interface for this is based on the one of
@@ -101,6 +99,18 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
             )
         self.kernel = kernel
 
+    def get_feature_names(self):
+        """
+        Return feature names for output features.
+
+        Returns
+        -------
+        output_feature_names : ndarray of shape (n_output_features,)
+            Array of feature names.
+        """
+
+        return [self.__class__.__name__]
+
     def fit(self, X, y=None):
         """Fit the estimator.
 
@@ -118,7 +128,6 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
         self : object
             Returns self.
         """
-        self.columns_ = X.columns.values
         return self
 
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
@@ -140,7 +149,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
 
         """
         if time_series is not None:
-            check_index(time_series)
+            _check_index(time_series)
 
         self._initialize_start_end_date(time_series)
 
@@ -249,10 +258,12 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
             )
             X.index = X.index.to_timestamp()
 
-            events_renamed = pd.merge(
-                X, grouped_events, left_index=True, right_index=True, how="inner"
-            )
+            # events_renamed = pd.merge(X, grouped_events, left_index=True, right_index=True, how="inner")
+
+            # filtering by index instead of merge
+            events_renamed = grouped_events.loc[X.index, :]
             events_renamed.index = ts.index
+
         else:
             events_renamed = events[self.start_: self.end_]
 
