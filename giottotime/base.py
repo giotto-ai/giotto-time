@@ -1,0 +1,23 @@
+from sklearn.utils.validation import check_is_fitted
+
+
+# TODO: doc
+class FeatureMixin:
+    """Mixin class for all feature extraction estimators in giotto-time."""
+    _estimator_type = "feature_extractor"
+
+    def _more_tags(self):
+        return {'no_validation': True, 'X_types': []}
+
+    def get_feature_names(self):
+        """
+        Return feature names for output features.
+
+        Returns
+        -------
+        output_feature_names : ndarray of shape (n_output_features,)
+            Array of feature names.
+        """
+        check_is_fitted(self)
+
+        return [f'{name}__{self.__class__.__name__}' for name in self.columns_]
