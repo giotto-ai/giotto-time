@@ -4,12 +4,13 @@ of machine learning models, for dealing with time series and non time series dat
 """
 
 from .regressors import LinearRegressor
-from .time_series_models import GAR
+from .forecasting import GAR, GARFF
 from .trend_models import PolynomialTrend, ExponentialTrend
 
 __all__ = [
     "LinearRegressor",
     "GAR",
+    "GARFF",
     "PolynomialTrend",
     "ExponentialTrend",
 ]
