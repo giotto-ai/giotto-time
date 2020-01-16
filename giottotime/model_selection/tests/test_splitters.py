@@ -1,20 +1,24 @@
+import numpy as np
 import pytest
 
 import hypothesis.strategies as st
 from hypothesis import given, settings, HealthCheck
+from sklearn.compose import make_column_selector
 
+from giottotime.compose import DataFrameTransformer
 from giottotime.feature_extraction import Shift, MovingAverage
-from giottotime.model_selection.feature_splitters import FeatureSplitter
+from giottotime.model_selection.splitters import FeatureSplitter
 from giottotime.utils.hypothesis.feature_matrices import X_y_matrices
 
+#  TODO: refactor
+df_transformer = DataFrameTransformer(
+    [('shift_0', Shift(0), make_column_selector(dtype_include=np.number)),
+     ('shift_1', Shift(1), make_column_selector(dtype_include=np.number)),
+     ('moving_average_3', MovingAverage(window_size=3), make_column_selector(dtype_include=np.number)),
+     ]
+)
 
-FEATURES = [
-    Shift(0),
-    Shift(1),
-    MovingAverage(3),
-]
-
-HORIZON = 4
+horizon = 4
 
 
 class TestFeatureSplitter:
@@ -29,7 +33,7 @@ class TestFeatureSplitter:
     @settings(suppress_health_check=(HealthCheck.too_slow,))
     @given(
         X_y_matrices(
-            horizon=HORIZON, time_series_features=FEATURES, allow_nan_infinity=False,
+            horizon=horizon, df_transformer=df_transformer, allow_nan_infinity=False,
         )
     )
     def test_transform(self, X_y):
@@ -37,7 +41,7 @@ class TestFeatureSplitter:
         feature_splitter = FeatureSplitter()
         X_train, y_train, X_test, y_test = feature_splitter.transform(X, y)
 
-        assert X_train.shape[0] == max(0, X.shape[0] - 2 - HORIZON)
+        assert X_train.shape[0] == max(0, X.shape[0] - 2 - horizon)
         assert y_train.shape[0] == X_train.shape[0]
-        assert X_test.shape[0] == min(max(0, X.shape[0] - 2), HORIZON)
+        assert X_test.shape[0] == min(max(0, X.shape[0] - 2), horizon)
         assert y_test.shape[0] == X_test.shape[0]
