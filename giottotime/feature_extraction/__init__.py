@@ -3,7 +3,6 @@ The :mod:`giottotime.feature_extraction` module deals with the creation of featu
 starting from a time series.
 """
 
-from .feature_creation import FeatureCreation
 from giottotime.feature_generation.calendar import Calendar
 from .time_series import (
     Shift,
@@ -21,7 +20,6 @@ from .trend import (
     RemoveExponentialTrend)
 
 __all__ = [
-    "FeatureCreation",
     "Shift",
     "MovingAverage",
     "Polynomial",

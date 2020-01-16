@@ -4,7 +4,6 @@ from typing import Callable
 from sklearn.metrics import mean_squared_error
 import pandas as pd
 
-from .base import IndexDependentFeature
 from giottotime.models.trend_models import TrendModel
 from giottotime.models.trend_models import PolynomialTrend
 from giottotime.models.trend_models import ExponentialTrend
@@ -16,7 +15,7 @@ __all__ = [
 ]
 
 
-class DetrendedFeature(IndexDependentFeature):
+class DetrendedFeature():
     """Apply a de-trend transformation to a time series.
 
     Parameters

@@ -6,11 +6,9 @@ from pandas import DatetimeIndex
 
 from math import pi
 
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted
+from sklearn.base import BaseEstimator
 
 from giottotime.base import FeatureMixin
-from giottotime.feature_extraction.base import StandardFeature
 
 __all__ = ["PeriodicSeasonalFeature", "ConstantFeature", "CustomFeature"]
 
@@ -202,7 +200,7 @@ class PeriodicSeasonalFeature(BaseEstimator, FeatureMixin):
         return (np.sin(2 * pi * (datetime_index - self.start_date) / self.period)) * self.amplitude
 
 
-class ConstantFeature(StandardFeature):
+class ConstantFeature():
     """Generate a ``pd.DataFrame`` with one column, of the same length as the input
      ``X`` and containing the value ``constant`` across the whole column.
 
@@ -267,7 +265,7 @@ class ConstantFeature(StandardFeature):
         return constant_series_renamed
 
 
-class CustomFeature(StandardFeature):
+class CustomFeature():
     """Given a custom function, apply it to a time series and generate a
     ``pd.Dataframe``.
 

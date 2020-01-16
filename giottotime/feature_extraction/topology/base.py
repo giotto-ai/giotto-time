@@ -8,8 +8,6 @@ import giotto.diagrams as diag
 import giotto.homology as hl
 import pandas as pd
 
-from ..base import IndexDependentFeature
-
 __all__ = ["TDAFeatures"]
 
 
@@ -36,7 +34,7 @@ def _align_indices(
     return output_X
 
 
-class TDAFeatures(IndexDependentFeature, metaclass=ABCMeta):
+class TDAFeatures(metaclass=ABCMeta):
     """Base class for all the TDA feature_extraction contained in the package.
 
     """
