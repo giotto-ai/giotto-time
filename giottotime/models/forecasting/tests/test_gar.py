@@ -60,6 +60,7 @@ class TestFitPredict:
         with pytest.raises(NotFittedError):
             gar_no_feedforward.predict(time_series)
 
+    # FIXME
     @given(X_y_matrices(horizon=4, df_transformer=df_transformer, allow_nan_infinity=False, min_length=10))
     def test_correct_fit_date(self, X_y):
         base_model = LinearRegression()
