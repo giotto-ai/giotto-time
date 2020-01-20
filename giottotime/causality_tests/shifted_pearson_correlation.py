@@ -46,8 +46,15 @@ class ShiftedPearsonCorrelation(CausalityTest):
     """
 
     def __init__(
-        self, max_shift: int = 10, target_col: str = "y", dropna: bool = False
+        self,
+        max_shift: int = 10,
+        target_col: str = "y",
+        dropna: bool = False,
+        bootstrap_iterations=1000,
+        bootstrap_samples=100,
+        confidence=0.05,
     ):
+        super().__init__(bootstrap_iterations, bootstrap_samples, confidence)
         self.max_shift = max_shift
         self.target_col = target_col
         self.dropna = dropna
@@ -67,20 +74,34 @@ class ShiftedPearsonCorrelation(CausalityTest):
         self : ``ShiftedPearsonCorrelation``
 
         """
-        best_shifts = pd.DataFrame(columns=["x", "y", "shift", "max_corr"])
+        best_shifts = pd.DataFrame(
+            columns=["x", "y", "shift", "max_corr", "significance"]
+        )
         best_shifts = best_shifts.astype(
-            {"x": np.float64, "y": np.float64, "shift": np.int64, "max_corr": np.int64}
+            {
+                "x": np.float64,
+                "y": np.float64,
+                "shift": np.int64,
+                "max_corr": np.int64,
+                "significance": np.bool,
+            }
         )
 
         for x, y in product(data.columns, repeat=2):
             res = self._get_max_corr_shift(data, self.max_shift, x=x, y=y)
-
+            significance = self._compute_is_test_significant(data, x, y)
             best_shift = res[1]
             max_corr = res[0]
             # N = data.shape[0] - max_shift
 
             best_shifts = best_shifts.append(
-                {"x": x, "y": y, "shift": best_shift, "max_corr": max_corr},
+                {
+                    "x": x,
+                    "y": y,
+                    "shift": best_shift,
+                    "max_corr": max_corr,
+                    "significance": significance,
+                },
                 ignore_index=True,
             )
 
@@ -90,9 +111,13 @@ class ShiftedPearsonCorrelation(CausalityTest):
         max_corrs = pd.pivot_table(
             best_shifts, index=["x"], columns=["y"], values="max_corr"
         )
+        test_significance = pd.pivot_table(
+            best_shifts, index=["x"], columns=["y"], values="significance"
+        )
 
         self.best_shifts_ = pivot_best_shifts
         self.max_corrs_ = max_corrs
+        self.test_significance_ = test_significance
 
         return self
 
