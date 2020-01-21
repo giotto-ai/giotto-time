@@ -4,7 +4,7 @@ starting from a time series.
 """
 
 from giottotime.feature_generation.calendar import Calendar
-from .time_series import (
+from .standard import (
     Shift,
     MovingAverage,
     Polynomial,
@@ -14,10 +14,8 @@ from .time_series import (
 from .topology import AmplitudeFeature, AvgLifeTimeFeature, \
     BettiCurvesFeature, NumberOfRelevantHolesFeature
 
-from .trend import (
-    DetrendedFeature,
-    RemovePolynomialTrend,
-    RemoveExponentialTrend)
+from .trend import Detrender
+
 
 __all__ = [
     "Shift",
@@ -26,9 +24,7 @@ __all__ = [
     "Exogenous",
     "topology",
     "Calendar",
-    "DetrendedFeature",
-    "RemovePolynomialTrend",
-    "RemoveExponentialTrend",
+    "Detrender",
     "AmplitudeFeature",
     "AvgLifeTimeFeature",
     "BettiCurvesFeature",

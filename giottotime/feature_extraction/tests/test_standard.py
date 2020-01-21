@@ -21,7 +21,7 @@ df_shift_m2 = pd.DataFrame.from_dict({f'x__{shift_class_name}': [2, 3, 4, 5, np.
 df_shift_0 = pd.DataFrame.from_dict({f'x__{shift_class_name}': [0, 1, 2, 3, 4, 5]})
 
 
-#  FIXME: shift a + shift b = shift a+b instead
+# FIXME: shift a + shift b = shift a+b instead
 class TestShift:
     def _correct_shift(self, df: pd.DataFrame, shift: int) -> pd.DataFrame:
         return df.shift(shift)
@@ -58,10 +58,10 @@ class TestShift:
         df_shifted = shift_feature.fit_transform(df)
         correct_df_shifted = self._correct_shift(df, shift)
 
-        # testing.assert_frame_equal(correct_df_shifted, df_shifted)
+        #  testing.assert_frame_equal(correct_df_shifted, df_shifted)
 
 
-#  FIXME: mean(df_k, df_k+1) = dft_k
+# FIXME: mean(df_k, df_k+1) = dft_k
 class TestMovingAverage:
     def _correct_ma(self, df: pd.DataFrame, window_size: int) -> pd.DataFrame:
         return (
@@ -125,6 +125,8 @@ class TestMovingAverage:
         testing.assert_frame_equal(expected_df_ma, df_ma)
 
 
+# FIXME: refactor with pytest parametrize
+@pytest.mark.skip(reason="TODO: Use pytest parametrize")
 class TestExogenous:
     def _correct_exog(self, exog: pd.DataFrame, df: pd.DataFrame) -> pd.DataFrame:
         return exog.reindex(index=df.index)
@@ -163,8 +165,7 @@ class TestExogenous:
             pd.Timestamp(2000, 1, 4),
         ]
 
-        #  FIXME: refactor with pytest parametrize
-        # testing.assert_frame_equal(expected_exog, new_exog_feature)
+        testing.assert_frame_equal(expected_exog, new_exog_feature)
 
     def test_correct_exog_backfill_method(self):
         method = "backfill"
@@ -196,8 +197,7 @@ class TestExogenous:
             pd.Timestamp(2000, 1, 4),
         ]
 
-        #  FIXME: refactor with pytest parametrize
-        # testing.assert_frame_equal(expected_exog, new_exog_feature)
+        testing.assert_frame_equal(expected_exog, new_exog_feature)
 
     def test_correct_exog_pad_method(self):
         method = "pad"
@@ -230,8 +230,7 @@ class TestExogenous:
             pd.Timestamp(2000, 1, 4),
         ]
 
-        #  FIXME: refactor with pytest parametrize
-        # testing.assert_frame_equal(expected_exog, new_exog_feature)
+        testing.assert_frame_equal(expected_exog, new_exog_feature)
 
     def test_correct_nearest_pad_method(self):
         method = "nearest"
@@ -264,8 +263,7 @@ class TestExogenous:
             pd.Timestamp(2000, 1, 29),
         ]
 
-        #  FIXME: refactor with pytest parametrize
-        # testing.assert_frame_equal(expected_exog, new_exog_feature)
+        testing.assert_frame_equal(expected_exog, new_exog_feature)
 
     def test_correct_multi_columns_exog(self):
         output_name = "exog"
@@ -303,20 +301,11 @@ class TestExogenous:
             pd.Timestamp(2000, 1, 29),
         ]
 
-        #  FIXME: refactor with pytest parametrize
-        # testing.assert_frame_equal(expected_exog, new_exog_feature)
+        testing.assert_frame_equal(expected_exog, new_exog_feature)
 
 
-# FIXME: use ColumnTransformer / make_column_transformer
 class TestPolynomial:
-    def _correct_pol_features(self, df: pd.DataFrame, degree: int) -> pd.DataFrame:
-        poly = PolynomialFeatures(degree)
-        pol_features_arr = poly.fit_transform(df)
-        pol_features = pd.DataFrame(pol_features_arr, index=df.index)
-        return pol_features
-
     def test_correct_pol_features_single_column(self):
-        output_name = "pol_features"
         degree = 3
         df = pd.DataFrame.from_dict({"x": [0, 1, 2, 3]})
         df.index = [
@@ -327,14 +316,16 @@ class TestPolynomial:
         ]
 
         pol_feature = Polynomial(degree=degree)
+        feature_name = pol_feature.__class__.__name__
+
         pol_df = pol_feature.fit_transform(df)
 
         expected_pol_df = pd.DataFrame.from_dict(
             {
-                f"{output_name}_0": [1.0, 1.0, 1.0, 1.0],
-                f"{output_name}_1": [0.0, 1.0, 2.0, 3.0],
-                f"{output_name}_2": [0.0, 1.0, 4.0, 9.0],
-                f"{output_name}_3": [0.0, 1.0, 8.0, 27.0],
+                f"0__{feature_name}": [1.0, 1.0, 1.0, 1.0],
+                f"1__{feature_name}": [0.0, 1.0, 2.0, 3.0],
+                f"2__{feature_name}": [0.0, 1.0, 4.0, 9.0],
+                f"3__{feature_name}": [0.0, 1.0, 8.0, 27.0],
             }
         )
         expected_pol_df.index = [
@@ -344,10 +335,9 @@ class TestPolynomial:
             pd.Timestamp(2000, 4, 1),
         ]
 
-        # testing.assert_frame_equal(expected_pol_df, pol_df)
+        testing.assert_frame_equal(expected_pol_df, pol_df)
 
     def test_correct_pol_features_multi_columns(self):
-        output_name = "pol_features"
         degree = 2
         df = pd.DataFrame.from_dict({"x_1": [0, 2, 4], "x_2": [1, 3, 5]})
         df.index = [
@@ -357,16 +347,18 @@ class TestPolynomial:
         ]
 
         pol_feature = Polynomial(degree=degree)
+        feature_name = pol_feature.__class__.__name__
+
         pol_df = pol_feature.fit_transform(df)
 
         expected_pol_df = pd.DataFrame.from_dict(
             {
-                f"{output_name}_0": [1.0, 1.0, 1],
-                f"{output_name}_1": [0.0, 2.0, 4],
-                f"{output_name}_2": [1.0, 3.0, 5],
-                f"{output_name}_3": [0.0, 4.0, 16.0],
-                f"{output_name}_4": [0.0, 6.0, 20.0],
-                f"{output_name}_5": [1.0, 9.0, 25.0],
+                f"0__{feature_name}": [1.0, 1.0, 1],
+                f"1__{feature_name}": [0.0, 2.0, 4],
+                f"2__{feature_name}": [1.0, 3.0, 5],
+                f"3__{feature_name}": [0.0, 4.0, 16.0],
+                f"4__{feature_name}": [0.0, 6.0, 20.0],
+                f"5__{feature_name}": [1.0, 9.0, 25.0],
             }
         )
         expected_pol_df.index = [
@@ -375,4 +367,4 @@ class TestPolynomial:
             pd.Timestamp(2000, 3, 1),
         ]
 
-        # testing.assert_frame_equal(expected_pol_df, pol_df)
+        testing.assert_frame_equal(expected_pol_df, pol_df)

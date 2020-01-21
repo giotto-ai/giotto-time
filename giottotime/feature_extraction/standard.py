@@ -16,9 +16,6 @@ from sklearn.utils.validation import check_is_fitted
 from ..base import FeatureMixin
 
 
-# FIXME: rewrite example for all transformers
-# TODO: check array..
-
 class Shift(BaseEstimator, TransformerMixin, FeatureMixin):
     """Perform a shift of a DataFrame of size equal to ``shift``.
 
@@ -166,6 +163,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
         return time_series_mvg_avg
 
 
+# TODO: use make_column_transformer instead
 class Polynomial(BaseEstimator, TransformerMixin, FeatureMixin):
     """Compute the polynomial feature_extraction, of a degree equal to the input
     ``degree``.
@@ -234,7 +232,6 @@ class Polynomial(BaseEstimator, TransformerMixin, FeatureMixin):
         check_is_fitted(self)
 
         pol_feature = PolynomialFeatures(self.degree)
-        # FIXME: fit_transform in transform ?
         pol_of_X_array = pol_feature.fit_transform(time_series)
         pol_of_X = pd.DataFrame(pol_of_X_array, index=time_series.index).add_suffix('__' + self.__class__.__name__)
 
