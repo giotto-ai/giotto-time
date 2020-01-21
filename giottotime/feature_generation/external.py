@@ -6,14 +6,14 @@ from pandas import DatetimeIndex
 
 from math import pi
 
-from sklearn.base import BaseEstimator
+from sklearn.base import BaseEstimator, TransformerMixin
 
 from giottotime.base import FeatureMixin
 
-__all__ = ["PeriodicSeasonalFeature", "ConstantFeature", "CustomFeature"]
+__all__ = ["PeriodicSeasonalFeature", "ConstantFeature"]
 
 
-# TODO : refactor to something like 'make_periodic_feature' or 'make_sinusoid'
+# TODO: refactor to something like 'make_periodic_feature' or 'make_sinusoid', not a "Transformer" technically
 class PeriodicSeasonalFeature(BaseEstimator, FeatureMixin):
     """Create a sinusoid from a given date and with a given period and
     amplitude.
@@ -200,7 +200,7 @@ class PeriodicSeasonalFeature(BaseEstimator, FeatureMixin):
         return (np.sin(2 * pi * (datetime_index - self.start_date) / self.period)) * self.amplitude
 
 
-class ConstantFeature():
+class ConstantFeature(BaseEstimator, TransformerMixin, FeatureMixin):
     """Generate a ``pd.DataFrame`` with one column, of the same length as the input
      ``X`` and containing the value ``constant`` across the whole column.
 
@@ -212,9 +212,6 @@ class ConstantFeature():
     length : int, optional, default: ``50``
         The length of the DataFrame to generate. This is used only if X is not passed in
         the ``transform`` method, otherwise the length is inferred from it.
-
-    output_name : str, optional, default: ``'ConstantFeature'``
-        The name of the output column.
 
     Examples
     --------
@@ -231,11 +228,31 @@ class ConstantFeature():
     """
 
     def __init__(
-            self, constant: int = 2, length: int = 50, output_name: str = "ConstantFeature"
+            self, constant: int = 2, length: int = 50
     ):
-        super().__init__(output_name)
+        super().__init__()
         self.length = length
         self.constant = constant
+
+    def fit(self, X, y=None):
+        """Fit the estimator.
+
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+        self.columns_ = X.columns.values
+        return self
 
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """Generate a ``pd.DataFrame`` with one column with the same length as
@@ -261,76 +278,5 @@ class ConstantFeature():
         else:
             constant_series = pd.Series(data=[self.constant] * self.length).to_frame()
 
-        constant_series_renamed = self._rename_columns(constant_series)
+        constant_series_renamed = constant_series.add_suffix('__' + self.__class__.__name__)
         return constant_series_renamed
-
-
-class CustomFeature():
-    """Given a custom function, apply it to a time series and generate a
-    ``pd.Dataframe``.
-
-    Parameters
-    ----------
-    custom_feature_function : Callable, required.
-        The function to use to generate a ``pd.DataFrame`` containing the feature.
-
-    output_name: str, optional, default: ``'CustomFeature'``.
-        The name of the output column.
-
-    kwargs : ``object``, optional.
-        Optional arguments to pass to the function.
-
-    Examples
-    --------
-    >>> import pandas as pd
-    >>> from giottotime.feature_extraction import CustomFeature
-    >>> def custom_function(X, power):
-    ...     return X**power
-    >>> X = pd.DataFrame([0, 1, 2, 3, 4, 5])
-    >>> custom_feature = CustomFeature(custom_function, output_name="custom_f", power=3)
-    >>> custom_feature.transform(X)
-       custom_f
-    0         0
-    1         1
-    2         8
-    3        27
-    4        64
-    5       125
-
-    """
-
-    def __init__(
-            self,
-            custom_feature_function: Callable,
-            output_name: str = "CustomFeature",
-            **kwargs: object,
-    ):
-        super().__init__(output_name)
-        self.custom_feature_function = custom_feature_function
-        self.kwargs = kwargs
-
-    def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
-        """Generate a ``pd.DataFrame``, given ``time_series`` as input to the
-        ``custom_feature_function``, as well as other optional arguments.
-
-        Parameters
-        ----------
-        time_series : pd.DataFrame, shape (n_samples, 1), optional, default: ``None``
-            The DataFrame on which to apply the the custom function.
-
-        Returns
-        -------
-        custom_feature_renamed : pd.DataFrame, shape (length, 1)
-            A DataFrame containing the generated feature_extraction.
-
-        Notes
-        -----
-        In order to use the ``CustomFeature`` class inside a
-        ``giottotime.feature_extraction.FeatureCreation`` class, the output of  the custom
-         function should be a ``pd.DataFrame`` and have the same index as
-         ``time_series``.
-
-        """
-        custom_feature = self.custom_feature_function(time_series, **self.kwargs)
-        custom_feature_renamed = self._rename_columns(custom_feature)
-        return custom_feature_renamed

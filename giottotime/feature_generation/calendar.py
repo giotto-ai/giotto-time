@@ -161,7 +161,6 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
             events = self._apply_kernel(events)
 
         events_renamed = events.add_suffix('__' + self.__class__.__name__)
-        # FIXME: remove base ts after merging
         aligned_events = self._align_event_indices(time_series, events_renamed)
 
         return aligned_events
