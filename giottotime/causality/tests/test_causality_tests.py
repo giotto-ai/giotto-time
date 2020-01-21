@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from pandas.util import testing as testing
 
-from giottotime.causality_tests import (
+from giottotime.causality import (
     ShiftedLinearCoefficient,
     ShiftedPearsonCorrelation,
 )
