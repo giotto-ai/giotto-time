@@ -52,9 +52,9 @@ class ShiftedPearsonCorrelation(CausalityTest):
         dropna: bool = False,
         bootstrap_iterations=1000,
         bootstrap_samples=100,
-        confidence=0.05,
+        threshold=0.05,
     ):
-        super().__init__(bootstrap_iterations, bootstrap_samples, confidence)
+        super().__init__(bootstrap_iterations, bootstrap_samples, threshold)
         self.max_shift = max_shift
         self.target_col = target_col
         self.dropna = dropna
@@ -89,9 +89,9 @@ class ShiftedPearsonCorrelation(CausalityTest):
 
         for x, y in product(data.columns, repeat=2):
             res = self._get_max_corr_shift(data, self.max_shift, x=x, y=y)
-            significance = self._compute_is_test_significant(data, x, y)
             best_shift = res[1]
             max_corr = res[0]
+            significance = self._compute_is_test_significant(data, x, y, best_shift)
             # N = data.shape[0] - max_shift
 
             best_shifts = best_shifts.append(

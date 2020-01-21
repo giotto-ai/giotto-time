@@ -9,10 +9,10 @@ class CausalityTest(metaclass=ABCMeta):
 
     """
 
-    def __init__(self, bootstrap_iterations, bootstrap_samples, confidence):
-        self.confidence = confidence
-        self.bootstrap_samples = bootstrap_samples
+    def __init__(self, bootstrap_iterations, bootstrap_samples, threshold):
         self.bootstrap_iterations = bootstrap_iterations
+        self.bootstrap_samples = bootstrap_samples
+        self.threshold = threshold
 
     @abstractmethod
     def fit(self, data_matrix):
@@ -22,12 +22,19 @@ class CausalityTest(metaclass=ABCMeta):
     def transform(self, time_series):
         raise NotImplementedError  # to exclude from pytest coverage
 
-    def _compute_is_test_significant(self, data, x, y):
+    def _compute_is_test_significant(self, data, x, y, best_shift):
+        bootstrap_matrix = data.copy()
+        bootstrap_matrix[y] = bootstrap_matrix.shift(best_shift)[y]
+        bootstrap_matrix.dropna(axis=0, inplace=True)
         rhos = []
+
         for k in range(self.bootstrap_iterations):
-            bootstraps = data.sample(n=self.bootstrap_samples, replace=True)
+            bootstraps = bootstrap_matrix.sample(n=self.bootstrap_samples, replace=True)
             rhos.append(pearsonr(bootstraps[x], bootstraps[y])[0])
         rhos = pd.DataFrame(rhos)
-        lq = rhos.quantile(self.confidence / 2).iloc[0]
-        uq = rhos.quantile(self.confidence / 2).iloc[0]
+        threshold = self.threshold / 2
+
+        lq = rhos.quantile(threshold).iloc[0]
+        uq = rhos.quantile(1 - threshold).iloc[0]
+
         return (0 < lq) or (0 > uq)

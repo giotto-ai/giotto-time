@@ -56,6 +56,18 @@ class TestCausalityTest:
 
         np.testing.assert_array_equal(transformation, expected_transformation)
 
+    def test_p_values(self):
+        expected_shifts = [randint(2, 9) * 2 for _ in range(3)]
+        df = make_df_from_expected_shifts(expected_shifts)
+        shifted_test = ShiftedLinearCoefficient(
+            target_col="A",
+            max_shift=5,
+            threshold=0.9,
+            bootstrap_iterations=20000,
+            bootstrap_samples=1000,
+        )
+        shifted_test.fit(df)
+
 
 def make_df_from_expected_shifts(expected_shifts: List[int]) -> pd.DataFrame:
     testing.N, testing.K = 500, 1
