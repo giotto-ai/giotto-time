@@ -10,7 +10,7 @@ from giottotime.feature_extraction import Shift, MovingAverage
 from giottotime.model_selection.splitters import FeatureSplitter
 from giottotime.utils.hypothesis.feature_matrices import X_y_matrices
 
-#  TODO: refactor
+# TODO: refactor, make hypothesis generator instead of a full pipeline
 df_transformer = DataFrameTransformer(
     [('shift_0', Shift(0), make_column_selector(dtype_include=np.number)),
      ('shift_1', Shift(1), make_column_selector(dtype_include=np.number)),

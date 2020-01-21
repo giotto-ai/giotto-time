@@ -5,8 +5,6 @@ from giottotime.feature_extraction import Shift
 
 def walk_forward_split(time_series: pd.DataFrame, horizon) -> pd.DataFrame:
     """
-    TODO: doc
-
     Parameters
     ----------
     time_series : List[TimeSeriesFeature], required
