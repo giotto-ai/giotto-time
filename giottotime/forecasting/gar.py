@@ -19,10 +19,10 @@ class GAR(MultiOutputRegressor):
         return X_p_df
 
 
-# FIXME: GARFF != oldGAR(feed_forward=True)
+# FIXME: See #99
 class GARFF(RegressorChain):
     def __init__(self, base_estimator, random_state=None):
-        #  TODO: justify order=None and cv in documentation
+        # TODO: justify order=None and cv in documentation
         super().__init__(base_estimator, order=None, cv=None, random_state=random_state)
 
     def fit(self, X, y):

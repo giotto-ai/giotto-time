@@ -3,14 +3,13 @@ The :mod:`giottotime.feature_extraction` module contains a collection of differe
 of machine learning models, for dealing with time series and non time series data.
 """
 
-from .regressors import LinearRegressor
-from .forecasting import GAR, GARFF
-from .trend_models import PolynomialTrend, ExponentialTrend
+from giottotime.regressors import LinearRegressor
+from .gar import GAR, GARFF
+from .trend_models import TrendForecaster
 
 __all__ = [
     "LinearRegressor",
     "GAR",
     "GARFF",
-    "PolynomialTrend",
-    "ExponentialTrend",
+    "TrendForecaster",
 ]

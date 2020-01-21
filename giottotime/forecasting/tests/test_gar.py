@@ -15,9 +15,8 @@ from giottotime.feature_extraction import (
 )
 from giottotime.feature_generation import ConstantFeature
 from giottotime.model_selection import FeatureSplitter
-from giottotime.models.forecasting import GAR, GARFF
+from giottotime.forecasting import GAR, GARFF
 from giottotime.utils.hypothesis.feature_matrices import X_y_matrices
-from giottotime.utils.hypothesis.time_indexes import giotto_time_series
 
 df_transformer = DataFrameTransformer(
     [('shift_0', Shift(0), make_column_selector(dtype_include=np.number)),
@@ -60,7 +59,8 @@ class TestFitPredict:
         with pytest.raises(NotFittedError):
             gar_no_feedforward.predict(time_series)
 
-    # FIXME
+    # FIXME: See #100
+    @pytest.mark.skip(reason="Issue #100")
     @given(X_y_matrices(horizon=4, df_transformer=df_transformer, allow_nan_infinity=False, min_length=10))
     def test_correct_fit_date(self, X_y):
         base_model = LinearRegression()
