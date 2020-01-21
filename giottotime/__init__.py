@@ -10,10 +10,10 @@ from giottotime._version import __version__
 
 
 __all__ = [
-    "causality_tests",
+    "causality",
     "feature_extraction",
     "loss_functions",
     "model_selection",
-    "models",
+    "forecasting",
     "time_series_preparation",
 ]
