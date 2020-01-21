@@ -1,21 +1,23 @@
 from abc import ABC
 from typing import Callable
 
+import numpy as np
+from scipy.optimize import minimize
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import mean_squared_error
 import pandas as pd
+from sklearn.utils.validation import check_is_fitted
 
-from giottotime.models.trend_models import TrendModel
-from giottotime.models.trend_models import PolynomialTrend
-from giottotime.models.trend_models import ExponentialTrend
+from giottotime.base import FeatureMixin
 
 __all__ = [
-    "DetrendedFeature",
-    "RemovePolynomialTrend",
-    "RemoveExponentialTrend",
+    "Detrender",
 ]
 
+from giottotime.utils.trends import TRENDS
 
-class DetrendedFeature():
+
+class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
     """Apply a de-trend transformation to a time series.
 
     Parameters
@@ -29,10 +31,10 @@ class DetrendedFeature():
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.feature_extraction import DetrendedFeature
+    >>> from giottotime.feature_extraction import Detrender
     >>> from giottotime.models import PolynomialTrend
     >>> model = PolynomialTrend(order=2)
-    >>> detrend_feature = DetrendedFeature(trend_model=model)
+    >>> detrend_feature = Detrender(trend_model=model)
     >>> time_index = pd.date_range("2020-01-01", "2020-01-10")
     >>> X = pd.DataFrame(range(0, 10), index=time_index)
     >>> detrend_feature.transform(X)
@@ -50,116 +52,72 @@ class DetrendedFeature():
 
     """
 
-    def __init__(
-        self, trend_model: TrendModel, output_name: str = "DetrendedFeature",
-    ):
-        super().__init__(output_name)
-        self.trend_model = trend_model
+    def __init__(self, trend, trend_init, loss: Callable = mean_squared_error, method: str = "BFGS"):
+        self.trend = trend
+        self.trend_init = trend_init
+        self.loss = loss
+        self.method = method
 
-    def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
-        """Apply a de-trend transformation to the input ``time_series``.
+    def fit(self, X, y=None):
+        """Fit the estimator.
 
         Parameters
         ----------
-        time_series : pd.DataFrame, shape (n_samples, 1), required
-            The time series on which to apply the de-trend transformation.
+        X : pd.DataFrame, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
 
         Returns
         -------
-        time_series_t : pd.DataFrame, shape (n_samples, 1)
-            The de-trended time series.
+        self : object
+            Returns self.
+        """
+
+        # TODO: create validation function
+        if self.trend not in TRENDS:
+            raise ValueError("The trend '%s' is not supported. Supported "
+                             "trends are %s."
+                             % (self.trend, list(sorted(TRENDS))))
+
+        self.best_trend_params_ = minimize(
+            lambda opt: self.loss(X.values, [TRENDS[self.trend](t, opt) for t in range(0, X.shape[0])]),
+            self.trend_init,
+            method=self.method,
+            options={"disp": False},
+        )["x"]
+
+        self.t0_ = X.index[0]
+        freq = X.index.freq
+        if freq is not None:
+            self.period_ = freq
+        else:
+            self.period_ = X.index[1] - X.index[0]
+
+        return self
+
+    def transform(self, ts: pd.DataFrame) -> pd.DataFrame:
+        """Transform the ``time_series`` by removing the trend.
+
+        Parameters
+        ----------
+        ts: pd.DataFrame, shape (n_samples, 1), required
+            The time series to transform.
+
+        Returns
+        -------
+        ts_t : pd.DataFrame, shape (n_samples, n_features)
+            The transformed time series, without the trend.
 
         """
-        self.trend_model.fit(time_series)
-        time_series_t = self.trend_model.transform(time_series)
-        time_series_t = self._rename_columns(time_series_t)
-        return time_series_t
+        check_is_fitted(self)
 
+        time_steps = (ts.index - self.t0_) / self.period_
 
-class RemovePolynomialTrend(DetrendedFeature):
-    """Apply a de-trend transformation to a time series using a polynomial with a given
-    degree.
+        predictions = pd.Series(index=ts.index,
+                                data=np.array([TRENDS[self.trend](t, self.best_trend_params_) for t in time_steps])
+                                .flatten())
 
-    Parameters
-    ----------
-    polynomial_order : int, optional, default: ``1``
-        The order of the polynomial to use when de-trending the time series.
-
-    loss : Callable, optional, default: ``mean_squared_error``
-        The function to use in order to minimize the loss.
-
-    output_name : str, optional, default: ``'RemovePolynomialTrend'``
-        The name of the output column.
-
-    Examples
-    --------
-    >>> import pandas as pd
-    >>> from giottotime.feature_extraction import RemovePolynomialTrend
-    >>> detrend_feature = RemovePolynomialTrend(polynomial_order=4)
-    >>> time_index = pd.date_range("2020-01-01", "2020-01-10")
-    >>> X = pd.DataFrame(range(0, 10), index=time_index)
-    >>> detrend_feature.transform(X)
-                RemovePolynomialTrend
-    2020-01-01               0.000969
-    2020-01-02              -0.001216
-    2020-01-03              -0.000915
-    2020-01-04               0.000201
-    2020-01-05               0.001021
-    2020-01-06               0.000995
-    2020-01-07               0.000133
-    2020-01-08              -0.000993
-    2020-01-09              -0.001249
-    2020-01-10               0.001059
-
-    """
-
-    def __init__(
-        self,
-        polynomial_order: int = 2,
-        loss: Callable = mean_squared_error,
-        output_name: str = "RemovePolynomialTrend",
-    ):
-        trend_model = PolynomialTrend(order=polynomial_order, loss=loss)
-        super().__init__(trend_model=trend_model, output_name=output_name)
-
-
-class RemoveExponentialTrend(DetrendedFeature):
-    """Apply a de-trend transformation to a time series using an exponential function.
-
-    Parameters
-    ----------
-    loss : Callable, optional, default: ``mean_squared_error``
-        The function to use in order to minimize the loss.
-
-    output_name : str, optional, default: ``'RemoveExponentialTrend'``
-        The name of the output column.
-
-    Examples
-    --------
-    >>> import pandas as pd
-    >>> from giottotime.feature_extraction import RemoveExponentialTrend
-    >>> detrend_feature = RemoveExponentialTrend()
-    >>> time_index = pd.date_range("2020-01-01", "2020-01-10")
-    >>> X = pd.DataFrame(range(0, 10), index=time_index)
-    >>> detrend_feature.transform(X)
-                RemoveExponentialTrend
-    2020-01-01               -1.000000
-    2020-01-02               -0.295788
-    2020-01-03                0.320933
-    2020-01-04                0.824285
-    2020-01-05                1.180734
-    2020-01-06                1.346829
-    2020-01-07                1.266264
-    2020-01-08                0.866080
-    2020-01-09                0.051740
-    2020-01-10               -1.299262
-
-    """
-
-    def __init__(
-        self,
-        loss: Callable = mean_squared_error,
-        output_name: str = "RemoveExponentialTrend",
-    ):
-        trend_model = ExponentialTrend(loss=loss)
-        super().__init__(trend_model=trend_model, output_name=output_name)
+        return ts.sub(predictions, axis=0).add_suffix('__' + self.__class__.__name__)
