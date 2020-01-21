@@ -6,7 +6,7 @@ from hypothesis import given, settings
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats
 
-from giottotime.models.regressors.linear_regressor import LinearRegressor
+from giottotime.regressors import LinearRegressor
 
 
 class TestLinearRegressor:
