@@ -120,7 +120,9 @@ class ShiftedLinearCoefficient(CausalityTest):
 
         for col in data_t:
             if col != self.target_col:
-                data_t[col] = data_t[col].shift(self.best_shifts_[col][self.target_col])
+                data_t[col] = data_t[col].shift(
+                    -self.best_shifts_[col][self.target_col]
+                )
 
         if self.dropna:
             data_t = data_t.dropna()
