@@ -13,7 +13,7 @@ from giottotime.feature_extraction import (
     MovingAverage,
     Shift,
 )
-from giottotime.feature_generation import ConstantFeature
+from giottotime.feature_generation import Constant
 from giottotime.model_selection import FeatureSplitter
 from giottotime.forecasting import GAR, GARFF
 from giottotime.utils.hypothesis.feature_matrices import X_y_matrices
@@ -33,7 +33,7 @@ def time_series():
 
 
 def arbitrary_features(feature_length):
-    possible_features = [MovingAverage, ConstantFeature, Shift]
+    possible_features = [MovingAverage, Constant, Shift]
     random_features = []
     random_params = random.sample(range(1, 100), feature_length)
 

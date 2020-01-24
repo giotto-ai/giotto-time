@@ -10,6 +10,27 @@ from giottotime.utils.trends import TRENDS
 
 
 class TrendForecaster(BaseEstimator, RegressorMixin):
+    """Trend forecasting model
+
+    This estimator optimizes a trend function on train data and will forecast using this trend function with optimized
+    parameters.
+
+    Parameters
+    ----------
+    trend : string,
+        The kind of trend removal to apply.
+        Supported trends: ['polynomial', 'exponential']
+
+    trend_init : np.array,
+        Initialisation parameters passed to the trend function
+
+    loss : Callable,
+        Loss function
+
+    method : string,
+        Loss function optimisation method
+
+    """
     def __init__(self, trend, trend_init, loss: Callable = mean_squared_error, method: str = "BFGS"):
         self.trend = trend
         self.trend_init = trend_init
@@ -53,7 +74,7 @@ class TrendForecaster(BaseEstimator, RegressorMixin):
 
         Parameters
         ----------
-        ts: pd.DataFrame, shape (n_samples, 1), required
+        X: pd.DataFrame, shape (n_samples, 1), required
             The time series on which to predict.
 
         Returns
