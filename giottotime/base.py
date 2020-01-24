@@ -1,7 +1,6 @@
 from sklearn.utils.validation import check_is_fitted
 
 
-# TODO: doc
 class FeatureMixin:
     """Mixin class for all feature extraction estimators in giotto-time."""
     _estimator_type = "feature_extractor"

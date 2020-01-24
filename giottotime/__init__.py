@@ -12,8 +12,8 @@ from giottotime._version import __version__
 __all__ = [
     "causality",
     "feature_extraction",
-    "loss_functions",
+    "metrics",
     "model_selection",
     "forecasting",
-    "time_series_preparation",
+    "preprocessing",
 ]
