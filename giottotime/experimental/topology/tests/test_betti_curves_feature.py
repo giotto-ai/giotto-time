@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from giottotime.feature_extraction.topology import BettiCurvesFeature
+from giottotime.experimental.topology import BettiCurvesFeature
 
 
 def test_correct_betti_curves_mean():

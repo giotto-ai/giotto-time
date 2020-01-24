@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 from hypothesis import given, strategies as st
 
-from giottotime.feature_extraction.topology import TDAFeatures
+from giottotime.experimental.topology import TDAFeatures
 
 
 class BaseTDAFeature(TDAFeatures):

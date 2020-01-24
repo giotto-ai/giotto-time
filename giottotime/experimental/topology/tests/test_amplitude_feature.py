@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from giottotime.feature_extraction.topology import AmplitudeFeature
+from giottotime.experimental.topology import AmplitudeFeature
 
 
 def test_correct_amplitude_computation():

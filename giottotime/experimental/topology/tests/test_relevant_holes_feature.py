@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 from hypothesis import given, strategies as st
 
-from giottotime.feature_extraction.topology import NumberOfRelevantHolesFeature
+from giottotime.experimental.topology import NumberOfRelevantHolesFeature
 
 
 @given(st.integers(min_value=3))
