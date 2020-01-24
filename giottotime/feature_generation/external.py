@@ -7,10 +7,11 @@ from pandas import DatetimeIndex
 from math import pi
 
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils.validation import check_is_fitted
 
 from giottotime.base import FeatureMixin
 
-__all__ = ["PeriodicSeasonalFeature", "ConstantFeature"]
+__all__ = ["PeriodicSeasonalFeature", "Constant"]
 
 
 # TODO: refactor to something like 'make_periodic_feature' or 'make_sinusoid', not a "Transformer" technically
@@ -45,7 +46,7 @@ class PeriodicSeasonalFeature(BaseEstimator, FeatureMixin):
     >>> from giottotime.feature_extraction import PeriodicSeasonalFeature
     >>> period_feature = PeriodicSeasonalFeature(start_date="2020-01-01",
     ...                                          index_period=10)
-    >>> period_feature.transform()
+    >>> period_feature.fit_transform()
     Float64Index([              0.0, 0.0027397260273972603,
                0.005479452054794521,   0.00821917808219178,
                0.010958904109589041,    0.0136986301369863,
@@ -200,7 +201,7 @@ class PeriodicSeasonalFeature(BaseEstimator, FeatureMixin):
         return (np.sin(2 * pi * (datetime_index - self.start_date) / self.period)) * self.amplitude
 
 
-class ConstantFeature(BaseEstimator, TransformerMixin, FeatureMixin):
+class Constant(BaseEstimator, TransformerMixin, FeatureMixin):
     """Generate a ``pd.DataFrame`` with one column, of the same length as the input
      ``X`` and containing the value ``constant`` across the whole column.
 
@@ -228,11 +229,23 @@ class ConstantFeature(BaseEstimator, TransformerMixin, FeatureMixin):
     """
 
     def __init__(
-            self, constant: int = 2, length: int = 50
+            self, constant: int = 0, length: int = None
     ):
         super().__init__()
         self.length = length
         self.constant = constant
+
+    def get_feature_names(self):
+        """
+        Return feature names for output features.
+
+        Returns
+        -------
+        output_feature_names : ndarray of shape (n_output_features,)
+            Array of feature names.
+        """
+
+        return [self.__class__.__name__]
 
     def fit(self, X, y=None):
         """Fit the estimator.
@@ -252,6 +265,8 @@ class ConstantFeature(BaseEstimator, TransformerMixin, FeatureMixin):
             Returns self.
         """
         self.columns_ = X.columns.values
+        self.rows_ = X.shape[0]
+        self.length_ = np.min([self.length, self.rows_]) if self.length is not None else self.rows_
         return self
 
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
@@ -271,12 +286,16 @@ class ConstantFeature(BaseEstimator, TransformerMixin, FeatureMixin):
             A constant series, with the same length of ``X`` and with the same index.
 
         """
+        check_is_fitted(self)
+
+        constants = np.full(self.rows_, np.nan)
+        constants[:self.length_] = self.constant
         if time_series is not None:
             constant_series = pd.Series(
-                data=self.constant, index=time_series.index
+                data=constants, index=time_series.index
             ).to_frame()
         else:
-            constant_series = pd.Series(data=[self.constant] * self.length).to_frame()
+            constant_series = pd.Series(data=constants).to_frame()
 
         constant_series_renamed = constant_series.add_suffix('__' + self.__class__.__name__)
         return constant_series_renamed

@@ -61,7 +61,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
     --------
     >>> from giottotime.feature_extraction import Calendar
     >>> cal_feature = Calendar(region="europe", country="Italy", kernel=[3, 2])
-    >>> cal_feature.transform()
+    >>> cal_feature.fit_transform()
                 CalendarFeature
     2018-01-01              2.0
     2018-01-02              3.0

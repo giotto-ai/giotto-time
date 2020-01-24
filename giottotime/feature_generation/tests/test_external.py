@@ -5,7 +5,7 @@ from pandas.util import testing as testing
 
 from giottotime.utils.hypothesis.time_indexes import giotto_time_series
 from giottotime.feature_generation import (
-    ConstantFeature,
+    Constant,
     PeriodicSeasonalFeature,
 )
 
@@ -155,18 +155,17 @@ class TestPeriodicSesonalFeature:
 class TestConstantFeature:
 
     def test_correct_constant_feature(self):
-        output_name = "constant_feature"
         constant = 12
         df = pd.DataFrame.from_dict({"old_name": [0, 1, 2, 3, 4, 5]})
 
-        constant_feature = ConstantFeature(constant=constant)
+        constant_feature = Constant(constant=constant)
 
         df_constant = constant_feature.fit_transform(df)
         expected_df_constant = pd.DataFrame.from_dict(
             {f"0__{constant_feature.__class__.__name__}": [constant, constant, constant, constant, constant, constant]}
         )
 
-        testing.assert_frame_equal(expected_df_constant, df_constant)
+        testing.assert_frame_equal(expected_df_constant, df_constant, check_dtype=False)
 
     @given(
         giotto_time_series(
@@ -178,7 +177,7 @@ class TestConstantFeature:
     )
     def test_random_ts_and_constant(self, df: pd.DataFrame, constant: int):
 
-        constant_feature = ConstantFeature(constant=constant)
+        constant_feature = Constant(constant=constant)
         df_constant = constant_feature.fit_transform(df)
 
         # testing.assert_frame_equal(expected_df_constant, df_constant)
