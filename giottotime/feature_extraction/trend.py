@@ -10,34 +10,39 @@ from sklearn.utils.validation import check_is_fitted
 
 from giottotime.base import FeatureMixin
 
-__all__ = [
-    "Detrender",
-]
+__all__ = "Detrender"
 
 from giottotime.utils.trends import TRENDS
 
 
+# TODO: improve doc, trends params specifications
 class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
     """Apply a de-trend transformation to a time series.
 
     Parameters
     ----------
-    trend_model : TrendModel, optional, default: ``PolynomialTrend()``
+    trend : string,
         The kind of trend removal to apply.
+        Supported trends: ['polynomial', 'exponential']
 
-    output_name : str, optional, default: ``'DetrendedFeature'``
-        The name of the output column.
+    trend_init : np.array,
+        Initialisation parameters passed to the trend function
+
+    loss : Callable,
+        Loss function
+
+    method : string,
+        Loss function optimisation method
 
     Examples
     --------
     >>> import pandas as pd
+    >>> import numpy as np
     >>> from giottotime.feature_extraction import Detrender
-    >>> from giottotime.models import PolynomialTrend
-    >>> model = PolynomialTrend(order=2)
-    >>> detrend_feature = Detrender(trend_model=model)
+    >>> detrender = Detrender(trend='polynomial', trend_init=np.zeros(2))
     >>> time_index = pd.date_range("2020-01-01", "2020-01-10")
     >>> X = pd.DataFrame(range(0, 10), index=time_index)
-    >>> detrend_feature.transform(X)
+    >>> detrender.transform(X)
                 DetrendedFeature
     2020-01-01      2.092234e-06
     2020-01-02      6.590209e-07

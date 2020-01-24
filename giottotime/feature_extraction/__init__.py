@@ -11,8 +11,6 @@ from .standard import (
     Exogenous,
 )
 
-from .topology import AmplitudeFeature, AvgLifeTimeFeature, \
-    BettiCurvesFeature, NumberOfRelevantHolesFeature
 
 from .trend import Detrender
 
@@ -22,11 +20,6 @@ __all__ = [
     "MovingAverage",
     "Polynomial",
     "Exogenous",
-    "topology",
     "Calendar",
     "Detrender",
-    "AmplitudeFeature",
-    "AvgLifeTimeFeature",
-    "BettiCurvesFeature",
-    "NumberOfRelevantHolesFeature",
 ]

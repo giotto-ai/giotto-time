@@ -16,6 +16,7 @@ from sklearn.utils.validation import check_is_fitted
 from ..base import FeatureMixin
 
 
+# TODO: retest examples
 class Shift(BaseEstimator, TransformerMixin, FeatureMixin):
     """Perform a shift of a DataFrame of size equal to ``shift``.
 
@@ -36,7 +37,7 @@ class Shift(BaseEstimator, TransformerMixin, FeatureMixin):
     >>> from giottotime.feature_extraction import Shift
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
     >>> shift_feature = Shift(shift=3)
-    >>> shift_feature.transform(ts)
+    >>> shift_feature.fit_transform(ts)
        ShiftFeature
     0           NaN
     1           NaN
@@ -106,7 +107,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
     >>> from giottotime.feature_extraction import MovingAverage
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
     >>> mv_avg_feature = MovingAverage(window_size=2)
-    >>> mv_avg_feature.transform(ts)
+    >>> mv_avg_feature.fit_transform(ts)
        MovingAverageFeature
     0                   NaN
     1                   0.5
@@ -178,8 +179,8 @@ class Polynomial(BaseEstimator, TransformerMixin, FeatureMixin):
     >>> import pandas as pd
     >>> from giottotime.feature_extraction import Polynomial
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
-    >>> pol_feature = Polynomial(degree=3, output_name="pol")
-    >>> pol_feature.transform(ts)
+    >>> pol_feature = Polynomial(degree=3)
+    >>> pol_feature.fit_transform(ts)
        pol_0  pol_1  pol_2  pol_3
     0    1.0    0.0    0.0    0.0
     1    1.0    1.0    1.0    1.0
@@ -260,7 +261,7 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5], index=[3, 4, 5, 6, 7, 8])
     >>> exog_ts = pd.DataFrame([10, 8, 1, 3, 2, 7])
     >>> exog_feature = Exogenous(exog_ts)
-    >>> exog_feature.transform(ts)
+    >>> exog_feature.fit_transform(ts)
        ExogenousFeature
     3               3.0
     4               2.0
