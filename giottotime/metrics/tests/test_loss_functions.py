@@ -6,7 +6,7 @@ from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats
 
 
-from giottotime.loss_functions import smape, max_error
+from giottotime.metrics import smape, max_error
 
 
 class TestSmape:

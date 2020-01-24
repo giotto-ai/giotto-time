@@ -3,7 +3,7 @@ The :mod:`giottotime.feature_extraction` module contains a collection of differe
 functions.
 """
 
-from .loss_functions import smape, max_error
+from .metrics import smape, max_error
 
 __all__ = [
     "smape",

@@ -62,7 +62,7 @@ def smape(
 
     Examples
     --------
-    >>> from giottotime.loss_functions import smape
+    >>> from giottotime.metrics import smape
     >>> y_true = [0, 1, 2, 3, 4, 5]
     >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
     >>> smape(y_true, y_pred)
