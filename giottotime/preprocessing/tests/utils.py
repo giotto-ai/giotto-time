@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from pandas.testing import assert_series_equal
 
-from giottotime.time_series_preparation.time_series_conversion import (
+from giottotime.preprocessing.time_series_conversion import (
     SequenceToTimeIndexSeries,
     PandasSeriesToTimeIndexSeries,
     TimeIndexSeriesToPeriodIndexSeries,

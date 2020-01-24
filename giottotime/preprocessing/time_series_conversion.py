@@ -63,11 +63,11 @@ class TimeSeriesConversion(ABC):
 
     Parameters
     ----------
-    start : PandasData, optional, default: ``None``
+    start : PandasDate, optional, default: ``None``
         start date of the output time series. Not mandatory for all time series
         conversion.
 
-    end : PandasData, optional, default: ``None``
+    end : PandasDate, optional, default: ``None``
         end date of the output time series. Not mandatory for all time series
         conversion.
 

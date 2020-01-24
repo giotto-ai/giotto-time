@@ -8,7 +8,7 @@ from .time_series_conversion import (
     SequenceToTimeIndexSeries,
     TimeIndexSeriesToPeriodIndexSeries,
 )
-from ..time_series_preparation.time_series_resampling import TimeSeriesResampler
+from ..preprocessing.time_series_resampling import TimeSeriesResampler
 
 SUPPORTED_SEQUENCE_TYPES = [
     np.ndarray,

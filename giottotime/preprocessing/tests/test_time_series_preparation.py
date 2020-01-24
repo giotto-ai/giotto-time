@@ -14,7 +14,7 @@ from giottotime.utils.hypothesis.time_indexes import (
     series_with_datetime_index,
     available_freqs,
 )
-from giottotime.time_series_preparation import TimeSeriesPreparation
+from giottotime.preprocessing import TimeSeriesPreparation
 from .utils import (
     pandas_series_with_period_index,
     datetime_index_series_to_period_index_series,
