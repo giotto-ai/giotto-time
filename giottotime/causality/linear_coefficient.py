@@ -1,48 +1,49 @@
 from itertools import product
 
-import pandas as pd
 import numpy as np
-from sklearn.base import TransformerMixin, BaseEstimator
+import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.linear_model import LinearRegression
 from sklearn.utils.validation import check_is_fitted
 
 
-class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin):
-    # TODO: links for PPMCC
-    """Class responsible for assessing the shifted Pearson correlations (PPMCC) between
-    two or more series.
+class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin):
+    """Test the shifted linear fit coefficients between two or more time series.
 
     Parameters
     ----------
     max_shift : int, optional, default: ``10``
+        The maximum number of shifts to check for.
 
     target_col : str, optional, default: ``'y'``
-            The column to use as the a reference (i.e., the columns which is not
-            shifted).
+        The column to use as the a reference (i.e., the column which is not
+        shifted).
 
     dropna : bool, optional, default: ``False``
         Determines if the Nan values created by shifting are retained or dropped.
 
     Examples
     --------
-    >>> from giottotime.causality.shifted_pearson_correlation import ShiftedPearsonCorrelation
+
+    >>> from giottotime.causality.linear_coefficient import ShiftedLinearCoefficient
     >>> import pandas.util.testing as testing
     >>> data = testing.makeTimeDataFrame(freq="s")
-    >>> spc = ShiftedPearsonCorrelation(target_col="A")
-    >>> spc.fit(data)
-    >>> spc.best_shifts_
+    >>> slc = ShiftedLinearCoefficient(target_col="A")
+    >>> slc.fit(data)
+    >>> slc.best_shifts_
     y  A  B  C  D
     x
-    A  8  9  6  5
-    B  7  4  4  6
-    C  3  4  9  9
-    D  7  1  9  1
-    >>> spc.max_corrs_
+    A  3  6  8  5
+    B  9  9  4  1
+    C  8  2  4  9
+    D  3  9  4  3
+    >>> slc.max_corrs_
     y         A         B         C         D
     x
-    A  0.383800  0.260627  0.343628  0.360151
-    B  0.311608  0.307203  0.255969  0.298523
-    C  0.373613  0.267335  0.211913  0.140034
-    D  0.496535  0.204770  0.402473  0.310065
+    A  0.460236  0.420005  0.339370  0.267143
+    B  0.177856  0.300350  0.367150  0.550490
+    C  0.484860  0.263036  0.456046  0.251342
+    D  0.580068  0.344688  0.253626  0.256220
     """
 
     def __init__(
@@ -52,19 +53,19 @@ class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin):
         self.target_col = target_col
         self.dropna = dropna
 
-    def fit(self, data: pd.DataFrame) -> "ShiftedPearsonCorrelation":
-        """Create the dataframe of shifts of each time series which maximize the
-         Pearson correlation (PPMCC).
+    def fit(self, data: pd.DataFrame) -> "ShiftedLinearCoefficient":
+        """Create the DataFrame of shifts of each time series which maximize the shifted
+         linear fit coefficients.
 
         Parameters
         ----------
         data : pd.DataFrame, shape (n_samples, n_time_series), required
-            The DataFrame containing the time series on which to compute the shifted
-            correlations.
+            The DataFrame containing the time-series on which to compute the shifted
+            linear fit coefficients.
 
         Returns
         -------
-        self : ``ShiftedPearsonCorrelation``
+        self : ``ShiftedLinearCoefficient``
 
         """
         best_shifts = pd.DataFrame(columns=["x", "y", "shift", "max_corr"])
@@ -73,7 +74,7 @@ class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin):
         )
 
         for x, y in product(data.columns, repeat=2):
-            res = self._get_max_corr_shift(data, self.max_shift, x=x, y=y)
+            res = self._get_max_coeff_shift(data, self.max_shift, x=x, y=y)
 
             best_shift = res[1]
             max_corr = res[0]
@@ -97,8 +98,8 @@ class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Shifts each input time series by the amount which optimizes correlation with
-        the selected 'y' column.
+        """Shifts each input time series by the amount which maximizes shifted linear
+        fit coefficients with the selected 'y' column.
 
         Parameters
         ----------
@@ -109,8 +110,8 @@ class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin):
         Returns
         -------
         data_t : pd.DataFrame, shape (n_samples, n_time_series)
-            The DataFrame (Pivot table) of the shifts which maximize the correlation
-            between each time series The shift is indicated in rows.
+            The DataFrame (Pivot table) of the shifts which maximize the shifted linear
+            fit coefficients between each time series. The shift is indicated in rows.
 
         """
         check_is_fitted(self)
@@ -125,16 +126,21 @@ class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin):
 
         return data_t
 
-    def _get_max_corr_shift(
+    def _get_max_coeff_shift(
         self, data: pd.DataFrame, max_shift: int, x: str = "x", y: str = "y"
-    ):
+    ) -> (float, int):
         shifts = pd.DataFrame()
+
+        shifts[x] = data[x]
+        shifts[y] = data[y]
 
         for shift in range(1, max_shift):
             shifts[shift] = data[x].shift(shift)
 
         shifts = shifts.dropna()
-        self.shifted_corrs = shifts.corrwith(data[y])
+        lf = LinearRegression().fit(
+            shifts[range(1, max_shift)].values, shifts[y].values
+        )
 
-        q = self.shifted_corrs.max(), self.shifted_corrs.idxmax()
+        q = lf.coef_.max(), np.argmax(lf.coef_) + 1
         return q
