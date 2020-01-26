@@ -14,6 +14,7 @@ from .index_dependent_features import (
 from .index_dependent_features import (
     ShiftFeature,
     MovingAverageFeature,
+    MovingCustomFeature,
     PolynomialFeature,
     ExogenousFeature,
     AmplitudeFeature,

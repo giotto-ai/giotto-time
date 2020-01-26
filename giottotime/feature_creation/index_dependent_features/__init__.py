@@ -3,6 +3,7 @@ from .calendar_features import CalendarFeature
 from .time_series_features import (
     ShiftFeature,
     MovingAverageFeature,
+    MovingCustomFeature,
     PolynomialFeature,
     ExogenousFeature,
 )
