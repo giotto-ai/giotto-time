@@ -1,6 +1,7 @@
 from random import randint
 
 import numpy as np
+import pytest
 from hypothesis import given, strategies as st
 from pandas.util import testing as testing
 
@@ -18,11 +19,6 @@ def test_linear_coefficient():
 
     shifts = slc.best_shifts_.loc["A"][1:].values
     np.testing.assert_array_equal(shifts, expected_shifts)
-
-    transformation = slc.transform(df).dropna()
-    expected_transformation = shift_df_from_expected_shifts(df, expected_shifts)
-
-    np.testing.assert_array_equal(transformation, expected_transformation)
 
 
 # TODO: tests refactor TBD

@@ -16,11 +16,6 @@ def test_pearson_correlation():
     shifts = spc.best_shifts_.loc["A"][1:].values
     np.testing.assert_array_equal(shifts, expected_shifts)
 
-    transformation = spc.transform(df).dropna()
-    expected_transformation = shift_df_from_expected_shifts(df, expected_shifts)
-
-    np.testing.assert_array_equal(transformation, expected_transformation)
-
 
 def test_pearson_p_values():
     expected_shifts = [randint(2, 9) * 2 for _ in range(3)]
