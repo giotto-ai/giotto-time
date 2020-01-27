@@ -23,14 +23,14 @@ def test_linear_coefficient():
 
 # TODO: tests refactor TBD
 @given(st.integers(1, 20))
+@pytest.mark.skip(reason="TODO: Write proper test, increase hypothesis max duration")
 def test_linear_coefficient_hyp(shift):
     testing.N, testing.K = 500, 1
     df = testing.makeTimeDataFrame(freq="D")
     df["shifted"] = df["A"].shift(shift)
 
     slc = ShiftedLinearCoefficient(target_col="A", max_shift=20)
-    a = slc.fit(df).transform(df)
-    print(slc.best_shifts_)
+    slc.fit(df).transform(df)
 
 
 def test_linear_p_values():
