@@ -5,9 +5,6 @@ class FeatureMixin:
     """Mixin class for all feature extraction estimators in giotto-time."""
     _estimator_type = "feature_extractor"
 
-    def _more_tags(self):
-        return {'no_validation': True, 'X_types': []}
-
     def get_feature_names(self):
         """
         Return feature names for output features.
