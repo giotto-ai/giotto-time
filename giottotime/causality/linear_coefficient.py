@@ -56,7 +56,7 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
         bootstrap_iterations=1000,
         bootstrap_samples=100,
     ):
-        super(CausalityMixin, self).__init__(bootstrap_iterations, bootstrap_samples)
+        super().__init__(bootstrap_iterations, bootstrap_samples)
         self.max_shift = max_shift
         self.target_col = target_col
         self.dropna = dropna

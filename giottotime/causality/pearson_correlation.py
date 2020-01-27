@@ -5,8 +5,10 @@ import numpy as np
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.utils.validation import check_is_fitted
 
+from giottotime.causality.base import CausalityMixin
 
-class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin):
+
+class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin, CausalityMixin):
     # TODO: links for PPMCC
     """Class responsible for assessing the shifted Pearson correlations (PPMCC) between
     two or more series.
