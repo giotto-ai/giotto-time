@@ -46,8 +46,14 @@ class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin):
     """
 
     def __init__(
-        self, max_shift: int = 10, target_col: str = "y", dropna: bool = False
+        self,
+        max_shift: int = 10,
+        target_col: str = "y",
+        dropna: bool = False,
+        bootstrap_iterations=1000,
+        bootstrap_samples=100,
     ):
+        super().__init__(bootstrap_iterations, bootstrap_samples)
         self.max_shift = max_shift
         self.target_col = target_col
         self.dropna = dropna
@@ -67,20 +73,32 @@ class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin):
         self : ``ShiftedPearsonCorrelation``
 
         """
-        best_shifts = pd.DataFrame(columns=["x", "y", "shift", "max_corr"])
+        best_shifts = pd.DataFrame(columns=["x", "y", "shift", "max_corr", "p_values"])
         best_shifts = best_shifts.astype(
-            {"x": np.float64, "y": np.float64, "shift": np.int64, "max_corr": np.int64}
+            {
+                "x": np.float64,
+                "y": np.float64,
+                "shift": np.int64,
+                "max_corr": np.int64,
+                "p_values": np.float64,
+            }
         )
 
         for x, y in product(data.columns, repeat=2):
             res = self._get_max_corr_shift(data, self.max_shift, x=x, y=y)
-
             best_shift = res[1]
             max_corr = res[0]
+            p_value = self._compute_is_test_significant(data, x, y, best_shift)
             # N = data.shape[0] - max_shift
 
             best_shifts = best_shifts.append(
-                {"x": x, "y": y, "shift": best_shift, "max_corr": max_corr},
+                {
+                    "x": x,
+                    "y": y,
+                    "shift": best_shift,
+                    "max_corr": max_corr,
+                    "p_values": p_value,
+                },
                 ignore_index=True,
             )
 
@@ -90,9 +108,13 @@ class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin):
         max_corrs = pd.pivot_table(
             best_shifts, index=["x"], columns=["y"], values="max_corr"
         )
+        p_values = pd.pivot_table(
+            best_shifts, index=["x"], columns=["y"], values="p_values"
+        )
 
         self.best_shifts_ = pivot_best_shifts
         self.max_corrs_ = max_corrs
+        self.p_values_ = p_values
 
         return self
 
@@ -118,7 +140,9 @@ class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin):
 
         for col in data_t:
             if col != self.target_col:
-                data_t[col] = data_t[col].shift(self.best_shifts_[col][self.target_col])
+                data_t[col] = data_t[col].shift(
+                    -self.best_shifts_[col][self.target_col]
+                )
 
         if self.dropna:
             data_t = data_t.dropna()

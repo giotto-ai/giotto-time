@@ -35,3 +35,22 @@ def test_linear_coefficient_hyp(shift):
     slc = ShiftedLinearCoefficient(target_col="A", max_shift=20)
     a = slc.fit(df).transform(df)
     print(slc.best_shifts_)
+
+
+def test_linear_p_values():
+    # This test and the next one just test if the p_values on the diagonal are equal
+    # to 0. Is hard to implement other unittest, since the bootstrapping always
+    # gives different result. However, other properties could be tested
+    expected_shifts = [randint(2, 9) * 2 for _ in range(3)]
+    df = make_df_from_expected_shifts(expected_shifts)
+    shifted_test = ShiftedLinearCoefficient(
+        target_col="A",
+        max_shift=5,
+        bootstrap_iterations=500,
+        bootstrap_samples=1000,
+    )
+    shifted_test.fit(df)
+
+    linear_p_values = shifted_test.p_values_
+    for col_index in range(len(linear_p_values.columns)):
+        assert linear_p_values.iloc[col_index, col_index] == 0

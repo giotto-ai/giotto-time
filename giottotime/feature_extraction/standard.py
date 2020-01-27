@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Callable
 
 import pandas as pd
 from sklearn.preprocessing import PolynomialFeatures
@@ -162,6 +162,81 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
 
         time_series_mvg_avg = time_series.rolling(self.window_size).mean().add_suffix('__' + self.__class__.__name__)
         return time_series_mvg_avg
+
+
+class MovingCustomFeature:
+    """For each row in ``time_series``, compute the moving custom function of the
+    previous ``window_size`` rows. If there are not enough rows, the value is Nan.
+
+    Parameters
+    ----------
+    custom_feature_function : Callable, required.
+        The function to use to generate a ``pd.DataFrame`` containing the feature.
+
+    window_size : int, optional, default: ``1``
+        The number of previous points on which to compute the custom function
+
+    output_name : str, optional, default: ``'MovingAverageFeature'``
+        The name of the output column.
+
+    raw : bool, optional, default: ``True``
+        - False : passes each row or column as a Series to the function.
+        - True or None : the passed function will receive ndarray objects instead.
+         If you are just applying a NumPy reduction function this will achieve much
+         better performance. Credits: https://pandas.pydata.org/pandas-docs/stable/
+         reference/api/pandas.core.window.Rolling.apply.html
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> from giottotime.feature_extraction import MovingCustomFeature
+    >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
+    >>> mv_cust_feature = MovingCustomFeature(np.max,window_size=2)
+    >>> mv_cust_feature.transform(ts)
+       MovingCustomFeature
+    0                   NaN
+    1                   1.0
+    2                   2.0
+    3                   3.0
+    4                   4.0
+    5                   5.0
+
+    """
+
+    def __init__(
+        self,
+        custom_feature_function: Callable,
+        window_size: int = 1,
+        output_name: str = "MovingCustomFeature",
+        raw: bool = True,
+    ):
+        super().__init__(output_name)
+        self.custom_feature_function = custom_feature_function
+        self.window_size = window_size
+        self.raw = raw
+
+    # FIXME
+    def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
+        """compute the moving custom function, for every row of ``time_series``, of the
+         previous ``window_size`` elements.
+
+        Parameters
+        ----------
+        time_series : pd.DataFrame, shape (n_samples, 1), required
+            The DataFrame on which to compute the rolling moving custom function
+
+        Returns
+        -------
+        time_series_t : pd.DataFrame, shape (n_samples, 1)
+            A DataFrame, with the same length as ``time_series``, containing the rolling
+            moving custom funcyion for each element.
+
+        """
+        time_series_mvg_cust = time_series.rolling(self.window_size)\
+                                          .apply(self.custom_feature_function,raw=self.raw)
+        time_series_t = self._rename_columns(time_series_mvg_cust)
+        return time_series_t
 
 
 # TODO: use make_column_transformer instead

@@ -122,7 +122,7 @@ Specifically, giotto-time includes ExponentialTrend, PolynomialTrend model class
 >>> detrended.plot(figsize=(10, 10))
 >>> plt.show()
 
-|imga| |imgb|
+|imga|
 
 .. |imga| image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/trends.png
    :width: 450
