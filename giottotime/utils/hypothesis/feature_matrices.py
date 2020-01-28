@@ -4,7 +4,7 @@ import hypothesis.strategies as st
 import pandas as pd
 
 from .time_indexes import giotto_time_series
-from ...compose import DataFrameTransformer
+from ...compose import FeatureCreation
 from ...model_selection import walk_forward_split
 
 
@@ -12,7 +12,7 @@ from ...model_selection import walk_forward_split
 def X_y_matrices(
         draw,
         horizon: int,
-        df_transformer: DataFrameTransformer,
+        df_transformer: FeatureCreation,
         min_length: Optional[int] = None,
         allow_nan_infinity: bool = True,
 ):
@@ -61,7 +61,7 @@ def X_y_matrices(
 @st.composite
 def X_matrices(
         draw,
-        df_transformer: DataFrameTransformer,
+        df_transformer: FeatureCreation,
         min_length: Optional[int] = None,
         allow_nan_infinity: bool = True,
 ):

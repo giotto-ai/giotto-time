@@ -8,7 +8,7 @@ from sklearn.compose import make_column_selector
 from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression
 
-from giottotime.compose import DataFrameTransformer
+from giottotime.compose import FeatureCreation
 from giottotime.feature_extraction import (
     MovingAverage,
     Shift,
@@ -18,7 +18,7 @@ from giottotime.model_selection import FeatureSplitter
 from giottotime.forecasting import GAR, GARFF
 from giottotime.utils.hypothesis.feature_matrices import X_y_matrices
 
-df_transformer = DataFrameTransformer(
+df_transformer = FeatureCreation(
     [('shift_0', Shift(0), make_column_selector(dtype_include=np.number)),
      ('shift_1', Shift(1), make_column_selector(dtype_include=np.number)),
      ('moving_average_3', MovingAverage(window_size=3), make_column_selector(dtype_include=np.number)),

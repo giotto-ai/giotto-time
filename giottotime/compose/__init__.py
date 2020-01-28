@@ -1,5 +1,5 @@
-from .dataframe_transformer import DataFrameTransformer
+from .feature_creation import FeatureCreation
 
 __all__ = [
-    'DataFrameTransformer'
+    'FeatureCreation'
 ]

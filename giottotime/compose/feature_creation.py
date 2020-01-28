@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 
 
-class DataFrameTransformer(ColumnTransformer):
+class FeatureCreation(ColumnTransformer):
     """Applies transformers to columns of a pandas DataFrame.
 
     This estimator is a wrapper of sklearn.compose.ColumnTransformer, the only difference is the output type of
