@@ -6,28 +6,28 @@ from pandas.util import testing as testing
 from giottotime.utils.hypothesis.time_indexes import giotto_time_series
 from giottotime.feature_generation import (
     Constant,
-    PeriodicSeasonalFeature,
+    PeriodicSeasonal,
 )
 
 
 class TestPeriodicSesonalFeature:
     def test_missing_start_date_or_period(self):
-        periodic_feature = PeriodicSeasonalFeature()
+        periodic_feature = PeriodicSeasonal()
         with pytest.raises(ValueError):
             periodic_feature.transform()
 
-        periodic_feature = PeriodicSeasonalFeature(index_period=1)
+        periodic_feature = PeriodicSeasonal(index_period=1)
         with pytest.raises(ValueError):
             periodic_feature.transform()
 
-        periodic_feature = PeriodicSeasonalFeature(start_date="2010-01-01")
+        periodic_feature = PeriodicSeasonal(start_date="2010-01-01")
         with pytest.raises(ValueError):
             periodic_feature.transform()
 
     def test_string_period(self):
         testing.N, testing.K = 20, 1
         ts = testing.makeTimeDataFrame(freq="s")
-        periodic_feature = PeriodicSeasonalFeature(period="1 days")
+        periodic_feature = PeriodicSeasonal(period="1 days")
         periodic_feature.transform(ts)
 
         assert type(periodic_feature.period) == pd.Timedelta
@@ -36,21 +36,21 @@ class TestPeriodicSesonalFeature:
         testing.N, testing.K = 20, 1
         ts = testing.makeTimeDataFrame(freq="s")
         start_date = "2018-01-01"
-        periodic_feature = PeriodicSeasonalFeature(
+        periodic_feature = PeriodicSeasonal(
             period="1 days", start_date=start_date
         )
         periodic_feature.transform(ts)
 
         assert periodic_feature.start_date == ts.index.values[0]
 
-        periodic_feature = PeriodicSeasonalFeature(
+        periodic_feature = PeriodicSeasonal(
             period="3 days", index_period=10, start_date=start_date
         )
         periodic_feature.transform()
         assert periodic_feature.start_date == pd.to_datetime(start_date)
 
         start_date = pd.to_datetime("2018-01-01")
-        periodic_feature = PeriodicSeasonalFeature(
+        periodic_feature = PeriodicSeasonal(
             period="3 days", index_period=10, start_date=start_date
         )
         periodic_feature.transform()
@@ -58,7 +58,7 @@ class TestPeriodicSesonalFeature:
 
     def test_too_high_sampling_frequency(self):
         start_date = "2018-01-01"
-        periodic_feature = PeriodicSeasonalFeature(
+        periodic_feature = PeriodicSeasonal(
             period="2 days",
             start_date=start_date,
             index_period=pd.DatetimeIndex(start=start_date, end="2020-01-01", freq="W"),
@@ -70,7 +70,7 @@ class TestPeriodicSesonalFeature:
         testing.N, testing.K = 30, 1
         ts = testing.makeTimeDataFrame(freq="MS")
         start_date = "2018-01-01"
-        periodic_feature = PeriodicSeasonalFeature(
+        periodic_feature = PeriodicSeasonal(
             period="365 days",
             start_date=start_date,
             index_period=pd.DatetimeIndex(start=start_date, end="2020-01-01", freq="W"),

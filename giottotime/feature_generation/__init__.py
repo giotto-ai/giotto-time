@@ -1,6 +1,6 @@
-from .external import PeriodicSeasonalFeature, Constant
+from .external import PeriodicSeasonal, Constant
 from .calendar import Calendar
 
 __all__ = [
-    'PeriodicSeasonalFeature', 'Constant', 'Calendar'
+    'PeriodicSeasonal', 'Constant', 'Calendar'
 ]

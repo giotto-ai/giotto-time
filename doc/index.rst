@@ -44,7 +44,7 @@ Welcome to giotto-time's API reference!
    feature_creation.Exogenous
    feature_creation.CustomFeature
    feature_creation.Calendar
-   feature_creation.PeriodicSeasonalFeature
+   feature_creation.PeriodicSeasonal
    feature_creation.DetrendedFeature
    feature_creation.RemovePolynomialTrend
    feature_creation.RemoveExponentialTrend

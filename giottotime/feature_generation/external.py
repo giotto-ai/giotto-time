@@ -11,11 +11,11 @@ from sklearn.utils.validation import check_is_fitted
 
 from giottotime.base import FeatureMixin
 
-__all__ = ["PeriodicSeasonalFeature", "Constant"]
+__all__ = ["PeriodicSeasonal", "Constant"]
 
 
-# TODO: refactor to something like 'make_periodic_feature' or 'make_sinusoid', not a "Transformer" technically
-class PeriodicSeasonalFeature(BaseEstimator, FeatureMixin):
+# TODO: add something like 'make_periodic_feature' or 'make_sinusoid'
+class PeriodicSeasonal(BaseEstimator, TransformerMixin, FeatureMixin):
     """Create a sinusoid from a given date and with a given period and
     amplitude.
 
@@ -43,8 +43,8 @@ class PeriodicSeasonalFeature(BaseEstimator, FeatureMixin):
 
     Examples
     --------
-    >>> from giottotime.feature_extraction import PeriodicSeasonalFeature
-    >>> period_feature = PeriodicSeasonalFeature(start_date="2020-01-01",
+    >>> from giottotime.feature_extraction import PeriodicSeasonal
+    >>> period_feature = PeriodicSeasonal(start_date="2020-01-01",
     ...                                          index_period=10)
     >>> period_feature.fit_transform()
     Float64Index([              0.0, 0.0027397260273972603,
@@ -54,7 +54,7 @@ class PeriodicSeasonalFeature(BaseEstimator, FeatureMixin):
                0.021917808219178082,  0.024657534246575342],
              dtype='float64')
 
-       PeriodicSeasonalFeature
+       PeriodicSeasonal
     0                 0.000000
     1                 0.008607
     2                 0.017211
