@@ -1,11 +1,13 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from giottotime.experimental.topology import (
     AvgLifeTimeFeature,
 )
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_correct_average_lifetime_computation():
     np.random.seed(0)
 
@@ -44,6 +46,7 @@ def test_correct_average_lifetime_computation():
     assert np.allclose(expected_avg_lifetime, average_lifetime)
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_correct_avg_lifetime_feature():
     np.random.seed(0)
 

@@ -9,6 +9,7 @@ from hypothesis import given, strategies as st
 from giottotime.experimental.topology import TDAFeatures
 
 
+@pytest.mark.skip(reason="Deprecated features")
 class BaseTDAFeature(TDAFeatures):
     def __init__(
         self,

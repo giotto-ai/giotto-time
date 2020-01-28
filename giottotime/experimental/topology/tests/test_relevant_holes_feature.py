@@ -18,6 +18,7 @@ def test_wrong_theta(theta):
         NumberOfRelevantHolesFeature(output_name="ignored", theta=theta)
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_correct_n_holes_feature():
     np.random.seed(0)
 
@@ -71,6 +72,7 @@ def test_correct_n_holes_feature():
     assert np.allclose(expected_n_holes, n_holes)
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_correct_n_relevant_holes():
     np.random.seed(0)
 

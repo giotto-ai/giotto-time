@@ -5,6 +5,7 @@ import pytest
 from giottotime.experimental.topology import BettiCurvesFeature
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_correct_betti_curves_mean():
     np.random.seed(0)
 
@@ -55,6 +56,7 @@ def test_correct_betti_curves_mean():
     assert np.allclose(expected_betti_curves, betti_curves_mean)
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_correct_betti_curves_argmax():
     np.random.seed(0)
 
@@ -77,6 +79,7 @@ def test_correct_betti_curves_argmax():
     assert np.allclose(expected_betti_curves, betti_curves_arg_max)
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_wrong_inputs_for_betti_mode():
     df = pd.DataFrame(np.random.randint(0, 100, size=(14, 1)), columns=["old_name"])
 
@@ -95,6 +98,7 @@ def test_wrong_inputs_for_betti_mode():
         betti_curve_feature_2.fit_transform(df)
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_correct_mean_mode_betti_features():
     np.random.seed(0)
 
@@ -119,6 +123,7 @@ def test_correct_mean_mode_betti_features():
     assert np.allclose(expected_betti_features, betti_features)
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_correct_argmax_mode_betti_features():
     np.random.seed(0)
 

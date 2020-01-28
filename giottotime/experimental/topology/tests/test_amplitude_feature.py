@@ -1,9 +1,11 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from giottotime.experimental.topology import AmplitudeFeature
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_correct_amplitude_computation():
     np.random.seed(0)
 
@@ -39,6 +41,7 @@ def test_correct_amplitude_computation():
     assert np.allclose(expected_amplitudes, amplitudes)
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_correct_amplitude_feature():
     np.random.seed(0)
 
