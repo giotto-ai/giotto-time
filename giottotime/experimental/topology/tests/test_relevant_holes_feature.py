@@ -7,12 +7,14 @@ from giottotime.experimental.topology import NumberOfRelevantHolesFeature
 
 
 @given(st.integers(min_value=3))
+@pytest.mark.skip(reason="Deprecated features")
 def test_wrong_h_dim(h_dim):
     with pytest.raises(ValueError):
         NumberOfRelevantHolesFeature(output_name="ignored", h_dim=h_dim)
 
 
 @given(st.floats(max_value=0))
+@pytest.mark.skip(reason="Deprecated features")
 def test_wrong_theta(theta):
     with pytest.raises(ValueError):
         NumberOfRelevantHolesFeature(output_name="ignored", theta=theta)
