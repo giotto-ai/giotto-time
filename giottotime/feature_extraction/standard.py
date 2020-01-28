@@ -407,3 +407,63 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
         ).add_suffix('__' + self.__class__.__name__)
 
         return exog_feature
+
+
+class CustomFeature(BaseEstimator, TransformerMixin, FeatureMixin):
+    """Given a custom function, apply it to a time series and generate a
+    ``pd.Dataframe``.
+    Parameters
+    ----------
+    custom_feature_function : Callable, required.
+        The function to use to generate a ``pd.DataFrame`` containing the feature.
+    output_name: str, optional, default: ``'CustomFeature'``.
+        The name of the output column.
+    kwargs : ``object``, optional.
+        Optional arguments to pass to the function.
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.feature_extraction import CustomFeature
+    >>> def custom_function(X, power):
+    ...     return X**power
+    >>> X = pd.DataFrame([0, 1, 2, 3, 4, 5])
+    >>> custom_feature = CustomFeature(custom_function, power=3)
+    >>> custom_feature.transform(X)
+       custom_f
+    0         0
+    1         1
+    2         8
+    3        27
+    4        64
+    5       125
+    """
+
+    def __init__(
+        self,
+        custom_feature_function: Callable,
+        **kwargs: object,
+    ):
+        super().__init__()
+        self.custom_feature_function = custom_feature_function
+        self.kwargs = kwargs
+
+    def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+        """Generate a ``pd.DataFrame``, given ``time_series`` as input to the
+        ``custom_feature_function``, as well as other optional arguments.
+        Parameters
+        ----------
+        time_series : pd.DataFrame, shape (n_samples, 1), optional, default: ``None``
+            The DataFrame on which to apply the the custom function.
+        Returns
+        -------
+        custom_feature_renamed : pd.DataFrame, shape (length, 1)
+            A DataFrame containing the generated feature_creation.
+        Notes
+        -----
+        In order to use the ``CustomFeature`` class inside a
+        ``giottotime.feature_creation.FeatureCreation`` class, the output of  the custom
+         function should be a ``pd.DataFrame`` and have the same index as
+         ``time_series``.
+        """
+        custom_feature = self.custom_feature_function(time_series, **self.kwargs)
+        return custom_feature.add_suffix('__' + self.__class__.__name__)
