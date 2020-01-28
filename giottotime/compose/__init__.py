@@ -1,5 +1,3 @@
 from .feature_creation import FeatureCreation
 
-__all__ = [
-    'FeatureCreation'
-]
+__all__ = ["FeatureCreation"]

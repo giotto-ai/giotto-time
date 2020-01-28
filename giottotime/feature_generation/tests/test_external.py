@@ -36,9 +36,7 @@ class TestPeriodicSesonalFeature:
         testing.N, testing.K = 20, 1
         ts = testing.makeTimeDataFrame(freq="s")
         start_date = "2018-01-01"
-        periodic_feature = PeriodicSeasonal(
-            period="1 days", start_date=start_date
-        )
+        periodic_feature = PeriodicSeasonal(period="1 days", start_date=start_date)
         periodic_feature.transform(ts)
 
         assert periodic_feature.start_date == ts.index.values[0]
@@ -153,7 +151,6 @@ class TestPeriodicSesonalFeature:
 
 
 class TestConstantFeature:
-
     def test_correct_constant_feature(self):
         constant = 12
         df = pd.DataFrame.from_dict({"old_name": [0, 1, 2, 3, 4, 5]})
@@ -162,7 +159,16 @@ class TestConstantFeature:
 
         df_constant = constant_feature.fit_transform(df)
         expected_df_constant = pd.DataFrame.from_dict(
-            {f"0__{constant_feature.__class__.__name__}": [constant, constant, constant, constant, constant, constant]}
+            {
+                f"0__{constant_feature.__class__.__name__}": [
+                    constant,
+                    constant,
+                    constant,
+                    constant,
+                    constant,
+                    constant,
+                ]
+            }
         )
 
         testing.assert_frame_equal(expected_df_constant, df_constant, check_dtype=False)
@@ -180,4 +186,4 @@ class TestConstantFeature:
         constant_feature = Constant(constant=constant)
         df_constant = constant_feature.fit_transform(df)
 
-        # testing.assert_frame_equal(expected_df_constant, df_constant)
+        #  testing.assert_frame_equal(expected_df_constant, df_constant)

@@ -11,4 +11,4 @@ def exponential(X, exponent):
     return np.exp(X * exponent)
 
 
-TRENDS = {'polynomial': polynomial, 'exponential': exponential}
+TRENDS = {"polynomial": polynomial, "exponential": exponential}

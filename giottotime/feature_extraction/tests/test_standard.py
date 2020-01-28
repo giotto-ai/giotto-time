@@ -16,9 +16,11 @@ from giottotime.feature_extraction import (
 df = pd.DataFrame.from_dict({"x": [0, 1, 2, 3, 4, 5]})
 
 shift_class_name = Shift().__class__.__name__
-df_shift_1 = pd.DataFrame.from_dict({f'x__{shift_class_name}': [np.nan, 0, 1, 2, 3, 4]})
-df_shift_m2 = pd.DataFrame.from_dict({f'x__{shift_class_name}': [2, 3, 4, 5, np.nan, np.nan]})
-df_shift_0 = pd.DataFrame.from_dict({f'x__{shift_class_name}': [0, 1, 2, 3, 4, 5]})
+df_shift_1 = pd.DataFrame.from_dict({f"x__{shift_class_name}": [np.nan, 0, 1, 2, 3, 4]})
+df_shift_m2 = pd.DataFrame.from_dict(
+    {f"x__{shift_class_name}": [2, 3, 4, 5, np.nan, np.nan]}
+)
+df_shift_0 = pd.DataFrame.from_dict({f"x__{shift_class_name}": [0, 1, 2, 3, 4, 5]})
 
 
 # FIXME: shift a + shift b = shift a+b instead
@@ -26,21 +28,21 @@ class TestShift:
     def _correct_shift(self, df: pd.DataFrame, shift: int) -> pd.DataFrame:
         return df.shift(shift)
 
-    @pytest.mark.parametrize(('shift', 'expected'), [(1, df_shift_1), (-2, df_shift_m2), (0, df_shift_0)])
+    @pytest.mark.parametrize(
+        ("shift", "expected"), [(1, df_shift_1), (-2, df_shift_m2), (0, df_shift_0)]
+    )
     def test_shift_transform(self, shift, expected):
         shift = Shift(shift=shift)
         testing.assert_frame_equal(shift.fit_transform(df), expected)
 
     def test_multi_columns_time_shift_feature(self):
         shift = Shift(shift=-2)
-        df_multi = pd.DataFrame(
-            {"x0": [0, 1, 2, 3, 4, 5], "x1": [7, 8, 9, 10, 11, 12]}
-        )
+        df_multi = pd.DataFrame({"x0": [0, 1, 2, 3, 4, 5], "x1": [7, 8, 9, 10, 11, 12]})
 
         expected_df = pd.DataFrame.from_dict(
             {
-                f'x0__{shift_class_name}': [2, 3, 4, 5, np.nan, np.nan],
-                f'x1__{shift_class_name}': [9, 10, 11, 12, np.nan, np.nan],
+                f"x0__{shift_class_name}": [2, 3, 4, 5, np.nan, np.nan],
+                f"x1__{shift_class_name}": [9, 10, 11, 12, np.nan, np.nan],
             }
         )
 
@@ -66,8 +68,8 @@ class TestMovingAverage:
     def _correct_ma(self, df: pd.DataFrame, window_size: int) -> pd.DataFrame:
         return (
             df.rolling(window_size)
-                .mean()
-                .add_suffix("__" + MovingAverage().__class__.__name__)
+            .mean()
+            .add_suffix("__" + MovingAverage().__class__.__name__)
         )
 
     def test_invalid_window_size(self):
@@ -149,14 +151,12 @@ class TestExogenous:
             pd.Timestamp(2000, 1, 4),
         ]
 
-        exog_feature = Exogenous(
-            exogenous_time_series=exog, method=method
-        )
+        exog_feature = Exogenous(exogenous_time_series=exog, method=method)
         feature_name = exog_feature.__class__.__name__
 
         new_exog_feature = exog_feature.fit_transform(df)
         expected_exog = pd.DataFrame.from_dict(
-            {f'x0__{feature_name}': [0, np.nan, np.nan, np.nan]}
+            {f"x0__{feature_name}": [0, np.nan, np.nan, np.nan]}
         )
         expected_exog.index = [
             pd.Timestamp(2000, 1, 1),
@@ -189,7 +189,7 @@ class TestExogenous:
         exog_feature = Exogenous(exogenous_time_series=exog, method=method)
 
         new_exog_feature = exog_feature.fit_transform(df)
-        expected_exog = pd.DataFrame.from_dict({'output_name': [0, 1, 1, 1]})
+        expected_exog = pd.DataFrame.from_dict({"output_name": [0, 1, 1, 1]})
         expected_exog.index = [
             pd.Timestamp(2000, 1, 1),
             pd.Timestamp(2000, 1, 2),
@@ -217,12 +217,10 @@ class TestExogenous:
             pd.Timestamp(2000, 1, 4),
         ]
 
-        exog_feature = Exogenous(
-            exogenous_time_series=exog, method=method
-        )
+        exog_feature = Exogenous(exogenous_time_series=exog, method=method)
 
         new_exog_feature = exog_feature.fit_transform(df)
-        expected_exog = pd.DataFrame.from_dict({'output_name': [0, 0, 0, 0]})
+        expected_exog = pd.DataFrame.from_dict({"output_name": [0, 0, 0, 0]})
         expected_exog.index = [
             pd.Timestamp(2000, 1, 1),
             pd.Timestamp(2000, 1, 2),
@@ -250,12 +248,10 @@ class TestExogenous:
             pd.Timestamp(2000, 1, 29),
         ]
 
-        exog_feature = Exogenous(
-            exogenous_time_series=exog, method=method
-        )
+        exog_feature = Exogenous(exogenous_time_series=exog, method=method)
 
         new_exog_feature = exog_feature.fit_transform(df)
-        expected_exog = pd.DataFrame.from_dict({'output_name': [0, 0, 0, 1]})
+        expected_exog = pd.DataFrame.from_dict({"output_name": [0, 0, 0, 1]})
         expected_exog.index = [
             pd.Timestamp(2000, 1, 1),
             pd.Timestamp(2000, 1, 2),
@@ -267,9 +263,7 @@ class TestExogenous:
 
     def test_correct_multi_columns_exog(self):
         output_name = "exog"
-        exog = pd.DataFrame.from_dict(
-            {"x_0": [0, 1, 2, 3], "x_1": [5, 6, 7, 8]}
-        )
+        exog = pd.DataFrame.from_dict({"x_0": [0, 1, 2, 3], "x_1": [5, 6, 7, 8]})
         exog.index = [
             pd.Timestamp(2000, 1, 1),
             pd.Timestamp(2000, 2, 1),
