@@ -25,7 +25,7 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
         The kind of trend removal to apply.
         Supported trends: ['polynomial', 'exponential']
 
-    trend_init : np.array,
+    trend_x0 : np.array,
         Initialisation parameters passed to the trend function
 
     loss : Callable,
@@ -39,7 +39,7 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
     >>> import pandas as pd
     >>> import numpy as np
     >>> from giottotime.feature_extraction import Detrender
-    >>> detrender = Detrender(trend='polynomial', trend_init=np.zeros(2))
+    >>> detrender = Detrender(trend='polynomial', trend_x0=np.zeros(2))
     >>> time_index = pd.date_range("2020-01-01", "2020-01-10")
     >>> X = pd.DataFrame(range(0, 10), index=time_index)
     >>> detrender.transform(X)
@@ -57,9 +57,9 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
 
     """
 
-    def __init__(self, trend, trend_init, loss: Callable = mean_squared_error, method: str = "BFGS"):
+    def __init__(self, trend: str, trend_x0: np.array, loss: Callable = mean_squared_error, method: str = "BFGS"):
         self.trend = trend
-        self.trend_init = trend_init
+        self.trend_x0 = trend_x0
         self.loss = loss
         self.method = method
 
@@ -89,7 +89,7 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
 
         self.best_trend_params_ = minimize(
             lambda opt: self.loss(X.values, [TRENDS[self.trend](t, opt) for t in range(0, X.shape[0])]),
-            self.trend_init,
+            self.trend_x0,
             method=self.method,
             options={"disp": False},
         )["x"]
