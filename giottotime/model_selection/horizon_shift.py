@@ -3,7 +3,7 @@ import pandas as pd
 from giottotime.feature_extraction import Shift
 
 
-def walk_forward_split(time_series: pd.DataFrame, horizon) -> pd.DataFrame:
+def horizon_shift(time_series: pd.DataFrame, horizon) -> pd.DataFrame:
     """
     Parameters
     ----------

@@ -5,7 +5,7 @@ import pandas as pd
 
 from .time_indexes import giotto_time_series
 from ...compose import FeatureCreation
-from ...model_selection import walk_forward_split
+from ...model_selection import horizon_shift
 
 
 @st.composite
@@ -53,7 +53,7 @@ def X_y_matrices(
 
     X = df_transformer.fit_transform(period_index_series)
 
-    y = walk_forward_split(period_index_series, horizon=horizon)
+    y = horizon_shift(period_index_series, horizon=horizon)
 
     return X, y
 
@@ -131,6 +131,6 @@ def y_matrices(
         )
     )
 
-    y = walk_forward_split(period_index_series, horizon=horizon)
+    y = horizon_shift(period_index_series, horizon=horizon)
 
     return y

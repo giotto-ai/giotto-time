@@ -3,6 +3,6 @@ The :mod:`giottotime.feature_extraction` module deals with model selection.
 """
 
 from .splitters import FeatureSplitter
-from .walk_forward_split import walk_forward_split
+from .horizon_shift import horizon_shift
 
-__all__ = ["FeatureSplitter", "walk_forward_split"]
+__all__ = ["FeatureSplitter", "horizon_shift"]
