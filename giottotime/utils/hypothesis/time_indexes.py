@@ -35,10 +35,10 @@ def giotto_time_series(
 ):
     period_index_series = draw(
         series_with_period_index(
-            start_date,
-            end_date,
-            min_length,
-            max_length,
+            start=start_date,
+            end=end_date,
+            min_length=min_length,
+            max_length=max_length,
             allow_nan=allow_nan,
             allow_infinity=allow_infinity,
         )

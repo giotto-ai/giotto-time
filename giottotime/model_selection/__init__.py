@@ -1,7 +1,8 @@
 """
-The :mod:`giottotime.feature_creation` module deals with model selection.
+The :mod:`giottotime.feature_extraction` module deals with model selection.
 """
 
-from .feature_splitters import FeatureSplitter
+from .splitters import FeatureSplitter
+from .horizon_shift import horizon_shift
 
-__all__ = ["FeatureSplitter"]
+__all__ = ["FeatureSplitter", "horizon_shift"]
