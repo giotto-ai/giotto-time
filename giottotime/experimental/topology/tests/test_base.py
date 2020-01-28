@@ -71,6 +71,7 @@ class BaseTDAFeature(TDAFeatures):
         return diagram_scaler.transform(X_diagrams)
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_correct_compute_n_points():
     sliding_stride = 3
     sliding_window_width = 2
@@ -93,6 +94,7 @@ def test_correct_compute_n_points():
     assert expected_n_points == n_points
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_negative_or_zero_n_windows():
     tda_feature = BaseTDAFeature(output_name="ignored")
 
@@ -111,6 +113,7 @@ def test_negative_or_zero_n_windows():
     st.integers(1, 20),
     st.integers(1, 20),
 )
+@pytest.mark.skip(reason="Deprecated features")
 def test_correct_n_points_random_ts_and_values(
     n_windows,
     sliding_stride,
@@ -133,6 +136,7 @@ def test_correct_n_points_random_ts_and_values(
     assert expected_n_points > 0
 
 
+@pytest.mark.skip(reason="Deprecated features")
 def test_correct_persistence_diagrams():
     np.random.seed(0)
     df = pd.DataFrame(np.random.randint(0, 100, size=(13, 1)), columns=list("A"))
