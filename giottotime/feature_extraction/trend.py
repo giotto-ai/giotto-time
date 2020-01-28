@@ -57,7 +57,13 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
 
     """
 
-    def __init__(self, trend: str, trend_x0: np.array, loss: Callable = mean_squared_error, method: str = "BFGS"):
+    def __init__(
+        self,
+        trend: str,
+        trend_x0: np.array,
+        loss: Callable = mean_squared_error,
+        method: str = "BFGS",
+    ):
         self.trend = trend
         self.trend_x0 = trend_x0
         self.loss = loss
@@ -83,12 +89,15 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
 
         # TODO: create validation function
         if self.trend not in TRENDS:
-            raise ValueError("The trend '%s' is not supported. Supported "
-                             "trends are %s."
-                             % (self.trend, list(sorted(TRENDS))))
+            raise ValueError(
+                "The trend '%s' is not supported. Supported "
+                "trends are %s." % (self.trend, list(sorted(TRENDS)))
+            )
 
         self.best_trend_params_ = minimize(
-            lambda opt: self.loss(X.values, [TRENDS[self.trend](t, opt) for t in range(0, X.shape[0])]),
+            lambda opt: self.loss(
+                X.values, [TRENDS[self.trend](t, opt) for t in range(0, X.shape[0])]
+            ),
             self.trend_x0,
             method=self.method,
             options={"disp": False},
@@ -121,8 +130,11 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
 
         time_steps = (ts.index - self.t0_) / self.period_
 
-        predictions = pd.Series(index=ts.index,
-                                data=np.array([TRENDS[self.trend](t, self.best_trend_params_) for t in time_steps])
-                                .flatten())
+        predictions = pd.Series(
+            index=ts.index,
+            data=np.array(
+                [TRENDS[self.trend](t, self.best_trend_params_) for t in time_steps]
+            ).flatten(),
+        )
 
-        return ts.sub(predictions, axis=0).add_suffix('__' + self.__class__.__name__)
+        return ts.sub(predictions, axis=0).add_suffix("__" + self.__class__.__name__)

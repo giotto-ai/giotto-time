@@ -7,7 +7,7 @@ from sklearn.utils.validation import check_is_fitted
 
 
 # DEPRECATED
-class oldGAR():
+class oldGAR:
     """Implementation of the Generalized Auto Regression model.
 
     Parameters
@@ -80,7 +80,9 @@ class oldGAR():
 
             if self.feed_forward:
                 predictions = model_for_pred_step.predict(features)
-                features[f"preds_{pred_step}"] = predictions # target_y => sklearn RegressorChain
+                features[
+                    f"preds_{pred_step}"
+                ] = predictions  #  target_y => sklearn RegressorChain
 
         self.models_per_predstep_ = models_per_predstep
         self.train_features_ = X

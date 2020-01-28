@@ -19,10 +19,15 @@ from giottotime.forecasting import GAR, GARFF
 from giottotime.utils.hypothesis.feature_matrices import X_y_matrices
 
 df_transformer = FeatureCreation(
-    [('shift_0', Shift(0), make_column_selector(dtype_include=np.number)),
-     ('shift_1', Shift(1), make_column_selector(dtype_include=np.number)),
-     ('moving_average_3', MovingAverage(window_size=3), make_column_selector(dtype_include=np.number)),
-     ]
+    [
+        ("shift_0", Shift(0), make_column_selector(dtype_include=np.number)),
+        ("shift_1", Shift(1), make_column_selector(dtype_include=np.number)),
+        (
+            "moving_average_3",
+            MovingAverage(window_size=3),
+            make_column_selector(dtype_include=np.number),
+        ),
+    ]
 )
 
 
@@ -61,7 +66,14 @@ class TestFitPredict:
 
     # FIXME: See #100
     @pytest.mark.skip(reason="Issue #100")
-    @given(X_y_matrices(horizon=4, df_transformer=df_transformer, allow_nan_infinity=False, min_length=10))
+    @given(
+        X_y_matrices(
+            horizon=4,
+            df_transformer=df_transformer,
+            allow_nan_infinity=False,
+            min_length=10,
+        )
+    )
     def test_correct_fit_date(self, X_y):
         base_model = LinearRegression()
         feature_splitter = FeatureSplitter()
@@ -77,7 +89,7 @@ class TestFitPredict:
         assert len(predictions) == len(x_test)
         np.testing.assert_array_equal(predictions.index, x_test.index)
 
-        gar_with_feedforward = GARFF(base_estimator=base_model)
+        gar_with_feedforward = GARFF(estimator=base_model)
 
         gar_with_feedforward.fit(x_train, y_train)
 

@@ -14,15 +14,19 @@ from giottotime.utils.hypothesis.feature_matrices import (
 )
 
 df_transformer = FeatureCreation(
-    [('shift_0', Shift(0), make_column_selector(dtype_include=np.number)),
-     ('shift_1', Shift(1), make_column_selector(dtype_include=np.number)),
-     ('moving_average_3', MovingAverage(window_size=3), make_column_selector(dtype_include=np.number)),
-     ]
+    [
+        ("shift_0", Shift(0), make_column_selector(dtype_include=np.number)),
+        ("shift_1", Shift(1), make_column_selector(dtype_include=np.number)),
+        (
+            "moving_average_3",
+            MovingAverage(window_size=3),
+            make_column_selector(dtype_include=np.number),
+        ),
+    ]
 )
 
 
 class TestXyMatrices:
-
     @given(X_y_matrices(horizon=3, df_transformer=df_transformer))
     def test_X_shape_correct(self, X_y: Tuple[pd.DataFrame, pd.DataFrame]):
         X, y = X_y
@@ -49,8 +53,11 @@ class TestXMatrices:
 
     @given(X_matrices(df_transformer=df_transformer))
     def test_X_column_names(self, X: pd.DataFrame):
-        assert list(X.columns) == ['shift_0__time_series__Shift', 'shift_1__time_series__Shift',
-                                   'moving_average_3__time_series__MovingAverage']
+        assert list(X.columns) == [
+            "shift_0__time_series__Shift",
+            "shift_1__time_series__Shift",
+            "moving_average_3__time_series__MovingAverage",
+        ]
 
     @given(X_matrices(df_transformer=df_transformer, allow_nan_infinity=False))
     def test_allow_nan_false(self, X: pd.DataFrame):

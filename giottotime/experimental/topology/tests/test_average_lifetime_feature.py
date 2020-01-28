@@ -2,9 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from giottotime.experimental.topology import (
-    AvgLifeTimeFeature,
-)
+from giottotime.experimental.topology import AvgLifeTimeFeature
 
 
 @pytest.mark.skip(reason="Deprecated features")

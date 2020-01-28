@@ -32,7 +32,14 @@ class TrendForecaster(BaseEstimator, RegressorMixin):
         Loss function optimisation method
 
     """
-    def __init__(self, trend: str, trend_x0: np.array, loss: Callable = mean_squared_error, method: str = "BFGS"):
+
+    def __init__(
+        self,
+        trend: str,
+        trend_x0: np.array,
+        loss: Callable = mean_squared_error,
+        method: str = "BFGS",
+    ):
         self.trend = trend
         self.trend_x0 = trend_x0
         self.loss = loss
@@ -57,12 +64,15 @@ class TrendForecaster(BaseEstimator, RegressorMixin):
         """
 
         if self.trend not in TRENDS:
-            raise ValueError("The trend '%s' is not supported. Supported "
-                             "trends are %s."
-                             % (self.trend, list(sorted(TRENDS))))
+            raise ValueError(
+                "The trend '%s' is not supported. Supported "
+                "trends are %s." % (self.trend, list(sorted(TRENDS)))
+            )
 
         self.best_trend_params_ = minimize(
-            lambda opt: self.loss(X.values, [TRENDS[self.trend](t, opt) for t in range(0, X.shape[0])]),
+            lambda opt: self.loss(
+                X.values, [TRENDS[self.trend](t, opt) for t in range(0, X.shape[0])]
+            ),
             self.trend_x0,
             method=self.method,
             options={"disp": False},

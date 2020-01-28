@@ -4,6 +4,7 @@ from typing import Optional, Union, List
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
+import workalendar
 
 from giottotime.base import FeatureMixin
 
@@ -77,13 +78,13 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
     """
 
     def __init__(
-            self,
-            region: str = "america",
-            country: str = "Brazil",
-            start_date: str = "01/01/2018",
-            end_date: str = "01/01/2020",
-            kernel: Union[List, np.ndarray] = None,
-            reindex_method: str = "pad",
+        self,
+        region: str = "america",
+        country: str = "Brazil",
+        start_date: str = "01/01/2018",
+        end_date: str = "01/01/2020",
+        kernel: Union[List, np.ndarray] = None,
+        reindex_method: str = "pad",
     ):
         super().__init__()
         self.region = region
@@ -160,7 +161,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
         if self.kernel is not None:
             events = self._apply_kernel(events)
 
-        events_renamed = events.add_suffix('__' + self.__class__.__name__)
+        events_renamed = events.add_suffix("__" + self.__class__.__name__)
         aligned_events = self._align_event_indices(time_series, events_renamed)
 
         return aligned_events
@@ -236,8 +237,8 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
 
         kernel_events["status"] = (
             kernel_events["status"]
-                .rolling(klen, center=True)
-                .apply(apply_kernel, raw=False)
+            .rolling(klen, center=True)
+            .apply(apply_kernel, raw=False)
         )
         return kernel_events
 
@@ -264,6 +265,6 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
             events_renamed.index = ts.index
 
         else:
-            events_renamed = events[self.start_: self.end_]
+            events_renamed = events[self.start_ : self.end_]
 
         return events_renamed

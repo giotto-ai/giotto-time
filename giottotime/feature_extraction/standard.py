@@ -9,6 +9,7 @@ __all__ = [
     "MovingAverage",
     "Polynomial",
     "Exogenous",
+    "CustomFeature",
 ]
 
 from sklearn.utils.validation import check_is_fitted
@@ -88,7 +89,9 @@ class Shift(BaseEstimator, TransformerMixin, FeatureMixin):
         """
         check_is_fitted(self)
 
-        time_series_shifted = time_series.shift(self.shift).add_suffix('__' + self.__class__.__name__)
+        time_series_shifted = time_series.shift(self.shift).add_suffix(
+            "__" + self.__class__.__name__
+        )
         return time_series_shifted
 
 
@@ -160,7 +163,11 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
         """
         check_is_fitted(self)
 
-        time_series_mvg_avg = time_series.rolling(self.window_size).mean().add_suffix('__' + self.__class__.__name__)
+        time_series_mvg_avg = (
+            time_series.rolling(self.window_size)
+            .mean()
+            .add_suffix("__" + self.__class__.__name__)
+        )
         return time_series_mvg_avg
 
 
@@ -233,8 +240,9 @@ class MovingCustomFeature:
             moving custom funcyion for each element.
 
         """
-        time_series_mvg_cust = time_series.rolling(self.window_size)\
-                                          .apply(self.custom_feature_function,raw=self.raw)
+        time_series_mvg_cust = time_series.rolling(self.window_size).apply(
+            self.custom_feature_function, raw=self.raw
+        )
         time_series_t = self._rename_columns(time_series_mvg_cust)
         return time_series_t
 
@@ -269,6 +277,11 @@ class Polynomial(BaseEstimator, TransformerMixin, FeatureMixin):
     def __init__(self, degree: int = 2):
         super().__init__()
         self.degree = degree
+
+    def get_feature_names(self):
+        return [
+            f"_{index}" + self.__class__.__name__ for index in range(self.degree + 1)
+        ]
 
     def fit(self, X, y=None):
         """Fit the estimator.
@@ -309,7 +322,9 @@ class Polynomial(BaseEstimator, TransformerMixin, FeatureMixin):
 
         pol_feature = PolynomialFeatures(self.degree)
         pol_of_X_array = pol_feature.fit_transform(time_series)
-        pol_of_X = pd.DataFrame(pol_of_X_array, index=time_series.index).add_suffix('__' + self.__class__.__name__)
+        pol_of_X = pd.DataFrame(pol_of_X_array, index=time_series.index).add_suffix(
+            "__" + self.__class__.__name__
+        )
 
         return pol_of_X
 
@@ -357,9 +372,7 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
     """
 
     def __init__(
-            self,
-            exogenous_time_series: pd.DataFrame,
-            method: Optional[str] = None,
+        self, exogenous_time_series: pd.DataFrame, method: Optional[str] = None,
     ):
         super().__init__()
         self.method = method
@@ -404,7 +417,7 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
 
         exog_feature = self.exogenous_time_series.reindex(
             index=time_series.index, method=self.method
-        ).add_suffix('__' + self.__class__.__name__)
+        ).add_suffix("__" + self.__class__.__name__)
 
         return exog_feature
 
@@ -439,13 +452,31 @@ class CustomFeature(BaseEstimator, TransformerMixin, FeatureMixin):
     """
 
     def __init__(
-        self,
-        custom_feature_function: Callable,
-        **kwargs: object,
+        self, custom_feature_function: Callable, **kwargs: object,
     ):
         super().__init__()
         self.custom_feature_function = custom_feature_function
         self.kwargs = kwargs
+
+    def fit(self, X, y=None):
+        """Fit the estimator.
+
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+        self.columns_ = X.columns.values
+        return self
 
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """Generate a ``pd.DataFrame``, given ``time_series`` as input to the
@@ -466,4 +497,4 @@ class CustomFeature(BaseEstimator, TransformerMixin, FeatureMixin):
          ``time_series``.
         """
         custom_feature = self.custom_feature_function(time_series, **self.kwargs)
-        return custom_feature.add_suffix('__' + self.__class__.__name__)
+        return custom_feature.add_suffix("__" + self.__class__.__name__)

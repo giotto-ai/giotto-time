@@ -69,12 +69,12 @@ class PeriodicSeasonal(BaseEstimator, TransformerMixin, FeatureMixin):
     """
 
     def __init__(
-            self,
-            period: Union[pd.Timedelta, str] = "365 days",
-            amplitude: float = 0.5,
-            start_date: Optional[Union[pd.Timestamp, str]] = None,
-            length: Optional[int] = 50,
-            index_period: Optional[Union[DatetimeIndex, int]] = None,
+        self,
+        period: Union[pd.Timedelta, str] = "365 days",
+        amplitude: float = 0.5,
+        start_date: Optional[Union[pd.Timestamp, str]] = None,
+        length: Optional[int] = 50,
+        index_period: Optional[Union[DatetimeIndex, int]] = None,
     ):
         self.start_date = start_date
         self.period = period
@@ -141,7 +141,7 @@ class PeriodicSeasonal(BaseEstimator, TransformerMixin, FeatureMixin):
         else:
             periodic_feature = pd.DataFrame(data=periodic_feature_values[: self.length])
 
-        return periodic_feature.add_suffix('__' + self.__class__.__name__)
+        return periodic_feature.add_suffix("__" + self.__class__.__name__)
 
     def _validate_input(self, X: pd.DataFrame) -> None:
         if X is None:
@@ -198,7 +198,9 @@ class PeriodicSeasonal(BaseEstimator, TransformerMixin, FeatureMixin):
 
     def _compute_periodic_feature(self, datetime_index: pd.DatetimeIndex):
         print((datetime_index - self.start_date) / self.period)
-        return (np.sin(2 * pi * (datetime_index - self.start_date) / self.period)) * self.amplitude
+        return (
+            np.sin(2 * pi * (datetime_index - self.start_date) / self.period)
+        ) * self.amplitude
 
 
 class Constant(BaseEstimator, TransformerMixin, FeatureMixin):
@@ -228,9 +230,7 @@ class Constant(BaseEstimator, TransformerMixin, FeatureMixin):
 
     """
 
-    def __init__(
-            self, constant: int = 0, length: int = None
-    ):
+    def __init__(self, constant: int = 0, length: int = None):
         super().__init__()
         self.length = length
         self.constant = constant
@@ -266,7 +266,9 @@ class Constant(BaseEstimator, TransformerMixin, FeatureMixin):
         """
         self.columns_ = X.columns.values
         self.rows_ = X.shape[0]
-        self.length_ = np.min([self.length, self.rows_]) if self.length is not None else self.rows_
+        self.length_ = (
+            np.min([self.length, self.rows_]) if self.length is not None else self.rows_
+        )
         return self
 
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
@@ -289,7 +291,7 @@ class Constant(BaseEstimator, TransformerMixin, FeatureMixin):
         check_is_fitted(self)
 
         constants = np.full(self.rows_, np.nan)
-        constants[:self.length_] = self.constant
+        constants[: self.length_] = self.constant
         if time_series is not None:
             constant_series = pd.Series(
                 data=constants, index=time_series.index
@@ -297,5 +299,7 @@ class Constant(BaseEstimator, TransformerMixin, FeatureMixin):
         else:
             constant_series = pd.Series(data=constants).to_frame()
 
-        constant_series_renamed = constant_series.add_suffix('__' + self.__class__.__name__)
+        constant_series_renamed = constant_series.add_suffix(
+            "__" + self.__class__.__name__
+        )
         return constant_series_renamed

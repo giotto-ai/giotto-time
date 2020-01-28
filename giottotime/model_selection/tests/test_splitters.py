@@ -12,10 +12,15 @@ from giottotime.utils.hypothesis.feature_matrices import X_y_matrices
 
 # TODO: refactor, make hypothesis generator instead of a full pipeline
 df_transformer = FeatureCreation(
-    [('shift_0', Shift(0), make_column_selector(dtype_include=np.number)),
-     ('shift_1', Shift(1), make_column_selector(dtype_include=np.number)),
-     ('moving_average_3', MovingAverage(window_size=3), make_column_selector(dtype_include=np.number)),
-     ]
+    [
+        ("shift_0", Shift(0), make_column_selector(dtype_include=np.number)),
+        ("shift_1", Shift(1), make_column_selector(dtype_include=np.number)),
+        (
+            "moving_average_3",
+            MovingAverage(window_size=3),
+            make_column_selector(dtype_include=np.number),
+        ),
+    ]
 )
 
 horizon = 4

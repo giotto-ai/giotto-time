@@ -10,11 +10,11 @@ from ...model_selection import horizon_shift
 
 @st.composite
 def X_y_matrices(
-        draw,
-        horizon: int,
-        df_transformer: FeatureCreation,
-        min_length: Optional[int] = None,
-        allow_nan_infinity: bool = True,
+    draw,
+    horizon: int,
+    df_transformer: FeatureCreation,
+    min_length: Optional[int] = None,
+    allow_nan_infinity: bool = True,
 ):
     """ Returns a strategy that generates X and y feature matrices.
 
@@ -60,10 +60,10 @@ def X_y_matrices(
 
 @st.composite
 def X_matrices(
-        draw,
-        df_transformer: FeatureCreation,
-        min_length: Optional[int] = None,
-        allow_nan_infinity: bool = True,
+    draw,
+    df_transformer: FeatureCreation,
+    min_length: Optional[int] = None,
+    allow_nan_infinity: bool = True,
 ):
     """ Returns a strategy that generates the X feature matrix.
 
@@ -99,10 +99,10 @@ def X_matrices(
 
 @st.composite
 def y_matrices(
-        draw,
-        horizon: int = 3,
-        min_length: Optional[int] = None,
-        allow_nan_infinity: bool = True,
+    draw,
+    horizon: int = 3,
+    min_length: Optional[int] = None,
+    allow_nan_infinity: bool = True,
 ):
     """ Returns a strategy that generates the y feature matrix.
 

@@ -9,6 +9,7 @@ from .standard import (
     MovingAverage,
     Polynomial,
     Exogenous,
+    CustomFeature,
 )
 
 
@@ -22,4 +23,5 @@ __all__ = [
     "Exogenous",
     "Calendar",
     "Detrender",
+    "CustomFeature",
 ]

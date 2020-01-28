@@ -41,18 +41,16 @@ class GAR(MultiOutputRegressor):
 
     def predict(self, X):
         X_p = super().predict(X)
-        X_p_df = pd.DataFrame(data=X_p,
-                              columns=self._y_columns,
-                              index=X.index)
+        X_p_df = pd.DataFrame(data=X_p, columns=self._y_columns, index=X.index)
 
         return X_p_df
 
 
 # FIXME: See #99
 class GARFF(RegressorChain):
-    def __init__(self, base_estimator, random_state=None):
+    def __init__(self, estimator, random_state=None):
         # TODO: justify order=None and cv in documentation
-        super().__init__(base_estimator, order=None, cv=None, random_state=random_state)
+        super().__init__(estimator, order=None, cv=None, random_state=random_state)
 
     def fit(self, X, y):
         self._y_columns = y.columns
@@ -60,8 +58,6 @@ class GARFF(RegressorChain):
 
     def predict(self, X):
         X_p = super().predict(X)
-        X_p_df = pd.DataFrame(data=X_p,
-                              columns=self._y_columns,
-                              index=X.index)
+        X_p_df = pd.DataFrame(data=X_p, columns=self._y_columns, index=X.index)
 
         return X_p_df

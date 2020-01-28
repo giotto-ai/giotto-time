@@ -29,9 +29,7 @@ class FeatureCreation(ColumnTransformer):
 
         """
         X_t = super().fit_transform(X, y)
-        X_t_df = pd.DataFrame(data=X_t,
-                              columns=self.get_feature_names(),
-                              index=X.index)
+        X_t_df = pd.DataFrame(data=X_t, columns=self.get_feature_names(), index=X.index)
         return X_t_df
 
     def transform(self, X):
@@ -52,7 +50,5 @@ class FeatureCreation(ColumnTransformer):
 
         """
         X_t = super().transform(X)
-        X_t_df = pd.DataFrame(data=X_t,
-                              columns=self.get_feature_names(),
-                              index=X.index)
+        X_t_df = pd.DataFrame(data=X_t, columns=self.get_feature_names(), index=X.index)
         return X_t_df
