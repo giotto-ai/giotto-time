@@ -16,8 +16,7 @@ __all__ = ["PeriodicSeasonal", "Constant"]
 
 # TODO: add something like 'make_periodic_feature' or 'make_sinusoid'
 class PeriodicSeasonal(BaseEstimator, TransformerMixin, FeatureMixin):
-    """Create a sinusoid from a given date and with a given period and
-    amplitude.
+    """Create a sinusoid from a given date and with a given period and amplitude.
 
     Parameters
     ----------
@@ -76,12 +75,12 @@ class PeriodicSeasonal(BaseEstimator, TransformerMixin, FeatureMixin):
         self.length = length
         self.index_period = index_period
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y=None) -> "PeriodicSeasonal":
         """Fit the estimator.
 
         Parameters
         ----------
-        X : pd.DataFrame, shape (n_samples, n_features)
+        X : pd.DataFrame, shape (n_samples, n_features), required
             Input data.
 
         y : None
@@ -90,8 +89,9 @@ class PeriodicSeasonal(BaseEstimator, TransformerMixin, FeatureMixin):
 
         Returns
         -------
-        self : object
+        self : PeriodicSeasonal
             Returns self.
+
         """
         self.columns_ = X.columns.values
         return self
@@ -107,8 +107,8 @@ class PeriodicSeasonal(BaseEstimator, TransformerMixin, FeatureMixin):
         time_series : pd.DataFrame, shape (n_samples, 1), optional, default: ``None``
             The input DataFrame, If passed, the output DataFrame is going to have the
             same index as ``time_series``. If is not passed, then the ``start_date`` and
-             ``index_period`` must have been passed in the constructor when the object
-             was instantiated.
+            ``index_period`` must have been passed in the constructor when the object
+            was instantiated.
 
         Returns
         -------
@@ -231,18 +231,18 @@ class Constant(BaseEstimator, TransformerMixin, FeatureMixin):
         self.constant = constant
 
     def get_feature_names(self):
-        """
-        Return feature names for output features.
+        """Return feature names for output features.
 
         Returns
         -------
-        output_feature_names : ndarray of shape (n_output_features,)
+        output_feature_names : ndarray, shape (n_output_features,)
             Array of feature names.
+
         """
 
         return [self.__class__.__name__]
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y=None) -> "Constant":
         """Fit the estimator.
 
         Parameters
@@ -256,8 +256,9 @@ class Constant(BaseEstimator, TransformerMixin, FeatureMixin):
 
         Returns
         -------
-        self : object
+        self : Constant
             Returns self.
+
         """
         self.columns_ = X.columns.values
         self.rows_ = X.shape[0]

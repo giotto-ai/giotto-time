@@ -1,6 +1,5 @@
 """
-The :mod:`giottotime.feature_extraction` module contains a collection of different loss
-functions.
+The :mod:`giottotime.metrics` module contains a collection of different metrics.
 """
 
 from .metrics import smape, max_error

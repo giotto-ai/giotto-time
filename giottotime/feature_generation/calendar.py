@@ -61,7 +61,8 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
     --------
     >>> import pandas as pd
     >>> from giottotime.feature_extraction import Calendar
-    >>> X = pd.DataFrame(range(0, 10), index=pd.period_range(start='2019-04-18',  end='2019-04-27', freq='d'))
+    >>> X = pd.DataFrame(range(0, 10), index=pd.period_range(start='2019-04-18',
+    ...                  end='2019-04-27', freq='d'))
     >>> cal_feature = Calendar(region="europe", country="Italy", kernel=[2, 1])
     >>> cal_feature.fit_transform(X)
                 status__Calendar
@@ -102,19 +103,19 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
         self.kernel = kernel
 
     def get_feature_names(self):
-        """
-        Return feature names for output features.
+        """Return feature names for output features.
 
         Returns
         -------
-        output_feature_names : ndarray of shape (n_output_features,)
+        output_feature_names : ndarray, shape (n_output_features,)
             Array of feature names.
+
         """
 
         return [self.__class__.__name__]
 
-    def fit(self, X, y=None):
-        """Fit the estimator.
+    def fit(self, X: pd.DataFrame, y=None):
+        """Fit the estimator. Just used to be compatible with the sklearn API.
 
         Parameters
         ----------
@@ -129,6 +130,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
         -------
         self : object
             Returns self.
+
         """
         return self
 
