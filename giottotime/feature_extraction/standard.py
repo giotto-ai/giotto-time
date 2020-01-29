@@ -7,6 +7,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 __all__ = [
     "Shift",
     "MovingAverage",
+    "MovingCustomFunction",
     "Polynomial",
     "Exogenous",
     "CustomFeature",
@@ -17,7 +18,6 @@ from sklearn.utils.validation import check_is_fitted
 from ..base import FeatureMixin
 
 
-# TODO: retest examples
 class Shift(BaseEstimator, TransformerMixin, FeatureMixin):
     """Perform a shift of a DataFrame of size equal to ``shift``.
 
@@ -37,15 +37,15 @@ class Shift(BaseEstimator, TransformerMixin, FeatureMixin):
     >>> import pandas as pd
     >>> from giottotime.feature_extraction import Shift
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
-    >>> shift_feature = Shift(shift=3)
-    >>> shift_feature.fit_transform(ts)
-       ShiftFeature
-    0           NaN
-    1           NaN
-    2           NaN
-    3           0.0
-    4           1.0
-    5           2.0
+    >>> shift = Shift(shift=3)
+    >>> shift.fit_transform(ts)
+       0__Shift
+    0       NaN
+    1       NaN
+    2       NaN
+    3       0.0
+    4       1.0
+    5       2.0
 
     """
 
@@ -109,15 +109,15 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
     >>> import pandas as pd
     >>> from giottotime.feature_extraction import MovingAverage
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
-    >>> mv_avg_feature = MovingAverage(window_size=2)
-    >>> mv_avg_feature.fit_transform(ts)
-       MovingAverageFeature
-    0                   NaN
-    1                   0.5
-    2                   1.5
-    3                   2.5
-    4                   3.5
-    5                   4.5
+    >>> mv_avg = MovingAverage(window_size=2)
+    >>> mv_avg.fit_transform(ts)
+       0__MovingAverage
+    0               NaN
+    1               0.5
+    2               1.5
+    3               2.5
+    4               3.5
+    5               4.5
 
     """
 
@@ -171,7 +171,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
         return time_series_mvg_avg
 
 
-class MovingCustomFeature:
+class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
     """For each row in ``time_series``, compute the moving custom function of the
     previous ``window_size`` rows. If there are not enough rows, the value is Nan.
 
@@ -182,9 +182,6 @@ class MovingCustomFeature:
 
     window_size : int, optional, default: ``1``
         The number of previous points on which to compute the custom function
-
-    output_name : str, optional, default: ``'MovingAverageFeature'``
-        The name of the output column.
 
     raw : bool, optional, default: ``True``
         - False : passes each row or column as a Series to the function.
@@ -197,17 +194,17 @@ class MovingCustomFeature:
     --------
     >>> import pandas as pd
     >>> import numpy as np
-    >>> from giottotime.feature_extraction import MovingCustomFeature
+    >>> from giottotime.feature_extraction import MovingCustomFunction
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
-    >>> mv_cust_feature = MovingCustomFeature(np.max,window_size=2)
-    >>> mv_cust_feature.transform(ts)
-       MovingCustomFeature
-    0                   NaN
-    1                   1.0
-    2                   2.0
-    3                   3.0
-    4                   4.0
-    5                   5.0
+    >>> mv_custom = MovingCustomFunction(np.max, window_size=2)
+    >>> mv_custom.transform(ts)
+       0__MovingCustomFunction
+    0                      NaN
+    1                      1.0
+    2                      2.0
+    3                      3.0
+    4                      4.0
+    5                      5.0
 
     """
 
@@ -215,15 +212,13 @@ class MovingCustomFeature:
         self,
         custom_feature_function: Callable,
         window_size: int = 1,
-        output_name: str = "MovingCustomFeature",
         raw: bool = True,
     ):
-        super().__init__(output_name)
+        super().__init__()
         self.custom_feature_function = custom_feature_function
         self.window_size = window_size
         self.raw = raw
 
-    # FIXME
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """compute the moving custom function, for every row of ``time_series``, of the
          previous ``window_size`` elements.
@@ -237,13 +232,13 @@ class MovingCustomFeature:
         -------
         time_series_t : pd.DataFrame, shape (n_samples, 1)
             A DataFrame, with the same length as ``time_series``, containing the rolling
-            moving custom funcyion for each element.
+            moving custom function for each element.
 
         """
         time_series_mvg_cust = time_series.rolling(self.window_size).apply(
             self.custom_feature_function, raw=self.raw
         )
-        time_series_t = self._rename_columns(time_series_mvg_cust)
+        time_series_t = time_series_mvg_cust.add_suffix("__" + self.__class__.__name__)
         return time_series_t
 
 
@@ -262,15 +257,15 @@ class Polynomial(BaseEstimator, TransformerMixin, FeatureMixin):
     >>> import pandas as pd
     >>> from giottotime.feature_extraction import Polynomial
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
-    >>> pol_feature = Polynomial(degree=3)
-    >>> pol_feature.fit_transform(ts)
-       pol_0  pol_1  pol_2  pol_3
-    0    1.0    0.0    0.0    0.0
-    1    1.0    1.0    1.0    1.0
-    2    1.0    2.0    4.0    8.0
-    3    1.0    3.0    9.0   27.0
-    4    1.0    4.0   16.0   64.0
-    5    1.0    5.0   25.0  125.0
+    >>> pol = Polynomial(degree=3)
+    >>> pol.fit_transform(ts)
+       0__Polynomial  1__Polynomial  2__Polynomial  3__Polynomial
+    0            1.0            0.0            0.0            0.0
+    1            1.0            1.0            1.0            1.0
+    2            1.0            2.0            4.0            8.0
+    3            1.0            3.0            9.0           27.0
+    4            1.0            4.0           16.0           64.0
+    5            1.0            5.0           25.0          125.0
 
     """
 
@@ -350,25 +345,26 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
     >>> from giottotime.feature_extraction import Exogenous
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5], index=[3, 4, 5, 6, 7, 8])
     >>> exog_ts = pd.DataFrame([10, 8, 1, 3, 2, 7])
-    >>> exog_feature = Exogenous(exog_ts)
-    >>> exog_feature.fit_transform(ts)
-       ExogenousFeature
-    3               3.0
-    4               2.0
-    5               7.0
-    6               NaN
-    7               NaN
-    8               NaN
+    >>> exog = Exogenous(exog_ts)
+    >>> exog.fit_transform(ts)
+       0__Exogenous
+    3           3.0
+    4           2.0
+    5           7.0
+    6           NaN
+    7           NaN
+    8           NaN
 
-    >>> exog_feature = Exogenous(exog_ts, method="nearest")
-    >>> exog_feature.transform(ts)
-       ExogenousFeature
-    3                 3
-    4                 2
-    5                 7
-    6                 7
-    7                 7
-    8                 7
+    >>> exog = Exogenous(exog_ts, method="nearest")
+    >>> exog.fit_transform(ts)
+       0__Exogenous
+    3             3
+    4             2
+    5             7
+    6             7
+    7             7
+    8             7
+
     """
 
     def __init__(
@@ -425,14 +421,15 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
 class CustomFeature(BaseEstimator, TransformerMixin, FeatureMixin):
     """Given a custom function, apply it to a time series and generate a
     ``pd.Dataframe``.
+
     Parameters
     ----------
     custom_feature_function : Callable, required.
         The function to use to generate a ``pd.DataFrame`` containing the feature.
-    output_name: str, optional, default: ``'CustomFeature'``.
-        The name of the output column.
+
     kwargs : ``object``, optional.
         Optional arguments to pass to the function.
+
     Examples
     --------
     >>> import pandas as pd
@@ -441,14 +438,15 @@ class CustomFeature(BaseEstimator, TransformerMixin, FeatureMixin):
     ...     return X**power
     >>> X = pd.DataFrame([0, 1, 2, 3, 4, 5])
     >>> custom_feature = CustomFeature(custom_function, power=3)
-    >>> custom_feature.transform(X)
-       custom_f
-    0         0
-    1         1
-    2         8
-    3        27
-    4        64
-    5       125
+    >>> custom_feature.fit_transform(X)
+       0__CustomFeature
+    0                 0
+    1                 1
+    2                 8
+    3                27
+    4                64
+    5               125
+
     """
 
     def __init__(
@@ -481,14 +479,17 @@ class CustomFeature(BaseEstimator, TransformerMixin, FeatureMixin):
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """Generate a ``pd.DataFrame``, given ``time_series`` as input to the
         ``custom_feature_function``, as well as other optional arguments.
+
         Parameters
         ----------
         time_series : pd.DataFrame, shape (n_samples, 1), optional, default: ``None``
             The DataFrame on which to apply the the custom function.
+
         Returns
         -------
         custom_feature_renamed : pd.DataFrame, shape (length, 1)
             A DataFrame containing the generated feature_creation.
+
         Notes
         -----
         In order to use the ``CustomFeature`` class inside a
@@ -496,5 +497,7 @@ class CustomFeature(BaseEstimator, TransformerMixin, FeatureMixin):
          function should be a ``pd.DataFrame`` and have the same index as
          ``time_series``.
         """
+        check_is_fitted(self)
+
         custom_feature = self.custom_feature_function(time_series, **self.kwargs)
         return custom_feature.add_suffix("__" + self.__class__.__name__)
