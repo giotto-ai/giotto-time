@@ -19,8 +19,8 @@ class LinearRegressor:
 
     Examples
     --------
-    >>> from giottotime.models.regressors.linear_regressor import LinearRegressor
-    >>> from giottotime.loss_functions import max_error
+    >>> from giottotime.regressors.linear_regressor import LinearRegressor
+    >>> from giottotime.metrics import max_error
     >>> import numpy as np
     >>> import pandas as pd
     >>> X = np.random.random((100, 10))
@@ -30,7 +30,9 @@ class LinearRegressor:
     >>> X_test, y_test = X[90:], y[90:]
     >>> x0 = [0]*11
     >>> lr.fit(X_train, y_train, x0=x0)
-    >>> y_pred = lr.predict(X_test)
+    >>> lr.predict(X_test)
+    array([0.62987155, 0.46971378, 0.50421395, 0.5543149 , 0.50848151,
+           0.54768797, 0.50968854, 0.50500384, 0.58069366, 0.54912972])
 
     """
 

@@ -29,13 +29,13 @@ class FeatureSplitter:
     >>> feature_splitter = FeatureSplitter()
     >>> X_train, y_train, X_test, y_test = feature_splitter.transform(X, y)
     >>> X_train
-           feature_0            feature_1
-    2           1.0                   0.5
-    3           2.0                   1.5
-    4           3.0                   2.5
-    5           4.0                   3.5
-    6           5.0                   4.5
-    7           6.0                   5.5
+       feature_0  feature_1
+    2        1.0        0.5
+    3        2.0        1.5
+    4        3.0        2.5
+    5        4.0        3.5
+    6        5.0        4.5
+    7        6.0        5.5
     >>> y_train
        y_0  y_1  y_2
     2    2  3.0  4.0
@@ -45,9 +45,9 @@ class FeatureSplitter:
     6    6  7.0  8.0
     7    7  8.0  9.0
     >>> X_test
-          feature_0             feature_1
-    8           7.0                   6.5
-    9           8.0                   7.5
+       feature_0  feature_1
+    8        7.0        6.5
+    9        8.0        7.5
     >>> y_test
        y_0  y_1  y_2
     8    8  9.0  NaN

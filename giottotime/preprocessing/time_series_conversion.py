@@ -188,8 +188,8 @@ class SequenceToTimeIndexSeries(TimeSeriesConversion):
 
     Examples
     --------
-    >>> from giottotime.time_series_preparation import SequenceToTimeIndexSeries
-    >>> time_series = [1,2,3,5,5,7]
+    >>> from giottotime.preprocessing import SequenceToTimeIndexSeries
+    >>> time_series = [1, 2, 3, 5, 5, 7]
     >>> sequence_to_time_index = SequenceToTimeIndexSeries(start='01-01-2010', freq='10D')
     >>> sequence_to_time_index.transform(time_series)
     2010-01-01    1
@@ -238,8 +238,8 @@ class PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.time_series_preparation import PandasSeriesToTimeIndexSeries
-    >>> time_series = pd.Series([1,2,3,5,5,7])
+    >>> from giottotime.preprocessing import PandasSeriesToTimeIndexSeries
+    >>> time_series = pd.Series([1, 2, 3, 5, 5, 7])
     >>> sequence_to_time_index = PandasSeriesToTimeIndexSeries(start='01-01-2010', freq='10D')
     >>> sequence_to_time_index.transform(time_series)
     2010-01-01    1
@@ -295,18 +295,18 @@ class TimeIndexSeriesToPeriodIndexSeries(TimeSeriesConversion):
     Examples
     --------
     >>> import pandas as pd
-    >>> from giottotime.time_series_preparation import TimeIndexSeriesToPeriodIndexSeries
+    >>> from giottotime.preprocessing import TimeIndexSeriesToPeriodIndexSeries
     >>> period_index_time_series = pd.Series(
     ...     index = pd.period_range(start='01-01-2010', freq='10D', periods=6),
-    ...     data=[1,2,3,5,5,7]
+    ...     data=[1, 2, 3, 5, 5, 7]
     ... )
     >>> datetime_index_time_series = pd.Series(
     ...     index = pd.date_range(start='01-01-2010', freq='10D', periods=6),
-    ...     data=[1,2,3,5,5,7]
+    ...     data=[1, 2, 3, 5, 5, 7]
     ... )
     >>> timedelta_index_time_series = pd.Series(
     ...     index = pd.timedelta_range(start=pd.Timedelta(days=1), freq='10D', periods=6),
-    ...     data=[1,2,3,5,5,7]
+    ...     data=[1, 2, 3, 5, 5, 7]
     ... )
     >>> sequence_to_time_index = TimeIndexSeriesToPeriodIndexSeries()
     >>> sequence_to_time_index.transform(period_index_time_series)
