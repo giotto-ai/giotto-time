@@ -7,7 +7,7 @@ Welcome to giotto-time's API reference!
 ========================================
 
 :mod:`giottotime.causality`: Causality Tests
-==================================================
+============================================
 
 .. automodule:: giottotime.causality
    :no-members:
@@ -24,7 +24,7 @@ Welcome to giotto-time's API reference!
 
 
 :mod:`giottotime.compose`: Feature Creation
-====================================================
+===========================================
 
 .. automodule:: giottotime.compose
    :no-members:
@@ -40,7 +40,7 @@ Welcome to giotto-time's API reference!
 
 
 :mod:`giottotime.feature_extraction`: Feature Extraction
-====================================================
+========================================================
 
 .. automodule:: giottotime.feature_extraction
    :no-members:
@@ -61,7 +61,7 @@ Welcome to giotto-time's API reference!
 
 
 :mod:`giottotime.feature_generation`: Feature Generation
-====================================================
+========================================================
 
 .. automodule:: giottotime.feature_generation
    :no-members:
@@ -80,7 +80,7 @@ Welcome to giotto-time's API reference!
 
 
 :mod:`giottotime.forecasting`: Forecasting
-====================================================
+==========================================
 
 .. automodule:: giottotime.forecasting
    :no-members:
@@ -98,7 +98,7 @@ Welcome to giotto-time's API reference!
 
 
 :mod:`giottotime.forecasting`: Regressors
-====================================================
+=========================================
 
 .. automodule:: giottotime.regressors
    :no-members:
@@ -114,7 +114,7 @@ Welcome to giotto-time's API reference!
 
 
 :mod:`giottotime.metrics`: Metrics
-====================================================
+==================================
 
 .. automodule:: giottotime.metrics
    :no-members:
@@ -131,7 +131,7 @@ Welcome to giotto-time's API reference!
 
 
 :mod:`giottotime.model_selection`: Model Selection
-====================================================
+==================================================
 
 .. automodule:: giottotime.model_selection
    :no-members:
@@ -153,7 +153,7 @@ Welcome to giotto-time's API reference!
 
 
 :mod:`giottotime.preprocessing`: Preprocessing
-====================================================================
+==============================================
 
 .. automodule:: giottotime.preprocessing
    :no-members:

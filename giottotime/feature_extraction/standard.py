@@ -460,7 +460,7 @@ class CustomFeature(BaseEstimator, TransformerMixin, FeatureMixin):
         self.custom_feature_function = custom_feature_function
         self.kwargs = kwargs
 
-    def fit(self, time_series, y=None):
+    def fit(self, time_series: pd.DataFrame, y=None) -> "CustomFeature":
         """Fit the estimator.
 
         Parameters
@@ -500,6 +500,7 @@ class CustomFeature(BaseEstimator, TransformerMixin, FeatureMixin):
         ``giottotime.feature_creation.FeatureCreation`` class, the output of  the custom
          function should be a ``pd.DataFrame`` and have the same index as
          ``time_series``.
+
         """
         check_is_fitted(self)
 
