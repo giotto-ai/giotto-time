@@ -4,7 +4,6 @@ from typing import Optional, Union, List
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-import workalendar
 
 from giottotime.base import FeatureMixin
 
@@ -60,21 +59,23 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
 
     Examples
     --------
+    >>> import pandas as pd
     >>> from giottotime.feature_extraction import Calendar
-    >>> cal_feature = Calendar(region="europe", country="Italy", kernel=[3, 2])
-    >>> cal_feature.fit_transform()
-                CalendarFeature
-    2018-01-01              2.0
-    2018-01-02              3.0
-    2018-01-03              0.0
-    2018-01-04              0.0
-    2018-01-05              0.0
-    ...                     ...
-    2019-12-28              0.0
-    2019-12-29              0.0
-    2019-12-30              0.0
-    2019-12-31              0.0
-    2020-01-01              2.0
+    >>> X = pd.DataFrame(range(0, 10), index=pd.period_range(start='2019-04-18',  end='2019-04-27', freq='d'))
+    >>> cal_feature = Calendar(region="europe", country="Italy", kernel=[2, 1])
+    >>> cal_feature.fit_transform(X)
+                status__Calendar
+    2019-04-18               0.0
+    2019-04-19               0.0
+    2019-04-20               0.0
+    2019-04-21               1.0
+    2019-04-22               2.0
+    2019-04-23               0.0
+    2019-04-24               1.0
+    2019-04-25               2.0
+    2019-04-26               0.0
+    2019-04-27               0.0
+
     """
 
     def __init__(
