@@ -4,7 +4,8 @@ from sklearn.multioutput import MultiOutputRegressor, RegressorChain
 
 # TODO: retest example + docs
 class GAR(MultiOutputRegressor):
-    """Generalized Auto Regression model also known as MultiOutputRegressor in scikit-learn
+    """Generalized Auto Regression model also known as MultiOutputRegressor in
+    scikit-learn.
 
     Parameters
     ----------
@@ -48,6 +49,10 @@ class GAR(MultiOutputRegressor):
 
 # FIXME: See #99
 class GARFF(RegressorChain):
+    """
+
+    """
+
     def __init__(self, estimator, random_state=None):
         # TODO: justify order=None and cv in documentation
         super().__init__(estimator, order=None, cv=None, random_state=random_state)

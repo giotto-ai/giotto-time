@@ -3,8 +3,10 @@ import pandas as pd
 from giottotime.feature_extraction import Shift
 
 
-def horizon_shift(time_series: pd.DataFrame, horizon) -> pd.DataFrame:
-    """
+def horizon_shift(time_series: pd.DataFrame, horizon: int = 5) -> pd.DataFrame:
+    """Perform a shift of the original ``time_series`` for each time step between 1 and
+    the ``horizon``.
+
     Parameters
     ----------
     time_series : List[TimeSeriesFeature], required
@@ -13,6 +15,12 @@ def horizon_shift(time_series: pd.DataFrame, horizon) -> pd.DataFrame:
     horizon : int, optional, default: ``5``
         It represents how much into the future is necessary to predict. This corresponds
         to the number of shifts that are going to be performed on y.
+
+    Returns
+    -------
+    y : pd.DataFrame, shape (n_samples, horizon)
+        The shifted time series.
+
     """
 
     y = pd.DataFrame(index=time_series.index)

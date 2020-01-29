@@ -209,10 +209,7 @@ class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
     """
 
     def __init__(
-        self,
-        custom_feature_function: Callable,
-        window_size: int = 1,
-        raw: bool = True,
+        self, custom_feature_function: Callable, window_size: int = 1, raw: bool = True,
     ):
         super().__init__()
         self.custom_feature_function = custom_feature_function
