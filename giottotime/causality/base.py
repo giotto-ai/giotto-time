@@ -26,7 +26,7 @@ class CausalityMixin:
         -------
         data_t : pd.DataFrame, shape (n_samples, n_time_series)
             The DataFrame (Pivot table) of the shifts which maximize the correlation
-            between each time series The shift is indicated in rows.
+            between each time series. The shift is indicated in rows.
 
         """
         check_is_fitted(self)
