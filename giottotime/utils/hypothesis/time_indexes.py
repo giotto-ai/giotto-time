@@ -72,12 +72,12 @@ def series_with_period_index(
     -------
     pd.Series with PeriodIndex
     """
-    index = draw(period_indexes(start, end, min_length, max_length))
+    index = draw(period_indexes(start=start, end=end, min_length=min_length, max_length=max_length))
     values = draw(
         arrays(
             dtype=np.float64,
             shape=index.shape[0],
-            elements=st.floats(allow_nan=allow_nan, allow_infinity=allow_infinity),
+            elements=st.floats(allow_nan=allow_nan, allow_infinity=allow_infinity, width=32),
         )
     )
     return pd.Series(index=index, data=values)
@@ -109,12 +109,12 @@ def series_with_datetime_index(
     -------
     pd.Series with DatetimeIndex
     """
-    index = draw(datetime_indexes(start, end, min_length, max_length))
+    index = draw(datetime_indexes(start=start, end=end, min_length=min_length, max_length=max_length))
     values = draw(
         arrays(
             dtype=np.float64,
             shape=index.shape[0],
-            elements=st.floats(allow_nan=allow_nan, allow_infinity=allow_infinity),
+            elements=st.floats(allow_nan=allow_nan, allow_infinity=allow_infinity, width=32),
         )
     )
     return pd.Series(index=index, data=values)
@@ -146,12 +146,12 @@ def series_with_timedelta_index(
     -------
     pd.Series with TimedeltaIndex
     """
-    index = draw(timedelta_indexes(start, end, min_length, max_length))
+    index = draw(timedelta_indexes(start=start, end=end, min_length=min_length, max_length=max_length))
     values = draw(
         arrays(
             dtype=np.float64,
             shape=index.shape[0],
-            elements=st.floats(allow_nan=allow_nan, allow_infinity=allow_infinity),
+            elements=st.floats(allow_nan=allow_nan, allow_infinity=allow_infinity, width=32),
         )
     )
     return pd.Series(index=index, data=values)
@@ -179,7 +179,7 @@ def period_indexes(
     -------
     LazyStrategy that generates pandas PeriodIndex
     """
-    period_range_args = draw(period_range_args_from(start, end, min_length, max_length))
+    period_range_args = draw(period_range_args_from(start=start, end=end, min_length=min_length, max_length=max_length))
     assume(
         period_range_args_are_correct(
             period_range_args, min_length, max_length, start, end

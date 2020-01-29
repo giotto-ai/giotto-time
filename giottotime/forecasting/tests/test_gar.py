@@ -64,8 +64,6 @@ class TestFitPredict:
         with pytest.raises(NotFittedError):
             gar_no_feedforward.predict(time_series)
 
-    # FIXME: See #100
-    @pytest.mark.skip(reason="Issue #100")
     @given(
         X_y_matrices(
             horizon=4,
