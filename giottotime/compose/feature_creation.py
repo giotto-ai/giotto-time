@@ -21,9 +21,27 @@ class FeatureCreation(ColumnTransformer):
         y : array-like, shape (n_samples, ...), optional
             Targets for supervised learning.
 
+        Examples
+        --------
+        >>> import pandas.util.testing as testing
+        >>> from giottotime.compose import FeatureCreation
+        >>> from giottotime.feature_extraction import Shift, MovingAverage
+        >>> data = testing.makeTimeDataFrame(freq="s")
+        >>> fc = FeatureCreation([
+        ...     ('s1', Shift(1), ['A']),
+        ...     ('ma3', MovingAverage(window_size=3), ['B']),
+        ... ])
+        >>> fc.fit_transform(data).head()
+                             s1__A__Shift  ma3__B__MovingAverage
+        2000-01-01 00:00:00           NaN                    NaN
+        2000-01-01 00:00:01      0.211403                    NaN
+        2000-01-01 00:00:02     -0.313854               0.085045
+        2000-01-01 00:00:03      0.502018              -0.239269
+        2000-01-01 00:00:04     -0.225324              -0.144625
+
         Returns
         -------
-        X_t_df : array-like or sparse matrix, shape (n_samples, sum_n_components)
+        X_t_df : pd.DataFrame, shape (n_samples, sum_n_components)
             hstack of results of transformers. sum_n_components is the
             sum of n_components (output dimension) over transformers.
 
