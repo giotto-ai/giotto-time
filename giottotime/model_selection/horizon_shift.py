@@ -13,6 +13,20 @@ def horizon_shift(time_series: pd.DataFrame, horizon) -> pd.DataFrame:
     horizon : int, optional, default: ``5``
         It represents how much into the future is necessary to predict. This corresponds
         to the number of shifts that are going to be performed on y.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from giottotime.model_selection import horizon_shift
+    >>> X = pd.DataFrame(range(0, 5), index=pd.date_range("2020-01-01", "2020-01-05"))
+    >>> horizon_shift(X, horizon=2)
+                y_1  y_2
+    2020-01-01  1.0  2.0
+    2020-01-02  2.0  3.0
+    2020-01-03  3.0  4.0
+    2020-01-04  4.0  NaN
+    2020-01-05  NaN  NaN
+
     """
 
     y = pd.DataFrame(index=time_series.index)

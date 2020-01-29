@@ -31,6 +31,22 @@ class TrendForecaster(BaseEstimator, RegressorMixin):
     method : string,
         Loss function optimisation method
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> from giottotime.model_selection import horizon_shift, FeatureSplitter
+    >>> from giottotime.forecasting import TrendForecaster
+    >>>
+    >>> X = pd.DataFrame(np.random.random((10, 1)), index=pd.date_range("2020-01-01", "2020-01-10"))
+    >>> y = horizon_shift(X, horizon=2)
+    >>> X_train, y_train, X_test, y_test = FeatureSplitter().transform(X, y)
+    >>>
+    >>> tf = TrendForecaster(trend='polynomial', trend_x0=np.zeros(2))
+    >>> tf.fit(X_train).predict(X_test)
+    array([[0.39703029],
+           [0.41734957]])
+
     """
 
     def __init__(

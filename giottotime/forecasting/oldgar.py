@@ -24,7 +24,7 @@ class oldGAR:
     --------
     >>> import numpy as np
     >>> import pandas as pd
-    >>> from giottotime.models import oldGAR
+    >>> from giottotime.forecasting import oldGAR
     >>> from sklearn.ensemble import RandomForestRegressor
     >>> time_index = pd.date_range("2020-01-01", "2020-01-30")
     >>> X = pd.DataFrame(np.random.random((30, 5)), index=time_index)

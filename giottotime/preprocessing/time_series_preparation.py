@@ -53,7 +53,9 @@ class TimeSeriesPreparation:
 
     Examples
     --------
-    >>> time_series = [1,2,3,5,5,7]
+    >>> import pandas as pd
+    >>> from giottotime.preprocessing import TimeSeriesPreparation
+    >>> time_series = [1, 2, 3, 5, 5, 7]
     >>> period_index_time_series = pd.Series(
     ...     index = pd.period_range(start='01-01-2010', freq='10D', periods=6),
     ...     data=[1,2,3,5,5,7]
@@ -122,7 +124,7 @@ class TimeSeriesPreparation:
         self.sequence_converter = SequenceToTimeIndexSeries(
             self.start, self.end, self.freq
         )
-        self.resampler = TimeSeriesResampler()
+        # self.resampler = TimeSeriesResampler()
         self.to_period_index_series_converter = TimeIndexSeriesToPeriodIndexSeries(
             self.freq
         )
