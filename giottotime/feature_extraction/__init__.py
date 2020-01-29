@@ -7,18 +7,18 @@ from giottotime.feature_generation.calendar import Calendar
 from .standard import (
     Shift,
     MovingAverage,
+    MovingCustomFunction,
     Polynomial,
     Exogenous,
     CustomFeature,
 )
 
-
 from .trend import Detrender
-
 
 __all__ = [
     "Shift",
     "MovingAverage",
+    "MovingCustomFunction",
     "Polynomial",
     "Exogenous",
     "Calendar",

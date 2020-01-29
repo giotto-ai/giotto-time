@@ -43,28 +43,22 @@ class PeriodicSeasonal(BaseEstimator, TransformerMixin, FeatureMixin):
 
     Examples
     --------
-    >>> from giottotime.feature_extraction import PeriodicSeasonal
-    >>> period_feature = PeriodicSeasonal(start_date="2020-01-01",
-    ...                                          index_period=10)
-    >>> period_feature.fit_transform()
-    Float64Index([              0.0, 0.0027397260273972603,
-               0.005479452054794521,   0.00821917808219178,
-               0.010958904109589041,    0.0136986301369863,
-                0.01643835616438356,  0.019178082191780823,
-               0.021917808219178082,  0.024657534246575342],
-             dtype='float64')
-
-       PeriodicSeasonal
-    0                 0.000000
-    1                 0.008607
-    2                 0.017211
-    3                 0.025810
-    4                 0.034401
-    5                 0.042982
-    6                 0.051551
-    7                 0.060104
-    8                 0.068639
-    9                 0.077154
+    >>> import pandas as pd
+    >>> from giottotime.feature_generation import PeriodicSeasonal
+    >>> X = pd.DataFrame(range(0, 10), index=pd.date_range(start='2019-04-18',  end='2019-04-27', freq='d'))
+    >>> periodic = PeriodicSeasonal()
+    >>> periodic.fit_transform(X)
+                0__PeriodicSeasonal
+    2019-04-18             0.000000
+    2019-04-19             0.008607
+    2019-04-20             0.017211
+    2019-04-21             0.025810
+    2019-04-22             0.034401
+    2019-04-23             0.042982
+    2019-04-24             0.051551
+    2019-04-25             0.060104
+    2019-04-26             0.068639
+    2019-04-27             0.077154
 
     """
 
@@ -197,7 +191,6 @@ class PeriodicSeasonal(BaseEstimator, TransformerMixin, FeatureMixin):
             )
 
     def _compute_periodic_feature(self, datetime_index: pd.DatetimeIndex):
-        print((datetime_index - self.start_date) / self.period)
         return (
             np.sin(2 * pi * (datetime_index - self.start_date) / self.period)
         ) * self.amplitude
@@ -218,15 +211,17 @@ class Constant(BaseEstimator, TransformerMixin, FeatureMixin):
 
     Examples
     --------
-    >>> from giottotime.feature_extraction import ConstantFeature
-    >>> constant_feature = ConstantFeature(constant=3, length=5)
-    >>> constant_feature.transform()
-      ConstantFeature
-    0               3
-    1               3
-    2               3
-    3               3
-    4               3
+    >>> import pandas as pd
+    >>> from giottotime.feature_generation import Constant
+    >>> X = pd.DataFrame(range(0, 5), index=pd.date_range(start='2019-04-18',  end='2019-04-22', freq='d'))
+    >>> constant = Constant(constant=3)
+    >>> constant.fit_transform(X)
+                0__Constant
+    2019-04-18          3.0
+    2019-04-19          3.0
+    2019-04-20          3.0
+    2019-04-21          3.0
+    2019-04-22          3.0
 
     """
 
