@@ -1,10 +1,7 @@
-from itertools import product
-
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.linear_model import LinearRegression
-from sklearn.utils.validation import check_is_fitted
 
 from giottotime.causality.base import CausalityMixin
 
@@ -14,6 +11,9 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
 
     Parameters
     ----------
+    min_shift : int, optional, default: ``1``
+        The minimum number of shifts to check for.
+
     max_shift : int, optional, default: ``10``
         The maximum number of shifts to check for.
 
@@ -23,6 +23,9 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
 
     dropna : bool, optional, default: ``False``
         Determines if the Nan values created by shifting are retained or dropped.
+
+    bootstrap_iterations : int, optional, default: ``None``
+        If not None, compute the p_values of the test, by performing bootstrap.
 
     Examples
     --------
@@ -50,13 +53,14 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
 
     def __init__(
         self,
+        min_shift: int = 1,
         max_shift: int = 10,
         target_col: str = "y",
         dropna: bool = False,
-        bootstrap_iterations=1000,
-        bootstrap_samples=100,
+        bootstrap_iterations: int = None,
     ):
-        super().__init__(bootstrap_iterations, bootstrap_samples)
+        super().__init__(bootstrap_iterations=bootstrap_iterations)
+        self.min_shift = min_shift
         self.max_shift = max_shift
         self.target_col = target_col
         self.dropna = dropna
@@ -76,95 +80,29 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
         self : ``ShiftedLinearCoefficient``
 
         """
-        best_shifts = pd.DataFrame(columns=["x", "y", "shift", "max_corr", "p_values"])
-        best_shifts = best_shifts.astype(
-            {
-                "x": np.float64,
-                "y": np.float64,
-                "shift": np.int64,
-                "max_corr": np.int64,
-                "p_values": np.float64,
-            }
-        )
+        best_shifts = self._compute_best_shifts(data, self._get_max_coeff_shift)
+        pivot_tables = self._create_pivot_tables(best_shifts)
 
-        for x, y in product(data.columns, repeat=2):
-            res = self._get_max_coeff_shift(data, self.max_shift, x=x, y=y)
-            best_shift = res[1]
-            max_corr = res[0]
-            p_value = self._compute_is_test_significant(data, x, y, best_shift)
-            # N = data.shape[0] - max_shift
-            best_shifts = best_shifts.append(
-                {
-                    "x": x,
-                    "y": y,
-                    "shift": best_shift,
-                    "max_corr": max_corr,
-                    "p_values": p_value,
-                },
-                ignore_index=True,
-            )
+        self.best_shifts_ = pivot_tables["best_shifts"]
+        self.max_corrs_ = pivot_tables["max_corrs"]
 
-        pivot_best_shifts = pd.pivot_table(
-            best_shifts, index=["x"], columns=["y"], values="shift"
-        )
-        max_corrs = pd.pivot_table(
-            best_shifts, index=["x"], columns=["y"], values="max_corr"
-        )
-        p_values = pd.pivot_table(
-            best_shifts, index=["x"], columns=["y"], values="p_values"
-        )
-
-        self.best_shifts_ = pivot_best_shifts
-        self.max_corrs_ = max_corrs
-        self.p_values_ = p_values
+        if self.bootstrap_iterations:
+            self.p_values_ = pivot_tables["p_values"]
 
         return self
 
-    def transform(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Shifts each input time series by the amount which maximizes shifted linear
-        fit coefficients with the selected 'y' column.
-
-        Parameters
-        ----------
-        data : pd.DataFrame, shape (n_samples, n_time_series), required
-            The DataFrame containing the time series on which to perform the
-            transformation.
-
-        Returns
-        -------
-        data_t : pd.DataFrame, shape (n_samples, n_time_series)
-            The DataFrame (Pivot table) of the shifts which maximize the shifted linear
-            fit coefficients between each time series. The shift is indicated in rows.
-
-        """
-        check_is_fitted(self)
-        data_t = data.copy()
-
-        for col in data_t:
-            if col != self.target_col:
-                data_t[col] = data_t[col].shift(
-                    -self.best_shifts_[col][self.target_col]
-                )
-
-        if self.dropna:
-            data_t = data_t.dropna()
-
-        return data_t
-
-    def _get_max_coeff_shift(
-        self, data: pd.DataFrame, max_shift: int, x: str = "x", y: str = "y"
-    ) -> (float, int):
+    def _get_max_coeff_shift(self, data: pd.DataFrame, x, y):
         shifts = pd.DataFrame()
 
         shifts[x] = data[x]
         shifts[y] = data[y]
 
-        for shift in range(1, max_shift):
+        for shift in range(self.min_shift, self.max_shift):
             shifts[shift] = data[x].shift(shift)
 
         shifts = shifts.dropna()
         lf = LinearRegression().fit(
-            shifts[range(1, max_shift)].values, shifts[y].values
+            shifts[range(self.min_shift, self.max_shift)].values, shifts[y].values
         )
 
         q = lf.coef_.max(), np.argmax(lf.coef_) + 1
