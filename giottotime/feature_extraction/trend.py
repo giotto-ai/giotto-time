@@ -21,17 +21,16 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
 
     Parameters
     ----------
-    trend : string,
+    trend : ``'polynomial'`` | ``'exponential'``, required
         The kind of trend removal to apply.
-        Supported trends: ['polynomial', 'exponential']
 
-    trend_x0 : np.array,
+    trend_x0 : np.array, required
         Initialisation parameters passed to the trend function
 
-    loss : Callable,
-        Loss function
+    loss : Callable, optional, default: ``mean_squared_error``
+        The loss function to minimize.
 
-    method : string,
+    method : string, optional, default: ``"BFGS"``
         Loss function optimisation method
 
     Examples
@@ -69,7 +68,7 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
         self.loss = loss
         self.method = method
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y=None) -> "Detrender":
         """Fit the estimator.
 
         Parameters
@@ -85,6 +84,7 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
         -------
         self : object
             Returns self.
+
         """
 
         # TODO: create validation function
@@ -112,29 +112,31 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
 
         return self
 
-    def transform(self, ts: pd.DataFrame) -> pd.DataFrame:
+    def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """Transform the ``time_series`` by removing the trend.
 
         Parameters
         ----------
-        ts: pd.DataFrame, shape (n_samples, 1), required
+        time_series: pd.DataFrame, shape (n_samples, 1), required
             The time series to transform.
 
         Returns
         -------
-        ts_t : pd.DataFrame, shape (n_samples, n_features)
+        time_series_t : pd.DataFrame, shape (n_samples, n_features)
             The transformed time series, without the trend.
 
         """
         check_is_fitted(self)
 
-        time_steps = (ts.index - self.t0_) / self.period_
+        time_steps = (time_series.index - self.t0_) / self.period_
 
         predictions = pd.Series(
-            index=ts.index,
+            index=time_series.index,
             data=np.array(
                 [TRENDS[self.trend](t, self.best_trend_params_) for t in time_steps]
             ).flatten(),
         )
 
-        return ts.sub(predictions, axis=0).add_suffix("__" + self.__class__.__name__)
+        return time_series.sub(predictions, axis=0).add_suffix(
+            "__" + self.__class__.__name__
+        )

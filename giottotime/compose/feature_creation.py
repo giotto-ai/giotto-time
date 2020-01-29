@@ -5,20 +5,22 @@ from sklearn.compose import ColumnTransformer
 class FeatureCreation(ColumnTransformer):
     """Applies transformers to columns of a pandas DataFrame.
 
-    This estimator is a wrapper of sklearn.compose.ColumnTransformer, the only difference is the output type of
-    fit_transform and transform methods which is a DataFrame instead of an array.
+    This estimator is a wrapper of sklearn.compose.ColumnTransformer, the only
+    difference is the output type of fit_transform and transform methods which is a
+    DataFrame instead of an array.
+
     """
 
-    def fit_transform(self, X, y=None):
+    def fit_transform(self, X: pd.DataFrame, y: pd.DataFrame = None):
         """Fit all transformers, transform the data and concatenate results.
 
         Parameters
         ----------
-        X : DataFrame of shape [n_samples, n_features]
+        X : pd.DataFrame, shape (n_samples, n_features), required
             Input data, of which specified subsets are used to fit the
             transformers.
 
-        y : array-like, shape (n_samples, ...), optional
+        y : pd.DataFrame, shape (n_samples, ...), optional, default: ``None``
             Targets for supervised learning.
 
         Examples
@@ -50,12 +52,12 @@ class FeatureCreation(ColumnTransformer):
         X_t_df = pd.DataFrame(data=X_t, columns=self.get_feature_names(), index=X.index)
         return X_t_df
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame):
         """Transform X separately by each transformer, concatenate results.
 
         Parameters
         ----------
-        X : DataFrame of shape [n_samples, n_features]
+        X : pd.DataFrame, shape (n_samples, n_features), required
             The data to be transformed by subset.
 
         Returns

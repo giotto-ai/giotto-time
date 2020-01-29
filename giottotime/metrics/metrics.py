@@ -101,7 +101,7 @@ def max_error(
 
     Examples
     --------
-    >>> from giottotime.loss_functions import max_error
+    >>> from giottotime.metrics import max_error
     >>> y_true = [0, 1, 2, 3, 4, 5]
     >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
     >>> max_error(y_true, y_pred)

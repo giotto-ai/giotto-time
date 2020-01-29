@@ -18,17 +18,16 @@ class TrendForecaster(BaseEstimator, RegressorMixin):
 
     Parameters
     ----------
-    trend : string,
+    trend : ``"polynomial"`` | ``"exponential"``, required
         The kind of trend removal to apply.
-        Supported trends: ['polynomial', 'exponential']
 
-    trend_x0 : np.array,
+    trend_x0 : np.array, required
         Initialisation parameters passed to the trend function
 
-    loss : Callable,
-        Loss function
+    loss : Callable, optional, default: ``mean_squared_error``
+        Loss function to minimize.
 
-    method : string,
+    method : str, optional, default: ``"BFGS"``
         Loss function optimisation method
 
     """
@@ -45,12 +44,12 @@ class TrendForecaster(BaseEstimator, RegressorMixin):
         self.loss = loss
         self.method = method
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y=None) -> "TrendForecaster":
         """Fit the estimator.
 
         Parameters
         ----------
-        X : pd.DataFrame, shape (n_samples, n_features)
+        X : pd.DataFrame, shape (n_samples, n_features), required
             Input data.
 
         y : None
@@ -61,6 +60,7 @@ class TrendForecaster(BaseEstimator, RegressorMixin):
         -------
         self : object
             Returns self.
+
         """
 
         if self.trend not in TRENDS:
