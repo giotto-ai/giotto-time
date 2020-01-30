@@ -3,7 +3,7 @@
 
 |Version| |Azure-build|_ |Slack-join|_ |Black|_
 
-.. |Version| image:: https://badge.fury.io/py/giotto-time
+.. |Version| image:: https://badge.fury.io/py/giotto-time.svg
    :target: https://pypi.python.org/pypi/giotto-time/
 
 .. |Azure-build| image:: https://dev.azure.com/maintainers/Giotto/_apis/build/status/giotto-ai.giotto-time?branchName=master
@@ -58,7 +58,7 @@ User installation
 
 Linux, MacOS and Windows
 ''''''''''''''''''''''''
-Run this command in your favourite python environment::
+Run this command in your favourite python environment  ::
 
     pip install giotto-time
 
@@ -76,12 +76,12 @@ Developer installation
 Source code
 '''''''''''
 
-You can obtain the latest state of the source code with the command::
+You can obtain the latest state of the source code with the command  ::
 
     git clone https://github.com/giotto-ai/giotto-time.git
 
 
-then run::
+then run  ::
 
 .. code:: bash
 
