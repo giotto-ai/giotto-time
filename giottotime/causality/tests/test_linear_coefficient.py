@@ -43,7 +43,7 @@ def test_linear_p_values():
     expected_shifts = [randint(2, 9) * 2 for _ in range(3)]
     df = make_df_from_expected_shifts(expected_shifts)
     shifted_test = ShiftedLinearCoefficient(
-        target_col="A", max_shift=5, bootstrap_iterations=500, bootstrap_samples=1000,
+        target_col="A", max_shift=5, bootstrap_iterations=500,
     )
     shifted_test.fit(df)
 

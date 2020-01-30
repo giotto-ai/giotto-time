@@ -1,5 +1,5 @@
 """
-The :mod:`giottotime.feature_extraction` module deals with the preparation of time series
+The :mod:`giottotime.preprocessing` module deals with the preprocessing of time series
 data, such as conversion to `pandas.DataFrame` with a `PeriodIndex`.
 """
 

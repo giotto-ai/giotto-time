@@ -124,7 +124,7 @@ class TimeSeriesPreparation:
         self.sequence_converter = SequenceToTimeIndexSeries(
             self.start, self.end, self.freq
         )
-        # self.resampler = TimeSeriesResampler()
+        self.resampler = TimeSeriesResampler()
         self.to_period_index_series_converter = TimeIndexSeriesToPeriodIndexSeries(
             self.freq
         )

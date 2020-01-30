@@ -3,6 +3,9 @@ from typing import Optional, Callable
 import pandas as pd
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils.validation import check_is_fitted
+
+from ..base import FeatureMixin
 
 __all__ = [
     "Shift",
@@ -12,10 +15,6 @@ __all__ = [
     "Exogenous",
     "CustomFeature",
 ]
-
-from sklearn.utils.validation import check_is_fitted
-
-from ..base import FeatureMixin
 
 
 class Shift(BaseEstimator, TransformerMixin, FeatureMixin):
@@ -209,10 +208,7 @@ class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
     """
 
     def __init__(
-        self,
-        custom_feature_function: Callable,
-        window_size: int = 1,
-        raw: bool = True,
+        self, custom_feature_function: Callable, window_size: int = 1, raw: bool = True,
     ):
         super().__init__()
         self.custom_feature_function = custom_feature_function
@@ -220,13 +216,13 @@ class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
         self.raw = raw
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
-        """compute the moving custom function, for every row of ``time_series``, of the
+        """For every row of ``time_series``, compute the moving custom function of the
          previous ``window_size`` elements.
 
         Parameters
         ----------
         time_series : pd.DataFrame, shape (n_samples, 1), required
-            The DataFrame on which to compute the rolling moving custom function
+            The DataFrame on which to compute the rolling moving custom function.
 
         Returns
         -------
@@ -274,16 +270,24 @@ class Polynomial(BaseEstimator, TransformerMixin, FeatureMixin):
         self.degree = degree
 
     def get_feature_names(self):
+        """Return feature names for output features.
+
+        Returns
+        -------
+        output_feature_names : ndarray, shape (n_output_features,)
+            Array of feature names.
+
+        """
         return [
             f"_{index}" + self.__class__.__name__ for index in range(self.degree + 1)
         ]
 
-    def fit(self, X, y=None):
+    def fit(self, time_series: pd.DataFrame, y=None):
         """Fit the estimator.
 
         Parameters
         ----------
-        X : pd.DataFrame, shape (n_samples, n_features)
+        time_series : pd.DataFrame, shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -295,7 +299,7 @@ class Polynomial(BaseEstimator, TransformerMixin, FeatureMixin):
         self : object
             Returns self.
         """
-        self.columns_ = X.columns.values
+        self.columns_ = time_series.columns.values
         return self
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
@@ -374,12 +378,12 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
         self.method = method
         self.exogenous_time_series = exogenous_time_series
 
-    def fit(self, X, y=None):
+    def fit(self, time_series, y=None):
         """Fit the estimator.
 
         Parameters
         ----------
-        X : pd.DataFrame, shape (n_samples, n_features)
+        time_series : pd.DataFrame, shape (n_samples, n_features)
             Input data.
 
         y : None
@@ -391,7 +395,7 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
         self : object
             Returns self.
         """
-        self.columns_ = X.columns.values
+        self.columns_ = time_series.columns.values
         return self
 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
@@ -456,24 +460,24 @@ class CustomFeature(BaseEstimator, TransformerMixin, FeatureMixin):
         self.custom_feature_function = custom_feature_function
         self.kwargs = kwargs
 
-    def fit(self, X, y=None):
+    def fit(self, time_series: pd.DataFrame, y=None) -> "CustomFeature":
         """Fit the estimator.
 
         Parameters
         ----------
-        X : pd.DataFrame, shape (n_samples, n_features)
+        time_series : pd.DataFrame, shape (n_samples, n_features)
             Input data.
 
         y : None
-            There is no need of a target in a transformer, yet the pipeline API
-            requires this parameter.
+            There is no need of a target in a transformer, yet the pipeline API requires
+            this parameter.
 
         Returns
         -------
         self : object
             Returns self.
         """
-        self.columns_ = X.columns.values
+        self.columns_ = time_series.columns.values
         return self
 
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
@@ -496,6 +500,7 @@ class CustomFeature(BaseEstimator, TransformerMixin, FeatureMixin):
         ``giottotime.feature_creation.FeatureCreation`` class, the output of  the custom
          function should be a ``pd.DataFrame`` and have the same index as
          ``time_series``.
+
         """
         check_is_fitted(self)
 

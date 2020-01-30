@@ -6,10 +6,10 @@
 Welcome to giotto-time's API reference!
 ========================================
 
-:mod:`giottotime.causality_tests`: Causality Tests
-==================================================
+:mod:`giottotime.causality`: Causality Tests
+============================================
 
-.. automodule:: giottotime.causality_tests
+.. automodule:: giottotime.causality
    :no-members:
    :no-inherited-members:
 
@@ -19,14 +19,14 @@ Welcome to giotto-time's API reference!
    :toctree: generated/
    :template: class.rst
 
-   causality_tests.ShiftedLinearCoefficient
-   causality_tests.ShiftedPearsonCorrelation
+   causality.ShiftedLinearCoefficient
+   causality.ShiftedPearsonCorrelation
 
 
-:mod:`giottotime.feature_creation`: Feature Creation
-====================================================
+:mod:`giottotime.compose`: Feature Creation
+===========================================
 
-.. automodule:: giottotime.feature_creation
+.. automodule:: giottotime.compose
    :no-members:
    :no-inherited-members:
 
@@ -36,23 +36,53 @@ Welcome to giotto-time's API reference!
    :toctree: generated/
    :template: class.rst
 
-   feature_creation.FeatureCreation
-   feature_creation.Shift
-   feature_creation.MovingAverage
-   feature_creation.ConstantFeature
-   feature_creation.Polynomial
-   feature_creation.Exogenous
-   feature_creation.CustomFeature
-   feature_creation.Calendar
-   feature_creation.PeriodicSeasonal
-   feature_creation.DetrendedFeature
-   feature_creation.RemovePolynomialTrend
-   feature_creation.RemoveExponentialTrend
+   compose.FeatureCreation
 
-:mod:`giottotime.loss_functions`: Loss Functions
-====================================================
 
-.. automodule:: giottotime.loss_functions
+:mod:`giottotime.feature_extraction`: Feature Extraction
+========================================================
+
+.. automodule:: giottotime.feature_extraction
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+    feature_extraction.Shift
+    feature_extraction.MovingAverage
+    feature_extraction.MovingCustomFunction
+    feature_extraction.Polynomial
+    feature_extraction.Exogenous
+    feature_extraction.CustomFeature
+
+
+:mod:`giottotime.feature_generation`: Feature Generation
+========================================================
+
+.. automodule:: giottotime.feature_generation
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+
+   feature_generation.PeriodicSeasonal
+   feature_generation.Constant
+   feature_generation.Calendar
+
+
+:mod:`giottotime.forecasting`: Forecasting
+==========================================
+
+.. automodule:: giottotime.forecasting
    :no-members:
    :no-inherited-members:
 
@@ -62,12 +92,46 @@ Welcome to giotto-time's API reference!
    :toctree: generated/
    :template: function.rst
 
-   loss_functions.smape
-   loss_functions.max_error
+   forecasting.GAR
+   forecasting.GARFF
+   forecasting.TrendForecaster
+
+
+:mod:`giottotime.forecasting`: Regressors
+=========================================
+
+.. automodule:: giottotime.regressors
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+   regressors.LinearRegressor
+
+
+:mod:`giottotime.metrics`: Metrics
+==================================
+
+.. automodule:: giottotime.metrics
+   :no-members:
+   :no-inherited-members:
+
+.. currentmodule:: giottotime
+
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
+
+   metrics.smape
+   metrics.max_error
 
 
 :mod:`giottotime.model_selection`: Model Selection
-====================================================
+==================================================
 
 .. automodule:: giottotime.model_selection
    :no-members:
@@ -81,11 +145,17 @@ Welcome to giotto-time's API reference!
 
    model_selection.FeatureSplitter
 
+.. autosummary::
+   :toctree: generated/
+   :template: function.rst
 
-:mod:`giottotime.models`: Models
-====================================================
+   model_selection.horizon_shift
 
-.. automodule:: giottotime.models
+
+:mod:`giottotime.preprocessing`: Preprocessing
+==============================================
+
+.. automodule:: giottotime.preprocessing
    :no-members:
    :no-inherited-members:
 
@@ -95,24 +165,7 @@ Welcome to giotto-time's API reference!
    :toctree: generated/
    :template: class.rst
 
-   models.GAR
-   models.LinearRegressor
-
-
-:mod:`giottotime.time_series_preparation`: Time Series Preparation
-====================================================================
-
-.. automodule:: giottotime.time_series_preparation
-   :no-members:
-   :no-inherited-members:
-
-.. currentmodule:: giottotime
-
-.. autosummary::
-   :toctree: generated/
-   :template: class.rst
-
-   time_series_preparation.SequenceToTimeIndexSeries
-   time_series_preparation.PandasSeriesToTimeIndexSeries
-   time_series_preparation.TimeIndexSeriesToPeriodIndexSeries
-   time_series_preparation.TimeSeriesPreparation
+   preprocessing.SequenceToTimeIndexSeries
+   preprocessing.PandasSeriesToTimeIndexSeries
+   preprocessing.TimeIndexSeriesToPeriodIndexSeries
+   preprocessing.TimeSeriesPreparation
