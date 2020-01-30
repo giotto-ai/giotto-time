@@ -8,8 +8,7 @@ from sklearn.utils.validation import check_is_fitted
 
 
 class LinearRegressor:
-    """Implementation of a LinearRegressor that takes a custom lossfunction and is able
-     to fit the model over it.
+    """Implementation of a LinearRegressor that takes a custom loss function and is able to fit the model over it.
 
     Parameters
     ----------
