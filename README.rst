@@ -1,5 +1,5 @@
 .. image:: https://www.giotto.ai/static/vector/logo.svg
-   :width:
+   :width: 500
 
 |Version| |Azure-build| |PyPI download month| |Slack-join| |Black|
 
