@@ -1,7 +1,7 @@
 .. image:: https://www.giotto.ai/static/vector/logo.svg
    :width:
 
-|Version| |Azure-build|_ |Slack-join|_ |Black|_ |PyPI download month|
+|Version| |Azure-build| |Slack-join| |Black| |PyPI download month|
 
 .. |Version| image:: https://badge.fury.io/py/giotto-time.svg
    :target: https://pypi.python.org/pypi/giotto-time/
