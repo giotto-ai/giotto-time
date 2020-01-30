@@ -38,7 +38,10 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
 
     country : str, optional, default: ``'Brazil'``
         The name of the country from which to retrieve the holidays. The country must be
-         located in the given ``region``.
+         located in the given ``region``. For certain countries workalendar provides 
+         additional 'subregions'. In order to use them instead of the whole country, just
+         use the name of the subregion instead of the country name (e.g. 'Vaud' instead of
+         'Switzerland' for the canton of Vaud which is a part of Switzerland). 
 
     start_date : str, optional, default: ``'01/01/2019'``
         The date starting from which to retrieve the holidays.
