@@ -140,6 +140,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
         -------
         self : object
             Returns self.
+
         """
         self.columns_ = X.columns.values
         return self
@@ -215,6 +216,26 @@ class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
         self.window_size = window_size
         self.raw = raw
 
+    def fit(self, time_series: pd.DataFrame, y=None):
+        """Fit the estimator.
+
+        Parameters
+        ----------
+        time_series : pd.DataFrame, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+        self.columns_ = time_series.columns.values
+        return self
+
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """For every row of ``time_series``, compute the moving custom function of the
          previous ``window_size`` elements.
@@ -231,6 +252,8 @@ class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
             moving custom function for each element.
 
         """
+        check_is_fitted(self)
+
         time_series_mvg_cust = time_series.rolling(self.window_size).apply(
             self.custom_feature_function, raw=self.raw
         )

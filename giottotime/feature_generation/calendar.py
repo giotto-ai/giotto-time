@@ -4,6 +4,8 @@ from typing import Optional, Union, List
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
+import workalendar
+from sklearn.utils.validation import check_is_fitted
 
 from giottotime.base import FeatureMixin
 
@@ -155,6 +157,8 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
             A DataFrame containing the events.
 
         """
+        check_is_fitted(self)
+
         if time_series is not None:
             _check_index(time_series)
 
