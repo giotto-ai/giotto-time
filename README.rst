@@ -15,7 +15,7 @@
 .. |PyPI pyversions| image:: https://img.shields.io/pypi/pyversions/giotto-time.svg
    :target: https://pypi.python.org/pypi/giotto-time/
 
-.. |Slack-join| image:: https://img.shields.io/badge/Slack-Join-green
+.. |Slack-join| image:: https://img.shields.io/badge/Slack-Join-blue
    :target: https://slack.giotto.ai/
 
 .. |Black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
