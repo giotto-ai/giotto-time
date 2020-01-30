@@ -140,6 +140,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
         -------
         self : object
             Returns self.
+
         """
         self.columns_ = X.columns.values
         return self
@@ -251,6 +252,8 @@ class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
             moving custom function for each element.
 
         """
+        check_is_fitted(self)
+
         time_series_mvg_cust = time_series.rolling(self.window_size).apply(
             self.custom_feature_function, raw=self.raw
         )
