@@ -1,190 +1,130 @@
 .. image:: https://www.giotto.ai/static/vector/logo.svg
-   :width: 850
+   :width: 500
 
-|Azure|_ 
+|Version| |Azure-build| |PyPI download month| |PyPI pyversions| |Slack-join| |Black|
 
-.. |Azure| image:: https://dev.azure.com/maintainers/Giotto/_apis/build/status/giotto-ai.giotto-time?branchName=master
-.. _Azure: https://dev.azure.com/maintainers/Giotto/_build/latest?definitionId=4&branchName=master
+.. |Version| image:: https://badge.fury.io/py/giotto-time.svg
+   :target: https://pypi.python.org/pypi/giotto-time/
+
+.. |Azure-build| image:: https://dev.azure.com/maintainers/Giotto/_apis/build/status/giotto-ai.giotto-time?branchName=master
+   :target: https://dev.azure.com/maintainers/Giotto/_build/latest?definitionId=4&branchName=master
+
+.. |PyPI download month| image:: https://img.shields.io/pypi/dm/giotto-time.svg
+   :target: https://pypi.python.org/pypi/giotto-time/
+
+.. |PyPI pyversions| image:: https://img.shields.io/pypi/pyversions/giotto-time.svg
+   :target: https://pypi.python.org/pypi/giotto-time/
+
+.. |Slack-join| image:: https://img.shields.io/badge/Slack-Join-blue
+   :target: https://slack.giotto.ai/
+
+.. |Black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/ambv/black
 
 giotto-time
 ===========
 
-Machine learning based time series forecasting tools for python.
+giotto-time is a machine learning based time series forecasting toolbox in Python.
+It is part of the `Giotto <https://github.com/giotto-ai>`_ family of open-source projects.
 
-Overview
-========
+Project genesis
+---------------
 
-giotto-time is a time series forecasting library in Python. The main novelties compared to traditional time series libraries are the following:
+giotto-time was created to provide time series feature extraction, analysis and
+forecasting tools based on scikit-learn API.
 
-* Feature creation, model selection, model assessment and prediction pipeline for time series models.
+Documentation
+-------------
 
-* Plug-and-play availability of any scikit-learn-compatible (i.e., in the fit-transform framework) regression or classification models for forecasting.
+- API reference (stable release): https://docs-time.giotto.ai
 
-* Minimization of standard and custom loss functions for time series (SMAPE, max error, etc..).
+Getting started
+---------------
 
-* Easy-to-use scikit-learn-familiar and pandas-familiar API.
+Get started with giotto-time by following the installation steps below.
+Simple tutorials and real-world use cases can be found in example folder as notebooks.
 
-* Additionally we provide a causality tests with a scikit-learn-like transformer interface.
+Installation
+------------
 
-Time Series Forecasting Model
-=============================
+Dependencies
+~~~~~~~~~~~~
 
-Giotto-time provide the GAR class (Generalize Auto Regressive model). It operates in a similar way to the standard AR, but with an arbitrary number of features and with an arbitrary underlying regression model.
+The latest stable version of giotto-time requires:
 
+- Python (>= 3.6)
+- scikit-learn (>= 0.22.0)
+- pandas>=0.25.3
+- workalendar>=7.1.1
 
-.. image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/gar.png?v=400&s=200
-  :width: 600
+To run the examples, jupyter is required.
 
+User installation
+~~~~~~~~~~~~~~~~~
 
-This model allows the full force of machine learning regressors (compatible with the fit-transform framework of scikit-learn) to be combined with advanced feature creation strategies to forecast time series in a convienent api.
+Linux, MacOS and Windows
+''''''''''''''''''''''''
+Run this command in your favourite python environment  ::
 
->>> from giottotime.feature_creation import FeaturesCreation
->>> from giottotime.feature_creation.index_independent_features import Shift, MovingAverage
->>> from giottotime.model_selection.train_test_splitter import TrainTestSplitter
->>> from giottotime.regressors import LinearRegressor
->>> from giottotime.models.time_series_models import GAR
->>> 
->>> time_series = get_time_series()
->>> 
->>> features_creation = FeaturesCreation(
->>>     horizon=4,
->>>     features = [Shift(1), Shift(2), MovingAverage(5)]
->>> )
->>>
->>> train_test_splitter = TrainTestSplitter()
->>> time_series_model = GAR(base_model=LinearRegressor())
->>> 
->>> X, y = features_creation.transform(time_series)
->>> X_train, y_train, X_test, y_test = train_test_splitter.transform(X, y)
->>> 
->>> time_series_model.fit(X_train, y_train)
->>> predictions = time_series_model.predict(X_test)
+    pip install giotto-time
 
+Contributing
+------------
 
-Time Series Preparation
-=======================
+We welcome new contributors of all experience levels. The Giotto
+community goals are to be helpful, welcoming, and effective. To learn more about
+making a contribution to giotto-time, please see the `CONTRIBUTING.rst
+<https://github.com/giotto-ai/giotto-time/blob/master/CONTRIBUTING.rst>`_ file.
 
-To transform an input array-like structure into a DataFrame with a PeriodIndex we provide the classes:
+Developer installation
+~~~~~~~~~~~~~~~~~~~~~~
 
-* TimeSeriesPreparation
-* TimeSeriesConversion
-* SequenceToTimeIndexSeries
-* PandasSeriesToTimeIndexSeries
-* TimeIndexSeriesToPeriodIndexSeries
+Source code
+'''''''''''
 
-Feature Creation
-================
+You can obtain the latest state of the source code with the command  ::
 
-The following time series features are currently supported:
-
-* Calendar
-* PeriodicSeasonal
-* Shift
-* MovingAverage
-* ConstantFeature
-* Polynomial
-* Exogenous
-* CustomFeature
-
-These features all have a scikit-learn-like interface and behave as transformers.
-
-The class FeatureCreation wraps a list of features together and returns the X and y matrices from a time series given as input.
-
-Time Series Trend Model
-=======================
-
-We provide main classes to analyze and remove trends from time series in order to create trend stationary time series.
-
-Specifically, giotto-time includes ExponentialTrend, PolynomialTrend model classes and de-trending transformers.
-
->>> import numpy as np
->>> import pandas as pd
->>>
->>> import matplotlib.pyplot as plt
->>>
->>> from giottotime.models.regressors.linear_regressor import LinearRegressor
->>> from giottotime.loss_functions.loss_functions import max_error, smape
->>>
->>> from giottotime.models.trend_models.polynomial_trend import PolynomialTrend
->>>
->>> from math import pi
->>>
->>> d = pd.read_csv('trend.csv', index_col=0, parse_dates=True)
->>> tm = PolynomialTrend(order=3)
->>>
->>> tm.fit(d)
->>>
->>> d.plot(figsize=(10, 10))
->>> plt.show()
->>>
->>> detrended = tm.transform(d)
->>>
->>> detrended.plot(figsize=(10, 10))
->>> plt.show()
-
-|imga|
-
-.. |imga| image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/trends.png
-   :width: 450
-
-Before the detrending tranformer, a clear quadratic trend is present in the data. For additional information on trend stationarity, see: Trend stationarity: Wikipedia - https://en.wikipedia.org/wiki/Trend_stationary.
-
-Custom Regressors
-=================
-
-LinearRegressor is a linear regressor class that minimizes a custom loss function (compatitble with all scikit-learn metrics).
-   
-.. image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/custom_error.png
-
-In time series forecasting, it can be essential to minimize error metrics other than the standard R squared. Using this regressor class, it is possible to fit smape, max error and a range of other time series forecasting metrics easily with a simple interface via the GAR class.
-
->>> from giottotime.models.regressors.linear_regressor import LinearRegressor
->>> from giottotime.loss_functions import max_error
->>> import numpy as np
->>> import pandas as pd
->>> X = np.random.random((100, 10))
->>> y = np.random.random(100)
->>> lr = LinearRegressor(loss=max_error)
->>> X_train, y_train = X[:90], y[:90]
->>> X_test, y_test = X[90:], y[90:]
->>> x0 = [0]*11
->>> lr.fit(X_train, y_train, x0=x0)
->>> y_pred = lr.predict(X_test)
-
-Causality Tests
-===============
-
-We provide two tests: ShiftedLinearCoefficient and ShiftedPearsonCorrelation.
-
-These tests (which are implemented as scikit-learn compatible transformers) determine which shift of each time series maximizes the correlation to each other input time series. This is a very similar construction to the granger test.
-
-.. image:: https://storage.googleapis.com/l2f-open-models/giotto-time/images/granger.png
-  :width: 600
-
-An example use is shown below.
-
->>> from giottotime.causality_tests.shifted_linear_coefficient import ShiftedLinearCoefficient
->>> import pandas.util.testing as testing
->>> data = testing.makeTimeDataFrame(freq="s")
->>> slc = ShiftedLinearCoefficient(target_col="A")
->>> slc.fit(data)
->>> slc.best_shifts_
-y  A  B  C  D
-x
-A  3  6  8  5
-B  9  9  4  1
-C  8  2  4  9
-D  3  9  4  3
->>> slc.max_corrs_
-y         A         B         C         D
-x
-A  0.460236  0.420005  0.339370  0.267143
-B  0.177856  0.300350  0.367150  0.550490
-C  0.484860  0.263036  0.456046  0.251342
-D  0.580068  0.344688  0.253626  0.256220
-
-The target-col input variable to the constructor is used in the transform method. It determines which set of shifts are applied to all inputs. For example, if 'A' is selected, each column will be transform by a shift corresponding to the 'A' row of the *best_shifts* pivot table.
-
-  
+    git clone https://github.com/giotto-ai/giotto-time.git
 
 
+then run
+
+.. code-block:: bash
+
+   cd giotto-time
+   pip install -e ".[tests, doc]"
+
+This way, you can pull the library's latest changes and make them immediately available on your machine.
+Note: we recommend upgrading ``pip`` and ``setuptools`` to recent versions before installing in this way.
+
+Testing
+~~~~~~~
+
+After installation, you can launch the test suite from outside the
+source directory::
+
+    pytest giottotime
+
+
+Changelog
+---------
+
+See the `RELEASE.rst <https://github.com/giotto-ai/giotto-time/blob/master/RELEASE.rst>`__ file
+for a history of notable changes to giotto-time.
+
+Important links
+~~~~~~~~~~~~~~~
+
+- Official source code repo: https://github.com/giotto-ai/giotto-time
+- Download releases: https://pypi.org/project/giotto-time/
+- Issue tracker: https://github.com/giotto-ai/giotto-time/issues
+
+Community
+---------
+
+Giotto Slack workspace: https://slack.giotto.ai/
+
+Contacts
+--------
+
+maintainers@giotto.ai
