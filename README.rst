@@ -1,10 +1,10 @@
 .. image:: https://www.giotto.ai/static/vector/logo.svg
    :width:
 
-|Version|_ |Azure-build|_ |Slack-join|_ |Black|_
+|Version| |Azure-build|_ |Slack-join|_ |Black|_
 
 .. |Version| image:: https://badge.fury.io/py/giotto-time
-.. _Version:
+   :target: https://pypi.python.org/pypi/giotto-time/
 
 .. |Azure-build| image:: https://dev.azure.com/maintainers/Giotto/_apis/build/status/giotto-ai.giotto-time?branchName=master
 .. _Azure-build: https://dev.azure.com/maintainers/Giotto/_build/latest?definitionId=4&branchName=master
@@ -83,7 +83,7 @@ You can obtain the latest state of the source code with the command::
 
 then run::
 
-.. code-block:: bash
+.. code:: bash
 
    cd giotto-time
    pip install -e ".[tests, doc]"
