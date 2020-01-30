@@ -44,23 +44,7 @@ def test_unevenly_spaced_time_series():
     )
 
     with pytest.raises(ValueError):
-        cal_feature.transform(unevenly_spaced_ts)
-
-
-def test_correct_calendar_without_input_ts():
-    start_date = "2018-01-01"
-    end_date = "2019-01-01"
-
-    cal_feature = Calendar(
-        start_date=start_date,
-        end_date=end_date,
-        region="america",
-        country="Brazil",
-        kernel=np.array([0, 1]),
-    )
-    Xt = cal_feature.transform()
-    expected_index = pd.date_range(start_date, end_date)
-    np.testing.assert_array_equal(Xt.index, expected_index)
+        cal_feature.fit_transform(unevenly_spaced_ts)
 
 
 @settings(deadline=pd.Timedelta(milliseconds=5000), max_examples=7)
@@ -73,5 +57,5 @@ def test_correct_index_random_ts(ts):
         country="Brazil",
         kernel=np.array([1, 2]),
     )
-    Xt = cal_feature.transform(ts)
+    Xt = cal_feature.fit_transform(ts)
     np.testing.assert_array_equal(Xt.index, ts.index)

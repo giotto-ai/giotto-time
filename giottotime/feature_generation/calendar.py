@@ -137,6 +137,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
             Returns self.
 
         """
+        self.columns_ = X.columns.values
         return self
 
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
