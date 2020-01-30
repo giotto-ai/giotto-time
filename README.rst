@@ -81,9 +81,9 @@ You can obtain the latest state of the source code with the command  ::
     git clone https://github.com/giotto-ai/giotto-time.git
 
 
-then run  ::
+then run
 
-.. code:: bash
+.. code-block:: bash
 
    cd giotto-time
    pip install -e ".[tests, doc]"
