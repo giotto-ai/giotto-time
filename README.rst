@@ -1,19 +1,22 @@
 .. image:: https://www.giotto.ai/static/vector/logo.svg
    :width:
 
-|Version| |Azure-build|_ |Slack-join|_ |Black|_
+|Version| |Azure-build|_ |Slack-join|_ |Black|_ |PyPI download month|
 
 .. |Version| image:: https://badge.fury.io/py/giotto-time.svg
    :target: https://pypi.python.org/pypi/giotto-time/
 
 .. |Azure-build| image:: https://dev.azure.com/maintainers/Giotto/_apis/build/status/giotto-ai.giotto-time?branchName=master
-.. _Azure-build: https://dev.azure.com/maintainers/Giotto/_build/latest?definitionId=4&branchName=master
+   :target: https://dev.azure.com/maintainers/Giotto/_build/latest?definitionId=4&branchName=master
+
+.. |PyPI download month| image:: https://img.shields.io/pypi/dm/ansicolortags.svg
+   :target: https://pypi.python.org/pypi/ansicolortags/
 
 .. |Slack-join| image:: https://img.shields.io/badge/Slack-Join-green
-.. _Slack-join: https://slack.giotto.ai/
+   :target: https://slack.giotto.ai/
 
 .. |Black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-.. _Black: https://github.com/ambv/black
+   :target: https://github.com/ambv/black
 
 giotto-time
 ===========
