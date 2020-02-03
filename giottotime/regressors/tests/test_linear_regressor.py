@@ -19,7 +19,7 @@ class TestLinearRegressor:
         np.testing.assert_array_almost_equal(predictions, expected, decimal=2)
 
     @settings(deadline=None)
-    @given(arrays(dtype=float, shape=(100, 1), elements=floats(allow_nan=False, allow_infinity=False, width=32)))
+    @given(arrays(dtype=float, shape=(100, 1), elements=floats(allow_nan=False, allow_infinity=False, width=16)))
     def test_linear_regressor_random_array(self, random_array):
         train, test = train_test_dataframe(random_array)
 

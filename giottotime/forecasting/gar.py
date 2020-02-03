@@ -4,16 +4,15 @@ from sklearn.multioutput import MultiOutputRegressor, RegressorChain
 
 # TODO: retest example + docs
 class GAR(MultiOutputRegressor):
-    """Generalized Auto Regression model also known as MultiOutputRegressor in
-    scikit-learn.
+    """Generalized Auto Regression model.
+    This model is a wrapper of ``sklearn.multioutput.MultiOutputRegressor`` but returns a ``pd.DataFrame``.
 
     Fit one model for each target variable contained in the ``y`` matrix.
 
     Parameters
     ----------
     estimator : estimator object, required
-        The model used to make the predictions step by step. This object must be
-        inherits from RegressorMixin.
+        The model used to make the predictions step by step. Regressor object such as derived from ``RegressorMixin``.
 
     n_jobs : int, optional, default: ``None``
         The number of jobs to use for the parallelization.
@@ -82,10 +81,10 @@ class GAR(MultiOutputRegressor):
         return y_p_df
 
 
-# FIXME: See #99
+# TODO: See #99
 class GARFF(RegressorChain):
-    """Generalized Auto Regression Feed-Forward model also known as RegressorChain in
-    scikit-learn.
+    """Generalized Auto Regression model with feedforward training.
+    This model is a wrapper of ``sklearn.multioutput.RegressorChain`` but returns a ``pd.DataFrame``.
 
     Fit one model for each target variable contained in the ``y`` matrix, also using the
     predictions of the previous model.
@@ -93,17 +92,16 @@ class GARFF(RegressorChain):
     Parameters
     ----------
     estimator : estimator object, required
-        The model used to make the predictions step by step. This object must be
-        inherits from RegressorMixin.
+        The model used to make the predictions step by step. Regressor object such as derived from ``RegressorMixin``.
 
-    random_state : int, optional, default: ``None``
-        The random number generator is used to generate random chain orders.
-
+    Notes
+    -----
+    ``sklearn.multioutput.RegressorChain`` order, cv and random_state parameters were set to None due to target order
+    importance in a time-series forecasting context.
     """
 
-    def __init__(self, estimator, random_state: int = None):
-        # TODO: justify order=None and cv in documentation
-        super().__init__(estimator, order=None, cv=None, random_state=random_state)
+    def __init__(self, estimator):
+        super().__init__(base_estimator=estimator, order=None, cv=None, random_state=None)
 
     def fit(self, X: pd.DataFrame, y: pd.DataFrame):
         """

@@ -316,10 +316,10 @@ class TestPolynomial:
 
         expected_pol_df = pd.DataFrame.from_dict(
             {
-                f"0__{feature_name}": [1.0, 1.0, 1.0, 1.0],
-                f"1__{feature_name}": [0.0, 1.0, 2.0, 3.0],
-                f"2__{feature_name}": [0.0, 1.0, 4.0, 9.0],
-                f"3__{feature_name}": [0.0, 1.0, 8.0, 27.0],
+                f"1__{feature_name}": [1.0, 1.0, 1.0, 1.0],
+                f"x0__{feature_name}": [0.0, 1.0, 2.0, 3.0],
+                f"x0^2__{feature_name}": [0.0, 1.0, 4.0, 9.0],
+                f"x0^3__{feature_name}": [0.0, 1.0, 8.0, 27.0],
             }
         )
         expected_pol_df.index = [
@@ -347,12 +347,12 @@ class TestPolynomial:
 
         expected_pol_df = pd.DataFrame.from_dict(
             {
-                f"0__{feature_name}": [1.0, 1.0, 1],
-                f"1__{feature_name}": [0.0, 2.0, 4],
-                f"2__{feature_name}": [1.0, 3.0, 5],
-                f"3__{feature_name}": [0.0, 4.0, 16.0],
-                f"4__{feature_name}": [0.0, 6.0, 20.0],
-                f"5__{feature_name}": [1.0, 9.0, 25.0],
+                f"1__{feature_name}": [1.0, 1.0, 1],
+                f"x0__{feature_name}": [0.0, 2.0, 4],
+                f"x1__{feature_name}": [1.0, 3.0, 5],
+                f"x0^2__{feature_name}": [0.0, 4.0, 16.0],
+                f"x0 x1__{feature_name}": [0.0, 6.0, 20.0],
+                f"x1^2__{feature_name}": [1.0, 9.0, 25.0],
             }
         )
         expected_pol_df.index = [
