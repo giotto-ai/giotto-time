@@ -12,9 +12,9 @@ DEFAULT_END = pd.Timestamp("2020-01-01")
 DEFAULT_FREQ = pd.Timedelta("1D")
 
 __all__ = [
-    "SequenceToTimeIndexSeries",
-    "PandasSeriesToTimeIndexSeries",
-    "TimeIndexSeriesToPeriodIndexSeries",
+    "_SequenceToTimeIndexSeries",
+    "_PandasSeriesToTimeIndexSeries",
+    "_TimeIndexSeriesToPeriodIndexSeries",
 ]
 
 
@@ -169,8 +169,8 @@ class TimeSeriesConversion(ABC):
         )
 
 
-class SequenceToTimeIndexSeries(TimeSeriesConversion):
-    """Converts a np.array or list to Series with PeriodIndex.
+class _SequenceToTimeIndexSeries(TimeSeriesConversion):
+    """Converts a ``np.array`` or ``list`` to ``Series`` with ``PeriodIndex``.
 
     Parameters
     -----------
@@ -188,9 +188,9 @@ class SequenceToTimeIndexSeries(TimeSeriesConversion):
 
     Examples
     --------
-    >>> from gtime.preprocessing import SequenceToTimeIndexSeries
+    >>> from gtime.preprocessing import _SequenceToTimeIndexSeries
     >>> time_series = [1, 2, 3, 5, 5, 7]
-    >>> sequence_to_time_index = SequenceToTimeIndexSeries(start='01-01-2010', freq='10D')
+    >>> sequence_to_time_index = _SequenceToTimeIndexSeries(start='01-01-2010', freq='10D')
     >>> sequence_to_time_index.transform(time_series)
     2010-01-01    1
     2010-01-11    2
@@ -220,7 +220,7 @@ class SequenceToTimeIndexSeries(TimeSeriesConversion):
         return np.array(array_like_object)
 
 
-class PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
+class _PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
     """Returns a Pandas Series with time index (DatetimeIndex, TimedeltaIndex or
     PeriodIndex) from a standard Pandas Series
 
@@ -238,9 +238,9 @@ class PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
     Examples
     --------
     >>> import pandas as pd
-    >>> from gtime.preprocessing import PandasSeriesToTimeIndexSeries
+    >>> from gtime.preprocessing import _PandasSeriesToTimeIndexSeries
     >>> time_series = pd.Series([1, 2, 3, 5, 5, 7])
-    >>> sequence_to_time_index = PandasSeriesToTimeIndexSeries(start='01-01-2010', freq='10D')
+    >>> sequence_to_time_index = _PandasSeriesToTimeIndexSeries(start='01-01-2010', freq='10D')
     >>> sequence_to_time_index.transform(time_series)
     2010-01-01    1
     2010-01-11    2
@@ -281,7 +281,7 @@ class PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
         )
 
 
-class TimeIndexSeriesToPeriodIndexSeries(TimeSeriesConversion):
+class _TimeIndexSeriesToPeriodIndexSeries(TimeSeriesConversion):
     """Converts a series with a time index (DatetimeIndex, TimedeltaIndex or
     PeriodIndex) to a series with a PeriodIndex.
 
@@ -295,7 +295,7 @@ class TimeIndexSeriesToPeriodIndexSeries(TimeSeriesConversion):
     Examples
     --------
     >>> import pandas as pd
-    >>> from gtime.preprocessing import TimeIndexSeriesToPeriodIndexSeries
+    >>> from gtime.preprocessing import _TimeIndexSeriesToPeriodIndexSeries
     >>> period_index_time_series = pd.Series(
     ...     index = pd.period_range(start='01-01-2010', freq='10D', periods=6),
     ...     data=[1, 2, 3, 5, 5, 7]
@@ -308,7 +308,7 @@ class TimeIndexSeriesToPeriodIndexSeries(TimeSeriesConversion):
     ...     index = pd.timedelta_range(start=pd.Timedelta(days=1), freq='10D', periods=6),
     ...     data=[1, 2, 3, 5, 5, 7]
     ... )
-    >>> sequence_to_time_index = TimeIndexSeriesToPeriodIndexSeries()
+    >>> sequence_to_time_index = _TimeIndexSeriesToPeriodIndexSeries()
     >>> sequence_to_time_index.transform(period_index_time_series)
     2010-01-01    1
     2010-01-11    2

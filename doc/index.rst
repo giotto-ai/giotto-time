@@ -23,7 +23,7 @@ Welcome to giotto-time's API reference!
    causality.ShiftedPearsonCorrelation
 
 
-:mod:`gtime.compose`: Feature Creation
+:mod:`gtime.compose`: Compose
 ===========================================
 
 .. automodule:: gtime.compose
@@ -61,7 +61,7 @@ Welcome to giotto-time's API reference!
 
 
 :mod:`gtime.feature_generation`: Feature Generation
-========================================================
+===================================================
 
 .. automodule:: gtime.feature_generation
    :no-members:
@@ -80,7 +80,7 @@ Welcome to giotto-time's API reference!
 
 
 :mod:`gtime.forecasting`: Forecasting
-==========================================
+=====================================
 
 .. automodule:: gtime.forecasting
    :no-members:
@@ -90,15 +90,15 @@ Welcome to giotto-time's API reference!
 
 .. autosummary::
    :toctree: generated/
-   :template: function.rst
+   :template: class.rst
 
    forecasting.GAR
    forecasting.GARFF
    forecasting.TrendForecaster
 
 
-:mod:`gtime.forecasting`: Regressors
-=========================================
+:mod:`gtime.regressors`: Regressors
+====================================
 
 .. automodule:: gtime.regressors
    :no-members:
@@ -108,13 +108,13 @@ Welcome to giotto-time's API reference!
 
 .. autosummary::
    :toctree: generated/
-   :template: function.rst
+   :template: class.rst
 
    regressors.LinearRegressor
 
 
 :mod:`gtime.metrics`: Metrics
-================gtime==================
+=============================
 
 .. automodule:: gtime.metrics
    :no-members:
@@ -165,7 +165,4 @@ Welcome to giotto-time's API reference!
    :toctree: generated/
    :template: class.rst
 
-   preprocessing.SequenceToTimeIndexSeries
-   preprocessing.PandasSeriesToTimeIndexSeries
-   preprocessing.TimeIndexSeriesToPeriodIndexSeries
    preprocessing.TimeSeriesPreparation

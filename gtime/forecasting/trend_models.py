@@ -11,7 +11,7 @@ from gtime.utils.trends import TRENDS
 
 
 class TrendForecaster(BaseEstimator, RegressorMixin):
-    """Trend forecasting model
+    """Trend forecasting model.
 
     This estimator optimizes a trend function on train data and will forecast using this trend function with optimized
     parameters.

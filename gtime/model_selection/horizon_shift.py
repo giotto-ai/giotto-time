@@ -5,11 +5,11 @@ from gtime.feature_extraction import Shift
 
 def horizon_shift(time_series: pd.DataFrame, horizon: int = 5) -> pd.DataFrame:
     """Perform a shift of the original ``time_series`` for each time step between 1 and
-    the ``horizon``.
+    ``horizon``.
 
     Parameters
     ----------
-    time_series : List[TimeSeriesFeature], required
+    time_series : pd.DataFrame, shape (n_samples, n_features), required
         The list of ``TimeSeriesFeature`` from which to compute the feature_extraction.
 
     horizon : int, optional, default: ``5``
@@ -35,7 +35,6 @@ def horizon_shift(time_series: pd.DataFrame, horizon: int = 5) -> pd.DataFrame:
     2020-01-05  NaN  NaN
 
     """
-
     y = pd.DataFrame(index=time_series.index)
     for k in range(1, horizon + 1):
         shift_feature = Shift(-k)
