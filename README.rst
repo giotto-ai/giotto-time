@@ -1,7 +1,7 @@
 .. image:: https://www.giotto.ai/static/vector/logo.svg
    :width: 500
 
-|Version| |Azure-build| |PyPI download month| |PyPI pyversions| |Slack-join| |Black|
+|Version| |Azure-build| |PyPI download month| |Codecov| |PyPI pyversions| |Slack-join| |Black|
 
 .. |Version| image:: https://badge.fury.io/py/giotto-time.svg
    :target: https://pypi.python.org/pypi/giotto-time/
@@ -11,6 +11,9 @@
 
 .. |PyPI download month| image:: https://img.shields.io/pypi/dm/giotto-time.svg
    :target: https://pypi.python.org/pypi/giotto-time/
+
+.. |Codecov| image:: https://codecov.io/gh/giotto-ai/giotto-time/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/giotto-ai/giotto-time
 
 .. |PyPI pyversions| image:: https://img.shields.io/pypi/pyversions/giotto-time.svg
    :target: https://pypi.python.org/pypi/giotto-time/
