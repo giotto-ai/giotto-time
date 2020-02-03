@@ -15,9 +15,12 @@ __all__ = "Detrender"
 from giottotime.utils.trends import TRENDS
 
 
-# TODO: improve doc, trends params specifications
 class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
     """Apply a de-trend transformation to a time series.
+
+    The purpose of the class is to fit a model, define through the `trend` parameter, in
+    order to find a trend in the time series. Then, the trend can be removed by removing
+    the predictions of the fitted model.
 
     Parameters
     ----------
@@ -25,13 +28,14 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
         The kind of trend removal to apply.
 
     trend_x0 : np.array, required
-        Initialisation parameters passed to the trend function
+        Initialisation parameters passed to the trend function. This is used to select
+        a starting point in order to minimize the `loss` function.
 
     loss : Callable, optional, default: ``mean_squared_error``
         The loss function to minimize.
 
     method : string, optional, default: ``"BFGS"``
-        Loss function optimisation method
+        Loss function optimisation method.
 
     Examples
     --------

@@ -5,9 +5,9 @@ from giottotime.causality.base import CausalityMixin
 
 
 class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin, CausalityMixin):
-    # TODO: links for PPMCC
     """Class responsible for assessing the shifted Pearson correlations (PPMCC) between
-    two or more series.
+    two or more series. For more info about the test, click
+    `here <https://statistics.laerd.com/statistical-guides/pearson-correlation-coefficient-statistical-guide.php>`_.
 
     Parameters
     ----------
