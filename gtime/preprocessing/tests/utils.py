@@ -5,9 +5,9 @@ import pandas as pd
 from pandas.testing import assert_series_equal
 
 from gtime.preprocessing.time_series_conversion import (
-    SequenceToTimeIndexSeries,
-    PandasSeriesToTimeIndexSeries,
-    TimeIndexSeriesToPeriodIndexSeries,
+    _SequenceToTimeIndexSeries,
+    _PandasSeriesToTimeIndexSeries,
+    _TimeIndexSeriesToPeriodIndexSeries,
     count_not_none,
 )
 from gtime.utils.testing_constants import DEFAULT_START, DEFAULT_FREQ
@@ -45,7 +45,7 @@ def transform_sequence_into_time_index_series(
     end: Optional[str] = None,
     freq: Optional[str] = None,
 ) -> pd.Series:
-    time_series_conversion = SequenceToTimeIndexSeries(start, end, freq)
+    time_series_conversion = _SequenceToTimeIndexSeries(start, end, freq)
     return time_series_conversion.transform(array_like_object)
 
 
@@ -55,14 +55,14 @@ def transform_series_into_time_index_series(
     end: Optional[str] = None,
     freq: Optional[str] = None,
 ) -> pd.Series:
-    time_series_conversion = PandasSeriesToTimeIndexSeries(start, end, freq)
+    time_series_conversion = _PandasSeriesToTimeIndexSeries(start, end, freq)
     return time_series_conversion.transform(array_like_object)
 
 
 def transform_time_index_series_into_period_index_series(
     series: pd.Series, freq: pd.Timedelta = None,
 ) -> pd.Series:
-    to_period_conversion = TimeIndexSeriesToPeriodIndexSeries(freq=freq)
+    to_period_conversion = _TimeIndexSeriesToPeriodIndexSeries(freq=freq)
     return to_period_conversion.transform(series)
 
 

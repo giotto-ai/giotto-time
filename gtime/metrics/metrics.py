@@ -44,15 +44,16 @@ def smape(
     y_true: Union[pd.DataFrame, List, np.ndarray],
     y_pred: Union[pd.DataFrame, List, np.ndarray],
 ) -> float:
-    """Compute the 'Symmetric mean absolute percentage error' (SMAPE) between two
-    vectors.
+    """Compute the 'Symmetric Mean Absolute Percentage Error' (SMAPE) between two
+    vectors. Documentation
+    `here <https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error>_`.
 
     Parameters
     ----------
-    y_true : Union[pd.DataFrame, List, np.ndarray], shape (length, 1), required
+    y_true : array-like, shape (length, 1), required
         The first vector.
 
-    y_pred : Union[pd.DataFrame, List, np.ndarray], shape (length, 1), required
+    y_pred : array-like, shape (length, 1), required
         The second vector.
 
     Returns
@@ -88,10 +89,10 @@ def max_error(
 
     Parameters
     ----------
-    y_true : Union[pd.DataFrame, List, np.ndarray], shape (length, 1), required
+    y_true : array-like, shape (length, 1), required
         The first vector.
 
-    y_pred : Union[pd.DataFrame, List, np.ndarray], shape (length, 1), required
+    y_pred : array-like, shape (length, 1), required
         The second vector.
 
     Returns

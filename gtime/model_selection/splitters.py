@@ -9,7 +9,7 @@ class FeatureSplitter:
 
     Parameters
     ----------
-    drop_na_mode: str, optional, default: ``'any'``
+    drop_na_mode : str, optional, default: ``'any'``
         How to drop the Nan contained in the ``X`` and ``y`` matrices. Only 'any' is
         supported for the moment.
 
@@ -75,13 +75,13 @@ class FeatureSplitter:
         X : pd.DataFrame, shape (n_samples, n_features), required
             The feature matrix.
 
-        y : ``pd.DataFrame``, shape (n_samples, horizon), required
+        y : pd.DataFrame, shape (n_samples, horizon), required
             The y matrix.
 
         Returns
         -------
-        X_train, y_train, X_test, y_test : ``Tuple[pd.DataFrame, pd.DataFrame, \
-            pd.DataFrame, pd.DataFrame]``
+        X_train, y_train, X_test, y_test : Tuple[pd.DataFrame, pd.DataFrame,
+            pd.DataFrame, pd.DataFrame]
             The X and y, split between train and test.
 
         """

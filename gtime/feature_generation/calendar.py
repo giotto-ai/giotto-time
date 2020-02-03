@@ -28,10 +28,11 @@ def _check_index(time_series: pd.DataFrame) -> None:
 
 
 class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
-    """Create a feature based on the national holidays of a specific country, based on
-    a given kernel (if provided). The interface for this is based on the one of
-    'workalendar'. To see which regions and countries are available, check the
-    'workalendar' `documentation <https://peopledoc.github.io/workalendar/>`_.
+    """Create a feature based on the national holidays of a specific country.
+
+    The interface for this is based on the one of 'workalendar'. To see which regions
+    and countries are available, check the 'workalendar'
+    `documentation <https://peopledoc.github.io/workalendar/>`_.
 
     Parameters
     ----------
@@ -40,10 +41,10 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
 
     country : str, optional, default: ``'Brazil'``
         The name of the country from which to retrieve the holidays. The country must be
-         located in the given ``region``. For certain countries workalendar provides 
-         additional 'subregions'. In order to use them instead of the whole country, just
-         use the name of the subregion instead of the country name (e.g. 'Vaud' instead of
-         'Switzerland' for the canton of Vaud which is a part of Switzerland). 
+        located in the given ``region``. For certain countries workalendar provides
+        additional 'subregions'. In order to use them instead of the whole country,
+        just use the name of the subregion instead of the country name (e.g. 'Vaud'
+        instead of 'Switzerland' for the canton of Vaud which is a part of Switzerland).
 
     start_date : str, optional, default: ``'01/01/2019'``
         The date starting from which to retrieve the holidays.
@@ -64,7 +65,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
         with which to reindex the holiday events with the index of X. This method
         should be compatible with the reindex methods provided by pandas. Please refer
         to the pandas `documentation
-        https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.reindex.html`_
+        <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.reindex.html>`_
         for further details.
 
     Examples
