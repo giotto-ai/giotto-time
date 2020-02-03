@@ -6,14 +6,14 @@
 Welcome to giotto-time's API reference!
 ========================================
 
-:mod:`giottotime.causality`: Causality Tests
+:mod:`gtime.causality`: Causality Tests
 ============================================
 
-.. automodule:: giottotime.causality
+.. automodule:: gtime.causality
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giottotime
+.. currentmodule:: gtime
 
 .. autosummary::
    :toctree: generated/
@@ -23,14 +23,14 @@ Welcome to giotto-time's API reference!
    causality.ShiftedPearsonCorrelation
 
 
-:mod:`giottotime.compose`: Feature Creation
+:mod:`gtime.compose`: Feature Creation
 ===========================================
 
-.. automodule:: giottotime.compose
+.. automodule:: gtime.compose
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giottotime
+.. currentmodule:: gtime
 
 .. autosummary::
    :toctree: generated/
@@ -39,14 +39,14 @@ Welcome to giotto-time's API reference!
    compose.FeatureCreation
 
 
-:mod:`giottotime.feature_extraction`: Feature Extraction
+:mod:`gtime.feature_extraction`: Feature Extraction
 ========================================================
 
-.. automodule:: giottotime.feature_extraction
+.. automodule:: gtime.feature_extraction
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giottotime
+.. currentmodule:: gtime
 
 .. autosummary::
    :toctree: generated/
@@ -60,14 +60,14 @@ Welcome to giotto-time's API reference!
     feature_extraction.CustomFeature
 
 
-:mod:`giottotime.feature_generation`: Feature Generation
+:mod:`gtime.feature_generation`: Feature Generation
 ========================================================
 
-.. automodule:: giottotime.feature_generation
+.. automodule:: gtime.feature_generation
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giottotime
+.. currentmodule:: gtime
 
 .. autosummary::
    :toctree: generated/
@@ -79,14 +79,14 @@ Welcome to giotto-time's API reference!
    feature_generation.Calendar
 
 
-:mod:`giottotime.forecasting`: Forecasting
+:mod:`gtime.forecasting`: Forecasting
 ==========================================
 
-.. automodule:: giottotime.forecasting
+.. automodule:: gtime.forecasting
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giottotime
+.. currentmodule:: gtime
 
 .. autosummary::
    :toctree: generated/
@@ -97,14 +97,14 @@ Welcome to giotto-time's API reference!
    forecasting.TrendForecaster
 
 
-:mod:`giottotime.forecasting`: Regressors
+:mod:`gtime.forecasting`: Regressors
 =========================================
 
-.. automodule:: giottotime.regressors
+.. automodule:: gtime.regressors
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giottotime
+.. currentmodule:: gtime
 
 .. autosummary::
    :toctree: generated/
@@ -113,14 +113,14 @@ Welcome to giotto-time's API reference!
    regressors.LinearRegressor
 
 
-:mod:`giottotime.metrics`: Metrics
-==================================
+:mod:`gtime.metrics`: Metrics
+================gtime==================
 
-.. automodule:: giottotime.metrics
+.. automodule:: gtime.metrics
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giottotime
+.. currentmodule:: gtime
 
 .. autosummary::
    :toctree: generated/
@@ -130,14 +130,14 @@ Welcome to giotto-time's API reference!
    metrics.max_error
 
 
-:mod:`giottotime.model_selection`: Model Selection
+:mod:`gtime.model_selection`: Model Selection
 ==================================================
 
-.. automodule:: giottotime.model_selection
+.. automodule:: gtime.model_selection
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giottotime
+.. currentmodule:: gtime
 
 .. autosummary::
    :toctree: generated/
@@ -152,14 +152,14 @@ Welcome to giotto-time's API reference!
    model_selection.horizon_shift
 
 
-:mod:`giottotime.preprocessing`: Preprocessing
+:mod:`gtime.preprocessing`: Preprocessing
 ==============================================
 
-.. automodule:: giottotime.preprocessing
+.. automodule:: gtime.preprocessing
    :no-members:
    :no-inherited-members:
 
-.. currentmodule:: giottotime
+.. currentmodule:: gtime
 
 .. autosummary::
    :toctree: generated/

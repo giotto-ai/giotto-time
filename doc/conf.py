@@ -21,7 +21,7 @@ project = "giotto-time"
 copyright = "2019, L2F"
 
 # The full version, including alpha/beta/rc tags
-from giottotime import __version__
+from gtime import __version__
 
 release = __version__
 

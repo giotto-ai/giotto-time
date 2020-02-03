@@ -101,7 +101,7 @@ using `black`. To activate, install the `pre-commit` library.
 
 Development requirements
 ------------------------
-In order to contributing to giottotime, some additional python packages are required with respect to the standard
+In order to contributing to giotto-time, some additional python packages are required with respect to the standard
 requirements. To install them, do
 
 .. code-block:: python

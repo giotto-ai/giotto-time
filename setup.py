@@ -6,9 +6,9 @@ import codecs
 
 from setuptools import setup, find_packages
 
-from giottotime import __version__
+from gtime import __version__
 
-version_file = os.path.join("giottotime", "_version.py")
+version_file = os.path.join("gtime", "_version.py")
 with open(version_file) as f:
     exec(f.read())
 

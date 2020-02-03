@@ -2,6 +2,6 @@ steps:
 - bash: |
     cp conftest.py /tmp/
     cd /tmp/
-    pytest --cov --pyargs giottotime --cov-report xml --hypothesis-profile dev
+    pytest --cov --pyargs gtime --cov-report xml --hypothesis-profile dev
   displayName: 'Test the wheels'
 

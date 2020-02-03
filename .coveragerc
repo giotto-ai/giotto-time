@@ -1,6 +1,6 @@
 [run]
 branch = True
-source = giottotime
+source = gtime
 parallel = True
 omit =
     **/experimental/*
