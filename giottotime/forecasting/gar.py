@@ -101,7 +101,9 @@ class GARFF(RegressorChain):
     """
 
     def __init__(self, estimator):
-        super().__init__(base_estimator=estimator, order=None, cv=None, random_state=None)
+        super().__init__(
+            base_estimator=estimator, order=None, cv=None, random_state=None
+        )
 
     def fit(self, X: pd.DataFrame, y: pd.DataFrame):
         """

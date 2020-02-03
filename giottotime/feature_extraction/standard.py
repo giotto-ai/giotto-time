@@ -165,8 +165,8 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
 
         time_series_mvg_avg = (
             time_series.rolling(self.window_size)
-                .mean()
-                .add_suffix("__" + self.__class__.__name__)
+            .mean()
+            .add_suffix("__" + self.__class__.__name__)
         )
         return time_series_mvg_avg
 
@@ -209,7 +209,7 @@ class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
     """
 
     def __init__(
-            self, custom_feature_function: Callable, window_size: int = 1, raw: bool = True,
+        self, custom_feature_function: Callable, window_size: int = 1, raw: bool = True,
     ):
         super().__init__()
         self.custom_feature_function = custom_feature_function
@@ -330,8 +330,9 @@ class Polynomial(PolynomialFeatures, FeatureMixin):
         check_is_fitted(self)
 
         X_t = super().transform(time_series)
-        X_t_df = pd.DataFrame(data=X_t, columns=self.get_feature_names(), index=time_series.index).add_suffix(
-            "__" + self.__class__.__name__)
+        X_t_df = pd.DataFrame(
+            data=X_t, columns=self.get_feature_names(), index=time_series.index
+        ).add_suffix("__" + self.__class__.__name__)
 
         return X_t_df
 
@@ -380,7 +381,7 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
     """
 
     def __init__(
-            self, exogenous_time_series: pd.DataFrame, method: Optional[str] = None,
+        self, exogenous_time_series: pd.DataFrame, method: Optional[str] = None,
     ):
         super().__init__()
         self.method = method
@@ -462,7 +463,7 @@ class CustomFeature(FunctionTransformer, FeatureMixin):
     """
 
     def __init__(
-            self, func: Callable, **kwargs: object,
+        self, func: Callable, **kwargs: object,
     ):
         super().__init__(inverse_func=None, func=func, kw_args=kwargs)
 

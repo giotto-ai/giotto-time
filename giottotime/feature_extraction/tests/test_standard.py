@@ -11,6 +11,7 @@ from giottotime.feature_extraction import (
     MovingAverage,
     Exogenous,
     Polynomial,
+    MovingCustomFunction,
 )
 
 df = pd.DataFrame.from_dict({"x": [0, 1, 2, 3, 4, 5]})
@@ -362,3 +363,32 @@ class TestPolynomial:
         ]
 
         testing.assert_frame_equal(expected_pol_df, pol_df)
+
+
+class TestMovingCustomFunction:
+    def test_correct_moving_custom_function(self):
+        df = pd.DataFrame.from_dict({"x_1": [0, 7, 2], "x_2": [2, 10, 4]})
+        df.index = [
+            pd.Timestamp(2000, 1, 1),
+            pd.Timestamp(2000, 2, 1),
+            pd.Timestamp(2000, 3, 1),
+        ]
+        custom_feature = MovingCustomFunction(
+            custom_feature_function=np.diff, window_size=2
+        )
+        custom_output = custom_feature.fit_transform(df)
+
+        feature_name = custom_feature.__class__.__name__
+        expected_custom_df = pd.DataFrame.from_dict(
+            {
+                f"x_1__{feature_name}": [np.nan, 7.0, -5],
+                f"x_2__{feature_name}": [np.nan, 8.0, -6],
+            }
+        )
+        expected_custom_df.index = [
+            pd.Timestamp(2000, 1, 1),
+            pd.Timestamp(2000, 2, 1),
+            pd.Timestamp(2000, 3, 1),
+        ]
+
+        testing.assert_frame_equal(expected_custom_df, custom_output)
