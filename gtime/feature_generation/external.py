@@ -198,7 +198,7 @@ class PeriodicSeasonal(BaseEstimator, TransformerMixin, FeatureMixin):
 
 class Constant(BaseEstimator, TransformerMixin, FeatureMixin):
     """Generate a ``pd.DataFrame`` with one column, of the same length as the input
-     ``X`` and containing the value ``constant`` across the whole column.
+    ``X`` and containing the value ``constant`` across the whole column.
 
     Parameters
     ----------

@@ -1,6 +1,6 @@
 """
-The :mod:`gtime.compose` module deals with feature composition and feature
-aggregation.
+The :mod:`gtime.compose` module contains meta-estimators for building composite models
+with transformers.
 """
 
 from .feature_creation import FeatureCreation

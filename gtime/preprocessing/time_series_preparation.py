@@ -4,11 +4,11 @@ import numpy as np
 import pandas as pd
 
 from .time_series_conversion import (
-    PandasSeriesToTimeIndexSeries,
-    SequenceToTimeIndexSeries,
-    TimeIndexSeriesToPeriodIndexSeries,
+    _PandasSeriesToTimeIndexSeries,
+    _SequenceToTimeIndexSeries,
+    _TimeIndexSeriesToPeriodIndexSeries,
 )
-from ..preprocessing.time_series_resampling import TimeSeriesResampler
+from ..preprocessing.time_series_resampling import _TimeSeriesResampler
 
 SUPPORTED_SEQUENCE_TYPES = [
     np.ndarray,
@@ -118,14 +118,14 @@ class TimeSeriesPreparation:
         self.resample_if_not_equispaced = resample_if_not_equispaced
         self.output_name = output_name
 
-        self.pandas_converter = PandasSeriesToTimeIndexSeries(
+        self.pandas_converter = _PandasSeriesToTimeIndexSeries(
             self.start, self.end, self.freq
         )
-        self.sequence_converter = SequenceToTimeIndexSeries(
+        self.sequence_converter = _SequenceToTimeIndexSeries(
             self.start, self.end, self.freq
         )
-        self.resampler = TimeSeriesResampler()
-        self.to_period_index_series_converter = TimeIndexSeriesToPeriodIndexSeries(
+        self.resampler = _TimeSeriesResampler()
+        self.to_period_index_series_converter = _TimeIndexSeriesToPeriodIndexSeries(
             self.freq
         )
 

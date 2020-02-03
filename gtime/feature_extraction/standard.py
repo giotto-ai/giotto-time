@@ -96,12 +96,12 @@ class Shift(BaseEstimator, TransformerMixin, FeatureMixin):
 
 class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
     """For each row in ``time_series``, compute the moving average of the previous
-     ``window_size`` rows. If there are not enough rows, the value is Nan.
+    ``window_size`` rows. If there are not enough rows, the value is ``Nan``.
 
     Parameters
     ----------
     window_size : int, optional, default: ``1``
-        The number of previous points on which to compute the moving average
+        The number of previous points on which to compute the moving average.
 
     Examples
     --------
@@ -173,7 +173,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
 
 class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
     """For each row in ``time_series``, compute the moving custom function of the
-    previous ``window_size`` rows. If there are not enough rows, the value is Nan.
+    previous ``window_size`` rows. If there are not enough rows, the value is ``Nan``.
 
     Parameters
     ----------
@@ -181,14 +181,14 @@ class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
         The function to use to generate a ``pd.DataFrame`` containing the feature.
 
     window_size : int, optional, default: ``1``
-        The number of previous points on which to compute the custom function
+        The number of previous points on which to compute the custom function.
 
     raw : bool, optional, default: ``True``
-        - False : passes each row or column as a Series to the function.
-        - True or None : the passed function will receive ndarray objects instead.
+        - ``False`` : passes each row or column as a Series to the function.
+        - ``True`` or ``None`` : the passed function will receive ndarray objects
+        instead.
          If you are just applying a NumPy reduction function this will achieve much
-         better performance. Credits: https://pandas.pydata.org/pandas-docs/stable/
-         reference/api/pandas.core.window.Rolling.apply.html
+         better performance. Credits: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.core.window.Rolling.apply.html
 
     Examples
     --------
@@ -232,6 +232,7 @@ class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
         -------
         self : object
             Returns self.
+
         """
         self.columns_ = time_series.columns.values
         return self
@@ -264,11 +265,12 @@ class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
 class Polynomial(PolynomialFeatures, FeatureMixin):
     """Compute the polynomial feature_extraction, of a degree equal to the input
     ``degree``.
-    Wrapper of ``sklearn.preprocessing.PolynomialFeatures`` but returns a ``pd.DataFrame``.
+    Wrapper of ``sklearn.preprocessing.PolynomialFeatures`` but returns a
+    ``pd.DataFrame``.
 
     Parameters
     ----------
-    degree: int, optional, default: ``2``
+    degree : int, optional, default: ``2``
         The degree of the polynomial feature_extraction.
 
     Examples
@@ -308,6 +310,7 @@ class Polynomial(PolynomialFeatures, FeatureMixin):
         -------
         self : object
             Returns self.
+
         """
         self.columns_ = time_series.columns.values
         return super().fit(time_series)
@@ -403,6 +406,7 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
         -------
         self : object
             Returns self.
+
         """
         self.columns_ = time_series.columns.values
         return self
@@ -483,6 +487,7 @@ class CustomFeature(FunctionTransformer, FeatureMixin):
         -------
         self : object
             Returns self.
+
         """
         self.columns_ = time_series.columns.values
         return super().fit(time_series)

@@ -2,7 +2,7 @@ import pandas as pd
 
 
 # FIXME: TBD
-class TimeSeriesResampler:
+class _TimeSeriesResampler:
     def __init__(self):
         pass
 
