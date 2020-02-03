@@ -292,19 +292,6 @@ class Polynomial(PolynomialFeatures, FeatureMixin):
         super().__init__()
         self.degree = degree
 
-    def get__names(self, input_features=None):
-        """Return feature names for output features.
-
-        Returns
-        -------
-        output_feature_names : ndarray, shape (n_output_features,)
-            Array of feature names.
-
-        """
-        return [
-            f"_{index}" + self.__class__.__name__ for index in range(self.degree + 1)
-        ]
-
     def fit(self, time_series: pd.DataFrame, y=None):
         """Fit the estimator.
 
