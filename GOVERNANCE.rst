@@ -15,7 +15,9 @@ Giotto Time Project Team:
 
 - Alessio Baccelli a.baccelli@l2f.ch (Developer)
 - Stefano Savarè s.savare@l2f.ch (Developer)
-- Benjamin Russell b.russell@l2f.ch (Project Leader)
+- Philippe Nguyen p.nguyen@l2f.ch (Developer)
 
 Former Project Team Members:
 ----------------------------
+
+- Benjamin Russell b.russell@l2f.ch
