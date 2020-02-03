@@ -51,8 +51,13 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
     end_date : str, optional, default: ``'01/01/2020'``
         The date until which to retrieve the holidays.
 
-    kernel : list or np.ndarray, optional, default: ``None``
-        The kernel to use when creating the feature.
+    kernel : array-like, optional, default: ``None``
+        The kernel to use when creating the feature. The holiday feature is created by
+        taking the dot product between the kernel and the column which contains a 1 if
+        the corresponding day is a holiday and a 0 if the day is not a holiday. The
+        rolling window has the same size as the kernel and the calculated value of the
+        dot product is divided by the number of holidays in the window to get the value
+        of the holiday feature.
 
     reindex_method : str, optional, default: ``pad``
         Used only if X is passed in the ``transform`` method. It is used as the method
