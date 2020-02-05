@@ -13,7 +13,7 @@ def test_pearson_correlation():
     spc = ShiftedPearsonCorrelation(target_col="A", max_shift=20)
     spc.fit(df)
 
-    shifts = spc.best_shifts_.loc["A"][1:].values
+    shifts = spc.best_shifts_["A"][1:].values
     np.testing.assert_array_equal(shifts, expected_shifts)
 
 
