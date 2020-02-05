@@ -1,3 +1,4 @@
+import warnings
 from itertools import product
 
 import numpy as np
@@ -14,7 +15,8 @@ class CausalityMixin:
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         """Shifts each input time series by the amount which optimizes correlation with
-        the selected 'y' column.
+        the selected 'target_col' column. If no target column is specified, the first
+        column of the DataFrame is taken as the target.
 
         Parameters
         ----------
@@ -32,12 +34,18 @@ class CausalityMixin:
         check_is_fitted(self)
         data_t = data.copy()
 
+        if self.target_col is None:
+            self.target_col = data_t.columns[0]
+            warnings.warn(
+                "The target column was not specified. Therefore, the first "
+                f"column {self.target_col } of the DataFrame was taken as "
+                "target column. If you want to transform with respect to "
+                "another column, please use it as a target column."
+            )
+
         for col in data_t:
             if col != self.target_col:
-                data_t[col] = data_t[col].shift(
-                    -self.best_shifts_[col][self.target_col]
-                )
-
+                data_t[col] = data_t[col].shift(self.best_shifts_[self.target_col][col])
         if self.dropna:
             data_t = data_t.dropna()
 
@@ -64,7 +72,13 @@ class CausalityMixin:
     def _compute_best_shifts(self, data, shift_func):
         best_shifts = self._initialize_table()
 
-        for x, y in product(data.columns, repeat=2):
+        if self.target_col is None:
+            columns_to_shift = [(x, y) for x, y in product(data.columns, repeat=2)]
+
+        else:
+            columns_to_shift = [(col, self.target_col) for col in data.columns]
+
+        for (x, y) in columns_to_shift:
             res = shift_func(data, x=x, y=y)
             best_shift = res[1]
             max_corr = res[0]
@@ -75,7 +89,9 @@ class CausalityMixin:
                 "max_corr": max_corr,
             }
             if self.bootstrap_iterations:
-                p_value = self._compute_is_test_significant(data, x, y, best_shift)
+                p_value = self._compute_is_test_significant(
+                    data=data, x=x, y=y, best_shift=best_shift,
+                )
                 tables["p_values"] = p_value
 
             best_shifts = best_shifts.append(tables, ignore_index=True,)

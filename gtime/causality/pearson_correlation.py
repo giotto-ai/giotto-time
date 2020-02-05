@@ -17,7 +17,7 @@ class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin, CausalityMixin)
     max_shift : int, optional, default: ``10``
         The maximum number of shifts to check for.
 
-    target_col : str, optional, default: ``'y'``
+    target_col : str, optional, default: ``None``
             The column to use as the a reference (i.e., the columns which is not
             shifted).
 
@@ -54,7 +54,7 @@ class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin, CausalityMixin)
         self,
         min_shift: int = 1,
         max_shift: int = 10,
-        target_col: str = "y",
+        target_col: str = None,
         dropna: bool = False,
         bootstrap_iterations: int = None,
     ):
