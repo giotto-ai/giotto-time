@@ -1,15 +1,10 @@
-Release 0.1.3
+Release 0.2.0
 ==============
 
 Import name change
 ------------------
 The main module has been renamed from ``giottotime`` to ``gtime``. Therefore, now all the imports
 should be changed in order to match the new name of the package.
-
-Change of license
------------------
-
-The license changes from Apache 2.0 to GNU AGPLv3 from this release on.
 
 Renaming
 --------
