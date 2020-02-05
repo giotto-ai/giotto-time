@@ -94,7 +94,7 @@ class ShiftedPearsonCorrelation(BaseEstimator, TransformerMixin, CausalityMixin)
     def _get_max_corr_shift(self, data: pd.DataFrame, x, y):
         shifts = pd.DataFrame()
 
-        for shift in range(self.min_shift, self.max_shift):
+        for shift in range(self.min_shift, self.max_shift + 1):
             shifts[shift] = data[x].shift(shift)
 
         shifts = shifts.dropna()
