@@ -25,7 +25,12 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
         Determines if the Nan values created by shifting are retained or dropped.
 
     bootstrap_iterations : int, optional, default: ``None``
-        If not None, compute the p_values of the test, by performing bootstrap.
+        If not None, compute the p_values of the test, by performing bootstrapping of
+        the original data (sampling with replacement).
+
+    permutation_iterations : int, optional, default: ``None``
+        If not None, compute the p_values of the test, by performing permutations of
+        the original data.
 
     Examples
     --------
@@ -58,8 +63,12 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
         target_col: str = None,
         dropna: bool = False,
         bootstrap_iterations: int = None,
+        permutation_iterations: int = None,
     ):
-        super().__init__(bootstrap_iterations=bootstrap_iterations)
+        super().__init__(
+            bootstrap_iterations=bootstrap_iterations,
+            permutation_iterations=permutation_iterations,
+        )
         self.min_shift = min_shift
         self.max_shift = max_shift
         self.target_col = target_col
@@ -87,7 +96,10 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
         self.max_corrs_ = pivot_tables["max_corrs"]
 
         if self.bootstrap_iterations:
-            self.p_values_ = pivot_tables["p_values"]
+            self.bootstrap_p_values_ = pivot_tables["bootstrap_p_values"]
+
+        if self.permutation_iterations:
+            self.permutation_p_values_ = pivot_tables["permutation_p_values"]
 
         return self
 

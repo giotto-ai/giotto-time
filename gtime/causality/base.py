@@ -10,8 +10,9 @@ from sklearn.utils.validation import check_is_fitted
 class CausalityMixin:
     """ Base class for causality tests. """
 
-    def __init__(self, bootstrap_iterations):
+    def __init__(self, bootstrap_iterations, permutation_iterations):
         self.bootstrap_iterations = bootstrap_iterations
+        self.permutation_iterations = permutation_iterations
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         """Shifts each input time series by the amount which optimizes correlation with
@@ -89,24 +90,39 @@ class CausalityMixin:
                 "max_corr": max_corr,
             }
             if self.bootstrap_iterations:
-                p_value = self._compute_is_test_significant(
-                    data=data, x=x, y=y, best_shift=best_shift,
+                bootstrap_p_value = self._compute_p_values(
+                    data=data, x=x, y=y, shift=best_shift, test_type="bootstrap"
                 )
-                tables["p_values"] = p_value
+                tables["bootstrap_p_values"] = bootstrap_p_value
+
+            if self.permutation_iterations:
+                bootstrap_p_value = self._compute_p_values(
+                    data=data, x=x, y=y, shift=best_shift, test_type="permutation"
+                )
+                tables["permutation_p_values"] = bootstrap_p_value
 
             best_shifts = best_shifts.append(tables, ignore_index=True,)
 
         return best_shifts
 
-    def _compute_is_test_significant(self, data, x, y, best_shift):
-        bootstrap_matrix = data.copy()
-        bootstrap_matrix[x] = bootstrap_matrix.shift(best_shift)[x]
-        bootstrap_matrix.dropna(axis=0, inplace=True)
+    def _compute_p_values(self, data, x, y, shift, test_type):
+        data_t = data.copy()
+        data_t[x] = data_t.shift(shift)[x]
+        data_t.dropna(axis=0, inplace=True)
         rhos = []
+        n_iterations = (
+            self.permutation_iterations
+            if test_type == "permutation"
+            else self.bootstrap_iterations
+        )
 
-        for k in range(self.bootstrap_iterations):
-            bootstraps = bootstrap_matrix.sample(n=len(data), replace=True)
-            rhos.append(stats.pearsonr(bootstraps[x], bootstraps[y])[0])
+        for k in range(n_iterations):
+            if test_type == "permutation":
+                samples = data_t.sample(frac=1)
+            else:
+                samples = data_t.sample(n=len(data), replace=True)
+
+            rhos.append(stats.pearsonr(samples[x], samples[y])[0])
         rhos = pd.DataFrame(rhos)
         percentile = stats.percentileofscore(rhos, 0) / 100
         p_value = 2 * (percentile if percentile < 0.5 else 1 - percentile)
@@ -124,9 +140,15 @@ class CausalityMixin:
         pivot_tables = {"best_shifts": pivot_best_shifts, "max_corrs": max_corrs}
 
         if self.bootstrap_iterations:
-            p_values = pd.pivot_table(
-                best_shifts, index=["x"], columns=["y"], values="p_values"
+            bootstrap_p_values = pd.pivot_table(
+                best_shifts, index=["x"], columns=["y"], values="bootstrap_p_values"
             )
-            pivot_tables["p_values"] = p_values
+            pivot_tables["bootstrap_p_values"] = bootstrap_p_values
+
+        if self.permutation_iterations:
+            permutation_p_values = pd.pivot_table(
+                best_shifts, index=["x"], columns=["y"], values="permutation_p_values"
+            )
+            pivot_tables["permutation_p_values"] = permutation_p_values
 
         return pivot_tables
