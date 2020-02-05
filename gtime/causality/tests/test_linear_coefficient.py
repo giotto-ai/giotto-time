@@ -6,21 +6,17 @@ from hypothesis import given, strategies as st
 from pandas.util import testing as testing
 
 from gtime.causality import ShiftedLinearCoefficient
-
-from gtime.causality.tests.common import (
-    make_df_from_expected_shifts,
-    shift_df_from_expected_shifts,
-)
+from gtime.causality.tests.common import make_df_from_expected_shifts
 
 
 def test_linear_coefficient():
     expected_shifts = [randint(2, 9) * 2 for _ in range(3)]
-    df = make_df_from_expected_shifts(expected_shifts)
 
+    df = make_df_from_expected_shifts(expected_shifts)
     slc = ShiftedLinearCoefficient(target_col="A", max_shift=20)
     slc.fit(df)
 
-    shifts = slc.best_shifts_.loc["A"][1:].values
+    shifts = slc.best_shifts_["A"][1:].values
     np.testing.assert_array_equal(shifts, expected_shifts)
 
 

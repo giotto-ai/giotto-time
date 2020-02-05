@@ -17,7 +17,7 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
     max_shift : int, optional, default: ``10``
         The maximum number of shifts to check for.
 
-    target_col : str, optional, default: ``'y'``
+    target_col : str, optional, default: ``None``
         The column to use as the a reference (i.e., the column which is not
         shifted).
 
@@ -55,7 +55,7 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
         self,
         min_shift: int = 1,
         max_shift: int = 10,
-        target_col: str = "y",
+        target_col: str = None,
         dropna: bool = False,
         bootstrap_iterations: int = None,
     ):
@@ -97,7 +97,7 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
         shifts[x] = data[x]
         shifts[y] = data[y]
 
-        for shift in range(self.min_shift, self.max_shift + 1):
+        for shift in range(self.min_shift, self.max_shift + 10):
             shifts[shift] = data[x].shift(shift)
 
         shifts = shifts.dropna()
@@ -105,5 +105,5 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
             shifts[range(self.min_shift, self.max_shift + 1)].values, shifts[y].values
         )
 
-        q = lf.coef_.max(), np.argmax(lf.coef_) + 1
+        q = lf.coef_.max(), np.argmax(lf.coef_) + (self.min_shift - 0)
         return q
