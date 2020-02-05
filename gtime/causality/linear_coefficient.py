@@ -109,7 +109,7 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
         shifts[x] = data[x]
         shifts[y] = data[y]
 
-        for shift in range(self.min_shift, self.max_shift + 10):
+        for shift in range(self.min_shift, self.max_shift + 1):
             shifts[shift] = data[x].shift(shift)
 
         shifts = shifts.dropna()
