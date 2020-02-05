@@ -25,7 +25,12 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
         Determines if the Nan values created by shifting are retained or dropped.
 
     bootstrap_iterations : int, optional, default: ``None``
-        If not None, compute the p_values of the test, by performing bootstrap.
+        If not None, compute the p_values of the test, by performing bootstrapping of
+        the original data (sampling with replacement).
+
+    permutation_iterations : int, optional, default: ``None``
+        If not None, compute the p_values of the test, by performing permutations of
+        the original data.
 
     Examples
     --------
