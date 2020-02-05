@@ -57,8 +57,8 @@ The latest stable version of giotto-time requires:
 
 - Python (>= 3.6)
 - scikit-learn (>= 0.22.0)
-- pandas>=0.25.3
-- workalendar>=7.1.1
+- pandas (==0.25.3)
+- workalendar (>=7.1.1)
 
 To run the examples, jupyter is required.
 
