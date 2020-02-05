@@ -9,7 +9,7 @@ from math import pi
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from gtime.base import FeatureMixin
+from gtime.base import FeatureMixin, add_class_name
 
 __all__ = ["PeriodicSeasonal", "Constant"]
 
@@ -96,6 +96,7 @@ class PeriodicSeasonal(BaseEstimator, TransformerMixin, FeatureMixin):
         self.columns_ = X.columns.values
         return self
 
+    @add_class_name
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """Generate a sinusoid, with the given ``period``, ``amplitude`` and ``length``,
         starting from the selected ``start_date``. If ``time_series`` is not ``None``,
@@ -135,7 +136,7 @@ class PeriodicSeasonal(BaseEstimator, TransformerMixin, FeatureMixin):
         else:
             periodic_feature = pd.DataFrame(data=periodic_feature_values[: self.length])
 
-        return periodic_feature.add_suffix("__" + self.__class__.__name__)
+        return periodic_feature
 
     def _validate_input(self, X: pd.DataFrame) -> None:
         if X is None:
@@ -267,6 +268,7 @@ class Constant(BaseEstimator, TransformerMixin, FeatureMixin):
         )
         return self
 
+    @add_class_name
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """Generate a ``pd.DataFrame`` with one column with the same length as
         ``time_series`` and with the same index, containing a value equal to
@@ -295,7 +297,4 @@ class Constant(BaseEstimator, TransformerMixin, FeatureMixin):
         else:
             constant_series = pd.Series(data=constants).to_frame()
 
-        constant_series_renamed = constant_series.add_suffix(
-            "__" + self.__class__.__name__
-        )
-        return constant_series_renamed
+        return constant_series
