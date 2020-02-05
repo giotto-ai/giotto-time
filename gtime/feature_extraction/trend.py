@@ -8,7 +8,7 @@ from sklearn.metrics import mean_squared_error
 import pandas as pd
 from sklearn.utils.validation import check_is_fitted
 
-from gtime.base import FeatureMixin
+from gtime.base import FeatureMixin, add_class_name
 
 __all__ = "Detrender"
 
@@ -116,6 +116,7 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
 
         return self
 
+    @add_class_name
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """Transform the ``time_series`` by removing the trend.
 
@@ -141,6 +142,4 @@ class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):
             ).flatten(),
         )
 
-        return time_series.sub(predictions, axis=0).add_suffix(
-            "__" + self.__class__.__name__
-        )
+        return time_series.sub(predictions, axis=0)

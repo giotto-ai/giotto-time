@@ -1,5 +1,16 @@
 from sklearn.utils.validation import check_is_fitted
 
+import functools
+
+
+def add_class_name(func):
+    @functools.wraps(func)
+    def wrapper_add_class_name(*args, **kwargs):
+        value = func(*args, **kwargs)
+        return value.add_suffix("__" + args[0].__class__.__name__)
+
+    return wrapper_add_class_name
+
 
 class FeatureMixin:
     """Mixin class for all feature extraction estimators in giotto-time."""

@@ -5,7 +5,7 @@ from sklearn.preprocessing import PolynomialFeatures, FunctionTransformer
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import FeatureMixin
+from ..base import FeatureMixin, add_class_name
 
 __all__ = [
     "Shift",
@@ -72,6 +72,7 @@ class Shift(BaseEstimator, TransformerMixin, FeatureMixin):
         self.columns_ = X.columns.values
         return self
 
+    @add_class_name
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """Create a shifted version of ``time_series``.
 
@@ -88,9 +89,7 @@ class Shift(BaseEstimator, TransformerMixin, FeatureMixin):
         """
         check_is_fitted(self)
 
-        time_series_shifted = time_series.shift(self.shift).add_suffix(
-            "__" + self.__class__.__name__
-        )
+        time_series_shifted = time_series.shift(self.shift)
         return time_series_shifted
 
 
@@ -145,6 +144,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
         self.columns_ = X.columns.values
         return self
 
+    @add_class_name
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """Compute the moving average, for every row of ``time_series``, of the previous
         ``window_size`` elements.
@@ -163,11 +163,7 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
         """
         check_is_fitted(self)
 
-        time_series_mvg_avg = (
-            time_series.rolling(self.window_size)
-            .mean()
-            .add_suffix("__" + self.__class__.__name__)
-        )
+        time_series_mvg_avg = time_series.rolling(self.window_size).mean()
         return time_series_mvg_avg
 
 
@@ -237,6 +233,7 @@ class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
         self.columns_ = time_series.columns.values
         return self
 
+    @add_class_name
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """For every row of ``time_series``, compute the moving custom function of the
          previous ``window_size`` elements.
@@ -258,7 +255,7 @@ class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
         time_series_mvg_cust = time_series.rolling(self.window_size).apply(
             self.custom_feature_function, raw=self.raw
         )
-        time_series_t = time_series_mvg_cust.add_suffix("__" + self.__class__.__name__)
+        time_series_t = time_series_mvg_cust
         return time_series_t
 
 
@@ -315,6 +312,7 @@ class Polynomial(PolynomialFeatures, FeatureMixin):
         self.columns_ = time_series.columns.values
         return super().fit(time_series)
 
+    @add_class_name
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """Compute the polynomial feature_extraction of ``time_series``, up to a degree
         equal to ``degree``.
@@ -335,7 +333,7 @@ class Polynomial(PolynomialFeatures, FeatureMixin):
         X_t = super().transform(time_series)
         X_t_df = pd.DataFrame(
             data=X_t, columns=self.get_feature_names(), index=time_series.index
-        ).add_suffix("__" + self.__class__.__name__)
+        )
 
         return X_t_df
 
@@ -411,6 +409,7 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
         self.columns_ = time_series.columns.values
         return self
 
+    @add_class_name
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """Reindex the ``exogenous_time_series`` with the index of ``time_series``.
 
@@ -428,9 +427,7 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
         """
         check_is_fitted(self)
 
-        exog_feature = self.exogenous_time_series.reindex(
-            index=time_series.index, method=self.method
-        ).add_suffix("__" + self.__class__.__name__)
+        exog_feature = self.exogenous_time_series.reindex(index=time_series.index, method=self.method)
 
         return exog_feature
 
@@ -492,6 +489,7 @@ class CustomFeature(FunctionTransformer, FeatureMixin):
         self.columns_ = time_series.columns.values
         return super().fit(time_series)
 
+    @add_class_name
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """Generate a ``pd.DataFrame``, given ``time_series`` as input to the
         ``func``, as well as other optional arguments.
@@ -508,4 +506,4 @@ class CustomFeature(FunctionTransformer, FeatureMixin):
 
         """
         check_is_fitted(self)
-        return super().transform(time_series).add_suffix("__" + self.__class__.__name__)
+        return super().transform(time_series)

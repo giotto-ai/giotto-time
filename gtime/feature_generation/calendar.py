@@ -7,7 +7,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import workalendar
 from sklearn.utils.validation import check_is_fitted
 
-from gtime.base import FeatureMixin
+from gtime.base import FeatureMixin, add_class_name
 
 
 def _check_index(time_series: pd.DataFrame) -> None:
@@ -146,6 +146,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
         self.columns_ = X.columns.values
         return self
 
+    @add_class_name
     def transform(self, time_series: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """Generate a DataFrame containing the events associated to the holidays of the
         selected ``country``.
@@ -178,8 +179,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
         if self.kernel is not None:
             events = self._apply_kernel(events)
 
-        events_renamed = events.add_suffix("__" + self.__class__.__name__)
-        aligned_events = self._align_event_indices(time_series, events_renamed)
+        aligned_events = self._align_event_indices(time_series, events)
 
         return aligned_events
 
