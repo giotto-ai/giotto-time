@@ -508,7 +508,4 @@ class CustomFeature(FunctionTransformer, FeatureMixin):
 
         """
         check_is_fitted(self)
-
-        X_t = super().transform(time_series)
-        X_t_df = pd.DataFrame(data=X_t, columns=self.columns_, index=X_t.index)
-        return X_t_df.add_suffix("__" + self.__class__.__name__)
+        return super().transform(time_series).add_suffix("__" + self.__class__.__name__)
