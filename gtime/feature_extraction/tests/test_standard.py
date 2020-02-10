@@ -385,3 +385,11 @@ class TestMovingCustomFunction:
         ]
 
         testing.assert_frame_equal(expected_custom_df, custom_output)
+
+
+def test_custom_function():
+    f = lambda x: x + 1
+    df_apply = df.apply(f).rename(columns={'x': 'x__CustomFeature'})
+    cf = CustomFeature(f)
+    testing.assert_equal(df_apply, cf.fit_transform(df))
+
