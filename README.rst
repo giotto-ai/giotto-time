@@ -39,7 +39,7 @@ forecasting tools based on scikit-learn API.
 License
 -------
 
-gioto-time is distributed under the AGPLv3 `license <https://github.com/giotto-ai/giotto-time/blob/master/LICENSE>`_.
+giotto-time is distributed under the AGPLv3 `license <https://github.com/giotto-ai/giotto-time/blob/master/LICENSE>`_.
 If you need a different distribution license, please contact the L2F team at 
 business@l2f.ch
 
