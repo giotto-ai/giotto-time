@@ -4,14 +4,8 @@ import pandas.util.testing as testing
 import pytest
 from hypothesis import given, strategies as st
 
+from gtime.feature_extraction import Shift, MovingAverage, Exogenous, Polynomial, MovingCustomFunction
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
-from gtime.feature_extraction import (
-    Shift,
-    MovingAverage,
-    Exogenous,
-    Polynomial,
-    MovingCustomFunction,
-    CustomFeature)
 
 df = pd.DataFrame.from_dict({"x": [0, 1, 2, 3, 4, 5]})
 

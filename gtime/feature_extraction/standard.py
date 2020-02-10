@@ -1,8 +1,8 @@
 from typing import Optional, Callable
 
 import pandas as pd
-from sklearn.preprocessing import PolynomialFeatures, FunctionTransformer
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.preprocessing import PolynomialFeatures, FunctionTransformer
 from sklearn.utils.validation import check_is_fitted
 
 from ..base import FeatureMixin, add_class_name

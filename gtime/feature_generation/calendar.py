@@ -1,10 +1,10 @@
 import importlib
+import workalendar
 from typing import Optional, Union, List
 
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-import workalendar
 from sklearn.utils.validation import check_is_fitted
 
 from gtime.base import FeatureMixin, add_class_name

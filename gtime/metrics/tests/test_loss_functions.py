@@ -5,7 +5,6 @@ from hypothesis import given
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats
 
-
 from gtime.metrics import smape, max_error
 
 

@@ -3,11 +3,8 @@ import pytest
 from hypothesis import given, strategies as st
 from pandas.util import testing as testing
 
+from gtime.feature_generation import Constant, PeriodicSeasonal
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
-from gtime.feature_generation import (
-    Constant,
-    PeriodicSeasonal,
-)
 
 
 class TestPeriodicSesonalFeature:

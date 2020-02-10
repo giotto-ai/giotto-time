@@ -1,6 +1,6 @@
-from sklearn.utils.validation import check_is_fitted
-
 import functools
+
+from sklearn.utils.validation import check_is_fitted
 
 
 def add_class_name(func):

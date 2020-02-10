@@ -3,15 +3,11 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 from hypothesis import given
-from sklearn.compose import ColumnTransformer, make_column_selector
+from sklearn.compose import make_column_selector
 
 from gtime.compose import FeatureCreation
 from gtime.feature_extraction import Shift, MovingAverage
-from gtime.utils.hypothesis.feature_matrices import (
-    X_y_matrices,
-    X_matrices,
-    y_matrices,
-)
+from gtime.utils.hypothesis.feature_matrices import X_y_matrices, X_matrices, y_matrices
 
 df_transformer = FeatureCreation(
     [

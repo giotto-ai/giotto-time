@@ -1,11 +1,9 @@
-from typing import Union, Optional, Callable
+from math import pi
+from typing import Union, Optional
 
 import numpy as np
 import pandas as pd
 from pandas import DatetimeIndex
-
-from math import pi
-
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
