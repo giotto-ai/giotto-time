@@ -1,8 +1,7 @@
 import pandas as pd
+from gtime.models.trend_models.base import TrendModel
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
-
-from gtime.models.trend_models.base import TrendModel
 
 
 class FunctionTrend(TrendModel):

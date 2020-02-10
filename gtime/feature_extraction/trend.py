@@ -1,18 +1,16 @@
-from abc import ABC
 from typing import Callable
 
 import numpy as np
+import pandas as pd
 from scipy.optimize import minimize
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import mean_squared_error
-import pandas as pd
 from sklearn.utils.validation import check_is_fitted
 
 from gtime.base import FeatureMixin, add_class_name
+from gtime.utils.trends import TRENDS
 
 __all__ = "Detrender"
-
-from gtime.utils.trends import TRENDS
 
 
 class Detrender(BaseEstimator, TransformerMixin, FeatureMixin):

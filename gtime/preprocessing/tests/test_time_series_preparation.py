@@ -4,17 +4,17 @@ import hypothesis.strategies as st
 import numpy as np
 import pandas as pd
 import pytest
-from pandas.testing import assert_series_equal, assert_frame_equal
-from hypothesis.extra.numpy import arrays
 from hypothesis import given, settings, HealthCheck
+from hypothesis.extra.numpy import arrays
+from pandas.testing import assert_series_equal, assert_frame_equal
 
+from gtime.preprocessing import TimeSeriesPreparation
 from gtime.utils.hypothesis.time_indexes import (
     series_with_timedelta_index,
     series_with_period_index,
     series_with_datetime_index,
     available_freqs,
 )
-from gtime.preprocessing import TimeSeriesPreparation
 from .utils import (
     pandas_series_with_period_index,
     datetime_index_series_to_period_index_series,

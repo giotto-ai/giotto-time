@@ -1,9 +1,7 @@
 import numpy as np
 import pandas as pd
-
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
-
 from sklearn.utils.validation import check_is_fitted
 
 

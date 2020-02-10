@@ -3,19 +3,16 @@ import random
 import numpy as np
 import pandas.util.testing as testing
 import pytest
-from hypothesis import given, strategies as st
+from hypothesis import given
 from sklearn.compose import make_column_selector
 from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression
 
 from gtime.compose import FeatureCreation
-from gtime.feature_extraction import (
-    MovingAverage,
-    Shift,
-)
+from gtime.feature_extraction import MovingAverage, Shift
 from gtime.feature_generation import Constant
-from gtime.model_selection import FeatureSplitter
 from gtime.forecasting import GAR, GARFF
+from gtime.model_selection import FeatureSplitter
 from gtime.utils.hypothesis.feature_matrices import X_y_matrices
 
 df_transformer = FeatureCreation(
