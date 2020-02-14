@@ -1,4 +1,4 @@
-.. image:: logo.png
+.. image:: https://www.giotto.ai/static/vector/logo-time.svg
    :width: 500
 
 |Version| |Azure-build| |PyPI download month| |Codecov| |PyPI pyversions| |Slack-join| |Black|
