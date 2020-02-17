@@ -427,7 +427,9 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
         """
         check_is_fitted(self)
 
-        exog_feature = self.exogenous_time_series.reindex(index=time_series.index, method=self.method)
+        exog_feature = self.exogenous_time_series.reindex(
+            index=time_series.index, method=self.method
+        )
 
         return exog_feature
 
