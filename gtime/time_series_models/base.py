@@ -5,8 +5,7 @@ from gtime.compose import FeatureCreation
 from gtime.model_selection import horizon_shift, FeatureSplitter
 
 
-class TimeSeriesPipeline(BaseEstimator, metaclass=ABCMeta):
-
+class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
     def __init__(self, features: FeatureCreation, horizon: int, model: RegressorMixin):
         self.features = features
         self.horizon = horizon
