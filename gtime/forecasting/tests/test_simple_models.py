@@ -63,6 +63,22 @@ def test_snaive_predict(generate_ts):
     assert all(tm.predict(test).values == expected.values)
 
 
+def test_snaive_predict_multiperiod(generate_ts):
+
+    s = 12
+    horizon = 3
+    train = generate_ts.iloc[:-horizon]
+    test = generate_ts.iloc[-horizon:]
+
+    tm = SeasonalNaiveForecaster(seasonal_length=s)
+
+    tm.fit(train)
+    expected = pd.DataFrame(
+        train.iloc[-s : -s + horizon].to_numpy(), index=test.index, columns=test.columns
+    )
+    assert all(tm.predict(test) == expected)
+
+
 def test_ma_fit(generate_ts):
 
     w = 10
@@ -81,8 +97,24 @@ def test_ma_predict(generate_ts):
 
     tm = MovingAverageForecaster(window=w)
     tm.fit(train)
-    expected = pd.DataFrame(train.iloc[-w:].mean().values, index=test.index)
-    assert all(tm.predict(test) == expected.values)
+    expected = pd.DataFrame(
+        train.iloc[-w:].mean().values, index=test.index, columns=test.columns
+    )
+    assert all(tm.predict(test) == expected)
 
 
-# TODO add multi-period tests
+def test_ma_predict_multiperiod(generate_ts):
+
+    w = 10
+    horizon = 3
+    train = generate_ts.iloc[:-horizon]
+    test = generate_ts.iloc[-horizon:]
+
+    tm = MovingAverageForecaster(window=w)
+    tm.fit(train)
+    expected = pd.DataFrame(
+        np.tile(train.iloc[-w:].mean().to_numpy(), (len(test), 1)),
+        index=test.index,
+        columns=test.columns,
+    )
+    assert all(tm.predict(test) == expected)

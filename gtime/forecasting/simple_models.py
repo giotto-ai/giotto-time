@@ -123,12 +123,14 @@ class SeasonalNaiveForecaster(NaiveForecaster):
         check_is_fitted(self)
 
         len_x = len(X)
-        y_pred = (
-            list(self.next_value_.values) * (len_x // self.lag)
-            + list(self.next_value_.values)[: (len_x % self.lag)]
+        forecast = self.next_value_[X.columns].to_numpy()
+        len_f = len(forecast)
+        y_pred = np.concatenate(
+            (np.tile(forecast, (len_x // len_f, 1)), forecast[: (len_x % len_f), :]),
+            axis=0,
         )
 
-        predictions = pd.DataFrame(data=y_pred, index=X.index)
+        predictions = pd.DataFrame(data=y_pred, index=X.index, columns=X.columns)
 
         return predictions
 
@@ -193,7 +195,10 @@ class MovingAverageForecaster(BaseEstimator, RegressorMixin):
 
         check_is_fitted(self)
 
+        y_pred = self.next_value_[X.columns].to_numpy()
+        len_x = len(X)
+
         predictions = pd.DataFrame(
-            data=self.next_value_.values, index=X.index, columns=X.columns
+            data=np.tile(y_pred, (len_x, 1)), index=X.index, columns=X.columns
         )
         return predictions
