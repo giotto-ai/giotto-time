@@ -5,9 +5,12 @@ for dealing with time series data.
 
 from .gar import GAR, GARFF
 from .trend_models import TrendForecaster
+from.simple_models import NaiveForecaster, SeasonalNaiveForecaster
 
 __all__ = [
     "GAR",
     "GARFF",
     "TrendForecaster",
+    "NaiveForecaster",
+    "SeasonalNaiveForecaster",
 ]
