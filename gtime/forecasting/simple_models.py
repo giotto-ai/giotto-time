@@ -8,30 +8,8 @@ from sklearn.utils.validation import check_is_fitted
 
 
 class NaiveForecaster(BaseEstimator, RegressorMixin):
-    """Trend forecasting model.
-
-    This estimator optimizes a trend function on train data and will forecast using this trend function with optimized
-    parameters.
-
-    Parameters
-    ----------
-
-
-    Examples
-    --------
-    >>> import pandas as pd
-    >>> import numpy as np
-    >>> from gtime.model_selection import horizon_shift, FeatureSplitter
-    >>> from gtime.forecasting import TrendForecaster
-    >>>
-    >>> X = pd.DataFrame(np.random.random((10, 1)), index=pd.date_range("2020-01-01", "2020-01-10"))
-    >>> y = horizon_shift(X, horizon=2)
-    >>> X_train, y_train, X_test, y_test = FeatureSplitter().transform(X, y)
-    >>>
-    >>> tf = TrendForecaster(trend='polynomial', trend_x0=np.zeros(2))
-    >>> tf.fit(X_train).predict(X_test)
-    array([[0.39703029],
-           [0.41734957]])
+    """Naive forecasting model.
+    TDB
 
     """
 
@@ -92,6 +70,11 @@ class NaiveForecaster(BaseEstimator, RegressorMixin):
 
 
 class SeasonalNaiveForecaster(NaiveForecaster):
+
+    """Seasonal naive forecasting model.
+    TDB
+
+    """
 
     def __init__(
 
