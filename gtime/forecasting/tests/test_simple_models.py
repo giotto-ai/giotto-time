@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 from pandas.util import testing as testing
 
-from gtime.forecasting import NaiveForecaster, SeasonalNaiveForecaster
+from gtime.forecasting import NaiveForecaster, SeasonalNaiveForecaster, MovingAverageForecaster
 
 
 
@@ -60,6 +60,27 @@ def test_snaive_predict(generate_ts):
     tm.fit(train)
     expected = pd.DataFrame(train.iloc[-s].values, index=test.index)
     assert all(tm.predict(test).values == expected.values)
+
+
+def test_ma_fit(generate_ts):
+
+    w = 10
+    train = generate_ts.iloc[:-1]
+
+    tm = MovingAverageForecaster(window=w)
+    tm.fit(train)
+    assert tm.next_value_['A'] == train.iloc[-w:]['A'].mean()
+
+def test_ma_predict(generate_ts):
+
+    w = 10
+    train = generate_ts.iloc[:-1]
+    test = generate_ts.iloc[-1:]
+
+    tm = MovingAverageForecaster(window=w)
+    tm.fit(train)
+    expected = pd.DataFrame(train.iloc[-w:].mean().values, index=test.index)
+    assert all(tm.predict(test)== expected.values)
 
 
 # TODO add multi-period tests
