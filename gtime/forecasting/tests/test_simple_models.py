@@ -49,18 +49,17 @@ def test_snaive_fit(generate_ts):
     assert all(tm.next_value_['A'] == train.iloc[-s:]['A'])
 
 
-# def test_snaive_predict(generate_ts):
-#
-#     s = 12
-#     test_len = 3
-#     train = generate_ts.iloc[:-test_len]
-#     test = generate_ts.iloc[-test_len:]
-#
-#     tm = SeasonalNaiveForecaster(seasonal_length=s)
-#
-#     tm.fit(train)
-#     print(train.iloc[-s:-s+test_len])
-#     print(tm.predict(test))
-#     expected = pd.DataFrame(train.iloc[-s:-s+test_len], index=test.index)
-#     print(expected)
-#     assert all(tm.predict(test) == expected)
+def test_snaive_predict(generate_ts):
+
+    s = 12
+    train = generate_ts.iloc[:-1]
+    test = generate_ts.iloc[-1:]
+
+    tm = SeasonalNaiveForecaster(seasonal_length=s)
+
+    tm.fit(train)
+    expected = pd.DataFrame(train.iloc[-s].values, index=test.index)
+    assert all(tm.predict(test).values == expected.values)
+
+
+# TODO add multi-period tests
