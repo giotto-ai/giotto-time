@@ -4,17 +4,13 @@ from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_is_fitted
 
 
-
 class NaiveForecaster(BaseEstimator, RegressorMixin):
     """Naive forecasting model.
     TDB
 
     """
 
-    def __init__(
-
-        self,
-    ):
+    def __init__(self,):
         """
         Not needed here really but let it be for compatibility
         """
@@ -75,9 +71,7 @@ class SeasonalNaiveForecaster(NaiveForecaster):
     """
 
     def __init__(
-
-        self,
-        seasonal_length = 1,
+        self, seasonal_length=1,
     ):
         """
         Not needed here really but let it be for compatibility
@@ -103,7 +97,7 @@ class SeasonalNaiveForecaster(NaiveForecaster):
             Returns self.
 
         """
-        self.next_value_ = X.iloc[-self.lag:]
+        self.next_value_ = X.iloc[-self.lag :]
 
         return self
 
@@ -129,7 +123,10 @@ class SeasonalNaiveForecaster(NaiveForecaster):
         check_is_fitted(self)
 
         len_x = len(X)
-        y_pred = list(self.next_value_.values) * (len_x // self.lag) + list(self.next_value_.values)[:(len_x % self.lag)]
+        y_pred = (
+            list(self.next_value_.values) * (len_x // self.lag)
+            + list(self.next_value_.values)[: (len_x % self.lag)]
+        )
 
         predictions = pd.DataFrame(data=y_pred, index=X.index)
 
@@ -143,9 +140,7 @@ class MovingAverageForecaster(BaseEstimator, RegressorMixin):
     """
 
     def __init__(
-
-        self,
-        window: int,
+        self, window: int,
     ):
         """
         Not needed here really but let it be for compatibility
@@ -172,7 +167,7 @@ class MovingAverageForecaster(BaseEstimator, RegressorMixin):
             Returns self.
 
         """
-        self.next_value_ = X.iloc[-self.window:].mean()
+        self.next_value_ = X.iloc[-self.window :].mean()
 
         return self
 
@@ -198,5 +193,7 @@ class MovingAverageForecaster(BaseEstimator, RegressorMixin):
 
         check_is_fitted(self)
 
-        predictions = pd.DataFrame(data=self.next_value_.values, index=X.index, columns=X.columns)
+        predictions = pd.DataFrame(
+            data=self.next_value_.values, index=X.index, columns=X.columns
+        )
         return predictions
