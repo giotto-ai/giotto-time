@@ -175,26 +175,23 @@ class GrangerCausality(BaseEstimator):
 
         """
 
-        x = self.x_col
-        y = self.target_col
-
-        x_cols = [x+'_'+str(i+1) for i in range(self.max_shift)]
-        y_cols = [y+'_'+str(i) for i in range(self.max_shift)]
-
-        shifts = pd.DataFrame(columns=np.array([x_cols, y_cols]).flatten())
-        for x_col, shift in zip(x_cols, range(1, self.max_shift+1)):
-            shifts[x_col] = data[x].shift(shift) 
-        for y_col, shift in zip(y_cols, range(1, self.max_shift+1)):
-            shifts[y_col] = data[y].shift(shift)
+        shifts = data.copy()
+        x_columns, y_columns = [], []
+        for i in range(1, self.max_shift+1):
+            shifts[f'x_shift_{i}'] = data[self.x_col].shift(i)
+            shifts[f'y_shift_{i-1}'] = data[self.target_col].shift(i)
+            x_columns.append(f'x_shift_{i}')
+            y_columns.append(f'y_shift_{i-1}')
+        shifts.drop([self.x_col, self.target_col], axis='columns', inplace=True)
         shifts = shifts.dropna()
 
-        data_single = shifts[x_cols].copy()
-        data_joint = shifts[x_cols + y_cols].copy()
+        data_single = shifts[x_columns].copy()
+        data_joint = shifts[x_columns + y_columns].copy()
 
         linreg_single = LinearRegression()
         linreg_joint = LinearRegression()
-        linreg_single.fit(data_single, data[x].loc[data_single.index])
-        linreg_joint.fit(data_joint, data[x].loc[data_joint.index])
+        linreg_single.fit(data_single, data[self.x_col].loc[data_single.index])
+        linreg_joint.fit(data_joint, data[self.x_col].loc[data_joint.index])
 
         y_pred_single = linreg_single.predict(data_single)
         y_pred_joint = linreg_joint.predict(data_joint)
