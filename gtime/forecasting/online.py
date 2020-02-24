@@ -31,6 +31,20 @@ class HedgeForecaster(BaseEstimator):
         # TODO: write glossary
         See :term:`Glossary <random_state>` for details.
 
+    Attributes
+    ----------
+    loss_matrix_ : array, (n_samples, n_experts)
+        Loss matrix between X and y.
+
+    total_loss_ : int or float,
+        Sum of losses based on Hedge algorithm decisions.
+
+    weights_ : array, (n_experts)
+        Last weight of each expert.
+
+    decisions_ : array, (n_samples)
+        Indices of chosen expert depending on weights.
+
     Examples
     --------
     >>> import pandas as pd
@@ -115,7 +129,8 @@ class HedgeForecaster(BaseEstimator):
 
         Returns
         -------
-
+        predictions : pd.DataFrame
+            Predictions.
         """
         self.fit(X, y)
 
