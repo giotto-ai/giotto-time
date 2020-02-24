@@ -190,11 +190,8 @@ class GrangerCausality(BaseEstimator):
 
         linreg_single = LinearRegression()
         linreg_joint = LinearRegression()
-        linreg_single.fit(data_single, data[self.x_col].loc[data_single.index])
-        linreg_joint.fit(data_joint, data[self.x_col].loc[data_joint.index])
-
-        y_pred_single = linreg_single.predict(data_single)
-        y_pred_joint = linreg_joint.predict(data_joint)
+        y_pred_single = linreg_single.fit(data_single, data[self.x_col].loc[data_single.index]).predict(data_single)
+        y_pred_joint = linreg_joint.fit(data_joint, data[self.x_col].loc[data_joint.index]).predict(data_joint)
         
         dof_single = float(data_single.shape[0] - data_single.shape[1]) 
         dof_joint = float(data_joint.shape[0] - data_joint.shape[1]) - 1  
@@ -203,11 +200,19 @@ class GrangerCausality(BaseEstimator):
         linreg_joint_residues = linreg_joint._residues
         
         self.results_ = []
+        stat_test_input = {'linreg_single_residues': linreg_single_residues, 
+                           'linreg_joint_residues': linreg_joint_residues,  
+                           'dof_joint': dof_joint, 
+                           'max_shift': self.max_shift, 
+                           'data_single': data_single, 
+                           'y_pred_single': y_pred_single, 
+                           'y_pred_joint': y_pred_joint, 
+                           'data': data, 
+                           'x_col': self.x_col,
+                           'data_joint': data_joint, 
+                           'linreg_joint': linreg_joint}
 
         for s in self.statistics:
-            self.results_.append(STAT_TESTS[s](linreg_single_residues=linreg_single_residues, linreg_joint_residues=linreg_joint_residues, 
-                                               dof_joint=dof_joint, max_shift=self.max_shift, data_single=data_single, 
-                                               y_pred_single=y_pred_single, y_pred_joint=y_pred_joint, data = data, x_col=self.x_col,
-                                               data_joint=data_joint, linreg_joint=linreg_joint))
+            self.results_.append(STAT_TESTS[s](**stat_test_input))
 
         return self
