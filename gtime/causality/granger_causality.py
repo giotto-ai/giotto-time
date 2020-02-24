@@ -34,7 +34,7 @@ def pseudoinv_extended(X, ratio=1e-15):
             s[i] = 1. / s[i]
         else:
             s[i] = 0.
-    res = np.dot(np.transpose(vt), s[:, np.core.newaxis]*np.transpose(u))
+    res = np.dot(np.transpose(vt), s[:, np.core.newaxis] * np.transpose(u))
     return res
 
 def _ssr_f(**kwargs):
@@ -178,18 +178,18 @@ class GrangerCausality(BaseEstimator):
         x = self.x_col
         y = self.target_col
 
-        x_cols_joint = [x+'_'+str(i+1) for i in range(self.max_shift)]
-        y_cols_joint = [y+'_'+str(i) for i in range(self.max_shift)]
+        x_cols = [x+'_'+str(i+1) for i in range(self.max_shift)]
+        y_cols = [y+'_'+str(i) for i in range(self.max_shift)]
 
-        shifts = pd.DataFrame(columns=np.array([x_cols_joint, y_cols_joint]).flatten())
-        for x_col, shift in zip(x_cols_joint, range(1, self.max_shift+1)):
+        shifts = pd.DataFrame(columns=np.array([x_cols, y_cols]).flatten())
+        for x_col, shift in zip(x_cols, range(1, self.max_shift+1)):
             shifts[x_col] = data[x].shift(shift) 
-        for y_col, shift in zip(y_cols_joint, range(1, self.max_shift+1)):
+        for y_col, shift in zip(y_cols, range(1, self.max_shift+1)):
             shifts[y_col] = data[y].shift(shift)
         shifts = shifts.dropna()
 
-        data_single = shifts[x_cols_joint].copy()
-        data_joint = shifts[x_cols_joint + y_cols_joint].copy()
+        data_single = shifts[x_cols].copy()
+        data_joint = shifts[x_cols + y_cols].copy()
 
         linreg_single = LinearRegression()
         linreg_joint = LinearRegression()
