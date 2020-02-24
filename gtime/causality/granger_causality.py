@@ -99,7 +99,6 @@ def _zero_f(**kwargs):
     constraint_params = np.dot(constraint_matrix, linreg_params.T)
     params_diff = constraint_params - value_restriction
         
-    # pseudoinv_data = pseudoinv_extended(_whiten(data_joint.values))
     pseudoinv_data = pseudoinv_extended(np.append(data_joint.values, np.ones((len(data_joint.values), 1)), axis=1))
 
     # Covariance matrix
