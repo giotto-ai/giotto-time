@@ -66,10 +66,10 @@ def _ssr_chi2(**kwargs):
                                                                                        kwargs['linreg_joint_residues'], kwargs['dof_joint'], \
                                                                                        kwargs['max_shift']
     
-    fgc2 = len(data_single) * (linreg_single_residues - linreg_joint_residues) / linreg_joint_residues
+    chi2_stat = len(data_single) * (linreg_single_residues - linreg_joint_residues) / linreg_joint_residues
     
     result_df = pd.DataFrame()
-    result_df['ssr_chi2test'] = [fgc2, stats.chi2.sf(fgc2, max_shift), int(dof_joint), int(max_shift)]
+    result_df['ssr_chi2test'] = [chi2_stat, stats.chi2.sf(fgc2, max_shift), int(dof_joint), int(max_shift)]
     result_df.index = ['chi2', 'p-value', 'degrees of freedom', 'number of shifts']
     return result_df
 
