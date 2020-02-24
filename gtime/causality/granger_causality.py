@@ -13,9 +13,9 @@ def _loglikelihood(y_pred, y_true):
 
     diff = y_true - y_pred
     std_predictions = np.std(diff)
-    llh = -(len(y_true) / 2) * np.log(2.0 * np.pi * std_predictions * std_predictions) \
-        - ((np.dot(diff.T, diff)) / (2.0 * std_predictions * std_predictions))
-    return llh
+    loglikelihood = -(len(y_true) / 2) * np.log(2.0 * np.pi * std_predictions * std_predictions) \
+                    - ((np.dot(diff.T, diff)) / (2.0 * std_predictions * std_predictions))
+    return loglikelihood
         
 def pseudoinv_extended(X, ratio=1e-15):
     """Calculate pseudoinverse. Code adapted from statstools and numpy
@@ -34,6 +34,7 @@ def pseudoinv_extended(X, ratio=1e-15):
             s[i] = 1. / s[i]
         else:
             s[i] = 0.
+
     res = np.dot(np.transpose(vt), s[:, np.core.newaxis] * np.transpose(u))
     return res
 
