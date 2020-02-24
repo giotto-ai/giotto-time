@@ -18,7 +18,7 @@ def _loglikelihood(y_pred, y_true):
     return llh
 
 def _whiten(x):
-    """Helper function to whiten data
+    """Helper function to whiten the data (i.e. )
 
     """
 
@@ -53,10 +53,10 @@ def _ssr_f(**kwargs):
     linreg_single_residues, linreg_joint_residues, max_shift, dof_joint = kwargs['linreg_single_residues'], kwargs['linreg_joint_residues'], \
                                                                           kwargs['max_shift'], kwargs['dof_joint']
     
-    result_df = pd.DataFrame()
     f_stat = ((linreg_single_residues - linreg_joint_residues) / 
                linreg_joint_residues / max_shift * dof_joint)                            
     
+    result_df = pd.DataFrame()
     result_df['ssr F-test'] = [f_stat, stats.f.sf(f_stat, max_shift, dof_joint), int(dof_joint), int(max_shift)]
     result_df.index = ['F-value', 'p-value', 'degrees of freedom', 'number of shifts']
     return result_df
@@ -66,8 +66,9 @@ def _ssr_chi2(**kwargs):
                                                                                        kwargs['linreg_joint_residues'], kwargs['dof_joint'], \
                                                                                        kwargs['max_shift']
     
-    result_df = pd.DataFrame()
     fgc2 = len(data_single) * (linreg_single_residues - linreg_joint_residues) / linreg_joint_residues
+    
+    result_df = pd.DataFrame()
     result_df['ssr_chi2test'] = [fgc2, stats.chi2.sf(fgc2, max_shift), int(dof_joint), int(max_shift)]
     result_df.index = ['chi2', 'p-value', 'degrees of freedom', 'number of shifts']
     return result_df
@@ -77,12 +78,12 @@ def _likelihood_chi2(**kwargs):
     data_single, data_joint, dof_joint = kwargs['data_single'], kwargs['data_joint'], kwargs['dof_joint']
     max_shift, x_col = kwargs['max_shift'], kwargs['x_col']
     
-    result_df = pd.DataFrame()
     linreg_single_loglikelihood = _loglikelihood(y_pred=y_pred_single, y_true=data[x_col].loc[data_single.index])
     linreg_joint_loglikelihood = _loglikelihood(y_pred=y_pred_joint, y_true=data[x_col].loc[data_joint.index])
     
     likelihood_ratio = -2 * (linreg_single_loglikelihood - linreg_joint_loglikelihood)
 
+    result_df = pd.DataFrame()
     result_df['likelihood ratio test'] = [likelihood_ratio, stats.chi2.sf(likelihood_ratio, max_shift), int(dof_joint), int(max_shift)]
     result_df.index = ['chi2', 'p-value', 'degrees of freedom', 'number of shifts']
     return result_df
@@ -95,7 +96,6 @@ def _zero_f(**kwargs):
     data_joint, linreg_joint, data, y_pred_joint = kwargs['data_joint'], kwargs['linreg_joint'], kwargs['data'], kwargs['y_pred_joint']
     linreg_joint_residues, dof_joint, max_shift, x_col = kwargs['linreg_joint_residues'], kwargs['dof_joint'], kwargs['max_shift'], kwargs['x_col']
     
-    result_df = pd.DataFrame()
     constraint_matrix = np.column_stack((np.zeros((max_shift, max_shift)),
                                          np.eye(max_shift, max_shift),
                                          np.zeros((max_shift, 1))))
@@ -107,24 +107,22 @@ def _zero_f(**kwargs):
     linreg_params.append(linreg_joint.intercept_)
     linreg_params = np.array([linreg_params])
     constraint_params = np.dot(constraint_matrix, linreg_params.T)
-    rbq = constraint_params - value_restriction
-    
-    scale = mean_squared_error(y_pred_joint, data[x_col].loc[data_joint.index])
-    scale = linreg_joint_residues / dof_joint
-    
-    pseudoinv_data = pseudoinv_extended(_whiten(data_joint.values.reshape(len(data_joint), -1)))
+    params_diff = constraint_params - value_restriction
+        
+    pseudoinv_data = pseudoinv_extended(_whiten(data_joint.values))
     
     # Covariance matrix
+    scale = linreg_joint_residues / dof_joint
     covar = np.dot(pseudoinv_data, np.transpose(pseudoinv_data)) * scale
     covar = np.dot(constraint_matrix, np.dot(covar, constraint_matrix.T))
     invcov = np.linalg.pinv(covar)
 
-    f = (np.dot(np.dot(rbq.T, invcov), rbq) / len(constraint_matrix))[0, 0]
+    f = (np.dot(np.dot(params_diff.T, invcov), params_diff) / len(constraint_matrix))[0, 0]
     pvalue = stats.f.sf(f, len(constraint_matrix), dof_joint)
     
+    result_df = pd.DataFrame()
     result_df['F-test'] = [f, pvalue, int(dof_joint), int(max_shift)]
     result_df.index = ['F-value', 'p-value', 'degrees of freedom', 'number of shifts']
-    
     return result_df
 
 STAT_TESTS = {'ssr_f': _ssr_f,
@@ -223,9 +221,9 @@ class GrangerCausality(BaseEstimator):
         self.results_ = []
 
         for s in self.statistics:
-            self.results_.append(STAT_TESTS[s](linreg_single_residues = linreg_single_residues, linreg_joint_residues = linreg_joint_residues, 
-                                               dof_joint = dof_joint, max_shift = self.max_shift, data_single = data_single, 
-                                               y_pred_single = y_pred_single, y_pred_joint = y_pred_joint, data = data, x_col = self.x_col,
+            self.results_.append(STAT_TESTS[s](linreg_single_residues=linreg_single_residues, linreg_joint_residues=linreg_joint_residues, 
+                                               dof_joint=dof_joint, max_shift=self.max_shift, data_single=data_single, 
+                                               y_pred_single=y_pred_single, y_pred_joint=y_pred_joint, data = data, x_col=self.x_col,
                                                data_joint=data_joint, linreg_joint=linreg_joint))
 
         return self
