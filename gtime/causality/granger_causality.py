@@ -8,9 +8,8 @@ from sklearn.metrics import mean_squared_error
 
 def _loglikelihood(y_pred, y_true):
     """Helper function to calculate the loglikelihood for the log likelihood chi2 test
-
     """
-
+    
     diff = y_true - y_pred
     std_predictions = np.std(diff)
     loglikelihood = -(len(y_true) / 2) * np.log(2.0 * np.pi * std_predictions * std_predictions) \
@@ -19,7 +18,6 @@ def _loglikelihood(y_pred, y_true):
         
 def pseudoinv_extended(X, ratio=1e-15):
     """Calculate pseudoinverse. Code adapted from statstools and numpy
-
     """
 
     X = np.asarray(X)
@@ -78,11 +76,6 @@ def _likelihood_chi2(params_dict):
     return result_df
 
 def _zero_f(params_dict):
-    """
-    Link: http://web.vu.lt/mif/a.buteikis/wp-content/uploads/PE_Book/4-2-Multiple-OLS.html (especially the part about hypothesis testing)
-
-    """
-
     data_joint, linreg_joint, data, y_pred_joint = params_dict['data_joint'], params_dict['linreg_joint'], params_dict['data'], params_dict['y_pred_joint']
     linreg_joint_residues, dof_joint, max_shift, x_col = params_dict['linreg_joint_residues'], params_dict['dof_joint'], params_dict['max_shift'], params_dict['x_col']
     
