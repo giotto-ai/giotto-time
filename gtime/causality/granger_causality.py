@@ -16,18 +16,6 @@ def _loglikelihood(y_pred, y_true):
     llh = -(len(y_true) / 2) * np.log(2.0 * np.pi * std_predictions * std_predictions) \
         - ((np.dot(diff.T, diff)) / (2.0 * std_predictions * std_predictions))
     return llh
-
-def _whiten(x):
-    """Helper function to whiten the data (i.e. )
-
-    """
-
-    x = np.append(x, np.ones((len(x), 1)), axis=1)
-    weights = np.array([1.])
-    if x.ndim == 1:
-        return x * np.sqrt(weights)
-    elif x.ndim == 2:
-        return np.sqrt(weights)[:, None] * x
         
 def pseudoinv_extended(X, ratio=1e-15):
     """Calculate pseudoinverse. Code adapted from statstools and numpy
@@ -69,7 +57,7 @@ def _ssr_chi2(**kwargs):
     chi2_stat = len(data_single) * (linreg_single_residues - linreg_joint_residues) / linreg_joint_residues
     
     result_df = pd.DataFrame()
-    result_df['ssr_chi2test'] = [chi2_stat, stats.chi2.sf(fgc2, max_shift), int(dof_joint), int(max_shift)]
+    result_df['ssr_chi2test'] = [chi2_stat, stats.chi2.sf(chi2_stat, max_shift), int(dof_joint), int(max_shift)]
     result_df.index = ['chi2', 'p-value', 'degrees of freedom', 'number of shifts']
     return result_df
 
@@ -93,6 +81,7 @@ def _zero_f(**kwargs):
     Link: http://web.vu.lt/mif/a.buteikis/wp-content/uploads/PE_Book/4-2-Multiple-OLS.html (especially the part about hypothesis testing)
 
     """
+
     data_joint, linreg_joint, data, y_pred_joint = kwargs['data_joint'], kwargs['linreg_joint'], kwargs['data'], kwargs['y_pred_joint']
     linreg_joint_residues, dof_joint, max_shift, x_col = kwargs['linreg_joint_residues'], kwargs['dof_joint'], kwargs['max_shift'], kwargs['x_col']
     
@@ -109,8 +98,9 @@ def _zero_f(**kwargs):
     constraint_params = np.dot(constraint_matrix, linreg_params.T)
     params_diff = constraint_params - value_restriction
         
-    pseudoinv_data = pseudoinv_extended(_whiten(data_joint.values))
-    
+    # pseudoinv_data = pseudoinv_extended(_whiten(data_joint.values))
+    pseudoinv_data = pseudoinv_extended(np.append(data_joint.values, np.ones((len(data_joint.values), 1)), axis=1))
+
     # Covariance matrix
     scale = linreg_joint_residues / dof_joint
     covar = np.dot(pseudoinv_data, np.transpose(pseudoinv_data)) * scale
@@ -142,7 +132,7 @@ class GrangerCausality(BaseEstimator):
         The column to test for Granger causality, i.e. the time 
         series X.
     max_shift : int
-        The maximal number of shifts to check for Granger causality
+        The maximal number of shifts to check for Granger causality. 
     statistics : list, optional, default: ['ssr_f']
         The statistical test(s) to perform for Granger causality. A list with elements
         from the set: 'ssr_f' (sum squared residuals with F-test), 'ssr_chi2' (sum squared 
@@ -188,21 +178,18 @@ class GrangerCausality(BaseEstimator):
         x = self.x_col
         y = self.target_col
 
-        shifts = pd.DataFrame()
-        
-        for shift in range(0, self.max_shift+1):
-            shifts[str(x)+'_'+str(shift)] = data[x].shift(shift)
-            if shift > 0:
-                shifts[str(y)+'_'+str(shift-1)] = data[y].shift(shift)
+        x_cols_joint = [x+'_'+str(i+1) for i in range(self.max_shift)]
+        y_cols_joint = [y+'_'+str(i) for i in range(self.max_shift)]
+
+        shifts = pd.DataFrame(columns=np.array([x_cols_joint, y_cols_joint]).flatten())
+        for x_col, shift in zip(x_cols_joint, range(1, self.max_shift+1)):
+            shifts[x_col] = data[x].shift(shift) 
+        for y_col, shift in zip(y_cols_joint, range(1, self.max_shift+1)):
+            shifts[y_col] = data[y].shift(shift)
         shifts = shifts.dropna()
-                
-        y_columns = [c for c in shifts.columns if c.split('_')[0]==y]
-        x_columns = [c for c in shifts.columns if c.split('_')[0]==x]
-        
-        data_single = shifts[x_columns].copy()
-        data_joint = shifts[x_columns + y_columns].copy()
-        data_single.drop([str(x)+'_'+str(0)], inplace=True, axis='columns')
-        data_joint.drop([str(x)+'_'+str(0)], inplace=True, axis='columns')
+
+        data_single = shifts[x_cols_joint].copy()
+        data_joint = shifts[x_cols_joint + y_cols_joint].copy()
 
         linreg_single = LinearRegression()
         linreg_joint = LinearRegression()
