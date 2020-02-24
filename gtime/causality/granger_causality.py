@@ -197,7 +197,7 @@ class GrangerCausality(BaseEstimator):
         y_pred_joint = linreg_joint.predict(data_joint)
         
         dof_single = float(data_single.shape[0] - data_single.shape[1]) 
-        dof_joint = float(data_joint.shape[0] - data_joint.shape[1]) -1  
+        dof_joint = float(data_joint.shape[0] - data_joint.shape[1]) - 1  
                 
         linreg_single_residues = linreg_single._residues
         linreg_joint_residues = linreg_joint._residues
