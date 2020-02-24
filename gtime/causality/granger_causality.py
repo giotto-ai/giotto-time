@@ -38,9 +38,9 @@ def pseudoinv_extended(X, ratio=1e-15):
     res = np.dot(np.transpose(vt), s[:, np.core.newaxis] * np.transpose(u))
     return res
 
-def _ssr_f(dict_params):
-    linreg_single_residues, linreg_joint_residues, max_shift, dof_joint = dict_params['linreg_single_residues'], dict_params['linreg_joint_residues'], \
-                                                                          dict_params['max_shift'], dict_params['dof_joint']
+def _ssr_f(params_dict):
+    linreg_single_residues, linreg_joint_residues, max_shift, dof_joint = params_dict['linreg_single_residues'], params_dict['linreg_joint_residues'], \
+                                                                          params_dict['max_shift'], params_dict['dof_joint']
     
     f_stat = ((linreg_single_residues - linreg_joint_residues) / 
                linreg_joint_residues / max_shift * dof_joint)                            
@@ -50,10 +50,10 @@ def _ssr_f(dict_params):
     result_df.index = ['F-value', 'p-value', 'degrees of freedom', 'number of shifts']
     return result_df
 
-def _ssr_chi2(dict_params):
-    data_single, linreg_single_residues, linreg_joint_residues, dof_joint, max_shift = dict_params['data_single'], dict_params['linreg_single_residues'], \
-                                                                                       dict_params['linreg_joint_residues'], dict_params['dof_joint'], \
-                                                                                       dict_params['max_shift']
+def _ssr_chi2(params_dict):
+    data_single, linreg_single_residues, linreg_joint_residues, dof_joint, max_shift = params_dict['data_single'], params_dict['linreg_single_residues'], \
+                                                                                       params_dict['linreg_joint_residues'], params_dict['dof_joint'], \
+                                                                                       params_dict['max_shift']
     
     chi2_stat = len(data_single) * (linreg_single_residues - linreg_joint_residues) / linreg_joint_residues
     
@@ -62,10 +62,10 @@ def _ssr_chi2(dict_params):
     result_df.index = ['chi2', 'p-value', 'degrees of freedom', 'number of shifts']
     return result_df
 
-def _likelihood_chi2(dict_params):
-    y_pred_single, y_pred_joint, data = dict_params['y_pred_single'], dict_params['y_pred_joint'], dict_params['data']
-    data_single, data_joint, dof_joint = dict_params['data_single'], dict_params['data_joint'], dict_params['dof_joint']
-    max_shift, x_col = dict_params['max_shift'], dict_params['x_col']
+def _likelihood_chi2(params_dict):
+    y_pred_single, y_pred_joint, data = params_dict['y_pred_single'], params_dict['y_pred_joint'], params_dict['data']
+    data_single, data_joint, dof_joint = params_dict['data_single'], params_dict['data_joint'], params_dict['dof_joint']
+    max_shift, x_col = params_dict['max_shift'], params_dict['x_col']
     
     linreg_single_loglikelihood = _loglikelihood(y_pred=y_pred_single, y_true=data[x_col].loc[data_single.index])
     linreg_joint_loglikelihood = _loglikelihood(y_pred=y_pred_joint, y_true=data[x_col].loc[data_joint.index])
@@ -77,14 +77,14 @@ def _likelihood_chi2(dict_params):
     result_df.index = ['chi2', 'p-value', 'degrees of freedom', 'number of shifts']
     return result_df
 
-def _zero_f(dict_params):
+def _zero_f(params_dict):
     """
     Link: http://web.vu.lt/mif/a.buteikis/wp-content/uploads/PE_Book/4-2-Multiple-OLS.html (especially the part about hypothesis testing)
 
     """
 
-    data_joint, linreg_joint, data, y_pred_joint = dict_params['data_joint'], dict_params['linreg_joint'], dict_params['data'], dict_params['y_pred_joint']
-    linreg_joint_residues, dof_joint, max_shift, x_col = dict_params['linreg_joint_residues'], dict_params['dof_joint'], dict_params['max_shift'], dict_params['x_col']
+    data_joint, linreg_joint, data, y_pred_joint = params_dict['data_joint'], params_dict['linreg_joint'], params_dict['data'], params_dict['y_pred_joint']
+    linreg_joint_residues, dof_joint, max_shift, x_col = params_dict['linreg_joint_residues'], params_dict['dof_joint'], params_dict['max_shift'], params_dict['x_col']
     
     constraint_matrix = np.column_stack((np.zeros((max_shift, max_shift)),
                                          np.eye(max_shift, max_shift),
@@ -128,11 +128,14 @@ class GrangerCausality(BaseEstimator):
     ----------
     target_col : str, 
         The column to use as the reference, i.e. the time series Y
+
     x_col : str
         The column to test for Granger causality, i.e. the time 
         series X.
+
     max_shift : int
         The maximal number of shifts to check for Granger causality. 
+
     statistics : list, optional, default: ['ssr_f']
         The statistical test(s) to perform for Granger causality. A list with elements
         from the set: 'ssr_f' (sum squared residuals with F-test), 'ssr_chi2' (sum squared 
@@ -145,7 +148,8 @@ class GrangerCausality(BaseEstimator):
     >>> from gtime.causality.granger_causality import GrangerCausality
     >>> import pandas.util.testing as testing
     >>> data = testing.makeTimeDataFrame(freq="s", nper=1000)
-    >>> GrangerCausality(target_col='A', x_col='B', max_shift=10, statistics='ssr_f').fit(data)
+    >>> gc = GrangerCausality(target_col='A', x_col='B', max_shift=10, statistics=['ssr_f']).fit(data)
+    >>> gc.results_[0]
                         ssr F-test
     F-value               0.372640
     p-value               0.958527
