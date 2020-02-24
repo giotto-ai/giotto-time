@@ -114,3 +114,76 @@ def max_error(
 
     error = np.amax(np.absolute(np.subtract(y_true, y_pred)))
     return error
+
+def mse(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the maximum error between two vectors.
+
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required
+        The first vector.
+
+    y_pred : array-like, shape (length, 1), required
+        The second vector.
+
+    Returns
+    -------
+    error : float
+        The maximum error between the two vectors.
+
+    Examples
+    --------
+    >>> from gtime.metrics import max_error
+    >>> y_true = [0, 1, 2, 3, 4, 5]
+    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> max_error(y_true, y_pred)
+    1.20
+
+    """
+    y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
+    _check_input(y_true, y_pred)
+    
+    sum_squared_error = sum((np.subtract(y_true, y_pred)) ** 2)
+    mse = sum_squared_error / float(len(y_true))
+    return mse
+
+
+def log_mse(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the maximum error between two vectors.
+
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required
+        The first vector.
+
+    y_pred : array-like, shape (length, 1), required
+        The second vector.
+
+    Returns
+    -------
+    error : float
+        The maximum error between the two vectors.
+
+    Examples
+    --------
+    >>> from gtime.metrics import log_mse
+    >>> y_true = [0, 1, 2, 3, 4, 5]
+    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> log_mse(y_true, y_pred)
+    0.244
+
+    """
+    y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
+    _check_input(y_true, y_pred)
+    
+    log_y_true = np.log(y_true + 1)
+    log_y_pred = np.log(y_pred + 1)
+    sum_squared_error = sum((np.subtract(log_y_true, log_y_pred)) ** 2)
+    log_mse = sum_squared_error / float(len(y_true))
+    return log_mse

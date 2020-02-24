@@ -5,7 +5,7 @@ from hypothesis import given
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats
 
-from gtime.metrics import smape, max_error
+from gtime.metrics import *
 
 
 class TestSmape:
@@ -158,3 +158,115 @@ class TestMaxError:
         print(y_true)
         print(y_pred)
         assert expected_error == error
+
+
+class TestMSE:
+    def _correct_mse(self, y_true, y_pred):
+        sum_squared_error = sum((np.subtract(y_true, y_pred)) ** 2)
+        mse = sum_squared_error / float(len(y_true))
+        return mse
+
+    def test_wrong_vector_length(self):
+        y_true = np.random.random(5)
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            mse(y_true, y_pred)
+
+    def test_nan_values(self):
+        y_true = [np.nan, 1, 2, 3]
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            mse(y_true, y_pred)
+
+    def test_infinite_values(self):
+        y_true = np.random.random(4)
+        y_pred = [0, np.inf, 2, 3]
+
+        with pytest.raises(ValueError):
+            mse(y_true, y_pred)
+
+    def test_mse_list(self):
+        y_true = [0, 1, 2, 3, 4, 5]
+        y_pred = [-1, 4, 5, 10, 4, 1]
+
+        mse_value = mse(y_pred, y_true)
+        expected_mse = 7
+
+        assert expected_mse, mse_value
+
+    def test_mse_array(self):
+        y_true = np.array([0, 1, 2, 3, 4, 5])
+        y_pred = np.array([-1, 4, 5, 10, 4, 1])
+
+        mse_value = mse(y_pred, y_true)
+        expected_mse = 7
+
+        assert expected_mse, mse_value
+
+    def test_mse_dataframe(self):
+        y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
+        y_pred = pd.DataFrame([-1, 4, 5, 10, 4, 1])
+
+        mse_value = mse(y_pred, y_true)
+        expected_mse = 7
+
+        assert expected_mse, mse_value
+
+
+class TestLogMSE:
+    def _correct_mse(self, y_true, y_pred):
+        log_y_true = np.log(y_true + 1)
+        log_y_pred = np.log(y_pred + 1)
+        sum_squared_error = sum((np.subtract(log_y_true, log_y_pred)) ** 2)
+        log_mse = sum_squared_error / float(len(y_true))
+        return log_mse
+
+    def test_wrong_vector_length(self):
+        y_true = np.random.random(5)
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            log_mse(y_true, y_pred)
+
+    def test_nan_values(self):
+        y_true = [np.nan, 1, 2, 3]
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            log_mse(y_true, y_pred)
+
+    def test_infinite_values(self):
+        y_true = np.random.random(4)
+        y_pred = [0, np.inf, 2, 3]
+
+        with pytest.raises(ValueError):
+            log_mse(y_true, y_pred)
+
+    def test_log_mse_list(self):
+        y_true = [0, 1, 2, 3, 4, 5]
+        y_pred = [-1, 4, 5, 10, 4, 1]
+
+        log_mse_value = log_mse(y_pred, y_true)
+        expected_log_mse = 7
+
+        assert expected_log_mse, log_mse_value
+
+    def test_log_mse_array(self):
+        y_true = np.array([0, 1, 2, 3, 4, 5])
+        y_pred = np.array([-1, 4, 5, 10, 4, 1])
+
+        log_mse_value = log_mse(y_pred, y_true)
+        expected_log_mse = 7
+
+        assert expected_log_mse, log_mse_value
+
+    def test_log_mse_dataframe(self):
+        y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
+        y_pred = pd.DataFrame([-1, 4, 5, 10, 4, 1])
+
+        log_mse_value = log_mse(y_pred, y_true)
+        expected_log_mse = 7
+
+        assert expected_log_mse, log_mse_value
