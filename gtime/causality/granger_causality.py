@@ -126,7 +126,7 @@ class GrangerCausality(BaseEstimator):
         The column to test for Granger causality, i.e. the time 
         series X.
 
-    max_shift : int
+    max_shift : int, optional, default: 10
         The maximal number of shifts to check for Granger causality. 
 
     statistics : list, optional, default: ['ssr_f']
@@ -159,7 +159,7 @@ class GrangerCausality(BaseEstimator):
     def __init__(self, 
                  target_col: str, 
                  x_col: str, 
-                 max_shift: int, 
+                 max_shift=10, 
                  statistics=['ssr_f']):
         self.target_col = target_col
         self.x_col = x_col
@@ -179,7 +179,7 @@ class GrangerCausality(BaseEstimator):
         -------
         self : object
             Returns the instance itself.
-            
+
         """
 
         shifts = data.copy()
