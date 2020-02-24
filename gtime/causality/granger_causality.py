@@ -9,7 +9,7 @@ from sklearn.metrics import mean_squared_error
 def _loglikelihood(y_pred, y_true):
     """Helper function to calculate the loglikelihood for the log likelihood chi2 test
     """
-    
+
     diff = y_true - y_pred
     std_predictions = np.std(diff)
     loglikelihood = -(len(y_true) / 2) * np.log(2.0 * np.pi * std_predictions * std_predictions) \
@@ -119,7 +119,7 @@ class GrangerCausality(BaseEstimator):
 
     Parameters
     ----------
-    target_col : str, 
+    target_col : str
         The column to use as the reference, i.e. the time series Y
 
     x_col : str
@@ -135,6 +135,11 @@ class GrangerCausality(BaseEstimator):
         residuals with chi square test), 'likelihood_chi2' (likelihood ratio test with 
         chi square distribution), 'zero_F' (F-test that all lag coefficients of 
         the time series X are zero).
+
+    Attributes
+    ----------
+    results_ : list
+        A list of pandas dataframes with the results for all the listed tests in 'statistics'.
 
     Examples
     --------
@@ -170,6 +175,11 @@ class GrangerCausality(BaseEstimator):
         data : pd.DataFrame, shape (n_samples, n_time_series), required
             The dataframe containing the time series.
 
+        Returns
+        -------
+        self : object
+            Returns the instance itself.
+            
         """
 
         shifts = data.copy()
