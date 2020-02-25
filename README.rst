@@ -70,43 +70,39 @@ Get the latest state of the source code with the command
     cd giotto-time
     pip install -e ".[tests, doc]"
 
-Examples
---------
+Example
+-------
 
 .. code-block:: python
 
-    import numpy as np
-    import pandas as pd
     from gtime import *
+    from gtime.feature_extraction import *
+    import pandas as pd
+    import numpy as np
     from sklearn.linear_model import LinearRegression
 
-    # Create random DataFrame with DatetimeIndex
+    # Create random DataFrame with DatetimeIndex
     X_dt = pd.DataFrame(np.random.randint(4, size=(20)),
                         index=pd.date_range("2019-12-20", "2020-01-08"),
                         columns=['time_series'])
 
-    # Convert the DatetimeIndex to PeriodIndex and y matrix
-    X = TimeSeriesPreparation().transform(X_dt)
-    y = horizon_shift(X, horizon=3)
+    # Convert the DatetimeIndex to PeriodIndex and create y matrix
+    X = preprocessing.TimeSeriesPreparation().transform(X_dt)
+    y = model_selection.horizon_shift(X, horizon=2)
 
-    # Create some features
-    cal = Calendar(region="europe", country="Switzerland", kernel=np.array([1, 2]))
-    fc = FeatureCreation(
+    # Create some features
+    cal = feature_generation.Calendar(region="europe", country="Switzerland", kernel=np.array([1, 2]))
+    X_f = compose.FeatureCreation(
         [('s_2', Shift(2), ['time_series']),
          ('ma_3', MovingAverage(window_size=3), ['time_series']),
-         ('cal', cal, ['time_series']),
-        ]).fit_transform(X)
+         ('cal', cal, ['time_series'])]).fit_transform(X)
 
-    # Train test split
-    X_train, y_train, X_test, y_test = FeatureSplitter().transform(X, y)
+    # Train/test split
+    X_train, y_train, X_test, y_test = model_selection.FeatureSplitter().transform(X_f, y)
 
-    # Try some forecasting models
-    tf = TrendForecaster(trend='polynomial', trend_x0=np.zeros(3))
-    tf.fit(X_train).predict(X_test)
-
-    gar = GAR(LinearRegression())
+    # Try sklearn's MultiOutputRegressor as time-series forecasting model
+    gar = forecasting.GAR(LinearRegression())
     gar.fit(X_train, y_train).predict(X_test)
-
 
 Changelog
 ---------
