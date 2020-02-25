@@ -119,7 +119,7 @@ def mse(
     y_true: Union[pd.DataFrame, List, np.ndarray],
     y_pred: Union[pd.DataFrame, List, np.ndarray],
 ) -> float:
-    """Compute the maximum error between two vectors.
+    """Compute the mean squared error between two vectors.
 
     Parameters
     ----------
@@ -132,14 +132,14 @@ def mse(
     Returns
     -------
     error : float
-        The maximum error between the two vectors.
+        The mean squared error between the two vectors.
 
     Examples
     --------
-    >>> from gtime.metrics import max_error
+    >>> from gtime.metrics import mse
     >>> y_true = [0, 1, 2, 3, 4, 5]
     >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
-    >>> max_error(y_true, y_pred)
+    >>> mse(y_true, y_pred)
     1.20
 
     """
@@ -155,7 +155,7 @@ def log_mse(
     y_true: Union[pd.DataFrame, List, np.ndarray],
     y_pred: Union[pd.DataFrame, List, np.ndarray],
 ) -> float:
-    """Compute the maximum error between two vectors.
+    """Compute the log mean squared error between two vectors.
 
     Parameters
     ----------
@@ -168,7 +168,7 @@ def log_mse(
     Returns
     -------
     error : float
-        The maximum error between the two vectors.
+        The log mean squared error between the two vectors.
 
     Examples
     --------
@@ -187,3 +187,44 @@ def log_mse(
     sum_squared_error = sum((np.subtract(log_y_true, log_y_pred)) ** 2)
     log_mse = sum_squared_error / float(len(y_true))
     return log_mse
+
+
+def r_square(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the R squared (Coefficient of Determination) between two vectors.
+
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required
+        The first vector.
+
+    y_pred : array-like, shape (length, 1), required
+        The second vector.
+
+    Returns
+    -------
+    error : float
+        The R squared between the two vectors.
+
+    Examples
+    --------
+    >>> from gtime.metrics import r_square
+    >>> y_true = [0, 1, 2, 3, 4, 5]
+    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> r_square(y_true, y_pred)
+    0.586
+
+    """
+    y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
+    _check_input(y_true, y_pred)
+    
+    y_true_mean = np.mean(y_true)
+    sum_squared_error = sum((np.subtract(y_true, y_pred)) ** 2)
+    print(sum_squared_error)
+    sum_squared_diff_y_true_mean = sum(np.subtract(y_true, y_true_mean) ** 2)
+    print(sum_squared_diff_y_true_mean)
+    r_square = 1 - (sum_squared_error / float(sum_squared_diff_y_true_mean))
+    return r_square
+

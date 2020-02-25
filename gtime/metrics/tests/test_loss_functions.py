@@ -191,32 +191,44 @@ class TestMSE:
         y_true = [0, 1, 2, 3, 4, 5]
         y_pred = [-1, 4, 5, 10, 4, 1]
 
-        mse_value = mse(y_pred, y_true)
-        expected_mse = 7
-
-        assert expected_mse, mse_value
+        mse_value = np.round(mse(y_true, y_pred), decimals=2)
+        expected_mse = 14
+        
+        assert expected_mse == mse_value
 
     def test_mse_array(self):
         y_true = np.array([0, 1, 2, 3, 4, 5])
         y_pred = np.array([-1, 4, 5, 10, 4, 1])
 
-        mse_value = mse(y_pred, y_true)
-        expected_mse = 7
-
-        assert expected_mse, mse_value
+        mse_value = np.round(mse(y_true, y_pred), decimals=2)
+        expected_mse = 14
+        
+        assert expected_mse == mse_value
 
     def test_mse_dataframe(self):
         y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
         y_pred = pd.DataFrame([-1, 4, 5, 10, 4, 1])
 
-        mse_value = mse(y_pred, y_true)
-        expected_mse = 7
+        mse_value = np.round(mse(y_true, y_pred), decimals=2)
+        expected_mse = 14
+        
+        assert expected_mse == mse_value
 
-        assert expected_mse, mse_value
+    @given(
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+    )
+    def test_mse_random_arrays_finite_values(self, y_true, y_pred):
+        error = mse(y_true, y_pred)
+        expected_error = self._correct_mse(y_true, y_pred)
+        print(y_true)
+        print(y_pred)
+
+        assert expected_error == error
 
 
 class TestLogMSE:
-    def _correct_mse(self, y_true, y_pred):
+    def _correct_log_mse(self, y_true, y_pred):
         log_y_true = np.log(y_true + 1)
         log_y_pred = np.log(y_pred + 1)
         sum_squared_error = sum((np.subtract(log_y_true, log_y_pred)) ** 2)
@@ -248,7 +260,7 @@ class TestLogMSE:
         y_true = [0, 1, 2, 3, 4, 5]
         y_pred = [-1, 4, 5, 10, 4, 1]
 
-        log_mse_value = log_mse(y_pred, y_true)
+        log_mse_value = np.round(log_mse(y_true, y_pred), decimals=2)
         expected_log_mse = 7
 
         assert expected_log_mse, log_mse_value
@@ -257,7 +269,7 @@ class TestLogMSE:
         y_true = np.array([0, 1, 2, 3, 4, 5])
         y_pred = np.array([-1, 4, 5, 10, 4, 1])
 
-        log_mse_value = log_mse(y_pred, y_true)
+        log_mse_value = np.round(log_mse(y_true, y_pred), decimals=2)
         expected_log_mse = 7
 
         assert expected_log_mse, log_mse_value
@@ -266,7 +278,86 @@ class TestLogMSE:
         y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
         y_pred = pd.DataFrame([-1, 4, 5, 10, 4, 1])
 
-        log_mse_value = log_mse(y_pred, y_true)
+        log_mse_value = np.round(log_mse(y_true, y_pred), decimals=2)
         expected_log_mse = 7
 
         assert expected_log_mse, log_mse_value
+
+    @given(
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+    )
+    def test_log_mse_random_arrays_finite_values(self, y_true, y_pred):
+        error = mse(y_true, y_pred)
+        expected_error = self._correct_log_mse(y_true, y_pred)
+        print(y_true)
+        print(y_pred)
+
+        assert expected_error == error
+
+class TestRSquare:
+    def _correct_r_squared(self, y_true, y_pred):
+        y_true_mean = np.mean(y_true)
+        sum_squared_error = sum((np.subtract(y_true, y_pred)) ** 2)
+        sum_squared_diff_y_true_mean = sum(np.subtract(y_true, y_true_mean) ** 2)
+        r_square = 1 - (sum_squared_error / float(sum_squared_diff_y_true_mean))
+        return r_square
+
+    def test_wrong_vector_length(self):
+        y_true = np.random.random(5)
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            r_square(y_true, y_pred)
+
+    def test_nan_values(self):
+        y_true = [np.nan, 1, 2, 3]
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            r_square(y_true, y_pred)
+
+    def test_infinite_values(self):
+        y_true = np.random.random(4)
+        y_pred = [0, np.inf, 2, 3]
+
+        with pytest.raises(ValueError):
+            r_square(y_true, y_pred)
+
+    def test_r_square_list(self):
+        y_true = [0, 1, 2, 3, 4, 5]
+        y_pred = [-1, 4, 5, 10, 4, 1]
+
+        r_square_value = np.round(r_square(y_true, y_pred), decimals=2)
+        expected_r_square = -3.8
+
+        assert expected_r_square == r_square_value
+
+    def test_r_square_array(self):
+        y_true = np.array([0, 1, 2, 3, 4, 5])
+        y_pred = np.array([-1, 4, 5, 10, 4, 1])
+
+        r_square_value = np.round(r_square(y_true, y_pred), decimals=2)
+        expected_r_square = -3.8
+
+        assert expected_r_square == r_square_value
+
+    def test_r_square_dataframe(self):
+        y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
+        y_pred = pd.DataFrame([-1, 4, 5, 10, 4, 1])
+
+        r_square_value = np.round(r_square(y_true, y_pred), decimals=2)
+        expected_r_square = -3.8
+
+        assert expected_r_square == r_square_value
+
+    @given(
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+    )
+    def test_r_square_random_arrays_finite_values(self, y_true, y_pred):
+        r_square_value = r_square(y_true, y_pred)
+        expected_r_square = self._correct_r_squared(y_true, y_pred)
+        print(y_true)
+        print(y_pred)
+        assert expected_r_square == r_square_value
