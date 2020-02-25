@@ -35,22 +35,6 @@ class TestNaive:
         assert all(tm.predict(test) == expected)
 
 
-class TestSeasonalNaive:
-    def test_fit(self, generate_ts):
-        train, _ = generate_ts
-        tm = SeasonalNaiveModel(seasonal_length=4)
-        tm.fit(train)
-        assert all(tm.last_value_["A"] == train.iloc[-tm.lag_:]["A"])
-
-    def test_predict(self, generate_ts):
-        train, test = generate_ts
-        print(train, test)
-        tm = SeasonalNaiveModel(seasonal_length=4)
-        tm.fit(train)
-        expected = pd.DataFrame(data=train.iloc[-4:-1], index=test.index)
-        assert all(tm.predict(test) == expected)
-
-
 class TestDriftModel:
     def test_fit(self, generate_ts):
         train, _ = generate_ts
@@ -68,3 +52,19 @@ class TestDriftModel:
         last = train.iloc[-1]
         y_pred = tm.predict(test)
         assert all(y_pred.iloc[2] == last + 2 * drift)
+
+
+class TestSeasonalNaive:
+    def test_fit(self, generate_ts):
+        train, _ = generate_ts
+        tm = SeasonalNaiveModel(seasonal_length=4)
+        tm.fit(train)
+        assert all(tm.last_value_["A"] == train.iloc[-tm.lag_:]["A"])
+
+    def test_predict(self, generate_ts):
+        train, test = generate_ts
+        print(train, test)
+        tm = SeasonalNaiveModel(seasonal_length=4)
+        tm.fit(train)
+        expected = pd.DataFrame(data=train.iloc[-4:-1], index=test.index)
+        assert all(tm.predict(test) == expected)
