@@ -222,9 +222,7 @@ def r_square(
     
     y_true_mean = np.mean(y_true)
     sum_squared_error = sum((np.subtract(y_true, y_pred)) ** 2)
-    print(sum_squared_error)
     sum_squared_diff_y_true_mean = sum(np.subtract(y_true, y_true_mean) ** 2)
-    print(sum_squared_diff_y_true_mean)
     r_square = 1 - (sum_squared_error / float(sum_squared_diff_y_true_mean))
     return r_square
 
