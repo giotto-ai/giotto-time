@@ -28,20 +28,15 @@ giotto-time
 ===========
 
 giotto-time is a machine learning based time series forecasting toolbox in Python.
-It is part of the `Giotto <https://github.com/giotto-ai>`_ family of open-source projects.
-
-Project genesis
----------------
-
-giotto-time was created to provide time series feature extraction, analysis and
-forecasting tools based on scikit-learn API.
+It is part of the `Giotto <https://github.com/giotto-ai>`_ collection of open-source projects and aims to provide
+feature extraction, analysis, causality testing and forecasting models based on
+`scikit-learn <https://scikit-learn.org/stable/>`_ API.
 
 License
 -------
 
 giotto-time is distributed under the AGPLv3 `license <https://github.com/giotto-ai/giotto-time/blob/master/LICENSE>`_.
-If you need a different distribution license, please contact the L2F team at 
-business@l2f.ch
+If you need a different distribution license, please contact the L2F team at business@l2f.ch.
 
 Documentation
 -------------
@@ -57,26 +52,63 @@ Simple tutorials and real-world use cases can be found in example folder as note
 Installation
 ------------
 
-Dependencies
-~~~~~~~~~~~~
-
-The latest stable version of giotto-time requires:
-
-- Python (>= 3.6)
-- scikit-learn (>= 0.22.0)
-- pandas (==0.25.3)
-- workalendar (>=7.1.1)
-
-To run the examples, jupyter is required.
-
 User installation
 ~~~~~~~~~~~~~~~~~
 
-Linux, MacOS and Windows
-''''''''''''''''''''''''
 Run this command in your favourite python environment  ::
 
     pip install giotto-time
+
+Developer installation
+~~~~~~~~~~~~~~~~~~~~~~
+
+Get the latest state of the source code with the command
+
+.. code-block:: bash
+
+    git clone https://github.com/giotto-ai/giotto-time.git
+    cd giotto-time
+    pip install -e ".[tests, doc]"
+
+Example
+-------
+
+.. code-block:: python
+
+    from gtime import *
+    from gtime.feature_extraction import *
+    import pandas as pd
+    import numpy as np
+    from sklearn.linear_model import LinearRegression
+
+    # Create random DataFrame with DatetimeIndex
+    X_dt = pd.DataFrame(np.random.randint(4, size=(20)),
+                        index=pd.date_range("2019-12-20", "2020-01-08"),
+                        columns=['time_series'])
+
+    # Convert the DatetimeIndex to PeriodIndex and create y matrix
+    X = preprocessing.TimeSeriesPreparation().transform(X_dt)
+    y = model_selection.horizon_shift(X, horizon=2)
+
+    # Create some features
+    cal = feature_generation.Calendar(region="europe", country="Switzerland", kernel=np.array([1, 2]))
+    X_f = compose.FeatureCreation(
+        [('s_2', Shift(2), ['time_series']),
+         ('ma_3', MovingAverage(window_size=3), ['time_series']),
+         ('cal', cal, ['time_series'])]).fit_transform(X)
+
+    # Train/test split
+    X_train, y_train, X_test, y_test = model_selection.FeatureSplitter().transform(X_f, y)
+
+    # Try sklearn's MultiOutputRegressor as time-series forecasting model
+    gar = forecasting.GAR(LinearRegression())
+    gar.fit(X_train, y_train).predict(X_test)
+
+Changelog
+---------
+
+See the `RELEASE.rst <https://github.com/giotto-ai/giotto-time/blob/master/RELEASE.rst>`__ file
+for a history of notable changes to giotto-time.
 
 Contributing
 ------------
@@ -86,44 +118,8 @@ community goals are to be helpful, welcoming, and effective. To learn more about
 making a contribution to giotto-time, please see the `CONTRIBUTING.rst
 <https://github.com/giotto-ai/giotto-time/blob/master/CONTRIBUTING.rst>`_ file.
 
-Developer installation
-~~~~~~~~~~~~~~~~~~~~~~
-
-Source code
-'''''''''''
-
-You can obtain the latest state of the source code with the command  ::
-
-    git clone https://github.com/giotto-ai/giotto-time.git
-
-
-then run
-
-.. code-block:: bash
-
-   cd giotto-time
-   pip install -e ".[tests, doc]"
-
-This way, you can pull the library's latest changes and make them immediately available on your machine.
-Note: we recommend upgrading ``pip`` and ``setuptools`` to recent versions before installing in this way.
-
-Testing
-~~~~~~~
-
-After installation, you can launch the test suite from outside the
-source directory::
-
-    pytest gtime
-
-
-Changelog
----------
-
-See the `RELEASE.rst <https://github.com/giotto-ai/giotto-time/blob/master/RELEASE.rst>`__ file
-for a history of notable changes to giotto-time.
-
-Important links
-~~~~~~~~~~~~~~~
+Links
+-----
 
 - Official source code repo: https://github.com/giotto-ai/giotto-time
 - Download releases: https://pypi.org/project/giotto-time/
