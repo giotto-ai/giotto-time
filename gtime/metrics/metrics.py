@@ -224,6 +224,5 @@ def r_square(
     sum_squared_error = sum((np.subtract(y_true, y_pred)) ** 2)
     sum_squared_diff_y_true_mean = sum(np.subtract(y_true, y_true_mean) ** 2)
     r_square = 1 - (sum_squared_error / float(sum_squared_diff_y_true_mean))
-    
     return r_square
 
