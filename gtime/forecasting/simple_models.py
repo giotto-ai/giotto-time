@@ -8,15 +8,15 @@ class NaiveModel(BaseEstimator, RegressorMixin):
 
     def fit(self, X: pd.DataFrame, y=None):
 
-        self.last_value_ = X.iloc[-1]
+        self._y_columns = y.columns
 
         return self
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
 
         check_is_fitted(self)
-        y_pred = self.last_value_.to_numpy()
-        predictions = pd.DataFrame(data=np.tile(y_pred, len(X)), index=X.index, columns=X.columns)
+        y_pred = np.broadcast_to(X, (len(X), len(self._y_columns)))
+        predictions = pd.DataFrame(data=y_pred, columns=self._y_columns, index=X.index)
 
         return predictions
 
@@ -24,28 +24,41 @@ class NaiveModel(BaseEstimator, RegressorMixin):
 class SeasonalNaiveModel(BaseEstimator, RegressorMixin):
 
 
-    def __init__(self, seasonal_length = 1):
+    def __init__(self, seasonal_length: pd.Timedelta):
         super().__init__()
-        self.lag_ = seasonal_length
+        self.seasonal_length = seasonal_length
 
     def fit(self, X: pd.DataFrame, y=None):
 
-        self.last_value_ = X.iloc[-self.lag_:]
+        self.season_ = X.loc[X.index.max()-self.seasonal_length:]
+        self._y_columns = y.columns
 
         return self
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
 
         check_is_fitted(self)
-        len_x = len(X)
-        len_s = len(self.last_value_)
-        y_pred = self.last_value_[X.columns].to_numpy()
-        cycles = len_x // len_s
-        extra = len_x % len_s
-        y_pred = np.concatenate((np.tile(y_pred, (cycles, 1)), y_pred[:extra, :]), axis=0)
-        predictions = pd.DataFrame(data=y_pred, index=X.index, columns=X.columns)
+        time_diff = X.index - self.season_.index.max()
+        len_s = len(self.season_)
+        len_y = len(self._y_columns) # TODO to add horizon?
+        seasonal_pos = time_diff.days.values % len_s
+        y_pred = np.squeeze([self._season_roll_(x, len_y) for x in seasonal_pos])
+        predictions = pd.DataFrame(data=y_pred, index=X.index, columns=self._y_columns)
 
         return predictions
+
+    def _season_roll_(self, start: int, horizon: int) -> np.array:
+
+        len_s = len(self.season_)
+        cycles = np.maximum(horizon - start, 0) // len_s
+        tail = horizon - len_s * (cycles + 1) + start
+        if tail >= 0:
+            return np.concatenate(
+                (self.season_.iloc[start:, :], np.tile(self.season_, (cycles, 1)), self.season_.iloc[:tail, :]))
+        else:
+            return self.season_.iloc[start:tail].to_numpy()
+
+
 
 
 class DriftModel(BaseEstimator, RegressorMixin):
@@ -53,14 +66,28 @@ class DriftModel(BaseEstimator, RegressorMixin):
     def fit(self, X: pd.DataFrame, y=None):
 
         self.drift_ = (X.iloc[-1] - X.iloc[0]) / len(X)
-        self.last_value_ = X.iloc[-1]
+        self._y_columns = y.columns
         return self
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
 
         check_is_fitted(self)
-        len_x = len(X)
-        y_pred = [self.last_value_ + i * self.drift_ for i in range(len_x)]
-        predictions = pd.DataFrame(data=y_pred, index=X.index, columns=X.columns)
+        len_y = len(self._y_columns) # TODO to add horizon?
+        y_pred = np.squeeze([X.values + i * self.drift_ for i in range(len_y)])
+        predictions = pd.DataFrame(data=y_pred, index=X.index, columns=self._y_columns)
 
         return predictions
+
+
+# idx = pd.date_range(start='2011-01-01', end='2012-01-01')
+# df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
+# train_cut = pd.to_datetime('2011-06-05')
+# test_cut = pd.to_datetime('2011-08-10')
+# test_end = pd.to_datetime('2011-11-10')
+# train = df.loc[:train_cut]
+# test = df.loc[test_cut:test_end]
+# m = SeasonalNaiveModel(seasonal_length=pd.Timedelta(14, unit='d'))
+# y = pd.DataFrame(np.nan, index=test.index, columns=['y1', 'y2', 'y3'])
+# m.fit(train, y)
+# mm = m.predict(test)
+# print(mm)
