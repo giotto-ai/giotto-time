@@ -59,8 +59,6 @@ class SeasonalNaiveModel(BaseEstimator, RegressorMixin):
             return self.season_.iloc[start:tail].to_numpy()
 
 
-
-
 class DriftModel(BaseEstimator, RegressorMixin):
 
     def fit(self, X: pd.DataFrame, y=None):
@@ -79,6 +77,32 @@ class DriftModel(BaseEstimator, RegressorMixin):
         return predictions
 
 
+class AverageModel(BaseEstimator, RegressorMixin):
+
+    def fit(self, X: pd.DataFrame, y=None):
+
+        self.avg_train_ = X.mean(axis=0)
+        self.n_avg_ = len(X)
+        self._y_columns = y.columns
+
+        return self
+
+    def predict(self, X: pd.DataFrame) -> pd.DataFrame:
+
+        check_is_fitted(self)
+
+        sum_train = (self.avg_train_ * self.n_avg_).to_numpy()
+
+        predictions = pd.DataFrame(data=np.nan, columns=self._y_columns, index=X.index)
+
+        for i in range(len(X)):
+            predictions.iloc[i, :] = (sum_train + X.iloc[i].to_numpy()) / (self.n_avg_ + i + 1)
+            sum_train += X.iloc[i].values
+
+        return predictions
+
+
+
 # idx = pd.date_range(start='2011-01-01', end='2012-01-01')
 # df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
 # train_cut = pd.to_datetime('2011-06-05')
@@ -86,7 +110,7 @@ class DriftModel(BaseEstimator, RegressorMixin):
 # test_end = pd.to_datetime('2011-11-10')
 # train = df.loc[:train_cut]
 # test = df.loc[test_cut:test_end]
-# m = SeasonalNaiveModel(seasonal_length=pd.Timedelta(14, unit='d'))
+# m = AverageModel()
 # y = pd.DataFrame(np.nan, index=test.index, columns=['y1', 'y2', 'y3'])
 # m.fit(train, y)
 # mm = m.predict(test)
