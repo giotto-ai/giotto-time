@@ -38,25 +38,48 @@ class SeasonalNaiveModel(BaseEstimator, RegressorMixin):
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
 
         check_is_fitted(self)
-        time_diff = X.index - self.season_.index.max()
+        time_diff = X.index.to_timestamp() - self.season_.index.max().to_timestamp()
         len_s = len(self.season_)
         len_y = len(self._y_columns) # TODO to add horizon?
         seasonal_pos = time_diff.days.values % len_s
         y_pred = np.squeeze([self._season_roll_(x, len_y) for x in seasonal_pos])
+        # if y_pred.shape != (len(X), len_y):
+        #     y_pred = np.broadcast_to(y_pred, (len(X), len_y))
         predictions = pd.DataFrame(data=y_pred, index=X.index, columns=self._y_columns)
 
         return predictions
 
     def _season_roll_(self, start: int, horizon: int) -> np.array:
 
-        len_s = len(self.season_)
-        cycles = np.maximum(horizon - start, 0) // len_s
+        season = self.season_
+        len_s = len(season)
+        cycles = np.maximum(horizon + start - len_s, 0) // len_s
         tail = horizon - len_s * (cycles + 1) + start
-        if tail >= 0:
-            return np.concatenate(
-                (self.season_.iloc[start:, :], np.tile(self.season_, (cycles, 1)), self.season_.iloc[:tail, :]))
+        tail = tail % len_s if tail >= len_s else tail
+        if tail <= 0 and cycles == 0:
+            return season.iloc[start:start + horizon].to_numpy()
         else:
-            return self.season_.iloc[start:tail].to_numpy()
+            return np.concatenate(
+                (season.iloc[start:, :], np.tile(season, (cycles, 1)), season.iloc[:tail, :]))
+
+
+def season_roll(start: int, horizon: int, season: pd.DataFrame) -> np.array:
+
+    len_s = len(season)
+    cycles = np.maximum(horizon + start - len_s, 0) // len_s
+    tail = horizon - len_s * (cycles + 1) + start
+    tail = tail % len_s if tail >= len_s else tail
+    if tail <= 0 and cycles == 0:
+        return season.iloc[start:start + horizon].to_numpy()
+    else:
+        # if start == 0:
+        #     return np.concatenate(
+        #         (np.tile(season, (cycles, 1)), season.iloc[:tail, :]))
+        # else:
+        return np.concatenate(
+            (season.iloc[start:, :], np.tile(season, (cycles, 1)), season.iloc[:tail, :]))
+
+
 
 
 class DriftModel(BaseEstimator, RegressorMixin):
@@ -110,7 +133,9 @@ class AverageModel(BaseEstimator, RegressorMixin):
 # test_end = pd.to_datetime('2011-11-10')
 # train = df.loc[:train_cut]
 # test = df.loc[test_cut:test_end]
-# m = AverageModel()
+#
+# m = SeasonalNaiveModel(seasonal_length=pd.Timedelta(15, unit='d'))
+# # m = AverageModel()
 # y = pd.DataFrame(np.nan, index=test.index, columns=['y1', 'y2', 'y3'])
 # m.fit(train, y)
 # mm = m.predict(test)
