@@ -28,26 +28,25 @@ def forecast_input(draw, max_lenth):
             ))
     return df, horizon, window
 
-@st.composite
-def roll_input(draw, max_lenth):
-    # length = draw(st.integers(min_value=1, max_value=max_lenth))
-    horizon = draw(st.integers(min_value=1, max_value=5000))
-    df = draw(giotto_time_series(
-                min_length=1,
-                max_length=max_lenth,
-                allow_nan=False,
-                allow_infinity=False
-            ))
-    start = draw(st.integers(min_value=0, max_value=len(df)))
-    return df, horizon, start
-
-
-@given(x=roll_input(100))
-def test_season_roll(x):
-    df, horizon, start = x
-    y = season_roll(start, horizon, df)
-    assert len(y) == horizon
-
+# @st.composite
+# def roll_input(draw, max_lenth):
+#     # length = draw(st.integers(min_value=1, max_value=max_lenth))
+#     horizon = draw(st.integers(min_value=1, max_value=5000))
+#     df = draw(giotto_time_series(
+#                 min_length=1,
+#                 max_length=max_lenth,
+#                 allow_nan=False,
+#                 allow_infinity=False
+#             ))
+#     start = draw(st.integers(min_value=0, max_value=len(df)))
+#     return df, horizon, start
+#
+#
+# @given(x=roll_input(100))
+# def test_season_roll(x):
+#     df, horizon, start = x
+#     y = season_roll(start, horizon, df)
+#     assert len(y) == horizon
 
 
 class TestNaiveForecast:
@@ -80,38 +79,29 @@ class TestSeasonalNaiveForecast:
 
 
 
-# class TestAverageForecast:
-#
-#     @given(x=forecast_input(50))
-#     def test_fit_predict(self, x):
-#         df, horizon, window = x
-#         model = AverageForecastModel(horizon=horizon, window_size=window)
-#         model.fit(df)
-#         y_pred = model.predict()
-#         note(model.model.last_value_)
-#         note(y_pred)
-#         assert len(y_pred) == horizon
-#         # note((window, horizon))
-#         mean = df.iloc[-(horizon+window):-(horizon)].mean()
-#         # note(mean)
-#         expected_df = pd.DataFrame(float(mean), index=model.X_test_.index, columns=model.X_test_.columns)
-#         # note(expected_df)
-#         # if any(expected_df.values - y_pred.values > 0.1):
-#         #     print('AAA')
-#         testing.assert_frame_equal(y_pred, expected_df)
-#
+class TestAverageForecast:
+
+    @given(x=forecast_input(50))
+    def test_fit_predict(self, x):
+        df, horizon, _ = x
+        model = AverageForecastModel(horizon=horizon)
+        model.fit(df)
+        y_pred = model.predict()
+        note(y_pred)
+        assert y_pred.shape == (horizon, horizon)
+        assert pytest.approx(y_pred.diff(axis=1).sum().sum(), 0)
+        means = [df.mean()] + [df.iloc[:-i].mean() for i in range(1, horizon)]
+        assert pytest.approx(np.array(means[::-1]), y_pred.iloc[:, 0].values)
+
+
 class TestDriftForecast:
 
     @given(x=forecast_input(50))
     def test_fit_predict(self, x):
-        df, horizon, seasonal_length = x
+        df, horizon, _ = x
         model = DriftForecastModel(horizon=horizon)
         model.fit(df)
         y_pred = model.predict()
         note(y_pred)
         assert len(y_pred) == horizon
-        assert pytest.approx(y_pred.diff().diff().sum(), 0)
-
-
-d = TestDriftForecast()
-d.test_fit_predict()
+        assert pytest.approx(y_pred.diff().diff().sum().sum(), 0)
