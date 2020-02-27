@@ -24,13 +24,16 @@ class NaiveModel(BaseEstimator, RegressorMixin):
 class SeasonalNaiveModel(BaseEstimator, RegressorMixin):
 
 
-    def __init__(self, seasonal_length: pd.Timedelta):
+    def __init__(self, seasonal_length: int):
         super().__init__()
         self.seasonal_length = seasonal_length
 
     def fit(self, X: pd.DataFrame, y=None):
 
-        self.season_ = X.loc[X.index.max()-self.seasonal_length:]
+        x_freq = X.index.freq
+        seasonal_td = pd.Timedelta(self.seasonal_length * x_freq.n, x_freq.name)
+        self.season_ = X.loc[X.index.max()-seasonal_td:]
+        self.season_ = self.season_.iloc[-self.seasonal_length:] # TODO think of a better way to get a non-inclusive index
         self._y_columns = y.columns
 
         return self
@@ -41,8 +44,9 @@ class SeasonalNaiveModel(BaseEstimator, RegressorMixin):
         time_diff = X.index.to_timestamp() - self.season_.index.max().to_timestamp()
         len_s = len(self.season_)
         len_y = len(self._y_columns) # TODO to add horizon?
+        len_x = len(X)
         seasonal_pos = time_diff.days.values % len_s
-        y_pred = np.squeeze([self._season_roll_(x, len_y) for x in seasonal_pos])
+        y_pred = np.squeeze([self._season_roll_(x, len_y) for x in seasonal_pos], axis=2)
         # if y_pred.shape != (len(X), len_y):
         #     y_pred = np.broadcast_to(y_pred, (len(X), len_y))
         predictions = pd.DataFrame(data=y_pred, index=X.index, columns=self._y_columns)
