@@ -26,7 +26,7 @@ class AverageForecastModel(TimeSeriesForecastingModel):
 
 class SeasonalNaiveForecastModel(TimeSeriesForecastingModel):
 
-    def __init__(self, horizon: int, seasonal_length: pd.Timedelta):
+    def __init__(self, horizon: int, seasonal_length: int):
         features = FeatureCreation(
             [('s1', Shift(0), make_column_selector()),
             ])

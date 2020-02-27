@@ -98,7 +98,7 @@ class DriftModel(BaseEstimator, RegressorMixin):
 
         check_is_fitted(self)
         len_y = len(self._y_columns) # TODO to add horizon?
-        y_pred = np.squeeze([X.values + i * self.drift_ for i in range(len_y)])
+        y_pred = np.squeeze([X.values + i * self.drift_.values for i in range(len_y)], axis=2)
         predictions = pd.DataFrame(data=y_pred, index=X.index, columns=self._y_columns)
 
         return predictions
