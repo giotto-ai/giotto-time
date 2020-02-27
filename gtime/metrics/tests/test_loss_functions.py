@@ -302,8 +302,10 @@ class TestLogMSE:
 
 class TestRSquare:
     def _correct_r_squared(self, y_true, y_pred):
-        ss_res = sum((np.subtract(y_true, y_pred)) ** 2)
-        ss_tot = sum(np.subtract(y_true, np.mean(y_true)) ** 2)
+        y_true = np.array(y_true)
+        y_pred = np.array(y_pred)
+        ss_res = sum(((y_true - y_pred)) ** 2)
+        ss_tot = sum((y_true - np.mean(y_true)) ** 2)
         if not np.any(ss_tot):
             if not np.any(ss_res):
                 return 1.0
