@@ -79,9 +79,6 @@ class TestSeasonalNaiveForecast:
             assert all(y_pred.iloc[:, 0] == y_pred.iloc[:, seasonal_length])
 
 
-t = TestSeasonalNaiveForecast()
-t.test_fit_predict()
-
 
 # class TestAverageForecast:
 #
@@ -103,14 +100,18 @@ t.test_fit_predict()
 #         #     print('AAA')
 #         testing.assert_frame_equal(y_pred, expected_df)
 #
-# class TestDriftForecast:
-#
-#     @given(x=forecast_input(50))
-#     def test_fit_predict(self, x):
-#         df, horizon, seasonal_length = x
-#         model = DriftForecastModel(horizon=horizon)
-#         model.fit(df)
-#         y_pred = model.predict()
-#         note(y_pred)
-#         assert len(y_pred) == horizon
-#         assert pytest.approx(y_pred.diff().diff().sum(), 0)
+class TestDriftForecast:
+
+    @given(x=forecast_input(50))
+    def test_fit_predict(self, x):
+        df, horizon, seasonal_length = x
+        model = DriftForecastModel(horizon=horizon)
+        model.fit(df)
+        y_pred = model.predict()
+        note(y_pred)
+        assert len(y_pred) == horizon
+        assert pytest.approx(y_pred.diff().diff().sum(), 0)
+
+
+d = TestDriftForecast()
+d.test_fit_predict()
