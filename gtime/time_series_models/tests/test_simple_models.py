@@ -70,17 +70,17 @@ class TestSeasonalNaiveForecast:
     @given(x=forecast_input(50))
     def test_fit_predict(self, x):
         df, horizon, seasonal_length = x
-        model = SeasonalNaiveForecastModel(horizon=horizon, seasonal_length=pd.Timedelta(seasonal_length, unit='d'))
+        model = SeasonalNaiveForecastModel(horizon=horizon, seasonal_length=seasonal_length)
         model.fit(df)
         y_pred = model.predict()
         note(y_pred)
         assert y_pred.shape[1] == horizon
         if seasonal_length < horizon:
-            assert all(y_pred.iloc[0] == y_pred.iloc[seasonal_length])
+            assert all(y_pred.iloc[:, 0] == y_pred.iloc[:, seasonal_length])
 
 
-# t = TestSeasonalNaiveForecast()
-# t.test_fit_predict()
+t = TestSeasonalNaiveForecast()
+t.test_fit_predict()
 
 
 # class TestAverageForecast:
