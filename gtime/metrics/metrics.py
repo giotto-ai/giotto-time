@@ -146,8 +146,8 @@ def mse(
     y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
     _check_input(y_true, y_pred)
     
-    sum_squared_error = sum((np.subtract(y_true, y_pred)) ** 2)
-    mse = sum_squared_error / float(len(y_true))
+    sum_squared_error = sum((y_true - y_pred) ** 2)
+    mse = sum_squared_error / len(y_true)
     return mse
 
 
@@ -182,10 +182,11 @@ def log_mse(
     y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
     _check_input(y_true, y_pred)
     
+    if (np.any(y_true < 0)) or (np.any(y_pred < 0)):
+        raise ValueError("MSLE can not be used when inputs contain Negative values") 
     log_y_true = np.log(y_true + 1)
     log_y_pred = np.log(y_pred + 1)
-    sum_squared_error = sum((np.subtract(log_y_true, log_y_pred)) ** 2)
-    log_mse = sum_squared_error / float(len(y_true))
+    log_mse = mse(log_y_true, log_y_pred)
     return log_mse
 
 
@@ -220,9 +221,15 @@ def r_square(
     y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
     _check_input(y_true, y_pred)
     
-    y_true_mean = np.mean(y_true)
-    sum_squared_error = sum((np.subtract(y_true, y_pred)) ** 2)
-    sum_squared_diff_y_true_mean = sum(np.subtract(y_true, y_true_mean) ** 2)
-    r_square = 1 - (sum_squared_error / float(sum_squared_diff_y_true_mean))
+    ss_res = sum(((y_true - y_pred)) ** 2)
+    ss_tot = sum((y_true - np.mean(y_true)) ** 2)
+    if not np.any(ss_tot):
+        if not np.any(ss_res):
+            return 1.0
+        else:
+            return 0.0 
+    if np.isnan((ss_res / ss_tot)):
+       return np.NINF 
+    r_square = 1 - (ss_res / ss_tot)
     return r_square
 
