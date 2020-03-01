@@ -287,6 +287,13 @@ class TestLogMSE:
 
         assert expected_log_mse == log_mse_value
 
+    def test_log_mse_negative_values(self):
+        y_true = np.array([0, 1, 2, 3, 4, -5])
+        y_pred = np.array([0, 0, 0, 0, 0, 0])
+
+        with pytest.raises(ValueError):
+            log_mse(y_true, y_pred) 
+
     @given(
         arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False, min_value=0)),
         arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False, min_value=0)),
@@ -364,6 +371,47 @@ class TestRSquare:
 
         assert expected_r_square == r_square_value
 
+    def test_r_square_all_zero_values(self):
+        # The test checks for all zero inputs covering the 'if' condition 
+        # to check if both ss_res and ss_tot are all Zeros
+        y_true = np.array([0, 0, 0, 0, 0, 0])
+        y_pred = np.array([0, 0, 0, 0, 0, 0])
+
+        r_square_value = np.round(r_square(y_true, y_pred), decimals=2)
+        expected_r_square = 1.0
+
+        assert expected_r_square == r_square_value
+
+    def test_r_square_ss_tot_zero(self):
+        # The test checks for 'if' condition 
+        # to check if ss_res is certain value and ss_tot are all Zeros
+        y_true = np.array([0, 0, 0, 0, 0, 0])
+        y_pred = np.array([1, 1, 1, 1, 1, 1])
+
+        r_square_value = np.round(r_square(y_true, y_pred), decimals=2)
+        expected_r_square = 0.0
+
+        assert expected_r_square == r_square_value
+
+    def test_r_square_ss_res_ss_tot_infinity(self):
+        # The test checks for 'if' condition 
+        # to check if both ss_res and ss_tot are Infinite
+        y_true = [0.00000000e+000, 0.00000000e+000, 9.81351055e+200, 9.81351055e+200,
+                  9.81351055e+200, 9.81351055e+200, 9.81351055e+200, 9.81351055e+200,
+                  9.81351055e+200, 9.81351055e+200, 9.81351055e+200, 9.81351055e+200,
+                  9.81351055e+200, 9.81351055e+200, 9.81351055e+200, 9.81351055e+200,
+                  9.81351055e+200, 9.81351055e+200, 9.81351055e+200, 9.81351055e+200,
+                  9.81351055e+200, 9.81351055e+200, 9.81351055e+200, 9.81351055e+200,
+                  9.81351055e+200, 9.81351055e+200, 9.81351055e+200, 9.81351055e+200,
+                  9.81351055e+200, 9.81351055e+200]
+        y_pred = [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 
+                  0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]
+
+        r_square_value = np.round(r_square(y_true, y_pred), decimals=2)
+        expected_r_square = np.NINF
+
+        assert expected_r_square == r_square_value
+
     @given(
         arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
         arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
@@ -373,5 +421,5 @@ class TestRSquare:
         expected_r_square = self._correct_r_squared(y_true, y_pred)
         print(y_true)
         print(y_pred)
-    
+       
         assert expected_r_square == r_square_value
