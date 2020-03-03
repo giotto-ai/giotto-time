@@ -10,7 +10,30 @@ from gtime.forecasting import (
     NaiveModel,
     SeasonalNaiveModel,
     DriftModel,
+    AverageModel
 )
+
+
+
+# @st.composite
+# def roll_input(draw, max_lenth):
+#     # length = draw(st.integers(min_value=1, max_value=max_lenth))
+#     horizon = draw(st.integers(min_value=1, max_value=5000))
+#     df = draw(giotto_time_series(
+#                 min_length=1,
+#                 max_length=max_lenth,
+#                 allow_nan=False,
+#                 allow_infinity=False
+#             ))
+#     start = draw(st.integers(min_value=0, max_value=len(df)))
+#     return df, horizon, start
+#
+#
+# @given(x=roll_input(100))
+# def test_season_roll(x):
+#     df, horizon, start = x
+#     y = season_roll(start, horizon, df)
+#     assert len(y) == horizon
 
 # @st.composite
 # def forecast_input(draw, max_lenth):
