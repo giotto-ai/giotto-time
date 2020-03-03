@@ -6,22 +6,78 @@ from sklearn.utils.validation import check_is_fitted
 
 class NaiveModel(BaseEstimator, RegressorMixin):
 
+    """Naïve model, all predicted values are equal to the most recent available observation.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> from gtime.model_selection import horizon_shift, FeatureSplitter
+    >>> from gtime.forecasting import NaiveModel
+    >>> idx = pd.date_range(start='2011-01-01', end='2012-01-01')
+    >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
+    >>> y = horizon_shift(df, horizon=3)
+    >>> X_train, y_train, X_test, y_test = FeatureSplitter().transform(df, y)
+    >>> m = NaiveModel()
+    >>> m.fit(X_train, y_train).predict(X_test)
+                         y_1       y_2       y_3
+        2011-12-30  0.664035  0.664035  0.664035
+        2011-12-31  0.912093  0.912093  0.912093
+        2012-01-01  0.622069  0.622069  0.622069
+
+    """
+
     def fit(self, X: pd.DataFrame, y=None):
 
+        """Fit the estimator.
+
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, n_features), train sample, required for compatibility, not used for a naive model.
+
+        y : None
+            Used to store the predict feature names and prediction horizon.
+
+        Returns
+        -------
+        self : NaiveModel
+            Returns self.
+        """
+
         self._y_columns = y.columns
+        self._horizon = len(y.columns)
 
         return self
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
 
+        """Using the fitted polynomial, predict the values starting from ``X``.
+
+        Parameters
+        ----------
+        X: pd.DataFrame, shape (n_samples, 1), required
+            The time series on which to predict.
+
+        Returns
+        -------
+        predictions : pd.DataFrame, shape (n_samples, self._horizon)
+            The output predictions.
+
+        Raises
+        ------
+        NotFittedError
+            Raised if the model is not fitted yet.
+
+        """
+
         check_is_fitted(self)
-        y_pred = np.broadcast_to(X, (len(X), len(self._y_columns)))
+        y_pred = np.broadcast_to(X, (len(X), self._horizon))
         predictions = pd.DataFrame(data=y_pred, columns=self._y_columns, index=X.index)
 
         return predictions
 
 
-class SeasonalNaiveModel(BaseEstimator, RegressorMixin):
+class SeasonalNaiveModel(NaiveModel):
 
 
     def __init__(self, seasonal_length: int):
@@ -34,7 +90,7 @@ class SeasonalNaiveModel(BaseEstimator, RegressorMixin):
         seasonal_td = pd.Timedelta(self.seasonal_length * x_freq.n, x_freq.name)
         self.season_ = X.loc[X.index.max()-seasonal_td:]
         self.season_ = self.season_.iloc[-self.seasonal_length:] # TODO think of a better way to get a non-inclusive index
-        self._y_columns = y.columns
+        super().fit(X, y)
 
         return self
 
@@ -47,8 +103,6 @@ class SeasonalNaiveModel(BaseEstimator, RegressorMixin):
         len_x = len(X)
         seasonal_pos = time_diff.days.values % len_s
         y_pred = np.squeeze([self._season_roll_(x, len_y) for x in seasonal_pos], axis=2)
-        # if y_pred.shape != (len(X), len_y):
-        #     y_pred = np.broadcast_to(y_pred, (len(X), len_y))
         predictions = pd.DataFrame(data=y_pred, index=X.index, columns=self._y_columns)
 
         return predictions
@@ -106,6 +160,7 @@ class DriftModel(BaseEstimator, RegressorMixin):
 
 class AverageModel(BaseEstimator, RegressorMixin):
 
+
     def fit(self, X: pd.DataFrame, y=None):
 
         self.avg_train_ = X.mean(axis=0)
@@ -130,17 +185,17 @@ class AverageModel(BaseEstimator, RegressorMixin):
 
 
 
-# idx = pd.date_range(start='2011-01-01', end='2012-01-01')
-# df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
-# train_cut = pd.to_datetime('2011-06-05')
-# test_cut = pd.to_datetime('2011-08-10')
-# test_end = pd.to_datetime('2011-11-10')
-# train = df.loc[:train_cut]
-# test = df.loc[test_cut:test_end]
-#
+if __name__ == '__main__':
+    import pandas as pd
+    import numpy as np
+    from gtime.model_selection import horizon_shift, FeatureSplitter
+    from gtime.forecasting import NaiveModel
+    idx = pd.date_range(start='2011-01-01', end='2012-01-01')
+    df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
+    y = horizon_shift(df, horizon=3)
+    X_train, y_train, X_test, y_test = FeatureSplitter().transform(df, y)
+    m = NaiveModel()
+    print(m.fit(X_train, y_train).predict(X_test))
+
 # m = SeasonalNaiveModel(seasonal_length=pd.Timedelta(15, unit='d'))
-# # m = AverageModel()
-# y = pd.DataFrame(np.nan, index=test.index, columns=['y1', 'y2', 'y3'])
-# m.fit(train, y)
-# mm = m.predict(test)
-# print(mm)
+# m = AverageModel()
