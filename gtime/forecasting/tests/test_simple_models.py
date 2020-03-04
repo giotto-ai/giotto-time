@@ -41,10 +41,10 @@ class TestNaiveModel:
         self.y_pred = self.model.predict(X_test)
 
     def test_fit_horizon(self):
-        assert self.model._horizon == len(self.X_test)
+        assert self.model._horizon_ == len(self.X_test)
 
     def test_predict_shape(self):
-        assert self.y_pred.shape == (self.model._horizon, self.model._horizon)
+        assert self.y_pred.shape == (self.model._horizon_, self.model._horizon_)
 
     def test_predict_df(self):
         horizon = len(self.X_test)
@@ -67,7 +67,7 @@ class TestSeasonalNaiveModel(TestNaiveModel):
         self.y_pred = self.model.predict(X_test)
 
     def test_predict_seasonality(self):
-        if self.season_length < self.model._horizon:
+        if self.season_length < self.model._horizon_:
             assert all(self.y_pred.iloc[:, 0] == self.y_pred.iloc[:, self.season_length])
 
     def test_predict_df(self):

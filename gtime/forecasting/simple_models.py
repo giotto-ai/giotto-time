@@ -44,8 +44,8 @@ class NaiveModel(BaseEstimator, RegressorMixin):
             Returns self.
         """
 
-        self._y_columns = y.columns
-        self._horizon = len(y.columns)
+        self._y_columns_ = y.columns
+        self._horizon_ = len(y.columns)
 
         return self
 
@@ -71,8 +71,8 @@ class NaiveModel(BaseEstimator, RegressorMixin):
         """
 
         check_is_fitted(self)
-        y_pred = np.broadcast_to(X, (len(X), self._horizon))
-        predictions = pd.DataFrame(data=y_pred, columns=self._y_columns, index=X.index)
+        y_pred = np.broadcast_to(X, (len(X), self._horizon_))
+        predictions = pd.DataFrame(data=y_pred, columns=self._y_columns_, index=X.index)
 
         return predictions
 
@@ -162,8 +162,8 @@ class SeasonalNaiveModel(NaiveModel):
         time_diff = X.index.to_timestamp() - self.season_.index.max().to_timestamp()
         len_s = len(self.season_)
         seasonal_pos = time_diff.days.values % len_s
-        y_pred = np.squeeze([self._season_roll_(x, self._horizon) for x in seasonal_pos], axis=2)
-        predictions = pd.DataFrame(data=y_pred, index=X.index, columns=self._y_columns)
+        y_pred = np.squeeze([self._season_roll_(x, self._horizon_) for x in seasonal_pos], axis=2)
+        predictions = pd.DataFrame(data=y_pred, index=X.index, columns=self._y_columns_)
 
         return predictions
 
@@ -265,8 +265,8 @@ class DriftModel(NaiveModel):
         """
 
         check_is_fitted(self)
-        y_pred = np.transpose(np.squeeze([X.values + i * self.drift_.values for i in range(self._horizon)], axis=2))
-        predictions = pd.DataFrame(data=y_pred, index=X.index, columns=self._y_columns)
+        y_pred = np.transpose(np.squeeze([X.values + i * self.drift_.values for i in range(self._horizon_)], axis=2))
+        predictions = pd.DataFrame(data=y_pred, index=X.index, columns=self._y_columns_)
 
         return predictions
 
@@ -343,11 +343,11 @@ class AverageModel(NaiveModel):
         """
 
         check_is_fitted(self)
-        sum_train = (self.avg_train_ * self._horizon).to_numpy()
-        predictions = pd.DataFrame(data=np.nan, columns=self._y_columns, index=X.index)
+        sum_train = (self.avg_train_ * self._horizon_).to_numpy()
+        predictions = pd.DataFrame(data=np.nan, columns=self._y_columns_, index=X.index)
 
         for i in range(len(X)):
-            predictions.iloc[i, :] = (sum_train + X.iloc[i].to_numpy()) / (self._horizon + i + 1)
+            predictions.iloc[i, :] = (sum_train + X.iloc[i].to_numpy()) / (self._horizon_ + i + 1)
             sum_train += X.iloc[i].values
 
         return predictions
