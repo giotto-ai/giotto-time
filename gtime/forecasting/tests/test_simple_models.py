@@ -30,12 +30,11 @@ def forecast_input(draw, max_lenth):
     return X_train, y_train, X_test
 
 
-class TestNaiveModel:
+class SimplePipelineTest:
 
-    @given(data=forecast_input(50))
-    def setup(self, data):
+    def setup(self, data, Model):
         X_train, y_train, X_test = data
-        self.model = NaiveModel()
+        self.model = Model
         self.model.fit(X_train, y_train)
         self.X_test = X_test
         self.y_pred = self.model.predict(X_test)
@@ -46,6 +45,13 @@ class TestNaiveModel:
     def test_predict_shape(self):
         assert self.y_pred.shape == (self.model._horizon_, self.model._horizon_)
 
+
+class TestNaiveModel(SimplePipelineTest):
+
+    @given(data=forecast_input(50))
+    def setup(self, data):
+        super().setup(data, NaiveModel())
+
     def test_predict_df(self):
         horizon = len(self.X_test)
         y_cols = ['y_'+str(x+1) for x in range(len(self.X_test))]
@@ -54,21 +60,33 @@ class TestNaiveModel:
         testing.assert_frame_equal(self.y_pred, expected_df)
 
 
-class TestSeasonalNaiveModel(TestNaiveModel):
+class TestSeasonalNaiveModel(SimplePipelineTest):
 
     @given(data=forecast_input(50), season_length=st.integers(min_value=1, max_value=100))
     def setup(self, data, season_length):
-        X_train, y_train, X_test = data
         self.season_length = season_length
-        self.model = SeasonalNaiveModel(season_length)
-        self.model.fit(X_train, y_train)
-        self.X_test = X_test
-        note(season_length)
-        self.y_pred = self.model.predict(X_test)
+        super().setup(data, SeasonalNaiveModel(seasonal_length=season_length))
 
     def test_predict_seasonality(self):
         if self.season_length < self.model._horizon_:
             assert all(self.y_pred.iloc[:, 0] == self.y_pred.iloc[:, self.season_length])
 
-    def test_predict_df(self):
-        pass
+
+class TestDriftModel(SimplePipelineTest):
+
+    @given(data=forecast_input(50))
+    def setup(self, data):
+        super().setup(data, DriftModel())
+
+    def test_predict_drift(self):
+        assert pytest.approx(self.y_pred.diff().diff().sum().sum(), 0)
+
+
+class TestAverageModel(SimplePipelineTest):
+
+    @given(data=forecast_input(50))
+    def setup(self, data):
+        super().setup(data, AverageModel())
+
+    def test_predict_difference(self):
+        assert pytest.approx(self.y_pred.diff(axis=1).sum().sum(), 0)

@@ -55,7 +55,6 @@ class TestSeasonalNaiveForecast:
             assert all(y_pred.iloc[:, 0] == y_pred.iloc[:, seasonal_length])
 
 
-
 class TestAverageForecast:
 
     @given(x=forecast_input(50))
