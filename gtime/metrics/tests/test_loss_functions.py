@@ -5,7 +5,7 @@ from hypothesis import given
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats
 
-from gtime.metrics import smape, max_error, mse, log_mse, r_square
+from gtime.metrics import smape, max_error, mse, log_mse, r_square, mae
 
 
 class TestSmape:
@@ -96,7 +96,9 @@ class TestSmape:
 
 class TestMaxError:
     def _correct_max_error(self, y_true, y_pred):
-        error = np.amax(np.absolute(np.subtract(y_true, y_pred)))
+        y_true = np.array(y_true)
+        y_pred = np.array(y_pred)
+        error = np.amax(np.absolute((y_true - y_pred)))
         return error
 
     def test_wrong_vector_length(self):
@@ -124,48 +126,49 @@ class TestMaxError:
         y_true = [0, 1, 2, 3, 4, 5]
         y_pred = [-1, 4, 5, 10, 4, 1]
 
-        error = max_error(y_pred, y_true)
+        error = max_error(y_true, y_pred)
         expected_max_error = 7
 
-        assert expected_max_error, error
+        assert expected_max_error == error
 
     def test_max_error_array(self):
         y_true = np.array([0, 1, 2, 3, 4, 5])
         y_pred = np.array([-1, 4, 5, 10, 4, 1])
 
-        error = max_error(y_pred, y_true)
+        error = max_error(y_true, y_pred)
         expected_max_error = 7
 
-        assert expected_max_error, error
+        assert expected_max_error == error
 
     def test_max_error_dataframe(self):
         y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
         y_pred = pd.DataFrame([-1, 4, 5, 10, 4, 1])
 
-        error = max_error(y_pred, y_true)
+        error = max_error(y_true, y_pred)
         expected_max_error = 7
 
-        assert expected_max_error, error
+        assert expected_max_error == error
 
     @given(
         arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
         arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
     )
-    def test_smape_random_arrays_finite_values(self, y_true, y_pred):
+    def test_max_error_random_arrays_finite_values(self, y_true, y_pred):
         error = max_error(y_true, y_pred)
         expected_error = self._correct_max_error(y_true, y_pred)
         print(y_true)
         print(y_pred)
+        
         assert expected_error == error
 
 
 class TestMSE:
-    def _correct_mse(self, y_true, y_pred):
+    def _correct_mse(self, y_true, y_pred, rmse=False):
         y_true = np.array(y_true)
         y_pred = np.array(y_pred)
         sum_squared_error = sum(((y_true - y_pred)) ** 2)
         mse = sum_squared_error / len(y_true)
-        return mse
+        return np.sqrt(mse) if rmse else mse
 
     def test_wrong_vector_length(self):
         y_true = np.random.random(5)
@@ -194,8 +197,11 @@ class TestMSE:
 
         mse_value = np.round(mse(y_true, y_pred), decimals=2)
         expected_mse = 14
+        rmse_value = np.round(mse(y_true, y_pred, rmse=True), decimals=2)
+        expected_rmse = 3.74
         
         assert expected_mse == mse_value
+        assert expected_rmse == rmse_value
 
     def test_mse_array(self):
         y_true = np.array([0, 1, 2, 3, 4, 5])
@@ -203,8 +209,11 @@ class TestMSE:
 
         mse_value = np.round(mse(y_true, y_pred), decimals=2)
         expected_mse = 14
+        rmse_value = np.round(mse(y_true, y_pred, rmse=True), decimals=2)
+        expected_rmse = 3.74
         
         assert expected_mse == mse_value
+        assert expected_rmse == rmse_value
 
     def test_mse_dataframe(self):
         y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
@@ -212,24 +221,30 @@ class TestMSE:
 
         mse_value = np.round(mse(y_true, y_pred), decimals=2)
         expected_mse = 14
+        rmse_value = np.round(mse(y_true, y_pred, rmse=True), decimals=2)
+        expected_rmse = 3.74
         
         assert expected_mse == mse_value
+        assert expected_rmse == rmse_value
 
     @given(
         arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
         arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
     )
     def test_mse_random_arrays_finite_values(self, y_true, y_pred):
-        error = mse(y_true, y_pred)
-        expected_error = self._correct_mse(y_true, y_pred)
+        mse_value = mse(y_true, y_pred)
+        expected_mse = self._correct_mse(y_true, y_pred)
+        rmse_value = mse(y_true, y_pred, rmse=True)
+        expected_rmse = self._correct_mse(y_true, y_pred, rmse=True)
         print(y_true)
         print(y_pred)
 
-        assert expected_error == error
+        assert expected_mse == mse_value
+        assert expected_rmse == rmse_value
 
 
 class TestLogMSE:
-    def _correct_log_mse(self, y_true, y_pred):
+    def _correct_log_mse(self, y_true, y_pred, rmsle=False):
         y_true = np.array(y_true)
         y_pred = np.array(y_pred)
         if (np.any(y_true < 0)) or (np.any(y_pred < 0)):
@@ -237,7 +252,7 @@ class TestLogMSE:
         log_y_true = np.log(y_true + 1)
         log_y_pred = np.log(y_pred + 1)
         log_mse = mse(log_y_true, log_y_pred)
-        return log_mse
+        return np.sqrt(log_mse) if rmsle else log_mse
 
     def test_wrong_vector_length(self):
         y_true = np.random.random(5)
@@ -266,8 +281,11 @@ class TestLogMSE:
 
         log_mse_value = np.round(log_mse(y_true, y_pred), decimals=2)
         expected_log_mse = 0.67
-        
+        rmsle_value = np.round(log_mse(y_true, y_pred, rmsle=True), decimals=2)
+        expected_rmsle = 0.82
+
         assert expected_log_mse == log_mse_value
+        assert expected_rmsle == rmsle_value
 
     def test_log_mse_array(self):
         y_true = np.array([0, 1, 2, 3, 4, 5])
@@ -275,8 +293,11 @@ class TestLogMSE:
 
         log_mse_value = np.round(log_mse(y_true, y_pred), decimals=2)
         expected_log_mse = 0.67
+        rmsle_value = np.round(log_mse(y_true, y_pred, rmsle=True), decimals=2)
+        expected_rmsle = 0.82
 
         assert expected_log_mse == log_mse_value
+        assert expected_rmsle == rmsle_value
 
     def test_log_mse_dataframe(self):
         y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
@@ -284,8 +305,11 @@ class TestLogMSE:
 
         log_mse_value = np.round(log_mse(y_true, y_pred), decimals=2)
         expected_log_mse = 0.67
+        rmsle_value = np.round(log_mse(y_true, y_pred, rmsle=True), decimals=2)
+        expected_rmsle = 0.82
 
         assert expected_log_mse == log_mse_value
+        assert expected_rmsle == rmsle_value
 
     def test_log_mse_negative_values(self):
         y_true = np.array([0, 1, 2, 3, 4, -5])
@@ -300,11 +324,14 @@ class TestLogMSE:
     )
     def test_log_mse_random_arrays_finite_values(self, y_true, y_pred):
         log_mse_value = log_mse(y_true, y_pred)
-        expected_error = self._correct_log_mse(y_true, y_pred)
+        expected_log_mse = self._correct_log_mse(y_true, y_pred)
+        rmsle_value = log_mse(y_true, y_pred, rmsle=True)
+        expected_rmsle = self._correct_log_mse(y_true, y_pred, rmsle=True)
         print(y_true)
         print(y_pred)
 
-        assert expected_error == log_mse_value
+        assert expected_log_mse == log_mse_value
+        assert expected_rmsle == rmsle_value
 
 
 class TestRSquare:
@@ -423,3 +450,71 @@ class TestRSquare:
         print(y_pred)
        
         assert expected_r_square == r_square_value
+
+
+class TestMAE:
+    def _correct_mae(self, y_true, y_pred):
+        y_true = np.array(y_true)
+        y_pred = np.array(y_pred)
+        mae = np.mean(np.abs(y_true - y_pred))
+        return mae
+
+    def test_wrong_vector_length(self):
+        y_true = np.random.random(5)
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            mae(y_true, y_pred)
+
+    def test_nan_values(self):
+        y_true = [np.nan, 1, 2, 3]
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            mae(y_true, y_pred)
+
+    def test_infinite_values(self):
+        y_true = np.random.random(4)
+        y_pred = [0, np.inf, 2, 3]
+
+        with pytest.raises(ValueError):
+            mae(y_true, y_pred)
+
+    def test_mae_list(self):
+        y_true = [0, 1, 2, 3, 4, 5]
+        y_pred = [-1, 4, 5, 10, 4, 1]
+
+        mae_value = np.round(mae(y_true, y_pred), decimals=2)
+        expected_mae = 3
+        
+        assert expected_mae == mae_value
+
+    def test_mae_array(self):
+        y_true = np.array([0, 1, 2, 3, 4, 5])
+        y_pred = np.array([-1, 4, 5, 10, 4, 1])
+
+        mae_value = np.round(mae(y_true, y_pred), decimals=2)
+        expected_mae = 3
+        
+        assert expected_mae == mae_value
+
+    def test_mae_dataframe(self):
+        y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
+        y_pred = pd.DataFrame([-1, 4, 5, 10, 4, 1])
+
+        mae_value = np.round(mae(y_true, y_pred), decimals=2)
+        expected_mae = 3
+        
+        assert expected_mae == mae_value
+
+    @given(
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+    )
+    def test_mae_random_arrays_finite_values(self, y_true, y_pred):
+        mae_value = mae(y_true, y_pred)
+        expected_mae = self._correct_mae(y_true, y_pred)
+        print(y_true)
+        print(y_pred)
+
+        assert expected_mae == mae_value
