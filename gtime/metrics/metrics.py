@@ -3,19 +3,6 @@ from typing import Union, List
 import numpy as np
 import pandas as pd
 
-"""
-Metrics to measure the accuracy of the prediction models.
-The metrics included in this are as follows:
-
-1. SMAPE
-2. Maximum Error
-3. Mean Squared Error(MSE), Root Mean Squared Error(RMSE)
-4. Mean Squared Log Error(MSLE), Root Mean Squared Log Error(RMSLE)
-5. R Squared
-6. Mean Absolute Error(MAE)
-7. Mean Absolute Percentage Error(MAPE)
-
-"""
 
 def _check_input(y_true: np.ndarray, y_pred: np.ndarray) -> None:
     if len(y_pred) != len(y_true):
@@ -265,7 +252,7 @@ def r_square(
             return 1.0
         else:
             return 0.0 
-    if np.isnan((ss_res / ss_tot)):
+    if np.isnan(ss_res / ss_tot):
         return np.NINF
     r_square = 1 - (ss_res / ss_tot)
     return r_square
@@ -338,8 +325,8 @@ def mape(
     _check_input(y_true, y_pred)
     
     ratio_list = np.abs((y_pred - y_true)/y_true)
-    if (0 in y_true):
-        if np.isnan(ratio_list).any():
+    if (y_true == 0).any():
+        if (np.nan == ratio_list).any():
             raise ValueError("MAPE can not be calculated due to Zero/Zero")
         else:
             return np.inf

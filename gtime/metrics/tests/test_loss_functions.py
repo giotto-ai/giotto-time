@@ -344,7 +344,7 @@ class TestRSquare:
                 return 1.0
             else:
                 return 0.0
-        if np.isnan((ss_res / ss_tot)):
+        if np.isnan(ss_res / ss_tot):
             return np.NINF 
         r_square = 1 - (ss_res / ss_tot)
         return r_square
@@ -447,7 +447,7 @@ class TestRSquare:
         expected_r_square = self._correct_r_squared(y_true, y_pred)
         print(y_true)
         print(y_pred)
-       
+        
         assert expected_r_square == r_square_value
 
 
@@ -524,8 +524,8 @@ class TestMAPE:
         y_true = np.array(y_true)
         y_pred = np.array(y_pred)
         ratio_list = np.abs((y_pred - y_true)/y_true)
-        if (0 in y_true):
-            if np.isnan(ratio_list).any():
+        if (y_true == 0).any():
+            if (np.nan == ratio_list).any():
                 raise ValueError("MAPE can not be calculated due to Zero/Zero")
             else:
                 return np.inf
