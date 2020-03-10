@@ -112,5 +112,263 @@ def max_error(
     y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
     _check_input(y_true, y_pred)
 
-    error = np.amax(np.absolute(np.subtract(y_true, y_pred)))
+    error = np.amax(np.absolute((y_true - y_pred)))
     return error
+
+
+def mse(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the Mean Squared Error(MSE) between two vectors.
+
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required.
+        The first vector.
+
+    y_pred : array-like, shape (length, 1), required.
+        The second vector.
+
+    Returns
+    -------
+    mse : float
+        The Mean Squared Error between the two vectors.
+        
+    Examples
+    --------
+    >>> from gtime.metrics import mse
+    >>> y_true = [0, 1, 2, 3, 4, 5]
+    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> mse(y_true, y_pred)
+    1.20
+
+    """
+    y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
+    _check_input(y_true, y_pred)
+    
+    sum_squared_error = sum((y_true - y_pred) ** 2)
+    mse = sum_squared_error / len(y_true)
+    return mse
+
+
+def rmse(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the Root Mean Squared Error(RMSE) between two vectors.
+
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required.
+        The first vector.
+
+    y_pred : array-like, shape (length, 1), required.
+        The second vector.
+
+    Returns
+    -------
+    rmse : float
+        The Root Mean Squared Error between the two vectors.
+
+    Examples
+    --------
+    >>> from gtime.metrics import rmse
+    >>> y_true = [0, 1, 2, 3, 4, 5]
+    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> rmse(y_true, y_pred)
+    1.098
+
+    """
+
+    return np.sqrt(mse(y_true, y_pred)) 
+
+
+def log_mse(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the Mean Squared Log Error(MSLE) between two vectors.
+    Note: Log_mse accepts only positive numbers as input
+
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required
+        The first vector.
+
+    y_pred : array-like, shape (length, 1), required
+        The second vector.
+    
+    Returns
+    -------
+    log_mse : float
+        The mean squared log error between the two vectors.
+        
+    Examples
+    --------
+    >>> from gtime.metrics import log_mse
+    >>> y_true = [0, 1, 2, 3, 4, 5]
+    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> log_mse(y_true, y_pred)
+    0.244
+
+    """
+    y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
+    _check_input(y_true, y_pred)
+    
+    if (np.any(y_true < 0)) or (np.any(y_pred < 0)):
+        raise ValueError("MSLE can not be used when inputs contain Negative values") 
+    log_y_true = np.log(y_true + 1)
+    log_y_pred = np.log(y_pred + 1)
+    log_mse = mse(log_y_true, log_y_pred)
+    return log_mse
+
+
+def rmsle(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the Root Mean Squared Log Error(RMSLE) between two vectors.
+    Note: RMSLE accepts only positive numbers as input
+
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required.
+        The first vector.
+
+    y_pred : array-like, shape (length, 1), required.
+        The second vector.
+    
+    Returns
+    -------
+    rmsle_value : float
+        The root mean squared log error between the two vectors.
+        
+    Examples
+    --------
+    >>> from gtime.metrics import rmsle
+    >>> y_true = [0, 1, 2, 3, 4, 5]
+    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> rmsle(y_true, y_pred)
+    0.49
+
+    """
+  
+    return np.sqrt(log_mse(y_true, y_pred)) 
+
+
+def r_square(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the R squared (Coefficient of Determination) between two vectors.
+
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required
+        The first vector.
+
+    y_pred : array-like, shape (length, 1), required
+        The second vector.
+
+    Returns
+    -------
+    r_square : float
+        The R squared between the two vectors.
+
+    Examples
+    --------
+    >>> from gtime.metrics import r_square
+    >>> y_true = [0, 1, 2, 3, 4, 5]
+    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> r_square(y_true, y_pred)
+    0.586
+
+    """
+    y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
+    _check_input(y_true, y_pred)
+    
+    ss_res = sum((y_true - y_pred) ** 2)
+    ss_tot = sum((y_true - np.mean(y_true)) ** 2)
+    if not np.any(ss_tot):
+        if not np.any(ss_res):
+            return 1.0
+        else:
+            return 0.0 
+    if np.isnan(ss_res / ss_tot):
+        return np.NINF
+    r_square = 1 - (ss_res / ss_tot)
+    return r_square
+
+
+def mae(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the Mean Absolute Error(also called, Mean Absolute Deviation(MAD)) between two vectors.
+
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required
+        The first vector.
+
+    y_pred : array-like, shape (length, 1), required
+        The second vector.
+
+    Returns
+    -------
+    mae_value : float
+        The mean absolute error between the two vectors.
+
+    Examples
+    --------
+    >>> from gtime.metrics import mae
+    >>> y_true = [0, 1, 2, 3, 4, 5]
+    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> mae(y_true, y_pred)
+    1.033
+
+    """
+    y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
+    _check_input(y_true, y_pred)
+    
+    mae_value = np.mean(np.abs(y_pred - y_true))
+    return mae_value
+
+
+def mape(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the Mean Absolute Percentage Error(MAPE) between two vectors.
+
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required.
+        The first vector.
+
+    y_pred : array-like, shape (length, 1), required.
+        The second vector.
+
+    Returns
+    -------
+    mape_value : float
+        The mean absolute percentage error between the two vectors.
+
+    Examples
+    --------
+    >>> from gtime.metrics import mape
+    >>> y_true = [1, 1, 2, 3, 4, 5]
+    >>> y_pred = [1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> mape(y_true, y_pred)
+    45.08
+
+    """
+    y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
+    _check_input(y_true, y_pred)
+    
+    mape_value = np.mean(np.abs((y_pred - y_true)/y_true))
+    if np.isnan(mape_value):
+        raise ValueError("MAPE can not be calculated due to Zero/Zero")
+    return mape_value * 100
+
