@@ -143,12 +143,6 @@ def mse(
     >>> mse(y_true, y_pred)
     1.20
 
-    >>> from gtime.metrics import mse
-    >>> y_true = [0, 1, 2, 3, 4, 5]
-    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
-    >>> mse(y_true, y_pred, rmse=True)
-    1.098
-
     """
     y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
     _check_input(y_true, y_pred)
@@ -217,12 +211,6 @@ def log_mse(
     >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
     >>> log_mse(y_true, y_pred)
     0.244
-
-    >>> from gtime.metrics import log_mse
-    >>> y_true = [0, 1, 2, 3, 4, 5]
-    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
-    >>> log_mse(y_true, y_pred, rmsle=True)
-    0.49
 
     """
     y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
