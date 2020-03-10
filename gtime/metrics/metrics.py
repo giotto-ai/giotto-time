@@ -3,6 +3,19 @@ from typing import Union, List
 import numpy as np
 import pandas as pd
 
+"""
+Metrics to measure the accuracy of the prediction models.
+The metrics included in this are as follows:
+
+1. SMAPE
+2. Maximum Error
+3. Mean Squared Error(MSE), Root Mean Squared Error(RMSE)
+4. Mean Squared Log Error(MSLE), Root Mean Squared Log Error(RMSLE)
+5. R Squared
+6. Mean Absolute Error(MAE)
+7. Mean Absolute Percentage Error(MAPE)
+
+"""
 
 def _check_input(y_true: np.ndarray, y_pred: np.ndarray) -> None:
     if len(y_pred) != len(y_true):
@@ -293,7 +306,43 @@ def mae(
     return mae_value
 
 
+def mape(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the Mean Absolute Percentage Error(MAPE) between two vectors.
 
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required.
+        The first vector.
 
+    y_pred : array-like, shape (length, 1), required.
+        The second vector.
 
+    Returns
+    -------
+    mape_value : float
+        The mean absolute percentage error between the two vectors.
+
+    Examples
+    --------
+    >>> from gtime.metrics import mape
+    >>> y_true = [1, 1, 2, 3, 4, 5]
+    >>> y_pred = [1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> mape(y_true, y_pred)
+    45.08
+
+    """
+    y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
+    _check_input(y_true, y_pred)
     
+    ratio_list = np.abs((y_pred - y_true)/y_true)
+    if (0 in y_true):
+        if np.isnan(ratio_list).any():
+            raise ValueError("MAPE can not be calculated due to Zero/Zero")
+        else:
+            return np.inf
+    else:
+        mape_value = np.mean(ratio_list) * 100
+    return mape_value

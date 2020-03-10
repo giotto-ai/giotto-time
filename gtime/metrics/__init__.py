@@ -2,7 +2,7 @@
 The :mod:`gtime.metrics` module contains a collection of different metrics.
 """
 
-from .metrics import smape, max_error, mse, log_mse, r_square, mae
+from .metrics import smape, max_error, mse, log_mse, r_square, mae, mape
 
 __all__ = [
     "smape",
@@ -11,4 +11,5 @@ __all__ = [
     "log_mse",
     "r_square",
     "mae",
+    "mape",
 ]

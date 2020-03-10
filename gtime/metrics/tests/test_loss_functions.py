@@ -5,7 +5,7 @@ from hypothesis import given
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats
 
-from gtime.metrics import smape, max_error, mse, log_mse, r_square, mae
+from gtime.metrics import smape, max_error, mse, log_mse, r_square, mae, mape
 
 
 class TestSmape:
@@ -158,7 +158,6 @@ class TestMaxError:
         expected_error = self._correct_max_error(y_true, y_pred)
         print(y_true)
         print(y_pred)
-        
         assert expected_error == error
 
 
@@ -518,3 +517,96 @@ class TestMAE:
         print(y_pred)
 
         assert expected_mae == mae_value
+
+
+class TestMAPE:
+    def _correct_mape(self, y_true, y_pred):
+        y_true = np.array(y_true)
+        y_pred = np.array(y_pred)
+        ratio_list = np.abs((y_pred - y_true)/y_true)
+        if (0 in y_true):
+            if np.isnan(ratio_list).any():
+                raise ValueError("MAPE can not be calculated due to Zero/Zero")
+            else:
+                return np.inf
+        else:
+            mape_value = np.mean(ratio_list) * 100
+        return mape_value
+
+    def test_wrong_vector_length(self):
+        y_true = np.random.random(5)
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            mape(y_true, y_pred)
+
+    def test_nan_values(self):
+        y_true = [np.nan, 1, 2, 3]
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            mape(y_true, y_pred)
+
+    def test_infinite_values(self):
+        y_true = np.random.random(4)
+        y_pred = [0, np.inf, 2, 3]
+
+        with pytest.raises(ValueError):
+            mape(y_true, y_pred)
+
+    def test_mape_list(self):
+        y_true = [1, 5, 7, 3, 4, 5]
+        y_pred = [-1, 3, 5, 4, 4, 3]
+
+        mape_value = np.round(mape(y_true, y_pred), decimals=2)
+        expected_mape = 56.98
+        
+        assert expected_mape == mape_value
+
+    def test_mape_array(self):
+        y_true = np.array([1, 5, 7, 3, 4, 5])
+        y_pred = np.array([-1, 3, 5, 4, 4, 3])
+
+        mape_value = np.round(mape(y_true, y_pred), decimals=2)
+        expected_mape = 56.98
+        
+        assert expected_mape == mape_value
+
+    def test_mape_dataframe(self):
+        y_true = pd.DataFrame([1, 5, 7, 3, 4, 5])
+        y_pred = pd.DataFrame([-1, 3, 5, 4, 4, 3])
+
+        mape_value = np.round(mape(y_true, y_pred), decimals=2)
+        expected_mape = 56.98
+        
+        assert expected_mape == mape_value
+
+    def test_y_true_zero_and_ratio_zero(self):
+        # If y_true = 0 and (y_pred - y_true) = 0
+        y_true = [0, 1, 2, 3, 4, 5]
+        y_pred = [0, 2.3, 0.4, 3.9, 3.1, 4.6]
+
+        with pytest.raises(ValueError):
+            mape(y_true, y_pred)
+
+    def test_y_true_contains_zero(self):
+        # If y_true = 0 
+        y_true = [0, 2, 2, 3, 4, 5]
+        y_pred = [2, 2.3, 0.4, 3.9, 3.1, 4.6]
+
+        mape_value = np.round(mape(y_true, y_pred))
+        expected_mape = np.inf
+        
+        assert expected_mape == mape_value
+
+    @given(
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False, min_value=1)),
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False, min_value=1)),
+    )
+    def test_mape_random_arrays_finite_values(self, y_true, y_pred):
+        mape_value = mape(y_true, y_pred)
+        expected_mape = self._correct_mape(y_true, y_pred)
+        print(y_true)
+        print(y_pred)
+
+        assert expected_mape == mape_value
