@@ -5,7 +5,7 @@ from hypothesis import given
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats
 
-from gtime.metrics import smape, max_error, mse, log_mse, r_square, mae, mape
+from gtime.metrics import smape, max_error, mse, log_mse, r_square, mae, mape, rmse, rmsle
 
 
 class TestSmape:
@@ -162,12 +162,12 @@ class TestMaxError:
 
 
 class TestMSE:
-    def _correct_mse(self, y_true, y_pred, rmse=False):
+    def _correct_mse(self, y_true, y_pred):
         y_true = np.array(y_true)
         y_pred = np.array(y_pred)
         sum_squared_error = sum(((y_true - y_pred)) ** 2)
         mse = sum_squared_error / len(y_true)
-        return np.sqrt(mse) if rmse else mse
+        return mse
 
     def test_wrong_vector_length(self):
         y_true = np.random.random(5)
@@ -196,11 +196,8 @@ class TestMSE:
 
         mse_value = np.round(mse(y_true, y_pred), decimals=2)
         expected_mse = 14
-        rmse_value = np.round(mse(y_true, y_pred, rmse=True), decimals=2)
-        expected_rmse = 3.74
         
         assert expected_mse == mse_value
-        assert expected_rmse == rmse_value
 
     def test_mse_array(self):
         y_true = np.array([0, 1, 2, 3, 4, 5])
@@ -208,11 +205,8 @@ class TestMSE:
 
         mse_value = np.round(mse(y_true, y_pred), decimals=2)
         expected_mse = 14
-        rmse_value = np.round(mse(y_true, y_pred, rmse=True), decimals=2)
-        expected_rmse = 3.74
         
         assert expected_mse == mse_value
-        assert expected_rmse == rmse_value
 
     def test_mse_dataframe(self):
         y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
@@ -220,11 +214,8 @@ class TestMSE:
 
         mse_value = np.round(mse(y_true, y_pred), decimals=2)
         expected_mse = 14
-        rmse_value = np.round(mse(y_true, y_pred, rmse=True), decimals=2)
-        expected_rmse = 3.74
         
         assert expected_mse == mse_value
-        assert expected_rmse == rmse_value
 
     @given(
         arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
@@ -233,17 +224,81 @@ class TestMSE:
     def test_mse_random_arrays_finite_values(self, y_true, y_pred):
         mse_value = mse(y_true, y_pred)
         expected_mse = self._correct_mse(y_true, y_pred)
-        rmse_value = mse(y_true, y_pred, rmse=True)
-        expected_rmse = self._correct_mse(y_true, y_pred, rmse=True)
         print(y_true)
         print(y_pred)
 
         assert expected_mse == mse_value
+
+
+class TestRMSE:
+    def _correct_rmse(self, y_true, y_pred):
+        y_true = np.array(y_true)
+        y_pred = np.array(y_pred)
+        return np.sqrt(mse(y_true, y_pred))
+
+    def test_wrong_vector_length(self):
+        y_true = np.random.random(5)
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            rmse(y_true, y_pred)
+
+    def test_nan_values(self):
+        y_true = [np.nan, 1, 2, 3]
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            rmse(y_true, y_pred)
+
+    def test_infinite_values(self):
+        y_true = np.random.random(4)
+        y_pred = [0, np.inf, 2, 3]
+
+        with pytest.raises(ValueError):
+            rmse(y_true, y_pred)
+
+    def test_rmse_list(self):
+        y_true = [0, 1, 2, 3, 4, 5]
+        y_pred = [-1, 4, 5, 10, 4, 1]
+
+        rmse_value = np.round(rmse(y_true, y_pred), decimals=2)
+        expected_rmse = 3.74
+        
+        assert expected_rmse == rmse_value
+
+    def test_rmse_array(self):
+        y_true = np.array([0, 1, 2, 3, 4, 5])
+        y_pred = np.array([-1, 4, 5, 10, 4, 1])
+
+        rmse_value = np.round(rmse(y_true, y_pred), decimals=2)
+        expected_rmse = 3.74
+        
+        assert expected_rmse == rmse_value
+
+    def test_rmse_dataframe(self):
+        y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
+        y_pred = pd.DataFrame([-1, 4, 5, 10, 4, 1])
+
+        rmse_value = np.round(rmse(y_true, y_pred), decimals=2)
+        expected_rmse = 3.74
+        
+        assert expected_rmse == rmse_value
+
+    @given(
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+    )
+    def test_rmse_random_arrays_finite_values(self, y_true, y_pred):
+        rmse_value = rmse(y_true, y_pred)
+        expected_rmse = self._correct_rmse(y_true, y_pred)
+        print(y_true)
+        print(y_pred)
+
         assert expected_rmse == rmse_value
 
 
 class TestLogMSE:
-    def _correct_log_mse(self, y_true, y_pred, rmsle=False):
+    def _correct_log_mse(self, y_true, y_pred):
         y_true = np.array(y_true)
         y_pred = np.array(y_pred)
         if (np.any(y_true < 0)) or (np.any(y_pred < 0)):
@@ -251,7 +306,7 @@ class TestLogMSE:
         log_y_true = np.log(y_true + 1)
         log_y_pred = np.log(y_pred + 1)
         log_mse = mse(log_y_true, log_y_pred)
-        return np.sqrt(log_mse) if rmsle else log_mse
+        return log_mse
 
     def test_wrong_vector_length(self):
         y_true = np.random.random(5)
@@ -280,11 +335,8 @@ class TestLogMSE:
 
         log_mse_value = np.round(log_mse(y_true, y_pred), decimals=2)
         expected_log_mse = 0.67
-        rmsle_value = np.round(log_mse(y_true, y_pred, rmsle=True), decimals=2)
-        expected_rmsle = 0.82
 
         assert expected_log_mse == log_mse_value
-        assert expected_rmsle == rmsle_value
 
     def test_log_mse_array(self):
         y_true = np.array([0, 1, 2, 3, 4, 5])
@@ -292,11 +344,8 @@ class TestLogMSE:
 
         log_mse_value = np.round(log_mse(y_true, y_pred), decimals=2)
         expected_log_mse = 0.67
-        rmsle_value = np.round(log_mse(y_true, y_pred, rmsle=True), decimals=2)
-        expected_rmsle = 0.82
 
         assert expected_log_mse == log_mse_value
-        assert expected_rmsle == rmsle_value
 
     def test_log_mse_dataframe(self):
         y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
@@ -304,11 +353,8 @@ class TestLogMSE:
 
         log_mse_value = np.round(log_mse(y_true, y_pred), decimals=2)
         expected_log_mse = 0.67
-        rmsle_value = np.round(log_mse(y_true, y_pred, rmsle=True), decimals=2)
-        expected_rmsle = 0.82
 
         assert expected_log_mse == log_mse_value
-        assert expected_rmsle == rmsle_value
 
     def test_log_mse_negative_values(self):
         y_true = np.array([0, 1, 2, 3, 4, -5])
@@ -324,12 +370,84 @@ class TestLogMSE:
     def test_log_mse_random_arrays_finite_values(self, y_true, y_pred):
         log_mse_value = log_mse(y_true, y_pred)
         expected_log_mse = self._correct_log_mse(y_true, y_pred)
-        rmsle_value = log_mse(y_true, y_pred, rmsle=True)
-        expected_rmsle = self._correct_log_mse(y_true, y_pred, rmsle=True)
         print(y_true)
         print(y_pred)
 
         assert expected_log_mse == log_mse_value
+
+
+class TestRMSLE:
+    def _correct_rmsle(self, y_true, y_pred):
+        y_true = np.array(y_true)
+        y_pred = np.array(y_pred)
+        
+        return np.sqrt(log_mse(y_true, y_pred))
+
+    def test_wrong_vector_length(self):
+        y_true = np.random.random(5)
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            rmsle(y_true, y_pred)
+
+    def test_nan_values(self):
+        y_true = [np.nan, 1, 2, 3]
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            rmsle(y_true, y_pred)
+
+    def test_infinite_values(self):
+        y_true = np.random.random(4)
+        y_pred = [0, np.inf, 2, 3]
+
+        with pytest.raises(ValueError):
+            rmsle(y_true, y_pred)
+
+    def test_rmsle_list(self):
+        y_true = [0, 1, 2, 3, 4, 5]
+        y_pred = [1, 4, 5, 10, 4, 1]
+
+        rmsle_value = np.round(rmsle(y_true, y_pred), decimals=2)
+        expected_rmsle = 0.82
+
+        assert expected_rmsle == rmsle_value
+
+    def test_rmsle_array(self):
+        y_true = np.array([0, 1, 2, 3, 4, 5])
+        y_pred = np.array([1, 4, 5, 10, 4, 1])
+
+        rmsle_value = np.round(rmsle(y_true, y_pred), decimals=2)
+        expected_rmsle = 0.82
+
+        assert expected_rmsle == rmsle_value
+
+    def test_rmsle_dataframe(self):
+        y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
+        y_pred = pd.DataFrame([1, 4, 5, 10, 4, 1])
+
+        rmsle_value = np.round(rmsle(y_true, y_pred), decimals=2)
+        expected_rmsle = 0.82
+
+        assert expected_rmsle == rmsle_value
+
+    def test_rmsle_negative_values(self):
+        y_true = np.array([0, 1, 2, 3, 4, -5])
+        y_pred = np.array([0, 0, 0, 0, 0, 0])
+
+        with pytest.raises(ValueError):
+            rmsle(y_true, y_pred) 
+
+    @given(
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False, min_value=0)),
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False, min_value=0)),
+    )
+    def test_rmsle_random_arrays_finite_values(self, y_true, y_pred):
+        rmsle_value = rmsle(y_true, y_pred)
+        expected_rmsle = self._correct_rmsle(y_true, y_pred)
+        print(y_true)
+        print(y_pred)
+
         assert expected_rmsle == rmsle_value
 
 
@@ -523,15 +641,10 @@ class TestMAPE:
     def _correct_mape(self, y_true, y_pred):
         y_true = np.array(y_true)
         y_pred = np.array(y_pred)
-        ratio_list = np.abs((y_pred - y_true)/y_true)
-        if (y_true == 0).any():
-            if (np.nan == ratio_list).any():
-                raise ValueError("MAPE can not be calculated due to Zero/Zero")
-            else:
-                return np.inf
-        else:
-            mape_value = np.mean(ratio_list) * 100
-        return mape_value
+        mape_value = np.mean(np.abs((y_pred - y_true)/y_true))
+        if np.isnan(mape_value):
+            raise ValueError("MAPE can not be calculated due to Zero/Zero")
+        return mape_value * 100
 
     def test_wrong_vector_length(self):
         y_true = np.random.random(5)

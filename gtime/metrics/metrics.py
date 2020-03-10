@@ -119,9 +119,8 @@ def max_error(
 def mse(
     y_true: Union[pd.DataFrame, List, np.ndarray],
     y_pred: Union[pd.DataFrame, List, np.ndarray],
-    rmse = False,
 ) -> float:
-    """Compute the Mean Squared Error(MSE) or Root Mean Squared Error(RMSE) between two vectors.
+    """Compute the Mean Squared Error(MSE) between two vectors.
 
     Parameters
     ----------
@@ -131,15 +130,11 @@ def mse(
     y_pred : array-like, shape (length, 1), required.
         The second vector.
 
-    rmse : boolean, default is False.
-        To be set to True if Root Mean Squared Error is required
-
     Returns
     -------
     mse : float
         The Mean Squared Error between the two vectors.
-        If rmse is True then the function returns Root Mean Squared Error
-
+        
     Examples
     --------
     >>> from gtime.metrics import mse
@@ -160,15 +155,46 @@ def mse(
     
     sum_squared_error = sum((y_true - y_pred) ** 2)
     mse = sum_squared_error / len(y_true)
-    return np.sqrt(mse) if rmse else mse
+    return mse
+
+
+def rmse(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the Root Mean Squared Error(RMSE) between two vectors.
+
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required.
+        The first vector.
+
+    y_pred : array-like, shape (length, 1), required.
+        The second vector.
+
+    Returns
+    -------
+    rmse : float
+        The Root Mean Squared Error between the two vectors.
+
+    Examples
+    --------
+    >>> from gtime.metrics import rmse
+    >>> y_true = [0, 1, 2, 3, 4, 5]
+    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> rmse(y_true, y_pred)
+    1.098
+
+    """
+
+    return np.sqrt(mse(y_true, y_pred)) 
 
 
 def log_mse(
     y_true: Union[pd.DataFrame, List, np.ndarray],
     y_pred: Union[pd.DataFrame, List, np.ndarray],
-    rmsle = False,
 ) -> float:
-    """Compute the Mean Squared Log Error(MSLE) or Root Mean Squared Log Error(RMSLE) between two vectors.
+    """Compute the Mean Squared Log Error(MSLE) between two vectors.
     Note: Log_mse accepts only positive numbers as input
 
     Parameters
@@ -179,15 +205,11 @@ def log_mse(
     y_pred : array-like, shape (length, 1), required
         The second vector.
     
-    rmsle : boolean, default is False.
-        To be set to True if Root Mean Squared Log Error is required
-
     Returns
     -------
     log_mse : float
         The mean squared log error between the two vectors.
-        If rmsle is True then the function returns Root Mean Squared Log Error
-
+        
     Examples
     --------
     >>> from gtime.metrics import log_mse
@@ -211,7 +233,40 @@ def log_mse(
     log_y_true = np.log(y_true + 1)
     log_y_pred = np.log(y_pred + 1)
     log_mse = mse(log_y_true, log_y_pred)
-    return np.sqrt(log_mse) if rmsle else log_mse
+    return log_mse
+
+
+def rmsle(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the Root Mean Squared Log Error(RMSLE) between two vectors.
+    Note: RMSLE accepts only positive numbers as input
+
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required.
+        The first vector.
+
+    y_pred : array-like, shape (length, 1), required.
+        The second vector.
+    
+    Returns
+    -------
+    rmsle_value : float
+        The root mean squared log error between the two vectors.
+        
+    Examples
+    --------
+    >>> from gtime.metrics import rmsle
+    >>> y_true = [0, 1, 2, 3, 4, 5]
+    >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
+    >>> rmsle(y_true, y_pred)
+    0.49
+
+    """
+  
+    return np.sqrt(log_mse(y_true, y_pred)) 
 
 
 def r_square(
@@ -324,12 +379,8 @@ def mape(
     y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
     _check_input(y_true, y_pred)
     
-    ratio_list = np.abs((y_pred - y_true)/y_true)
-    if (y_true == 0).any():
-        if (np.nan == ratio_list).any():
-            raise ValueError("MAPE can not be calculated due to Zero/Zero")
-        else:
-            return np.inf
-    else:
-        mape_value = np.mean(ratio_list) * 100
-    return mape_value
+    mape_value = np.mean(np.abs((y_pred - y_true)/y_true))
+    if np.isnan(mape_value):
+        raise ValueError("MAPE can not be calculated due to Zero/Zero")
+    return mape_value * 100
+
