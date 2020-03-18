@@ -1,5 +1,7 @@
 import pandas as pd
 from sklearn.utils.validation import check_is_fitted
+
+from ..base import add_class_name
 from gtime.feature_extraction import MovingCustomFunction
 
 class SortedDensity(MovingCustomFunction):
@@ -32,20 +34,20 @@ class SortedDensity(MovingCustomFunction):
     5                 0.722222
     --------
     """    
-    def __init__(self, window_size: int = 1, is_causal: bool = True):        
-        super().__init__(self.sorted_density)
+    def __init__(self, window_size: int = 1, is_causal: bool = True):   
+        def sorted_density(signal):
+            import numpy as np
+            t = (np.array(range(len(signal))) + 1)
+            signal = signal[signal.argsort()[::-1]]
+            t = np.reshape(t, signal.shape)
+            SD = np.sum(np.multiply(t, signal))/np.sum(signal) # (eq. 2)
+            SD = SD/(len(signal))
+            return SD     
+        super().__init__(sorted_density)
         self.window_size = window_size
         self.is_causal = is_causal
-        
-    def sorted_density(self, signal):
-        import numpy as np
-        t = (np.array(range(len(signal))) + 1)
-        signal = signal[signal.argsort()[::-1]]
-        t = np.reshape(t, signal.shape)
-        SD = np.sum(np.multiply(t, signal))/np.sum(signal) # (eq. 2)
-        SD = SD/(len(signal))
-        return SD
     
+    @add_class_name 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """For every row of ``time_series``, compute the moving sorted density function of the
          previous ``window_size`` elements.
@@ -60,14 +62,15 @@ class SortedDensity(MovingCustomFunction):
             moving custom function for each element.
         """
         check_is_fitted(self)
+        
 
         if(self.is_causal):
             time_series_mvg_sd = time_series.rolling(self.window_size).apply(
-                self.sorted_density, raw=self.raw
+                self.custom_feature_function, raw=self.raw
             )
         else:
             time_series_mvg_sd = time_series.rolling(self.window_size, min_periods = int(self.window_size/2)).apply(
-                self.sorted_density, raw=self.raw
+                self.custom_feature_function, raw=self.raw
             )
             time_series_mvg_sd = time_series_mvg_sd.dropna()
             

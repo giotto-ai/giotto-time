@@ -1,5 +1,7 @@
 import pandas as pd
 from sklearn.utils.validation import check_is_fitted
+
+from ..base import add_class_name
 from gtime.feature_extraction import MovingCustomFunction
 
 class CrestFactorDetrending(MovingCustomFunction):
@@ -34,23 +36,23 @@ class CrestFactorDetrending(MovingCustomFunction):
     """
 
     def __init__(self, window_size: int = 1, is_causal: bool = True):
-        super().__init__(self.detrend)
+        def detrend(signal):
+            import numpy as np
+            N = 2
+            signal = np.array(signal)
+            large_signal_segment = signal**N
+            large_segment_mean = np.sum(large_signal_segment)
+            if (self.is_causal):
+                ref_index = -1
+            else:
+                ref_index = int(len(signal)/2) 
+            small_signal_segment = signal[ref_index]**N
+            return small_signal_segment/large_segment_mean # (eq. 1)
+        super().__init__(detrend)
         self.window_size = window_size
         self.is_causal = is_causal
     
-    def detrend(self, signal):
-        import numpy as np
-        N = 2
-        signal = np.array(signal)
-        large_signal_segment = signal**N
-        large_segment_mean = np.sum(large_signal_segment)
-        if (self.is_causal):
-            ref_index = -1
-        else:
-            ref_index = int(len(signal)/2) 
-        small_signal_segment = signal[ref_index]**N
-        return small_signal_segment/large_segment_mean # (eq. 1)
-     
+    @add_class_name 
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
         """For every row of ``time_series``, compute the moving crest factor detrending function of the
          previous ``window_size`` elements.
@@ -64,15 +66,15 @@ class CrestFactorDetrending(MovingCustomFunction):
             A DataFrame, with the same length as ``time_series``, containing the rolling
             moving custom function for each element.
         """
-        check_is_fitted(self)
+        check_is_fitted(self) 
 
         if(self.is_causal):
             time_series_mvg_dtr = time_series.rolling(self.window_size).apply(
-                self.detrend, raw=self.raw
+                self.custom_feature_function, raw=self.raw
             )
         else:
             time_series_mvg_dtr = time_series.rolling(self.window_size, min_periods = int(self.window_size/2)).apply(
-                self.detrend, raw=self.raw
+                self.custom_feature_function, raw=self.raw
             )
             time_series_mvg_dtr = time_series_mvg_dtr.dropna()
             
