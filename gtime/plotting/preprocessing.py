@@ -2,44 +2,52 @@ import pandas as pd
 import numpy as np
 
 
-def seasonal_split(df: pd.DataFrame, season):
+def seasonal_split(df: pd.DataFrame, cycle='year', freq=None, agg='mean'):
+    if freq is None:
+        freq = df.index.freqstr
+    df = df.resample(freq).agg(agg)
 
-    df = df.copy()
+    if isinstance(cycle, str):
+        if cycle == 'year':
+            df['_Series'] = df.index.start_time.year
+            if freq == 'D':
+                df['_Season'] = df.index.dayofyear
+            #             elif freq in ['W-SUN', 'W']:
+            #                 df['_Season'] = df.index.start_time.weekofyear
+            elif freq == 'M':
+                df['_Season'] = df.index.month
+            elif freq in ['Q', 'Q-DEC']:
+                df['_Season'] = df.index.quarter
+            else:
+                df['_Season'] = df.resample('Y').apply(lambda x: pd.Series(np.arange(1, len(x) + 1))).values
 
-    if isinstance(season, str):
-        if season == 'year':
-            df['_Period'] = ''
-            df['_Season'] = df.index.year
-            df['_Idx'] = df.index.dayofyear
-        elif season == 'month':
-            df['_Period'] = df.index.year
-            df['_Season'] = df.index.month
-            #             df['Season_name'] = list(map(lambda x: '_'.join([str(x.year), str(x.month)]), df.index))
-            df['_Idx'] = df.index.day
-        elif season == 'week':
-            df['_Period'] = df.index.year
-            df['_Season'] = df.index.week
-            #             df['Season_name'] = list(map(lambda x: '_'.join([str(x.year), str(x.weekofyear)]), df.index))
-            df['_Idx'] = df.index.dayofweek
+        elif cycle == 'quarter':
+            df['_Series'] = list(map(lambda x: '_'.join([str(x.year), str(x.quarter)]), df.index))
+            df['_Season'] = df.resample('Q').apply(lambda x: pd.Series(np.arange(1, len(x) + 1))).values
+
+        elif cycle == 'month':
+            df['_Series'] = list(map(lambda x: '_'.join([str(x.year), str(x.month)]), df.index))
+            if freq == 'D':
+                df['_Season'] = df.index.day
+            else:
+                df['_Season'] = df.resample('M').apply(lambda x: pd.Series(np.arange(1, len(x) + 1))).values
+
+        elif cycle == 'week':
+            df['_Series'] = list(map(lambda x: '_'.join([str(x.year), str(x.weekofyear)]), df.index))
+            if freq == 'D':
+                df['_Season'] = df.index.day
+            else:
+                df['_Season'] = df.resample('W').apply(lambda x: pd.Series(np.arange(1, len(x) + 1))).values
         else:
-            raise ValueError("Incorrect period name")
+            raise ValueError("Incorrect cycle period name")
+    else:
+        df['_Series'] = df.resample
+        s = []
+        for i, j in df.resample(freq):
+            s += [i.__str__()] * len(j)
+        df['_Season'] = s
 
-        return df.set_index(['_Period', '_Season', '_Idx']).unstack(level=[0, 1])
-
-    elif isinstance(season, pd.Timedelta):
-        cols = []
-        series = []
-        for i, col in df.resample(season):
-            cols.append(i)
-            series.append(col.reset_index(drop=True))
-        return pd.concat(series, keys=cols, axis=1)
-
-
-def subplot_split(df: pd.DataFrame, season, agg):
-
-    res = seasonal_split(df, season)
-    res = res.agg(agg, axis=0).unstack()
-    return res
+    return df.set_index(['_Series', '_Season']).unstack(level=0)
 
 
 def acf(df, max_lag=10):
