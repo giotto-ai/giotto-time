@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Union, List, Tuple
 
 import numpy as np
@@ -26,7 +27,7 @@ from .utils import (
     datetime_index_series_to_period_index_series,
 )
 
-PandasDate = Union[pd.datetime, pd.Timestamp, str]
+PandasDate = Union[datetime, pd.Timestamp, str]
 
 
 class TestListToTimeIndexSeries:

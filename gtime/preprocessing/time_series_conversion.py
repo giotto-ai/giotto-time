@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from typing import Optional, Union, List
 
 import numpy as np
 import pandas as pd
 
 PandasTimeIndex = Union[pd.DatetimeIndex, pd.PeriodIndex, pd.TimedeltaIndex]
-PandasDate = Union[pd.datetime, pd.Timestamp, str]
+PandasDate = Union[datetime, pd.Timestamp, str]
 
 DEFAULT_START = pd.Timestamp("1970-01-01")
 DEFAULT_END = pd.Timestamp("2020-01-01")
@@ -253,8 +254,8 @@ class _PandasSeriesToTimeIndexSeries(TimeSeriesConversion):
 
     def __init__(
         self,
-        start: Optional[Union[pd.datetime, str]] = None,
-        end: Optional[Union[pd.datetime, str]] = None,
+        start: Optional[Union[datetime, str]] = None,
+        end: Optional[Union[datetime, str]] = None,
         freq: Optional[pd.Timedelta] = None,
     ) -> None:
         super().__init__(start, end, freq)
