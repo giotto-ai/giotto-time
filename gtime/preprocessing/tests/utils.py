@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Union, Optional, Tuple
 
 import numpy as np
@@ -12,7 +13,7 @@ from gtime.preprocessing.time_series_conversion import (
 )
 from gtime.utils.testing_constants import DEFAULT_START, DEFAULT_FREQ
 
-PandasDate = Union[pd.datetime, pd.Timestamp, str]
+PandasDate = Union[datetime, pd.Timestamp, str]
 
 
 def compare_output_of_input_sequence_to_expected_one(
@@ -68,13 +69,13 @@ def transform_time_index_series_into_period_index_series(
 
 def pandas_series_with_period_index(
     values: Union[np.array, List[float]],
-    start: Optional[pd.datetime] = None,
-    end: Optional[pd.datetime] = None,
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
     freq: Optional[pd.Timedelta] = None,
 ) -> pd.Series:
     start, end, freq = _initialize_start_end_freq(start, end, freq)
     index = pd.period_range(start=start, end=end, periods=len(values), freq=freq,)
-    return pd.Series(index=index, data=values)
+    return pd.Series(index=index, data=values, dtype=np.float64)
 
 
 def _initialize_start_end_freq(
@@ -149,10 +150,16 @@ def datetime_index_series_to_period_index_series(
         )
 
 
+def timedelta_index_to_datetime(
+    index: pd.TimedeltaIndex, start: datetime = datetime(year=1970, month=1, day=1),
+) -> pd.DatetimeIndex:
+    return start + index
+
+
 def timedelta_index_series_to_period_index_series(
     timedelta_index_series: pd.Series, freq: Optional[pd.Timedelta] = None
 ) -> pd.Series:
-    datetime_index = pd.to_datetime(timedelta_index_series.index)
+    datetime_index = timedelta_index_to_datetime(timedelta_index_series.index)
     if datetime_index.freq is None:
         freq = "1D" if freq is None else freq
         period_index = pd.PeriodIndex(datetime_index, freq=freq)

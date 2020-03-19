@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Union, Optional
 
 import numpy as np
@@ -30,10 +31,10 @@ class TimeSeriesPreparation:
 
     Parameters
     ----------
-    start : pd.datetime, optional, default: ``None``
+    start : datetime, optional, default: ``None``
         The date to use as start date.
 
-    end : pd.datetime, optional, default: ``None``
+    end : datetime, optional, default: ``None``
         The date to use as end date.
 
     freq : pd.Timedelta, optional, default: ``None``
@@ -106,8 +107,8 @@ class TimeSeriesPreparation:
 
     def __init__(
         self,
-        start: Optional[pd.datetime] = None,
-        end: Optional[pd.datetime] = None,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
         freq: Optional[pd.Timedelta] = None,
         resample_if_not_equispaced: bool = False,
         output_name: str = "time_series",

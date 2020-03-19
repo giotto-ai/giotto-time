@@ -1,8 +1,15 @@
 import pandas as pd
 import numpy as np
 
-def compute_n_points(n_windows: int, sliding_stride: int, sliding_window_width: int, takens_stride: int,
-                     takens_dimension: int, takens_time_delay: int) -> int:
+
+def compute_n_points(
+    n_windows: int,
+    sliding_stride: int,
+    sliding_window_width: int,
+    takens_stride: int,
+    takens_dimension: int,
+    takens_time_delay: int,
+) -> int:
     """Helper function to reshape TDA feature for use with giotto-time.
 
     Parameters
@@ -21,15 +28,13 @@ def compute_n_points(n_windows: int, sliding_stride: int, sliding_window_width: 
     n_used_points : int
         Parameter for reshaping the feature values to pandas dataframes.
     """
-    embedder_length = (
-        sliding_stride * (n_windows - 1) + sliding_window_width
-    )
+    embedder_length = sliding_stride * (n_windows - 1) + sliding_window_width
 
     n_used_points = (
-        takens_stride * (embedder_length - 1)
-        + takens_dimension * takens_time_delay
+        takens_stride * (embedder_length - 1) + takens_dimension * takens_time_delay
     )
     return n_used_points
+
 
 def align_indices(X: pd.DataFrame, n_points: int, tda_feature_values: np.array) -> int:
     """Helper function to reshape TDA feature for use with giotto-time.

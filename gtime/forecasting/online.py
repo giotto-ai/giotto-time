@@ -70,7 +70,9 @@ class HedgeForecaster(BaseEstimator):
 
     """
 
-    def __init__(self, learning_rate: float = 0.001, loss: callable = l1, random_state=None):
+    def __init__(
+        self, learning_rate: float = 0.001, loss: callable = l1, random_state=None
+    ):
         self.eps = learning_rate
         self.loss = loss
         self.random_state = random_state
@@ -82,7 +84,9 @@ class HedgeForecaster(BaseEstimator):
 
         total_loss = 0
         for t in range(timestamps):
-            self.decisions_[t] = random_state.choice(n_experts, p=weights / np.sum(weights))
+            self.decisions_[t] = random_state.choice(
+                n_experts, p=weights / np.sum(weights)
+            )
             total_loss += loss[t][np.int(self.decisions_[t])]
             weights *= np.exp(-eps * loss[t])
         return total_loss, weights
@@ -111,8 +115,13 @@ class HedgeForecaster(BaseEstimator):
         timestamps = len(X)
         n_experts = X.shape[1]
 
-        self.total_loss_, self.weights_ = self.hedge(timestamps=timestamps, n_experts=n_experts,
-                                                     loss=self.loss_matrix_, eps=self.eps, random_state=random_state)
+        self.total_loss_, self.weights_ = self.hedge(
+            timestamps=timestamps,
+            n_experts=n_experts,
+            loss=self.loss_matrix_,
+            eps=self.eps,
+            random_state=random_state,
+        )
 
         return self
 
@@ -134,7 +143,9 @@ class HedgeForecaster(BaseEstimator):
         """
         self.fit(X, y)
 
-        predictions = pd.DataFrame(np.take_along_axis(check_array(X), self.decisions_.reshape(-1, 1), axis=1),
-                                   index=X.index)
+        predictions = pd.DataFrame(
+            np.take_along_axis(check_array(X), self.decisions_.reshape(-1, 1), axis=1),
+            index=X.index,
+        )
 
         return predictions

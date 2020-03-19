@@ -1,7 +1,12 @@
 import random
 
 import numpy as np
-import pandas.util.testing as testing
+import pandas as pd
+if pd.__version__ >= '1.0.0':
+    import pandas._testing as testing
+else:
+    import pandas.util.testing as testing
+
 import pytest
 from hypothesis import given
 from sklearn.compose import make_column_selector

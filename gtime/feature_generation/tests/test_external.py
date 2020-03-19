@@ -1,7 +1,10 @@
 import pandas as pd
 import pytest
 from hypothesis import given, strategies as st
-from pandas.util import testing as testing
+if pd.__version__ >= '1.0.0':
+    import pandas._testing as testing
+else:
+    import pandas.util.testing as testing
 
 from gtime.feature_generation import Constant, PeriodicSeasonal
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
@@ -56,7 +59,7 @@ class TestPeriodicSesonalFeature:
         periodic_feature = PeriodicSeasonal(
             period="2 days",
             start_date=start_date,
-            index_period=pd.DatetimeIndex(start=start_date, end="2020-01-01", freq="W"),
+            index_period=pd.date_range(start=start_date, end="2020-01-01", freq="W"),
         )
         with pytest.raises(ValueError):
             periodic_feature.transform()
@@ -68,7 +71,7 @@ class TestPeriodicSesonalFeature:
         periodic_feature = PeriodicSeasonal(
             period="365 days",
             start_date=start_date,
-            index_period=pd.DatetimeIndex(start=start_date, end="2020-01-01", freq="W"),
+            index_period=pd.date_range(start=start_date, end="2020-01-01", freq="W"),
         )
         output_sin = periodic_feature.transform(ts)
         expected_index = pd.DatetimeIndex(
