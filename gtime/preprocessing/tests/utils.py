@@ -150,10 +150,16 @@ def datetime_index_series_to_period_index_series(
         )
 
 
+def timedelta_index_to_datetime(
+    index: pd.TimedeltaIndex, start: datetime = datetime(year=1970, month=1, day=1),
+) -> pd.DatetimeIndex:
+    return start + index
+
+
 def timedelta_index_series_to_period_index_series(
     timedelta_index_series: pd.Series, freq: Optional[pd.Timedelta] = None
 ) -> pd.Series:
-    datetime_index = pd.to_datetime(timedelta_index_series.index)
+    datetime_index = timedelta_index_to_datetime(timedelta_index_series.index)
     if datetime_index.freq is None:
         freq = "1D" if freq is None else freq
         period_index = pd.PeriodIndex(datetime_index, freq=freq)

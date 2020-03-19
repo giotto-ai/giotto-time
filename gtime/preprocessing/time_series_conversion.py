@@ -360,8 +360,15 @@ class _TimeIndexSeriesToPeriodIndexSeries(TimeSeriesConversion):
         else:
             return pd.PeriodIndex(index)
 
+    def _timedelta_index_to_datetime(
+        self,
+        index: pd.TimedeltaIndex,
+        start: datetime = datetime(year=1970, month=1, day=1),
+    ) -> pd.DatetimeIndex:
+        return start + index
+
     def _timedelta_index_to_period(self, index: pd.TimedeltaIndex) -> pd.PeriodIndex:
-        datetime_index = pd.to_datetime(index)
+        datetime_index = self._timedelta_index_to_datetime(index)
         return self._datetime_index_to_period(datetime_index)
 
     def _get_values_from(self, time_series: pd.Series) -> np.array:

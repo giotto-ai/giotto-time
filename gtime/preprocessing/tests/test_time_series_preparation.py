@@ -168,11 +168,7 @@ class TestToEquispacedTimeSeries:
         series_with_period_index(), st.datetimes(), available_freqs(), st.text(),
     )
     def test_with_resample_false(
-        self,
-        series: pd.Series,
-        start: datetime,
-        freq: pd.Timedelta,
-        output_name: str,
+        self, series: pd.Series, start: datetime, freq: pd.Timedelta, output_name: str,
     ):
         time_series_preparation = TimeSeriesPreparation(
             start=start,
@@ -185,11 +181,7 @@ class TestToEquispacedTimeSeries:
 
     @given(series_with_period_index(), st.datetimes(), available_freqs(), st.text())
     def test_with_resample_true(
-        self,
-        series: pd.Series,
-        start: datetime,
-        freq: pd.Timedelta,
-        output_name: str,
+        self, series: pd.Series, start: datetime, freq: pd.Timedelta, output_name: str,
     ):
         time_series_preparation = TimeSeriesPreparation(
             start=start,

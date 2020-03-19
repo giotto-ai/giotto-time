@@ -5,7 +5,17 @@ from hypothesis import given
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats
 
-from gtime.metrics import smape, max_error, mse, log_mse, r_square, mae, mape, rmse, rmsle
+from gtime.metrics import (
+    smape,
+    max_error,
+    mse,
+    log_mse,
+    r_square,
+    mae,
+    mape,
+    rmse,
+    rmsle,
+)
 
 
 class TestSmape:
@@ -93,6 +103,7 @@ class TestSmape:
         expected_error = self._correct_smape(y_true, y_pred)
 
         assert expected_error == error
+
 
 class TestMaxError:
     def _correct_max_error(self, y_true, y_pred):
@@ -196,7 +207,7 @@ class TestMSE:
 
         mse_value = np.round(mse(y_true, y_pred), decimals=2)
         expected_mse = 14
-        
+
         assert expected_mse == mse_value
 
     def test_mse_array(self):
@@ -205,7 +216,7 @@ class TestMSE:
 
         mse_value = np.round(mse(y_true, y_pred), decimals=2)
         expected_mse = 14
-        
+
         assert expected_mse == mse_value
 
     def test_mse_dataframe(self):
@@ -214,7 +225,7 @@ class TestMSE:
 
         mse_value = np.round(mse(y_true, y_pred), decimals=2)
         expected_mse = 14
-        
+
         assert expected_mse == mse_value
 
     @given(
@@ -263,7 +274,7 @@ class TestRMSE:
 
         rmse_value = np.round(rmse(y_true, y_pred), decimals=2)
         expected_rmse = 3.74
-        
+
         assert expected_rmse == rmse_value
 
     def test_rmse_array(self):
@@ -272,7 +283,7 @@ class TestRMSE:
 
         rmse_value = np.round(rmse(y_true, y_pred), decimals=2)
         expected_rmse = 3.74
-        
+
         assert expected_rmse == rmse_value
 
     def test_rmse_dataframe(self):
@@ -281,7 +292,7 @@ class TestRMSE:
 
         rmse_value = np.round(rmse(y_true, y_pred), decimals=2)
         expected_rmse = 3.74
-        
+
         assert expected_rmse == rmse_value
 
     @given(
@@ -302,7 +313,7 @@ class TestLogMSE:
         y_true = np.array(y_true)
         y_pred = np.array(y_pred)
         if (np.any(y_true < 0)) or (np.any(y_pred < 0)):
-            raise ValueError("MSLE can not be used when inputs contain Negative values") 
+            raise ValueError("MSLE can not be used when inputs contain Negative values")
         log_y_true = np.log(y_true + 1)
         log_y_pred = np.log(y_pred + 1)
         log_mse = mse(log_y_true, log_y_pred)
@@ -361,11 +372,19 @@ class TestLogMSE:
         y_pred = np.array([0, 0, 0, 0, 0, 0])
 
         with pytest.raises(ValueError):
-            log_mse(y_true, y_pred) 
+            log_mse(y_true, y_pred)
 
     @given(
-        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False, min_value=0)),
-        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False, min_value=0)),
+        arrays(
+            float,
+            shape=30,
+            elements=floats(allow_nan=False, allow_infinity=False, min_value=0),
+        ),
+        arrays(
+            float,
+            shape=30,
+            elements=floats(allow_nan=False, allow_infinity=False, min_value=0),
+        ),
     )
     def test_log_mse_random_arrays_finite_values(self, y_true, y_pred):
         log_mse_value = log_mse(y_true, y_pred)
@@ -380,7 +399,7 @@ class TestRMSLE:
     def _correct_rmsle(self, y_true, y_pred):
         y_true = np.array(y_true)
         y_pred = np.array(y_pred)
-        
+
         return np.sqrt(log_mse(y_true, y_pred))
 
     def test_wrong_vector_length(self):
@@ -436,11 +455,19 @@ class TestRMSLE:
         y_pred = np.array([0, 0, 0, 0, 0, 0])
 
         with pytest.raises(ValueError):
-            rmsle(y_true, y_pred) 
+            rmsle(y_true, y_pred)
 
     @given(
-        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False, min_value=0)),
-        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False, min_value=0)),
+        arrays(
+            float,
+            shape=30,
+            elements=floats(allow_nan=False, allow_infinity=False, min_value=0),
+        ),
+        arrays(
+            float,
+            shape=30,
+            elements=floats(allow_nan=False, allow_infinity=False, min_value=0),
+        ),
     )
     def test_rmsle_random_arrays_finite_values(self, y_true, y_pred):
         rmsle_value = rmsle(y_true, y_pred)
@@ -463,7 +490,7 @@ class TestRSquare:
             else:
                 return 0.0
         if np.isnan(ss_res / ss_tot):
-            return np.NINF 
+            return np.NINF
         r_square = 1 - (ss_res / ss_tot)
         return r_square
 
@@ -516,7 +543,7 @@ class TestRSquare:
         assert expected_r_square == r_square_value
 
     def test_r_square_all_zero_values(self):
-        # The test checks for all zero inputs covering the 'if' condition 
+        # The test checks for all zero inputs covering the 'if' condition
         # to check if both ss_res and ss_tot are all Zeros
         y_true = np.array([0, 0, 0, 0, 0, 0])
         y_pred = np.array([0, 0, 0, 0, 0, 0])
@@ -527,7 +554,7 @@ class TestRSquare:
         assert expected_r_square == r_square_value
 
     def test_r_square_ss_tot_zero(self):
-        # The test checks for 'if' condition 
+        # The test checks for 'if' condition
         # to check if ss_res is certain value and ss_tot are all Zeros
         y_true = np.array([0, 0, 0, 0, 0, 0])
         y_pred = np.array([1, 1, 1, 1, 1, 1])
@@ -538,18 +565,72 @@ class TestRSquare:
         assert expected_r_square == r_square_value
 
     def test_r_square_ss_res_ss_tot_infinity(self):
-        # The test checks for 'if' condition 
+        # The test checks for 'if' condition
         # to check if both ss_res and ss_tot are Infinite
-        y_true = [0.00000000e+000, 0.00000000e+000, 9.81351055e+200, 9.81351055e+200,
-                  9.81351055e+200, 9.81351055e+200, 9.81351055e+200, 9.81351055e+200,
-                  9.81351055e+200, 9.81351055e+200, 9.81351055e+200, 9.81351055e+200,
-                  9.81351055e+200, 9.81351055e+200, 9.81351055e+200, 9.81351055e+200,
-                  9.81351055e+200, 9.81351055e+200, 9.81351055e+200, 9.81351055e+200,
-                  9.81351055e+200, 9.81351055e+200, 9.81351055e+200, 9.81351055e+200,
-                  9.81351055e+200, 9.81351055e+200, 9.81351055e+200, 9.81351055e+200,
-                  9.81351055e+200, 9.81351055e+200]
-        y_pred = [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 
-                  0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]
+        y_true = [
+            0.00000000e000,
+            0.00000000e000,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+            9.81351055e200,
+        ]
+        y_pred = [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ]
 
         r_square_value = np.round(r_square(y_true, y_pred), decimals=2)
         expected_r_square = np.NINF
@@ -565,7 +646,7 @@ class TestRSquare:
         expected_r_square = self._correct_r_squared(y_true, y_pred)
         print(y_true)
         print(y_pred)
-        
+
         assert expected_r_square == r_square_value
 
 
@@ -603,7 +684,7 @@ class TestMAE:
 
         mae_value = np.round(mae(y_true, y_pred), decimals=2)
         expected_mae = 3
-        
+
         assert expected_mae == mae_value
 
     def test_mae_array(self):
@@ -612,7 +693,7 @@ class TestMAE:
 
         mae_value = np.round(mae(y_true, y_pred), decimals=2)
         expected_mae = 3
-        
+
         assert expected_mae == mae_value
 
     def test_mae_dataframe(self):
@@ -621,7 +702,7 @@ class TestMAE:
 
         mae_value = np.round(mae(y_true, y_pred), decimals=2)
         expected_mae = 3
-        
+
         assert expected_mae == mae_value
 
     @given(
@@ -641,7 +722,7 @@ class TestMAPE:
     def _correct_mape(self, y_true, y_pred):
         y_true = np.array(y_true)
         y_pred = np.array(y_pred)
-        mape_value = np.mean(np.abs((y_pred - y_true)/y_true))
+        mape_value = np.mean(np.abs((y_pred - y_true) / y_true))
         if np.isnan(mape_value):
             raise ValueError("MAPE can not be calculated due to Zero/Zero")
         return mape_value * 100
@@ -673,7 +754,7 @@ class TestMAPE:
 
         mape_value = np.round(mape(y_true, y_pred), decimals=2)
         expected_mape = 56.98
-        
+
         assert expected_mape == mape_value
 
     def test_mape_array(self):
@@ -682,7 +763,7 @@ class TestMAPE:
 
         mape_value = np.round(mape(y_true, y_pred), decimals=2)
         expected_mape = 56.98
-        
+
         assert expected_mape == mape_value
 
     def test_mape_dataframe(self):
@@ -691,7 +772,7 @@ class TestMAPE:
 
         mape_value = np.round(mape(y_true, y_pred), decimals=2)
         expected_mape = 56.98
-        
+
         assert expected_mape == mape_value
 
     def test_y_true_zero_and_ratio_zero(self):
@@ -703,18 +784,26 @@ class TestMAPE:
             mape(y_true, y_pred)
 
     def test_y_true_contains_zero(self):
-        # If y_true = 0 
+        # If y_true = 0
         y_true = [0, 2, 2, 3, 4, 5]
         y_pred = [2, 2.3, 0.4, 3.9, 3.1, 4.6]
 
         mape_value = np.round(mape(y_true, y_pred))
         expected_mape = np.inf
-        
+
         assert expected_mape == mape_value
 
     @given(
-        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False, min_value=1)),
-        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False, min_value=1)),
+        arrays(
+            float,
+            shape=30,
+            elements=floats(allow_nan=False, allow_infinity=False, min_value=1),
+        ),
+        arrays(
+            float,
+            shape=30,
+            elements=floats(allow_nan=False, allow_infinity=False, min_value=1),
+        ),
     )
     def test_mape_random_arrays_finite_values(self, y_true, y_pred):
         mape_value = mape(y_true, y_pred)

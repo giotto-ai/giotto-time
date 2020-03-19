@@ -338,7 +338,9 @@ class TestTimeIndexSeriesToPeriodIndexSeries:
             data=[1, 2, 3],
         )
         expected_series = pd.Series(
-            index=pd.PeriodIndex(["1970-01-02", "1970-01-12", "1970-01-22"], freq="D"),
+            index=pd.PeriodIndex(
+                ["1970-01-02", "1970-01-12", "1970-01-22"], freq="10D"
+            ),
             data=[1, 2, 3],
         )
         computed_series = transform_time_index_series_into_period_index_series(
