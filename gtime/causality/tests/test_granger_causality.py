@@ -1,7 +1,12 @@
 import numpy as np
 import pytest
-import pandas.util.testing as testing
+import pandas as pd
+if pd.__version__ >= '1.0.0':
+    import pandas._testing as testing
+else:
+    import pandas.util.testing as testing
 from gtime.causality import GrangerCausality
+
 
 # Expected values from results of statstools
 @pytest.mark.parametrize(

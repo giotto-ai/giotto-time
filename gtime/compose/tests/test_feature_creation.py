@@ -1,4 +1,8 @@
-import pandas.util.testing as testing
+import pandas as pd
+if pd.__version__ >= '1.0.0':
+    import pandas._testing as testing
+else:
+    import pandas.util.testing as testing
 from numpy.testing import assert_array_equal
 
 from gtime.compose import FeatureCreation

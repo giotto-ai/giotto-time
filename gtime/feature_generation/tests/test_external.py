@@ -1,7 +1,10 @@
 import pandas as pd
 import pytest
 from hypothesis import given, strategies as st
-from pandas.util import testing as testing
+if pd.__version__ >= '1.0.0':
+    import pandas._testing as testing
+else:
+    import pandas.util.testing as testing
 
 from gtime.feature_generation import Constant, PeriodicSeasonal
 from gtime.utils.hypothesis.time_indexes import giotto_time_series

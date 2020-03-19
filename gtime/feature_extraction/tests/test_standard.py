@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd
-import pandas.util.testing as testing
+if pd.__version__ >= '1.0.0':
+    import pandas._testing as testing
+else:
+    import pandas.util.testing as testing
 import pytest
 from hypothesis import given, strategies as st
 
