@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Tuple
 
 import hypothesis.strategies as st
@@ -26,7 +27,7 @@ class TestConstructor:
     @given(st.datetimes(), available_freqs(), st.booleans(), st.text())
     def test_constructor_does_not_fail(
         self,
-        start: pd.datetime,
+        start: datetime,
         freq: pd.Timedelta,
         resample_if_not_equispaced: bool,
         output_name: str,
@@ -41,7 +42,7 @@ class TestConstructor:
     @given(st.datetimes(), available_freqs(), st.booleans(), st.text())
     def test_constructor_initializes_parameters(
         self,
-        start: pd.datetime,
+        start: datetime,
         freq: pd.Timedelta,
         resample_if_not_equispaced: bool,
         output_name: str,
@@ -66,7 +67,7 @@ class TestConstructor:
 class TestToTimeIndexSeries:
     @given(st.lists(st.floats()), st.datetimes(), available_freqs())
     def test_list_as_input(
-        self, input_list: pd.Series, start: pd.datetime, freq: pd.Timedelta,
+        self, input_list: pd.Series, start: datetime, freq: pd.Timedelta,
     ):
         time_series_preparation = TimeSeriesPreparation(start=start, freq=freq)
         computed_time_series = time_series_preparation._to_time_index_series(input_list)
@@ -81,7 +82,7 @@ class TestToTimeIndexSeries:
         available_freqs(),
     )
     def test_array_as_input(
-        self, input_array: np.ndarray, start: pd.datetime, freq: pd.Timedelta,
+        self, input_array: np.ndarray, start: datetime, freq: pd.Timedelta,
     ):
         time_series_preparation = TimeSeriesPreparation(start=start, freq=freq)
         computed_time_series = time_series_preparation._to_time_index_series(
@@ -94,7 +95,7 @@ class TestToTimeIndexSeries:
 
     @given(series_with_period_index(), st.datetimes(), available_freqs())
     def test_period_index_series_unchanged(
-        self, period_index_series: pd.Series, start: pd.datetime, freq: pd.Timedelta,
+        self, period_index_series: pd.Series, start: datetime, freq: pd.Timedelta,
     ):
         time_series_preparation = TimeSeriesPreparation(start=start, freq=freq)
         computed_time_series = time_series_preparation._to_time_index_series(
@@ -104,7 +105,7 @@ class TestToTimeIndexSeries:
 
     @given(series_with_datetime_index(), st.datetimes(), available_freqs())
     def test_datetime_index_series_unchanged(
-        self, datetime_index_series: pd.Series, start: pd.datetime, freq: pd.Timedelta,
+        self, datetime_index_series: pd.Series, start: datetime, freq: pd.Timedelta,
     ):
         time_series_preparation = TimeSeriesPreparation(start=start, freq=freq)
         computed_time_series = time_series_preparation._to_time_index_series(
@@ -114,7 +115,7 @@ class TestToTimeIndexSeries:
 
     @given(series_with_timedelta_index(), st.datetimes(), available_freqs())
     def test_timedelta_index_series_unchanged(
-        self, timedelta_index_series: pd.Series, start: pd.datetime, freq: pd.Timedelta,
+        self, timedelta_index_series: pd.Series, start: datetime, freq: pd.Timedelta,
     ):
         time_series_preparation = TimeSeriesPreparation(start=start, freq=freq)
         computed_time_series = time_series_preparation._to_time_index_series(
@@ -130,7 +131,7 @@ class TestToTimeIndexSeries:
 
     @given(series_with_period_index(), st.datetimes(), available_freqs())
     def test_period_index_dataframe_unchanged(
-        self, period_index_series: pd.Series, start: pd.datetime, freq: pd.Timedelta,
+        self, period_index_series: pd.Series, start: datetime, freq: pd.Timedelta,
     ):
         period_index_dataframe = pd.DataFrame(period_index_series)
         time_series_preparation = TimeSeriesPreparation(start=start, freq=freq)
@@ -141,7 +142,7 @@ class TestToTimeIndexSeries:
 
     @given(series_with_datetime_index(), st.datetimes(), available_freqs())
     def test_datetime_index_dataframe_unchanged(
-        self, datetime_index_series: pd.Series, start: pd.datetime, freq: pd.Timedelta,
+        self, datetime_index_series: pd.Series, start: datetime, freq: pd.Timedelta,
     ):
         datetime_index_dataframe = pd.DataFrame(datetime_index_series)
         time_series_preparation = TimeSeriesPreparation(start=start, freq=freq)
@@ -152,7 +153,7 @@ class TestToTimeIndexSeries:
 
     @given(series_with_timedelta_index(), st.datetimes(), available_freqs())
     def test_timedelta_index_dataframe_unchanged(
-        self, timedelta_index_series: pd.Series, start: pd.datetime, freq: pd.Timedelta,
+        self, timedelta_index_series: pd.Series, start: datetime, freq: pd.Timedelta,
     ):
         timedelta_index_dataframe = pd.DataFrame(timedelta_index_series)
         time_series_preparation = TimeSeriesPreparation(start=start, freq=freq)
@@ -167,11 +168,7 @@ class TestToEquispacedTimeSeries:
         series_with_period_index(), st.datetimes(), available_freqs(), st.text(),
     )
     def test_with_resample_false(
-        self,
-        series: pd.Series,
-        start: pd.datetime,
-        freq: pd.Timedelta,
-        output_name: str,
+        self, series: pd.Series, start: datetime, freq: pd.Timedelta, output_name: str,
     ):
         time_series_preparation = TimeSeriesPreparation(
             start=start,
@@ -184,11 +181,7 @@ class TestToEquispacedTimeSeries:
 
     @given(series_with_period_index(), st.datetimes(), available_freqs(), st.text())
     def test_with_resample_true(
-        self,
-        series: pd.Series,
-        start: pd.datetime,
-        freq: pd.Timedelta,
-        output_name: str,
+        self, series: pd.Series, start: datetime, freq: pd.Timedelta, output_name: str,
     ):
         time_series_preparation = TimeSeriesPreparation(
             start=start,
@@ -251,7 +244,7 @@ class TestTransform:
     def test_list_as_input(
         self,
         input_list: pd.Series,
-        start: pd.datetime,
+        start: datetime,
         freq: pd.Timedelta,
         output_name: str,
     ):
@@ -272,7 +265,7 @@ class TestTransform:
     def test_array_as_input(
         self,
         input_array: np.ndarray,
-        start: pd.datetime,
+        start: datetime,
         freq: pd.Timedelta,
         output_name: str,
     ):
@@ -288,7 +281,7 @@ class TestTransform:
     def test_period_index_as_input(
         self,
         period_index_series: pd.Series,
-        start: pd.datetime,
+        start: datetime,
         freq: pd.Timedelta,
         output_name: str,
     ):
@@ -303,7 +296,7 @@ class TestTransform:
     def test_datetime_index_as_input(
         self,
         datetime_index_series: pd.Series,
-        start: pd.datetime,
+        start: datetime,
         freq: pd.Timedelta,
         output_name: str,
     ):
@@ -321,7 +314,7 @@ class TestTransform:
     def test_timedelta_index_as_input(
         self,
         timedelta_index_series: pd.Series,
-        start: pd.datetime,
+        start: datetime,
         freq: pd.Timedelta,
         output_name: str,
     ):

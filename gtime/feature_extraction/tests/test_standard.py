@@ -1,10 +1,20 @@
 import numpy as np
 import pandas as pd
-import pandas.util.testing as testing
+if pd.__version__ >= '1.0.0':
+    import pandas._testing as testing
+else:
+    import pandas.util.testing as testing
 import pytest
 from hypothesis import given, strategies as st
 
-from gtime.feature_extraction import Shift, MovingAverage, Exogenous, Polynomial, CustomFeature, MovingCustomFunction
+from gtime.feature_extraction import (
+    Shift,
+    MovingAverage,
+    Exogenous,
+    Polynomial,
+    CustomFeature,
+    MovingCustomFunction,
+)
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
 
 df = pd.DataFrame.from_dict({"x": [0, 1, 2, 3, 4, 5]})
@@ -389,7 +399,6 @@ class TestMovingCustomFunction:
 
 def test_custom_function():
     f = lambda x: x + 1
-    df_apply = df.apply(f).rename(columns={'x': 'x__CustomFeature'})
+    df_apply = df.apply(f).rename(columns={"x": "x__CustomFeature"})
     cf = CustomFeature(f)
     testing.assert_equal(df_apply, cf.fit_transform(df))
-

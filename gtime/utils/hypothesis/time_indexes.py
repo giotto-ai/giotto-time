@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, Dict, Union, Iterable
 
 import hypothesis.strategies as st
@@ -16,7 +17,7 @@ from .utils import (
     expected_end_date_from,
 )
 
-IndexRangeArgs = Dict[str, Union[pd.datetime, int, pd.Timedelta]]
+IndexRangeArgs = Dict[str, Union[datetime, int, pd.Timedelta]]
 
 string_freqs = ["B", "D", "W", "M", "Q", "A", "Y", "H", "T", "S"]
 pandas_range_params = ["start", "end", "periods", "freq"]
@@ -49,8 +50,8 @@ def giotto_time_series(
 @st.composite
 def series_with_period_index(
     draw,
-    start: Optional[pd.datetime] = None,
-    end: Optional[pd.datetime] = None,
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
     min_length: int = 0,
     max_length: int = 1000,
     allow_nan: bool = True,
@@ -61,8 +62,8 @@ def series_with_period_index(
     Parameters
     ----------
     draw
-    start : ``pd.datetime``, optional, (default=None)
-    end : ``pd.datetime``, optional, (default=None)
+    start : ``datetime``, optional, (default=None)
+    end : ``datetime``, optional, (default=None)
     min_length : ``int``, optional, (default=0)
     max_length : ``int``, optional, (default=None)
     allow_nan : ``bool``, optional, (default=True)
@@ -92,8 +93,8 @@ def series_with_period_index(
 @st.composite
 def series_with_datetime_index(
     draw,
-    start: Optional[pd.datetime] = None,
-    end: Optional[pd.datetime] = None,
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
     min_length: int = 0,
     max_length: int = 1000,
     allow_nan: bool = True,
@@ -104,8 +105,8 @@ def series_with_datetime_index(
     Parameters
     ----------
     draw
-    start : ``pd.datetime``, optional, (default=None)
-    end : ``pd.datetime``, optional, (default=None)
+    start : ``datetime``, optional, (default=None)
+    end : ``datetime``, optional, (default=None)
     min_length : ``int``, optional, (default=0)
     max_length : ``int``, optional, (default=1000)
     allow_nan : ``bool``, optional, (default=True)
@@ -178,8 +179,8 @@ def series_with_timedelta_index(
 @st.composite
 def period_indexes(
     draw,
-    start: Optional[pd.datetime] = None,
-    end: Optional[pd.datetime] = None,
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
     min_length: int = 0,
     max_length: int = 1000,
 ):
@@ -188,8 +189,8 @@ def period_indexes(
     Parameters
     ----------
     draw
-    start : ``pd.datetime``, optional, (default=None)
-    end : ``pd.datetime``, optional, (default=None)
+    start : ``datetime``, optional, (default=None)
+    end : ``datetime``, optional, (default=None)
     min_length : ``int``, optional, (default=0)
     max_length : ``int``, optional, (default=1000)
 
@@ -213,8 +214,8 @@ def period_indexes(
 @st.composite
 def datetime_indexes(
     draw,
-    start: Optional[pd.datetime] = None,
-    end: Optional[pd.datetime] = None,
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
     min_length: int = 0,
     max_length: int = 1000,
 ):
@@ -223,8 +224,8 @@ def datetime_indexes(
     Parameters
     ----------
     draw
-    start : ``pd.datetime``, optional, (default=None)
-    end : ``pd.datetime``, optional, (default=None)
+    start : ``datetime``, optional, (default=None)
+    end : ``datetime``, optional, (default=None)
     min_length : ``int``, optional, (default=0)
     max_length : ``int``, default: ``1000``
 
@@ -277,19 +278,19 @@ def timedelta_indexes(
 
 
 def pair_of_ordered_dates(
-    start: Optional[pd.datetime] = None, end: Optional[pd.datetime] = None
+    start: Optional[datetime] = None, end: Optional[datetime] = None
 ):
     """ Returns an hypothesis strategy that generates a pair of ordered
-    pd.datetime. Useful to create a Pandas index
+    datetime. Useful to create a Pandas index
 
     Parameters
     ----------
-    start : ``pd.datetime``, optional, (default=None)
-    end : ``pd.datetime``, optional, (default=None)
+    start : ``datetime``, optional, (default=None)
+    end : ``datetime``, optional, (default=None)
 
     Returns
     -------
-    LazyStrategy that generates Tuple[pd.datetime, pd.datetime]
+    LazyStrategy that generates Tuple[datetime, datetime]
     """
     start, end = initialize_start_date_end_date(start, end)
 
@@ -307,8 +308,8 @@ def pair_of_ordered_timedeltas(
 
     Parameters
     ----------
-    start : ``pd.datetime``, optional, (default=None)
-    end : ``pd.datetime``, optional, (default=None)
+    start : ``datetime``, optional, (default=None)
+    end : ``datetime``, optional, (default=None)
 
     Returns
     -------
@@ -370,8 +371,8 @@ def available_freqs(draw) -> pd.Timedelta:
 @st.composite
 def period_range_args_from(
     draw,
-    start: pd.datetime,
-    end: pd.datetime,
+    start: datetime,
+    end: datetime,
     min_length: int,
     max_length: int,
     arg_to_remove: Optional[str] = None,
@@ -385,8 +386,8 @@ def period_range_args_from(
     Parameters
     ----------
     draw
-    start : ``pd.datetime``, required
-    end : ``pd.datetime``, required
+    start : ``datetime``, required
+    end : ``datetime``, required
     min_length : ``int``, required
     max_length : ``int``, required
     arg_to_remove : ``str``, optional, (default=None)
@@ -464,8 +465,8 @@ def compute_period_range(period_range_args: IndexRangeArgs) -> pd.PeriodIndex:
 @st.composite
 def date_range_args_from(
     draw,
-    start: pd.datetime,
-    end: pd.datetime,
+    start: datetime,
+    end: datetime,
     min_length: int,
     max_length: int,
     arg_to_remove: Optional[str] = None,
@@ -479,8 +480,8 @@ def date_range_args_from(
     Parameters
     ----------
     draw
-    start : ``pd.datetime``, required
-    end : ``pd.datetime``, required
+    start : ``datetime``, required
+    end : ``datetime``, required
     min_length: ``int``, required
     max_length : ``int``, required
     arg_to_remove: ``str``, optional, (default=None)
@@ -577,8 +578,8 @@ def timedelta_range_args_from(
     Parameters
     ----------
     draw
-    start : pd.datetime, required
-    end : pd.datetime, required
+    start : datetime, required
+    end : datetime, required
     min_length : int, required
     max_length : int, required
     arg_to_remove: str, optional, (default=None)
@@ -662,8 +663,8 @@ def _range_args_are_correct(
     range_args: IndexRangeArgs,
     min_length: int = 0,
     max_length: int = 1000,
-    min_start: Union[pd.Timedelta, pd.datetime] = None,
-    max_end: Union[pd.Timedelta, pd.datetime] = None,
+    min_start: Union[pd.Timedelta, datetime] = None,
+    max_end: Union[pd.Timedelta, datetime] = None,
 ) -> bool:
     """Checks if range args are correct.
 
@@ -672,8 +673,8 @@ def _range_args_are_correct(
     range_args: ``IndexRangeArgs``, required
     min_length : ``int``, optional, (default=0)
     max_length : ``int``, optional, (default=1000)
-    min_start : ``Union[pd.Timedelta, pd.datetime]``, optional, (default=None)
-    max_end : ``Union[pd.Timedelta, pd.datetime]``, optional, (default=None)
+    min_start : ``Union[pd.Timedelta, datetime]``, optional, (default=None)
+    max_end : ``Union[pd.Timedelta, datetime]``, optional, (default=None)
 
     Returns
     -------
