@@ -106,7 +106,6 @@ class SeasonalNaiveModel(NaiveModel):
         2012-01-01  0.300248  0.782749  0.990472  0.300248  0.782749
     """
 
-
     def __init__(self, seasonal_length: int):
 
         super().__init__()
@@ -131,8 +130,10 @@ class SeasonalNaiveModel(NaiveModel):
 
         x_freq = X.index.freq
         seasonal_td = pd.Timedelta(self.seasonal_length * x_freq.n, x_freq.name)
-        self.season_ = X.loc[X.index.max()-seasonal_td:]
-        self.season_ = self.season_.iloc[-self.seasonal_length:] # TODO think of a better way to get a non-inclusive index
+        self.season_ = X.loc[X.index.max() - seasonal_td :]
+        self.season_ = self.season_.iloc[
+            -self.seasonal_length :
+        ]  # TODO think of a better way to get a non-inclusive index
         super().fit(X, y)
 
         return self
@@ -162,7 +163,9 @@ class SeasonalNaiveModel(NaiveModel):
         time_diff = X.index.to_timestamp() - self.season_.index.max().to_timestamp()
         len_s = len(self.season_)
         seasonal_pos = time_diff.days.values % len_s
-        y_pred = np.squeeze([self._season_roll_(x, self._horizon_) for x in seasonal_pos], axis=2)
+        y_pred = np.squeeze(
+            [self._season_roll_(x, self._horizon_) for x in seasonal_pos], axis=2
+        )
         predictions = pd.DataFrame(data=y_pred, index=X.index, columns=self._y_columns_)
 
         return predictions
@@ -189,10 +192,15 @@ class SeasonalNaiveModel(NaiveModel):
         tail = horizon - len_s * (cycles + 1) + start
         tail = tail % len_s if tail >= len_s else tail
         if tail <= 0 and cycles == 0:
-            return season.iloc[start:start + horizon].to_numpy()
+            return season.iloc[start : start + horizon].to_numpy()
         else:
             return np.concatenate(
-                (season.iloc[start:, :], np.tile(season, (cycles, 1)), season.iloc[:tail, :]))
+                (
+                    season.iloc[start:, :],
+                    np.tile(season, (cycles, 1)),
+                    season.iloc[:tail, :],
+                )
+            )
 
 
 class DriftModel(NaiveModel):
@@ -265,7 +273,12 @@ class DriftModel(NaiveModel):
         """
 
         check_is_fitted(self)
-        y_pred = np.transpose(np.squeeze([X.values + i * self.drift_.values for i in range(self._horizon_)], axis=2))
+        y_pred = np.transpose(
+            np.squeeze(
+                [X.values + i * self.drift_.values for i in range(self._horizon_)],
+                axis=2,
+            )
+        )
         predictions = pd.DataFrame(data=y_pred, index=X.index, columns=self._y_columns_)
 
         return predictions
@@ -347,8 +360,9 @@ class AverageModel(NaiveModel):
         predictions = pd.DataFrame(data=np.nan, columns=self._y_columns_, index=X.index)
 
         for i in range(len(X)):
-            predictions.iloc[i, :] = (sum_train + X.iloc[i].to_numpy()) / (self._horizon_ + i + 1)
+            predictions.iloc[i, :] = (sum_train + X.iloc[i].to_numpy()) / (
+                self._horizon_ + i + 1
+            )
             sum_train += X.iloc[i].values
 
         return predictions
-

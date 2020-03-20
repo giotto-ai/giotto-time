@@ -31,7 +31,9 @@ class NaiveForecastModel(TimeSeriesForecastingModel):
     """
 
     def __init__(self, horizon: int):
-        features = [('s1', Shift(0), make_column_selector()),]
+        features = [
+            ("s1", Shift(0), make_column_selector()),
+        ]
         super().__init__(features=features, horizon=horizon, model=NaiveModel())
 
 
@@ -63,7 +65,9 @@ class AverageForecastModel(TimeSeriesForecastingModel):
     """
 
     def __init__(self, horizon: int):
-        features = [('s1', Shift(0), make_column_selector()),]
+        features = [
+            ("s1", Shift(0), make_column_selector()),
+        ]
         super().__init__(features=features, horizon=horizon, model=AverageModel())
 
 
@@ -97,8 +101,14 @@ class SeasonalNaiveForecastModel(TimeSeriesForecastingModel):
     """
 
     def __init__(self, horizon: int, seasonal_length: int):
-        features = [('s1', Shift(0), make_column_selector()),]
-        super().__init__(features=features, horizon=horizon, model=SeasonalNaiveModel(seasonal_length))
+        features = [
+            ("s1", Shift(0), make_column_selector()),
+        ]
+        super().__init__(
+            features=features,
+            horizon=horizon,
+            model=SeasonalNaiveModel(seasonal_length),
+        )
 
 
 class DriftForecastModel(TimeSeriesForecastingModel):
@@ -129,23 +139,22 @@ class DriftForecastModel(TimeSeriesForecastingModel):
         2012-01-01  0.458604  0.457602  0.456600  0.455598  0.454596
 
     """
+
     def __init__(self, horizon: int):
-        features = [('s1', Shift(0), make_column_selector()),]
+        features = [
+            ("s1", Shift(0), make_column_selector()),
+        ]
         super().__init__(features=features, horizon=horizon, model=DriftModel())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import pandas as pd
     import numpy as np
     from gtime.time_series_models import DriftForecastModel
-    idx = pd.period_range(start='2011-01-01', end='2012-01-01')
+
+    idx = pd.period_range(start="2011-01-01", end="2012-01-01")
     np.random.seed(0)
-    df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
+    df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=["1"])
     model = DriftForecastModel(horizon=5)
     model.fit(df)
     model.predict()
-
-
-
-
-

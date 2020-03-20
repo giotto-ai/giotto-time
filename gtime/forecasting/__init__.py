@@ -13,8 +13,8 @@ __all__ = [
     "GARFF",
     "TrendForecaster",
     "HedgeForecaster",
-    'NaiveModel',
-    'SeasonalNaiveModel',
-    'DriftModel',
-    'AverageModel'
+    "NaiveModel",
+    "SeasonalNaiveModel",
+    "DriftModel",
+    "AverageModel",
 ]

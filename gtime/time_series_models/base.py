@@ -52,6 +52,7 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
     2000-01-01 00:00:19  0.801922  0.178843  0.518739
 
     """
+
     def __init__(self, features: List[Tuple], horizon: int, model: RegressorMixin):
         self.feature_creation = FeatureCreation(features)
         self.horizon = horizon

@@ -32,7 +32,7 @@ class AR(TimeSeriesForecastingModel):
     2000-01-01 00:00:19 -0.107707  0.052031 -0.105526
     """
 
-    def __init__(self, p: int, horizon: int, column_name: str = 'time_series'):
-        features = [tuple((f's{i}', Shift(i), [column_name])) for i in range(1, p+1)]
+    def __init__(self, p: int, horizon: int, column_name: str = "time_series"):
+        features = [tuple((f"s{i}", Shift(i), [column_name])) for i in range(1, p + 1)]
         model = GAR(LinearRegression())
         super().__init__(features=features, horizon=horizon, model=model)
