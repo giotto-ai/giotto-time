@@ -108,6 +108,7 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
 
     def _create_X_y_feature_matrices(self, X, y=None):
         feature_X = self.feature_creation.fit_transform(X, y)
+
         feature_y = horizon_shift(X, horizon=self.horizon)
         return feature_X, feature_y
 
