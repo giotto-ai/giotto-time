@@ -4,7 +4,7 @@ from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_is_fitted
 
 
-class NaiveModel(BaseEstimator, RegressorMixin):
+class NaiveForecaster(BaseEstimator, RegressorMixin):
 
     """Naïve model, all predicted values are equal to the most recent available observation.
 
@@ -13,13 +13,13 @@ class NaiveModel(BaseEstimator, RegressorMixin):
     >>> import pandas as pd
     >>> import numpy as np
     >>> from gtime.model_selection import horizon_shift, FeatureSplitter
-    >>> from gtime.forecasting import NaiveModel
+    >>> from gtime.forecasting import NaiveForecaster
     >>> idx = pd.period_range(start='2011-01-01', end='2012-01-01')
     >>> np.random.seed(1)
     >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
     >>> y = horizon_shift(df, horizon=3)
     >>> X_train, y_train, X_test, y_test = FeatureSplitter().transform(df, y)
-    >>> m = NaiveModel()
+    >>> m = NaiveForecaster()
     >>> m.fit(X_train, y_train).predict(X_test)
                          y_1       y_2       y_3
         2011-12-30  0.541559  0.541559  0.541559
@@ -27,7 +27,7 @@ class NaiveModel(BaseEstimator, RegressorMixin):
         2012-01-01  0.636604  0.636604  0.636604
     """
 
-    def fit(self, X: pd.DataFrame, y=None):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame):
 
         """Fit the estimator.
 
@@ -40,7 +40,7 @@ class NaiveModel(BaseEstimator, RegressorMixin):
 
         Returns
         -------
-        self : NaiveModel
+        self : NaiveForecaster
             Returns self.
         """
 
@@ -77,7 +77,7 @@ class NaiveModel(BaseEstimator, RegressorMixin):
         return predictions
 
 
-class SeasonalNaiveModel(NaiveModel):
+class SeasonalNaiveForecaster(NaiveForecaster):
     """Seasonal naïve model. The forecast is expected to follow a seasonal pattern of ``seasonal_length`` data points, which is determined by the last ``seasonal_length`` observations of a training dataset available.
 
     Parameters
@@ -90,13 +90,13 @@ class SeasonalNaiveModel(NaiveModel):
     >>> import pandas as pd
     >>> import numpy as np
     >>> from gtime.model_selection import horizon_shift, FeatureSplitter
-    >>> from gtime.forecasting import SeasonalNaiveModel
+    >>> from gtime.forecasting import SeasonalNaiveForecaster
     >>> idx = pd.period_range(start='2011-01-01', end='2012-01-01')
     >>> np.random.seed(1)
     >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
     >>> y = horizon_shift(df, horizon=5)
     >>> X_train, y_train, X_test, y_test = FeatureSplitter().transform(df, y)
-    >>> m = SeasonalNaiveModel(seasonal_length=3)
+    >>> m = SeasonalNaiveForecaster(seasonal_length=3)
     >>> m.fit(X_train, y_train).predict(X_test)
                          y_1       y_2       y_3       y_4       y_5
         2011-12-28  0.990472  0.300248  0.782749  0.990472  0.300248
@@ -111,7 +111,7 @@ class SeasonalNaiveModel(NaiveModel):
         super().__init__()
         self.seasonal_length = seasonal_length
 
-    def fit(self, X: pd.DataFrame, y=None):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame):
         """Stores the seasonal pattern from the last ``self.seasonal_length`` observations
 
         Parameters
@@ -123,7 +123,7 @@ class SeasonalNaiveModel(NaiveModel):
 
         Returns
         -------
-        self : SeasonalNaiveModel
+        self : SeasonalNaiveForecaster
             Returns self.
 
         """
@@ -203,7 +203,7 @@ class SeasonalNaiveModel(NaiveModel):
             )
 
 
-class DriftModel(NaiveModel):
+class DriftForecaster(NaiveForecaster):
 
     """Simple drift model, calculates drift as the difference between the first and the last elements of the train series, divided by the number of periods.
 
@@ -212,13 +212,13 @@ class DriftModel(NaiveModel):
     >>> import pandas as pd
     >>> import numpy as np
     >>> from gtime.model_selection import horizon_shift, FeatureSplitter
-    >>> from gtime.forecasting import DriftModel
+    >>> from gtime.forecasting import DriftForecaster
     >>> idx = pd.period_range(start='2011-01-01', end='2012-01-01')
     >>> np.random.seed(1)
     >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
     >>> y = horizon_shift(df, horizon=5)
     >>> X_train, y_train, X_test, y_test = FeatureSplitter().transform(df, y)
-    >>> m = DriftModel()
+    >>> m = DriftForecaster()
     >>> m.fit(X_train, y_train).predict(X_test)
                          y_1       y_2       y_3       y_4       y_5
         2011-12-28  0.143006  0.142682  0.142359  0.142035  0.141712
@@ -229,7 +229,7 @@ class DriftModel(NaiveModel):
 
     """
 
-    def fit(self, X: pd.DataFrame, y=None):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame):
 
         """Calculates and stores the drift as a difference between the first and the last observations of the train set divided by number of observations.
 
@@ -242,7 +242,7 @@ class DriftModel(NaiveModel):
 
         Returns
         -------
-        self : SeasonalNaiveModel
+        self : SeasonalNaiveForecaster
             Returns self.
 
         """
@@ -284,7 +284,7 @@ class DriftModel(NaiveModel):
         return predictions
 
 
-class AverageModel(NaiveModel):
+class AverageForecaster(NaiveForecaster):
 
     """ Predicts all future data points as an average of all train items and all test items prior to is
 
@@ -293,13 +293,13 @@ class AverageModel(NaiveModel):
     >>> import pandas as pd
     >>> import numpy as np
     >>> from gtime.model_selection import horizon_shift, FeatureSplitter
-    >>> from gtime.forecasting import AverageModel
+    >>> from gtime.forecasting import AverageForecaster
     >>> idx = pd.period_range(start='2011-01-01', end='2012-01-01')
     >>> np.random.seed(1)
     >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
     >>> y = horizon_shift(df, horizon=5)
     >>> X_train, y_train, X_test, y_test = FeatureSplitter().transform(df, y)
-    >>> m = AverageModel()
+    >>> m = AverageForecaster()
     >>> m.fit(X_train, y_train).predict(X_test)
                          y_1       y_2       y_3       y_4       y_5
         2011-12-28  0.510285  0.510285  0.510285  0.510285  0.510285
@@ -311,7 +311,7 @@ class AverageModel(NaiveModel):
 
     """
 
-    def fit(self, X: pd.DataFrame, y=None):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame):
 
         """Stores average of all train data points
 
@@ -324,7 +324,7 @@ class AverageModel(NaiveModel):
 
         Returns
         -------
-        self : SeasonalNaiveModel
+        self : SeasonalNaiveForecaster
             Returns self.
 
         """

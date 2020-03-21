@@ -6,15 +6,15 @@ for dealing with time series data.
 from .gar import GAR, GARFF
 from .trend_models import TrendForecaster
 from .online import HedgeForecaster
-from .simple_models import NaiveModel, SeasonalNaiveModel, DriftModel, AverageModel
+from .simple_models import NaiveForecaster, SeasonalNaiveForecaster, DriftForecaster, AverageForecaster
 
 __all__ = [
     "GAR",
     "GARFF",
     "TrendForecaster",
     "HedgeForecaster",
-    "NaiveModel",
-    "SeasonalNaiveModel",
-    "DriftModel",
-    "AverageModel",
+    "NaiveForecaster",
+    "SeasonalNaiveForecaster",
+    "DriftForecaster",
+    "AverageForecaster",
 ]

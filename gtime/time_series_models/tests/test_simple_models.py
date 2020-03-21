@@ -8,10 +8,10 @@ from gtime.utils.hypothesis.time_indexes import giotto_time_series
 
 
 from gtime.time_series_models import (
-    NaiveForecastModel,
-    SeasonalNaiveForecastModel,
-    AverageForecastModel,
-    DriftForecastModel,
+    Naive,
+    SeasonalNaive,
+    Average,
+    Drift,
 )
 
 
@@ -35,7 +35,7 @@ class TestNaiveForecast:
     @given(x=forecast_input(50))
     def test_fit_predict(self, x):
         df, horizon, _ = x
-        model = NaiveForecastModel(horizon=horizon)
+        model = Naive(horizon=horizon)
         model.fit(df)
         y_pred = model.predict()
         assert y_pred.shape == (horizon, horizon)
@@ -49,7 +49,7 @@ class TestSeasonalNaiveForecast:
     @given(x=forecast_input(50))
     def test_fit_predict(self, x):
         df, horizon, seasonal_length = x
-        model = SeasonalNaiveForecastModel(
+        model = SeasonalNaive(
             horizon=horizon, seasonal_length=seasonal_length
         )
         model.fit(df)
@@ -64,7 +64,7 @@ class TestAverageForecast:
     @given(x=forecast_input(50))
     def test_fit_predict(self, x):
         df, horizon, _ = x
-        model = AverageForecastModel(horizon=horizon)
+        model = Average(horizon=horizon)
         model.fit(df)
         y_pred = model.predict()
         note(y_pred)
@@ -78,7 +78,7 @@ class TestDriftForecast:
     @given(x=forecast_input(50))
     def test_fit_predict(self, x):
         df, horizon, _ = x
-        model = DriftForecastModel(horizon=horizon)
+        model = Drift(horizon=horizon)
         model.fit(df)
         y_pred = model.predict()
         note(y_pred)
