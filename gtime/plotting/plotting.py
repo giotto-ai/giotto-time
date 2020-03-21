@@ -86,7 +86,3 @@ def season_ts(df: pd.DataFrame, cycle, freq=None, polar=False, ax=None):
 #             ax.set_xlabel(str(freq) + ' of ' + cycle)
     return ax
 
-
-def acf_plot(df: pd.DataFrame, max_lag: int):
-
-    acf_ts = acf(df, max_lag)
