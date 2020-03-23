@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from gtime.plotting.preprocessing import seasonal_split, acf
+from gtime.plotting.preprocessing import seasonal_split, acf, pacf
+from scipy.stats import norm
 from matplotlib.axes._axes import Axes
 
 
@@ -82,7 +83,24 @@ def season_ts(df: pd.DataFrame, cycle, freq=None, polar=False, ax=None):
         ax = polar_ts(df_seas, ax=ax)
     else:
         ax = basic_ts(df_seas, ax=ax)
-#         if isinstance(cycle, str):
-#             ax.set_xlabel(str(freq) + ' of ' + cycle)
     return ax
 
+
+def acf_plot(df: pd.DataFrame, max_lags: int = 10, ci: float = 0.05, partial=False, ax=None):
+    x = np.squeeze(df.values)
+    if partial:
+        acfs = pacf(x, max_lags)
+    else:
+        acfs = acf(x, max_lags)
+    print(acfs)
+
+    if ax is None:
+        ax = plt.subplot(111)
+    ax.bar(range(1, max_lags + 1), acfs, 0.05)
+    ci = norm.ppf(1 - ci / 2) / np.sqrt(len(x))
+    print(ci)
+    ax.axhline(ci, color='gray', linestyle='--')
+    ax.axhline(0.0, color='black', linestyle='-')
+    ax.axhline(-ci, color='gray', linestyle='--')
+
+    return ax

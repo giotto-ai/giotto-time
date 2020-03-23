@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from scipy.linalg import toeplitz
 
 
 def seasonal_split(df: pd.DataFrame, cycle='year', freq=None, agg='mean'):
@@ -12,8 +13,6 @@ def seasonal_split(df: pd.DataFrame, cycle='year', freq=None, agg='mean'):
             df['_Series'] = df.index.start_time.year
             if freq == 'D':
                 df['_Season'] = df.index.dayofyear
-            #             elif freq in ['W-SUN', 'W']:
-            #                 df['_Season'] = df.index.start_time.weekofyear
             elif freq == 'M':
                 df['_Season'] = df.index.month
             elif freq in ['Q', 'Q-DEC']:
@@ -50,9 +49,34 @@ def seasonal_split(df: pd.DataFrame, cycle='year', freq=None, agg='mean'):
     return df.set_index(['_Series', '_Season']).unstack(level=0)
 
 
-def acf(df, max_lag=10):
-    s = pd.DataFrame(np.nan, index=range(1, max_lag + 1), columns=df.columns)
-    for i, col in df.iteritems():
-        for j in s.index:
-            s.loc[j, i] = col.autocorr(j)
-    return s
+def acf(x, max_lags=None):
+    n = len(x)
+    if max_lags is None or max_lags > n:
+        max_lags = n
+    x = (x - np.mean(x)) / (np.std(x) * np.sqrt(n))
+
+    if max_lags == n:
+        result = np.correlate(x, x, mode='full')[-n:]
+    else:
+        result = np.correlate(x, x, mode='full')[-n:-n + max_lags + 1]
+    return result
+
+
+def yw(x: np.array, order=1, unbiased=False):
+    n = len(x)
+    r = np.zeros(order + 1, np.float64)
+    r[0] = (x ** 2).sum() / n
+    for k in range(1, order + 1):
+        r[k] = (x[0:-k] * x[k:]).sum() / (n - k * unbiased)
+    R = toeplitz(r[:-1])
+    rho = np.linalg.solve(R, r[1:])
+    return rho
+
+
+def pacf(x, max_lags=1):
+    n = len(x)
+    x = (x - np.mean(x)) / (np.std(x) * np.sqrt(n))
+    pacf = [1.]
+    for k in range(1, max_lags + 1):
+        pacf.append(yw(x, k)[-1])
+    return np.array(pacf)
