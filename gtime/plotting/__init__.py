@@ -1,8 +1,8 @@
-from .plotting import season_ts, subplots, lagplot
+from .plotting import seasonal_plot, subplots, lagplot, acf_plot
 
 __all__ = [
-    "season_ts",
+    "seasonal_plot",
     "subplots",
-    # "acf_plot",
+    "acf_plot",
     "lagplot",
 ]

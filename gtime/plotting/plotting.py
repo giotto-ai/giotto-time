@@ -3,10 +3,12 @@ import pandas as pd
 import numpy as np
 from gtime.plotting.preprocessing import seasonal_split, acf, pacf
 from scipy.stats import norm
-from matplotlib.axes._axes import Axes
 
 
 def lagplot(df: pd.DataFrame, lags):
+
+
+
     if isinstance(lags, int):
         lags = list(range(1, lags + 1))
 
@@ -27,7 +29,8 @@ def lagplot(df: pd.DataFrame, lags):
             axes.label_outer()
             j += 1
         i += 1
-    plt.show()
+    return axes
+    # plt.show()
 
 
 def subplots(df: pd.DataFrame, cycle, freq=None, agg='mean', box=False):
@@ -50,7 +53,7 @@ def subplots(df: pd.DataFrame, cycle, freq=None, agg='mean', box=False):
             axes.set_xticklabels([])
             j += 1
         i += 1
-    plt.show()
+    return axes
 
 
 def plot_fun(df, ax=None):
@@ -77,7 +80,7 @@ def polar_ts(df, ax=None):
     ax.set_xticklabels(df.index)
     return ax
 
-def season_ts(df: pd.DataFrame, cycle, freq=None, polar=False, ax=None):
+def seasonal_plot(df: pd.DataFrame, cycle, freq=None, polar=False, ax=None):
     df_seas = seasonal_split(df, cycle, freq)
     if polar:
         ax = polar_ts(df_seas, ax=ax)
@@ -102,5 +105,4 @@ def acf_plot(df: pd.DataFrame, max_lags: int = 10, ci: float = 0.05, partial=Fal
     ax.axhline(ci, color='gray', linestyle='--')
     ax.axhline(0.0, color='black', linestyle='-')
     ax.axhline(-ci, color='gray', linestyle='--')
-
     return ax

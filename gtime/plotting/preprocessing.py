@@ -50,19 +50,25 @@ def seasonal_split(df: pd.DataFrame, cycle='year', freq=None, agg='mean'):
 
 
 def acf(x, max_lags=None):
-    n = len(x)
+    n = x.size
     if max_lags is None or max_lags > n:
         max_lags = n
-    x = (x - np.mean(x)) / (np.std(x) * np.sqrt(n))
-
+    if np.std(x) == 0:
+        x = x - np.mean(x)
+    else:
+        x = (x - np.mean(x)) / (np.std(x) * np.sqrt(n))
     if max_lags == n:
         result = np.correlate(x, x, mode='full')[-n:]
     else:
-        result = np.correlate(x, x, mode='full')[-n:-n + max_lags + 1]
+        result = np.correlate(x, x, mode='full')[-n:-n + max_lags]
     return result
 
 
 def yw(x: np.array, order=1, unbiased=False):
+
+    if order == 0:
+        return np.array([1.0])
+
     n = len(x)
     r = np.zeros(order + 1, np.float64)
     r[0] = (x ** 2).sum() / n
@@ -76,7 +82,5 @@ def yw(x: np.array, order=1, unbiased=False):
 def pacf(x, max_lags=1):
     n = len(x)
     x = (x - np.mean(x)) / (np.std(x) * np.sqrt(n))
-    pacf = [1.]
-    for k in range(1, max_lags + 1):
-        pacf.append(yw(x, k)[-1])
-    return np.array(pacf)
+    pacf = np.array([yw(x, i)[-1] for i in range(min(n, max_lags))])
+    return pacf
