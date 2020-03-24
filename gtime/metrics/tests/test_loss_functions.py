@@ -876,6 +876,16 @@ class TestGMAE:
 
         assert expected_gmae == gmae_value
 
+    def test_zero_in_difference_gmae(self):
+        #if absolute difference is zero then GMAE is zero
+        y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
+        y_pred = pd.DataFrame([-1, 4, 5, 10, 4, 1])
+
+        gmae_value = np.round(gmae(y_true, y_pred), decimals=2)
+        expected_gmae = 0
+
+        assert expected_gmae == gmae_value
+
     @given(
         arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
         arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
