@@ -407,8 +407,4 @@ def gmae(
     _check_input(y_true, y_pred)
 
     absolute_difference = np.abs(y_pred - y_true)
-    if (0 in absolute_difference):
-        return 0
-    else:
-        gmae_value = gmean(absolute_difference)
-        return gmae_value
+    return 0 if 0 in absolute_difference else gmean(absolute_difference)

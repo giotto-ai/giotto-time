@@ -822,11 +822,7 @@ class TestGMAE:
         y_pred = np.array(y_pred)
 
         absolute_difference = np.abs(y_true - y_pred)
-        if (0 in absolute_difference):
-            return 0
-        else:
-            gmae = gmean(absolute_difference)
-            return gmae
+        return 0 if 0 in absolute_difference else gmean(absolute_difference)
 
     def test_wrong_vector_length(self):
         y_true = np.random.random(5)
