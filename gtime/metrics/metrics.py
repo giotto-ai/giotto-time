@@ -2,6 +2,7 @@ from typing import Union, List
 
 import numpy as np
 import pandas as pd
+from scipy.stats import gmean
 
 
 def _check_input(y_true: np.ndarray, y_pred: np.ndarray) -> None:
@@ -305,7 +306,8 @@ def mae(
     y_true: Union[pd.DataFrame, List, np.ndarray],
     y_pred: Union[pd.DataFrame, List, np.ndarray],
 ) -> float:
-    """Compute the Mean Absolute Error(also called, Mean Absolute Deviation(MAD)) between two vectors.
+    """Compute the Mean Absolute Error(also called, Mean Absolute Deviation(MAD) or Mean Ratio) 
+    between two vectors.
 
     Parameters
     ----------
@@ -371,3 +373,42 @@ def mape(
     if np.isnan(mape_value):
         raise ValueError("MAPE can not be calculated due to Zero/Zero")
     return mape_value * 100
+
+
+def gmae(
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+) -> float:
+    """Compute the Geometric Mean Absolute Error between two vectors.
+
+    Parameters
+    ----------
+    y_true : array-like, shape (length, 1), required
+        The first vector.
+
+    y_pred : array-like, shape (length, 1), required
+        The second vector.
+
+    Returns
+    -------
+    gmae_value : float
+        The geometric mean absolute error between the two vectors.
+
+    Examples
+    --------
+    >>> from gtime.metrics import gmae
+    >>> y_true = [0, 1, 2, 3, 6, 5]
+    >>> y_pred = [-1, 4, 5, 10, 4, 1]
+    >>> gmae(y_true, y_pred)
+    2.82
+
+    """
+    y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
+    _check_input(y_true, y_pred)
+
+    absolute_difference = np.abs(y_pred - y_true)
+    if (0 in absolute_difference):
+        return 0
+    else:
+        gmae_value = gmean(absolute_difference)
+        return gmae_value
