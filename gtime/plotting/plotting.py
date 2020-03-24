@@ -7,8 +7,6 @@ from scipy.stats import norm
 
 def lagplot(df: pd.DataFrame, lags):
 
-
-
     if isinstance(lags, int):
         lags = list(range(1, lags + 1))
 
@@ -95,14 +93,22 @@ def acf_plot(df: pd.DataFrame, max_lags: int = 10, ci: float = 0.05, partial=Fal
         acfs = pacf(x, max_lags)
     else:
         acfs = acf(x, max_lags)
-    print(acfs)
 
     if ax is None:
         ax = plt.subplot(111)
-    ax.bar(range(1, max_lags + 1), acfs, 0.05)
+
+    ax.bar(range(0, max_lags), acfs, 0.05)
     ci = norm.ppf(1 - ci / 2) / np.sqrt(len(x))
-    print(ci)
     ax.axhline(ci, color='gray', linestyle='--')
     ax.axhline(0.0, color='black', linestyle='-')
     ax.axhline(-ci, color='gray', linestyle='--')
+    ax.set_xlabel('Lags')
+
     return ax
+
+
+
+df_sp = pd.read_csv('https://storage.googleapis.com/l2f-open-models/giotto-time/examples/data/^GSPC.csv') # to replace with a link
+df_close = df_sp.set_index('Date')['Close']
+df_close.index = pd.to_datetime(df_close.index)
+seasonal_plot(df_close, 'year')

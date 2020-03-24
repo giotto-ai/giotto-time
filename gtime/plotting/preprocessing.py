@@ -7,6 +7,7 @@ def seasonal_split(df: pd.DataFrame, cycle='year', freq=None, agg='mean'):
     if freq is None:
         freq = df.index.freqstr
     df = df.resample(freq).agg(agg)
+    col_name = df.columns[0]
 
     if isinstance(cycle, str):
         if cycle == 'year':
@@ -18,7 +19,7 @@ def seasonal_split(df: pd.DataFrame, cycle='year', freq=None, agg='mean'):
             elif freq in ['Q', 'Q-DEC']:
                 df['_Season'] = df.index.quarter
             else:
-                df['_Season'] = df.resample('Y').apply(lambda x: pd.Series(np.arange(1, len(x) + 1))).values
+                df['_Season'] = df[col_name].resample('Y').apply(lambda x: pd.Series(np.arange(1, len(x) + 1))).values
 
         elif cycle == 'quarter':
             df['_Series'] = list(map(lambda x: '_'.join([str(x.year), str(x.quarter)]), df.index))
@@ -75,12 +76,20 @@ def yw(x: np.array, order=1, unbiased=False):
     for k in range(1, order + 1):
         r[k] = (x[0:-k] * x[k:]).sum() / (n - k * unbiased)
     R = toeplitz(r[:-1])
-    rho = np.linalg.solve(R, r[1:])
+
+    try:
+        rho = np.linalg.solve(R, r[1:])
+    except np.linalg.LinAlgError:
+        print('Solution is not defined for singular matrices')
+        rho = [np.nan]
     return rho
 
 
 def pacf(x, max_lags=1):
     n = len(x)
-    x = (x - np.mean(x)) / (np.std(x) * np.sqrt(n))
+    if np.std(x) == 0:
+        x = x - np.mean(x)
+    else:
+        x = (x - np.mean(x)) / (np.std(x) * np.sqrt(n))
     pacf = np.array([yw(x, i)[-1] for i in range(min(n, max_lags))])
     return pacf
