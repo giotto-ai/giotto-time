@@ -7,7 +7,12 @@ import hypothesis.strategies as st
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
 from gtime.model_selection import horizon_shift, FeatureSplitter
 
-from gtime.forecasting import NaiveModel, SeasonalNaiveModel, DriftModel, AverageModel
+from gtime.forecasting import (
+    NaiveForecaster,
+    SeasonalNaiveForecaster,
+    DriftForecaster,
+    AverageForecaster,
+)
 
 
 @st.composite
@@ -36,16 +41,16 @@ class SimplePipelineTest:
         self.y_pred = self.model.predict(X_test)
 
     def test_fit_horizon(self):
-        assert self.model._horizon_ == len(self.X_test)
+        assert self.model.horizon_ == len(self.X_test)
 
     def test_predict_shape(self):
-        assert self.y_pred.shape == (self.model._horizon_, self.model._horizon_)
+        assert self.y_pred.shape == (self.model.horizon_, self.model.horizon_)
 
 
 class TestNaiveModel(SimplePipelineTest):
     @given(data=forecast_input(50))
     def setup(self, data):
-        super().setup(data, NaiveModel())
+        super().setup(data, NaiveForecaster())
 
     def test_predict_df(self):
         horizon = len(self.X_test)
@@ -56,15 +61,16 @@ class TestNaiveModel(SimplePipelineTest):
 
 
 class TestSeasonalNaiveModel(SimplePipelineTest):
-    @given(
-        data=forecast_input(50), season_length=st.integers(min_value=1, max_value=100)
-    )
+    @given(data=forecast_input(50), season_length=st.data())
     def setup(self, data, season_length):
+        season_length = season_length.draw(
+            st.integers(min_value=1, max_value=len(data[0]))
+        )
         self.season_length = season_length
-        super().setup(data, SeasonalNaiveModel(seasonal_length=season_length))
+        super().setup(data, SeasonalNaiveForecaster(seasonal_length=season_length))
 
     def test_predict_seasonality(self):
-        if self.season_length < self.model._horizon_:
+        if self.season_length < self.model.horizon_:
             assert all(
                 self.y_pred.iloc[:, 0] == self.y_pred.iloc[:, self.season_length]
             )
@@ -73,7 +79,7 @@ class TestSeasonalNaiveModel(SimplePipelineTest):
 class TestDriftModel(SimplePipelineTest):
     @given(data=forecast_input(50))
     def setup(self, data):
-        super().setup(data, DriftModel())
+        super().setup(data, DriftForecaster())
 
     def test_predict_drift(self):
         assert pytest.approx(self.y_pred.diff().diff().sum().sum(), 0)
@@ -82,7 +88,7 @@ class TestDriftModel(SimplePipelineTest):
 class TestAverageModel(SimplePipelineTest):
     @given(data=forecast_input(50))
     def setup(self, data):
-        super().setup(data, AverageModel())
+        super().setup(data, AverageForecaster())
 
     def test_predict_difference(self):
         assert pytest.approx(self.y_pred.diff(axis=1).sum().sum(), 0)
