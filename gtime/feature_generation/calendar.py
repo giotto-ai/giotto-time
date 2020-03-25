@@ -1,10 +1,12 @@
 import importlib
+from datetime import datetime
+
+import workalendar
 from typing import Optional, Union, List
 
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-import workalendar
 from sklearn.utils.validation import check_is_fitted
 
 from gtime.base import FeatureMixin, add_class_name
@@ -197,12 +199,12 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
         slacked_start_date_ = self.start_ - slack_days
         slacked_end_date_ = self.end_ + slack_days
 
-        self.slacked_start_date_ = pd.datetime(
+        self.slacked_start_date_ = datetime(
             year=slacked_start_date_.year,
             month=slacked_start_date_.month,
             day=slacked_start_date_.day,
         )
-        self.slacked_end_date_ = pd.datetime(
+        self.slacked_end_date_ = datetime(
             year=slacked_end_date_.year,
             month=slacked_end_date_.month,
             day=slacked_end_date_.day,

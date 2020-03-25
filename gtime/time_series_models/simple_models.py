@@ -2,10 +2,15 @@ from gtime.compose import FeatureCreation
 from sklearn.compose import make_column_selector
 from gtime.feature_extraction import Shift, MovingAverage, MovingCustomFunction
 from gtime.time_series_models import TimeSeriesForecastingModel
-from gtime.forecasting import NaiveModel, SeasonalNaiveModel, DriftModel, AverageModel
+from gtime.forecasting import (
+    NaiveForecaster,
+    SeasonalNaiveForecaster,
+    DriftForecaster,
+    AverageForecaster,
+)
 
 
-class NaiveForecastModel(TimeSeriesForecastingModel):
+class Naive(TimeSeriesForecastingModel):
     """ Naive model pipeline, no feature creation and ``NaiveModel()`` as a model
 
         Parameters
@@ -16,11 +21,11 @@ class NaiveForecastModel(TimeSeriesForecastingModel):
         --------
         >>> import pandas as pd
         >>> import numpy as np
-        >>> from gtime.time_series_models import NaiveForecastModel
+        >>> from gtime.time_series_models import Naive
         >>> idx = pd.period_range(start='2011-01-01', end='2012-01-01')
         >>> np.random.seed(0)
         >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
-        >>> model = NaiveForecastModel(horizon=4)
+        >>> model = Naive(horizon=4)
         >>> model.fit(df)
         >>> model.predict()
                          y_1       y_2       y_3       y_4
@@ -31,13 +36,13 @@ class NaiveForecastModel(TimeSeriesForecastingModel):
     """
 
     def __init__(self, horizon: int):
-        features = FeatureCreation(
-            [('s1', Shift(0), make_column_selector()),
-            ])
-        super().__init__(features=features, horizon=horizon, model=NaiveModel())
+        features = [
+            ("s1", Shift(0), make_column_selector()),
+        ]
+        super().__init__(features=features, horizon=horizon, model=NaiveForecaster())
 
 
-class AverageForecastModel(TimeSeriesForecastingModel):
+class Average(TimeSeriesForecastingModel):
     """ Average model pipeline, no feature creation and ``AverageModel()`` as a model
 
         Parameters
@@ -48,11 +53,11 @@ class AverageForecastModel(TimeSeriesForecastingModel):
         --------
         >>> import pandas as pd
         >>> import numpy as np
-        >>> from gtime.time_series_models import AverageForecastModel
+        >>> from gtime.time_series_models import Average
         >>> idx = pd.period_range(start='2011-01-01', end='2012-01-01')
         >>> np.random.seed(0)
         >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
-        >>> model = AverageForecastModel(horizon=5)
+        >>> model = Average(horizon=5)
         >>> model.fit(df)
         >>> model.predict()
                          y_1       y_2       y_3       y_4       y_5
@@ -65,13 +70,13 @@ class AverageForecastModel(TimeSeriesForecastingModel):
     """
 
     def __init__(self, horizon: int):
-        features = FeatureCreation(
-            [('s1', Shift(0), make_column_selector()),
-            ])
-        super().__init__(features=features, horizon=horizon, model=AverageModel())
+        features = [
+            ("s1", Shift(0), make_column_selector()),
+        ]
+        super().__init__(features=features, horizon=horizon, model=AverageForecaster())
 
 
-class SeasonalNaiveForecastModel(TimeSeriesForecastingModel):
+class SeasonalNaive(TimeSeriesForecastingModel):
     """ Seasonal naive model pipeline, no feature creation and ``SeasonalNaiveModel()`` as a model
 
         Parameters
@@ -84,11 +89,11 @@ class SeasonalNaiveForecastModel(TimeSeriesForecastingModel):
 
         >>> import pandas as pd
         >>> import numpy as np
-        >>> from gtime.time_series_models import SeasonalNaiveForecastModel
+        >>> from gtime.time_series_models import SeasonalNaive
         >>> idx = pd.period_range(start='2011-01-01', end='2012-01-01')
         >>> np.random.seed(0)
         >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
-        >>> model = SeasonalNaiveForecastModel(horizon=5, seasonal_length=4)
+        >>> model = SeasonalNaive(horizon=5, seasonal_length=4)
         >>> model.fit(df)
         >>> model.predict()
 
@@ -101,13 +106,17 @@ class SeasonalNaiveForecastModel(TimeSeriesForecastingModel):
     """
 
     def __init__(self, horizon: int, seasonal_length: int):
-        features = FeatureCreation(
-            [('s1', Shift(0), make_column_selector()),
-            ])
-        super().__init__(features=features, horizon=horizon, model=SeasonalNaiveModel(seasonal_length))
+        features = [
+            ("s1", Shift(0), make_column_selector()),
+        ]
+        super().__init__(
+            features=features,
+            horizon=horizon,
+            model=SeasonalNaiveForecaster(seasonal_length),
+        )
 
 
-class DriftForecastModel(TimeSeriesForecastingModel):
+class Drift(TimeSeriesForecastingModel):
     """ Simple drift model pipeline, no feature creation and ``DriftModel()`` as a model
 
         Parameters
@@ -119,11 +128,11 @@ class DriftForecastModel(TimeSeriesForecastingModel):
 
         >>> import pandas as pd
         >>> import numpy as np
-        >>> from gtime.time_series_models import DriftForecastModel
+        >>> from gtime.time_series_models import Drift
         >>> idx = pd.period_range(start='2011-01-01', end='2012-01-01')
         >>> np.random.seed(0)
         >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
-        >>> model = DriftForecastModel(horizon=5)
+        >>> model = Drift(horizon=5)
         >>> model.fit(df)
         >>> model.predict()
 
@@ -135,25 +144,9 @@ class DriftForecastModel(TimeSeriesForecastingModel):
         2012-01-01  0.458604  0.457602  0.456600  0.455598  0.454596
 
     """
+
     def __init__(self, horizon: int):
-        features = FeatureCreation(
-            [('s1', Shift(0), make_column_selector()),
-            ])
-        super().__init__(features=features, horizon=horizon, model=DriftModel())
-
-
-if __name__ == '__main__':
-    import pandas as pd
-    import numpy as np
-    from gtime.time_series_models import DriftForecastModel
-    idx = pd.period_range(start='2011-01-01', end='2012-01-01')
-    np.random.seed(0)
-    df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
-    model = DriftForecastModel(horizon=5)
-    model.fit(df)
-    model.predict()
-
-
-
-
-
+        features = [
+            ("s1", Shift(0), make_column_selector()),
+        ]
+        super().__init__(features=features, horizon=horizon, model=DriftForecaster())

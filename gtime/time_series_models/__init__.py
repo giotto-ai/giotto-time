@@ -1,9 +1,21 @@
-from .base import TimeSeriesForecastingModel
-from .simple_models import NaiveForecastModel, SeasonalNaiveForecastModel, AverageForecastModel, DriftForecastModel
+"""
+The :mod:`gtime.time_series_models` module contains time series models.
+"""
 
-__all__ = ["TimeSeriesForecastingModel",
-           'NaiveForecastModel',
-           'SeasonalNaiveForecastModel',
-           'AverageForecastModel',
-           'DriftForecastModel',
-           ]
+from .base import TimeSeriesForecastingModel
+from .ar import AR
+from .simple_models import (
+    Naive,
+    SeasonalNaive,
+    Average,
+    Drift,
+)
+
+__all__ = [
+    "TimeSeriesForecastingModel",
+    "AR",
+    "Naive",
+    "SeasonalNaive",
+    "Average",
+    "Drift",
+]

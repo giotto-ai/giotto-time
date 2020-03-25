@@ -1,3 +1,11 @@
+Release 0.2.1
+==============
+
+- Granger causality test added
+- Hedge online algorithm added
+- Update data for the tda example notebook
+- Fix imports
+
 Release 0.2.0
 ==============
 

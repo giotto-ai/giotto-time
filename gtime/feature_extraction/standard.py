@@ -1,8 +1,8 @@
 from typing import Optional, Callable
 
 import pandas as pd
-from sklearn.preprocessing import PolynomialFeatures, FunctionTransformer
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.preprocessing import PolynomialFeatures, FunctionTransformer
 from sklearn.utils.validation import check_is_fitted
 
 from ..base import FeatureMixin, add_class_name
@@ -193,7 +193,7 @@ class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
     >>> from gtime.feature_extraction import MovingCustomFunction
     >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
     >>> mv_custom = MovingCustomFunction(np.max, window_size=2)
-    >>> mv_custom.transform(ts)
+    >>> mv_custom.fit_transform(ts)
        0__MovingCustomFunction
     0                      NaN
     1                      1.0

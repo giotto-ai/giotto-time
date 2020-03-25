@@ -8,7 +8,10 @@ from gtime.utils.hypothesis.time_indexes import giotto_time_series
 
 
 from gtime.time_series_models import (
-    NaiveForecastModel, SeasonalNaiveForecastModel, AverageForecastModel, DriftForecastModel,
+    Naive,
+    SeasonalNaive,
+    Average,
+    Drift,
 )
 
 
@@ -17,36 +20,36 @@ def forecast_input(draw, max_lenth):
     length = draw(st.integers(min_value=4, max_value=max_lenth))
     horizon = draw(st.integers(min_value=1, max_value=length - 1))
     window = draw(st.integers(min_value=1, max_value=length - horizon))
-    df = draw(giotto_time_series(
-                min_length=horizon + window,
-                max_length=max_lenth,
-                allow_nan=False,
-                allow_infinity=False
-            ))
+    df = draw(
+        giotto_time_series(
+            min_length=horizon + window,
+            max_length=max_lenth,
+            allow_nan=False,
+            allow_infinity=False,
+        )
+    )
     return df, horizon, window
 
 
 class TestNaiveForecast:
-
     @given(x=forecast_input(50))
     def test_fit_predict(self, x):
         df, horizon, _ = x
-        model = NaiveForecastModel(horizon=horizon)
+        model = Naive(horizon=horizon)
         model.fit(df)
         y_pred = model.predict()
         assert y_pred.shape == (horizon, horizon)
         res = np.broadcast_to(df.iloc[-horizon:], (horizon, horizon))
-        y_cols = ['y_'+str(x+1) for x in range(horizon)]
+        y_cols = ["y_" + str(x + 1) for x in range(horizon)]
         expected_df = pd.DataFrame(res, index=model.X_test_.index, columns=y_cols)
         testing.assert_frame_equal(y_pred, expected_df)
 
 
 class TestSeasonalNaiveForecast:
-
     @given(x=forecast_input(50))
     def test_fit_predict(self, x):
         df, horizon, seasonal_length = x
-        model = SeasonalNaiveForecastModel(horizon=horizon, seasonal_length=seasonal_length)
+        model = SeasonalNaive(horizon=horizon, seasonal_length=seasonal_length)
         model.fit(df)
         y_pred = model.predict()
         note(y_pred)
@@ -56,11 +59,10 @@ class TestSeasonalNaiveForecast:
 
 
 class TestAverageForecast:
-
     @given(x=forecast_input(50))
     def test_fit_predict(self, x):
         df, horizon, _ = x
-        model = AverageForecastModel(horizon=horizon)
+        model = Average(horizon=horizon)
         model.fit(df)
         y_pred = model.predict()
         note(y_pred)
@@ -71,11 +73,10 @@ class TestAverageForecast:
 
 
 class TestDriftForecast:
-
     @given(x=forecast_input(50))
     def test_fit_predict(self, x):
         df, horizon, _ = x
-        model = DriftForecastModel(horizon=horizon)
+        model = Drift(horizon=horizon)
         model.fit(df)
         y_pred = model.predict()
         note(y_pred)

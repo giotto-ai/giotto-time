@@ -1,8 +1,8 @@
-import pytest
-from hypothesis import given, assume
-import pandas as pd
-from pandas.testing import assert_series_equal
 import numpy as np
+import pandas as pd
+import pytest
+from hypothesis import given
+from pandas.testing import assert_series_equal
 
 from gtime.utils.hypothesis.time_indexes import (
     period_indexes,

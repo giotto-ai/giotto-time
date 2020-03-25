@@ -1,7 +1,7 @@
 from typing import Callable
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from scipy.optimize import minimize
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.metrics import mean_squared_error

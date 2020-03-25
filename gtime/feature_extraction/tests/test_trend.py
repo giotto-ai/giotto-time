@@ -1,7 +1,7 @@
 import numpy as np
+import pandas as pd
 
 from gtime.feature_extraction import Detrender
-import pandas as pd
 
 
 def test_polynomial_detrend():

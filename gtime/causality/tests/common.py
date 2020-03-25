@@ -1,7 +1,11 @@
 from typing import List
 
 import pandas as pd
-from pandas.util import testing as testing
+
+if pd.__version__ >= "1.0.0":
+    import pandas._testing as testing
+else:
+    import pandas.util.testing as testing
 
 
 def make_df_from_expected_shifts(expected_shifts: List[int]) -> pd.DataFrame:

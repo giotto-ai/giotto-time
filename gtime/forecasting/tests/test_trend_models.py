@@ -1,6 +1,11 @@
 import numpy as np
 import pandas as pd
-from pandas.util import testing as testing
+
+if pd.__version__ >= "1.0.0":
+    import pandas._testing as testing
+else:
+    import pandas.util.testing as testing
+
 
 from gtime.forecasting import TrendForecaster
 
