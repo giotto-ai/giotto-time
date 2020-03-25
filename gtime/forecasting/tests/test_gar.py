@@ -2,7 +2,8 @@ import random
 
 import numpy as np
 import pandas as pd
-if pd.__version__ >= '1.0.0':
+
+if pd.__version__ >= "1.0.0":
     import pandas._testing as testing
 else:
     import pandas.util.testing as testing
