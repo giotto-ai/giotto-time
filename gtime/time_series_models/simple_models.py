@@ -2,7 +2,12 @@ from gtime.compose import FeatureCreation
 from sklearn.compose import make_column_selector
 from gtime.feature_extraction import Shift, MovingAverage, MovingCustomFunction
 from gtime.time_series_models import TimeSeriesForecastingModel
-from gtime.forecasting import NaiveForecaster, SeasonalNaiveForecaster, DriftForecaster, AverageForecaster
+from gtime.forecasting import (
+    NaiveForecaster,
+    SeasonalNaiveForecaster,
+    DriftForecaster,
+    AverageForecaster,
+)
 
 
 class Naive(TimeSeriesForecastingModel):

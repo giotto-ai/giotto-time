@@ -1,5 +1,6 @@
 from typing import List, Tuple
 
+import sklearn
 from sklearn.base import BaseEstimator, RegressorMixin
 import pandas as pd
 from sklearn.linear_model import LinearRegression
@@ -53,13 +54,19 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
 
     """
 
-    def __init__(self, features: List[Tuple], horizon: int, model: RegressorMixin, cache_features: bool = False):
+    def __init__(
+        self,
+        features: List[Tuple],
+        horizon: int,
+        model: RegressorMixin,
+        cache_features: bool = False,
+    ):
         self.features = features
         self.horizon = horizon
         self.model = model
         self.cache_features = cache_features
 
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame = None):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame = None, only_model: bool = False):
         """ Fit function for a time series forecasting model.
 
         It does the following:
@@ -73,19 +80,23 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
             input time series
         y : pd.DataFrame, optional, default: ``None``
             added for compatibility reasons with ``sklearn.compose.ColumnTransformer``
+        only_model: bool, optional, default: ``False``
+            if True only th model part is run, not the feature part. It is useful if the feature computation is expensive.
 
         Returns
         -------
         self
         """
-        X_train, y_train, X_test = self._compute_train_test_matrices(X, y)
-        if self.cache_features:
-            self.X_train_ = X_train
-            self.y_train_ = y_train
+        if not only_model:
+            X_train, y_train, X_test = self._compute_train_test_matrices(X, y)
+        elif not self.cache_features:
+            raise AttributeError("cache_feature must be True to fit only model")
+        else:
+            check_is_fitted(self)  # only_model works if the model is already fitted
+            X_train, y_train, X_test = self.X_train_, self.y_train_, self.X_test_
 
         self.model_ = self._fit_model(X_train, y_train)
         self.X_test_ = X_test
-
         return self
 
     def predict(self, X=None):
@@ -106,29 +117,28 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         if X is None:
             return self.model_.predict(self.X_test_)
         else:
-            X_test = self.feature_creation_.transform(X)
+            X_test = self.feature_creation_.transform(X).dropna()
             return self.model_.predict(X_test)
 
     def set_params(self, **params):
-        if 'features' in params:
-            try:
-                delattr(self, 'X_train_')
-                delattr(self, 'y_train_')
-                delattr(self, 'X_test_')
-                delattr(self, 'feature_creation_')
-            except AttributeError:
-                pass
+        if "features" in params:
+            self._reset()
         super(TimeSeriesForecastingModel, self).set_params(**params)
 
-    def _compute_train_test_matrices(self, X: pd.DataFrame, y: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-        try:
-            return self.X_train_, self.y_train_, self.X_test_
-        except AttributeError:
-            X, y = self._create_X_y_feature_matrices(X, y)
-            X_train, y_train, X_test, y_test = self._split_train_test(X, y)
-            return X_train, y_train, X_test
+    def _compute_train_test_matrices(
+        self, X: pd.DataFrame, y: pd.DataFrame
+    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        X, y = self._create_X_y_feature_matrices(X, y)
+        X_train, y_train, X_test, y_test = self._split_train_test(X, y)
+        if self.cache_features:
+            self.X_train_ = X_train
+            self.y_train_ = y_train
+            self.X_test_ = X_test
+        return X_train, y_train, X_test
 
-    def _create_X_y_feature_matrices(self, X, y=None) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    def _create_X_y_feature_matrices(
+        self, X, y=None
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         self.feature_creation_ = FeatureCreation(self.features)
         feature_X = self.feature_creation_.fit_transform(X, y)
 
@@ -142,3 +152,9 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
     def _fit_model(self, X_train, y_train):
         return self.model.fit(X_train, y_train)
 
+    def _reset(self):
+        attributes = [
+            v for v in vars(self) if v.endswith("_") and not v.startswith("__")
+        ]
+        for attribute in attributes:
+            delattr(self, attribute)

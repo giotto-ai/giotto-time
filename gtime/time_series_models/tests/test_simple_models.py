@@ -49,9 +49,7 @@ class TestSeasonalNaiveForecast:
     @given(x=forecast_input(50))
     def test_fit_predict(self, x):
         df, horizon, seasonal_length = x
-        model = SeasonalNaive(
-            horizon=horizon, seasonal_length=seasonal_length
-        )
+        model = SeasonalNaive(horizon=horizon, seasonal_length=seasonal_length)
         model.fit(df)
         y_pred = model.predict()
         note(y_pred)
