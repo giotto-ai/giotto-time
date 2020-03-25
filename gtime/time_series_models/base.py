@@ -53,11 +53,11 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
 
     """
 
-    def __init__(self, features: List[Tuple], horizon: int, model: RegressorMixin):
-        self.feature_creation = FeatureCreation(features)
+    def __init__(self, features: List[Tuple], horizon: int, model: RegressorMixin, cache_features: bool = False):
+        self.features = features
         self.horizon = horizon
-        self.feature_splitter = FeatureSplitter()
         self.model = model
+        self.cache_features = cache_features
 
     def fit(self, X: pd.DataFrame, y: pd.DataFrame = None):
         """ Fit function for a time series forecasting model.
@@ -78,8 +78,10 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         -------
         self
         """
-        X, y = self._create_X_y_feature_matrices(X, y)
-        X_train, y_train, X_test, y_test = self._split_train_test(X, y)
+        X_train, y_train, X_test = self._compute_train_test_matrices(X, y)
+        if self.cache_features:
+            self.X_train_ = X_train
+            self.y_train_ = y_train
 
         self.model_ = self._fit_model(X_train, y_train)
         self.X_test_ = X_test
@@ -104,17 +106,39 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         if X is None:
             return self.model_.predict(self.X_test_)
         else:
-            X_test = self.feature_creation.transform(X)
+            X_test = self.feature_creation_.transform(X)
             return self.model_.predict(X_test)
 
-    def _create_X_y_feature_matrices(self, X, y=None):
-        feature_X = self.feature_creation.fit_transform(X, y)
+    def set_params(self, **params):
+        if 'features' in params:
+            try:
+                delattr(self, 'X_train_')
+                delattr(self, 'y_train_')
+                delattr(self, 'X_test_')
+                delattr(self, 'feature_creation_')
+            except AttributeError:
+                pass
+        super(TimeSeriesForecastingModel, self).set_params(**params)
+
+    def _compute_train_test_matrices(self, X: pd.DataFrame, y: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        try:
+            return self.X_train_, self.y_train_, self.X_test_
+        except AttributeError:
+            X, y = self._create_X_y_feature_matrices(X, y)
+            X_train, y_train, X_test, y_test = self._split_train_test(X, y)
+            return X_train, y_train, X_test
+
+    def _create_X_y_feature_matrices(self, X, y=None) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        self.feature_creation_ = FeatureCreation(self.features)
+        feature_X = self.feature_creation_.fit_transform(X, y)
 
         feature_y = horizon_shift(X, horizon=self.horizon)
         return feature_X, feature_y
 
     def _split_train_test(self, X, y):
-        return self.feature_splitter.transform(X, y)
+        feature_splitter = FeatureSplitter()
+        return feature_splitter.transform(X, y)
 
     def _fit_model(self, X_train, y_train):
         return self.model.fit(X_train, y_train)
+
