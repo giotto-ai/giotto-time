@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import pytest
+from scipy.stats import gmean
 from hypothesis import given
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats
@@ -15,6 +16,7 @@ from gtime.metrics import (
     mape,
     rmse,
     rmsle,
+    gmae,
 )
 
 
@@ -812,3 +814,83 @@ class TestMAPE:
         print(y_pred)
 
         assert expected_mape == mape_value
+
+
+class TestGMAE:
+    def _correct_gmae(self, y_true, y_pred):
+        y_true = np.array(y_true)
+        y_pred = np.array(y_pred)
+
+        absolute_difference = np.abs(y_true - y_pred)
+        return 0 if 0 in absolute_difference else gmean(absolute_difference)
+
+    def test_wrong_vector_length(self):
+        y_true = np.random.random(5)
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            gmae(y_true, y_pred)
+
+    def test_nan_values(self):
+        y_true = [np.nan, 1, 2, 3]
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            gmae(y_true, y_pred)
+
+    def test_infinite_values(self):
+        y_true = np.random.random(4)
+        y_pred = [0, np.inf, 2, 3]
+
+        with pytest.raises(ValueError):
+            gmae(y_true, y_pred)
+
+    def test_gmae_list(self):
+        y_true = [0, 1, 2, 3, 6, 5]
+        y_pred = [-1, 4, 5, 10, 4, 1]
+
+        gmae_value = np.round(gmae(y_true, y_pred), decimals=2)
+        expected_gmae = 2.82
+
+        assert expected_gmae == gmae_value
+
+    def test_gmae_array(self):
+        y_true = np.array([0, 1, 2, 3, 6, 5])
+        y_pred = np.array([-1, 4, 5, 10, 4, 1])
+
+        gmae_value = np.round(gmae(y_true, y_pred), decimals=2)
+        expected_gmae = 2.82
+
+        assert expected_gmae == gmae_value
+
+    def test_gmae_dataframe(self):
+        y_true = pd.DataFrame([0, 1, 2, 3, 6, 5])
+        y_pred = pd.DataFrame([-1, 4, 5, 10, 4, 1])
+
+        gmae_value = np.round(gmae(y_true, y_pred), decimals=2)
+        expected_gmae = 2.82
+
+        assert expected_gmae == gmae_value
+
+    def test_zero_in_difference_gmae(self):
+        #if absolute difference is zero then GMAE is zero
+        y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
+        y_pred = pd.DataFrame([-1, 4, 5, 10, 4, 1])
+
+        gmae_value = np.round(gmae(y_true, y_pred), decimals=2)
+        expected_gmae = 0
+
+        assert expected_gmae == gmae_value
+
+    @given(
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+    )
+    def test_gmae_random_arrays_finite_values(self, y_true, y_pred):
+        gmae_value = gmae(y_true, y_pred)
+        expected_gmae = self._correct_gmae(y_true, y_pred)
+        print(y_true)
+        print(y_pred)
+        
+        assert expected_gmae == gmae_value
+
