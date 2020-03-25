@@ -68,7 +68,9 @@ class SimpleForecaster(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
 
         check_is_fitted(self)
         np_prediction = self._predict(X)
-        predictions_df = pd.DataFrame(np_prediction, columns=self.y_columns_, index=X.index)
+        predictions_df = pd.DataFrame(
+            np_prediction, columns=self.y_columns_, index=X.index
+        )
         return predictions_df
 
 
@@ -177,8 +179,10 @@ class SeasonalNaiveForecaster(SimpleForecaster):
         """
 
         if self.season_length > len(X):
-            raise ValueError(f'Only {len(X)} data points are available, at least {self.season_length} for this seasonal model')
-        self.season_ = X.iloc[-self.season_length:]
+            raise ValueError(
+                f"Only {len(X)} data points are available, at least {self.season_length} for this seasonal model"
+            )
+        self.season_ = X.iloc[-self.season_length :]
         super().fit(X, y)
 
         return self
@@ -204,8 +208,12 @@ class SeasonalNaiveForecaster(SimpleForecaster):
 
         """
 
-        seasonal_pos = [x.n % self.season_length for x in X.index - self.season_.index.max()]
-        predictions = np.concatenate([self._season_roll(x, self.horizon_) for x in seasonal_pos], axis=1)
+        seasonal_pos = [
+            x.n % self.season_length for x in X.index - self.season_.index.max()
+        ]
+        predictions = np.concatenate(
+            [self._season_roll(x, self.horizon_) for x in seasonal_pos], axis=1
+        )
 
         return predictions
 
@@ -232,10 +240,15 @@ class SeasonalNaiveForecaster(SimpleForecaster):
         tail = horizon - season_length * (cycles + 1) + start
         tail = tail % season_length if tail >= season_length else tail
         if tail <= 0 and cycles == 0:
-            return season.iloc[start:start + horizon].to_numpy()
+            return season.iloc[start : start + horizon].to_numpy()
         else:
             return np.concatenate(
-                (season.iloc[start:, :], np.tile(season, (cycles, 1)), season.iloc[:tail, :]))
+                (
+                    season.iloc[start:, :],
+                    np.tile(season, (cycles, 1)),
+                    season.iloc[:tail, :],
+                )
+            )
 
 
 class DriftForecaster(SimpleForecaster):
@@ -307,7 +320,12 @@ class DriftForecaster(SimpleForecaster):
 
         """
 
-        predictions = np.transpose(np.squeeze([X.values + i * self.drift_.values for i in range(self.horizon_)], axis=2))
+        predictions = np.transpose(
+            np.squeeze(
+                [X.values + i * self.drift_.values for i in range(self.horizon_)],
+                axis=2,
+            )
+        )
 
         return predictions
 
@@ -387,6 +405,8 @@ class AverageForecaster(NaiveForecaster):
         sum_train = (self.avg_train_ * self.train_lenth_).to_numpy()
         predictions = np.empty((len(X), self.horizon_)) * np.nan
         for i in range(len(X)):
-            predictions[i, :] = (sum_train + X.iloc[i].to_numpy()) / (self.train_lenth_ + i + 1)
+            predictions[i, :] = (sum_train + X.iloc[i].to_numpy()) / (
+                self.train_lenth_ + i + 1
+            )
             sum_train += X.iloc[i].values
         return predictions
