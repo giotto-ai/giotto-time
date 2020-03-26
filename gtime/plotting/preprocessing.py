@@ -19,25 +19,25 @@ def seasonal_split(df: pd.DataFrame, cycle='year', freq=None, agg='mean'):
             elif freq in ['Q', 'Q-DEC']:
                 df['_Season'] = df.index.quarter
             else:
-                df['_Season'] = df[col_name].resample('Y').apply(lambda x: pd.Series(np.arange(1, len(x) + 1))).values
+                df['_Season'] = df[col_name].groupby(pd.Grouper(freq="Y", convention='s')).cumcount() + 1
 
         elif cycle == 'quarter':
             df['_Series'] = list(map(lambda x: '_'.join([str(x.year), str(x.quarter)]), df.index))
-            df['_Season'] = df.resample('Q').apply(lambda x: pd.Series(np.arange(1, len(x) + 1))).values
+            df['_Season'] = df[col_name].groupby(pd.Grouper(freq="Q", convention='s')).cumcount() + 1
 
         elif cycle == 'month':
             df['_Series'] = list(map(lambda x: '_'.join([str(x.year), str(x.month)]), df.index))
             if freq == 'D':
                 df['_Season'] = df.index.day
             else:
-                df['_Season'] = df.resample('M').apply(lambda x: pd.Series(np.arange(1, len(x) + 1))).values
+                df['_Season'] = df[col_name].groupby(pd.Grouper(freq="M", convention='s')).cumcount() + 1
 
         elif cycle == 'week':
             df['_Series'] = list(map(lambda x: '_'.join([str(x.year), str(x.weekofyear)]), df.index))
             if freq == 'D':
                 df['_Season'] = df.index.day
             else:
-                df['_Season'] = df.resample('W').apply(lambda x: pd.Series(np.arange(1, len(x) + 1))).values
+                df['_Season'] = df[col_name].groupby(pd.Grouper(freq="W", convention='s')).cumcount() + 1
         else:
             raise ValueError("Incorrect cycle period name")
     else:
@@ -46,7 +46,9 @@ def seasonal_split(df: pd.DataFrame, cycle='year', freq=None, agg='mean'):
         for i, j in df.resample(freq):
             s += [i.__str__()] * len(j)
         df['_Season'] = s
-
+    d = df.set_index(['_Series', '_Season']).index.duplicated()
+    if any(d):
+        print('A')
     return df.set_index(['_Series', '_Season']).unstack(level=0)
 
 
