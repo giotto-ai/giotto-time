@@ -94,6 +94,7 @@ def acf(x, max_lags=None):
 
 
 def yw(x: np.array, order=1, unbiased=False):
+
     """ Estimate ``order`` parameters from a sequence using the Yule-Walker equations.
     http://www-stat.wharton.upenn.edu/~steele/Courses/956/Resource/YWSourceFiles/YW-Eshel.pdf
 

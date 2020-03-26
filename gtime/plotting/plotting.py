@@ -6,6 +6,19 @@ from scipy.stats import norm
 
 
 def lagplot(df: pd.DataFrame, lags):
+    """
+    Lag scatter plots.
+
+    Parameters
+    ----------
+    df : pd.DataFrame, time series to plot
+    lags : int or list of ints, lags to plot
+
+    Returns
+    -------
+    axes : plot axes
+
+    """
 
     if isinstance(lags, int):
         lags = list(range(1, lags + 1))
@@ -27,11 +40,25 @@ def lagplot(df: pd.DataFrame, lags):
             axes.label_outer()
             j += 1
         i += 1
-    return axes
-    # plt.show()
+    return ax
 
 
 def subplots(df: pd.DataFrame, cycle, freq=None, agg='mean', box=False):
+    """
+    Seasonal subplots
+
+    Parameters
+    ----------
+    df : pd.DataFrame, time series to plot
+    cycle : str, cycle, calendar term ('year', 'quarter', 'month', 'week') or pandas offset string
+    freq : frequency, if specified, time series is resampled to it
+    agg : aggregation function used in resampling
+    box : bool, use box plots
+
+    Returns
+    -------
+
+    """
     ss = seasonal_split(df, cycle, freq, agg)
     fig, ax = plt.subplots(ss.columns.levshape[0], ss.shape[0],
                            sharey=True, figsize=(15, 6), squeeze=False,
@@ -51,10 +78,23 @@ def subplots(df: pd.DataFrame, cycle, freq=None, agg='mean', box=False):
             axes.set_xticklabels([])
             j += 1
         i += 1
-    return axes
+    return ax
 
 
-def plot_fun(df, ax=None):
+def seasonal_line_plot(df, ax=None):
+    """
+    Basic seasonal line plot.
+
+    Parameters
+    ----------
+    df : pd.DataFrame, input dataframe reformated by seasons
+    ax : matplotlib axes to plot on
+
+    Returns
+    -------
+    ax : matplotlib axes
+
+    """
     if ax is None:
         ax = df.plot(legend=False)
     else:
@@ -62,11 +102,20 @@ def plot_fun(df, ax=None):
     return ax
 
 
-def basic_ts(df, ax=None):
-    ax = plot_fun(df, ax)
-    return ax
+def seasonal_polar_ts(df, ax=None):
+    """
+    Seasonal polar plot.
 
-def polar_ts(df, ax=None):
+    Parameters
+    ----------
+    df : pd.DataFrame, input dataframe reformated by seasons
+    ax : matplotlib axes to plot on
+
+    Returns
+    -------
+    ax : matplotlib axes
+
+    """
     df = df.append(df.iloc[0])
     if ax is None:
         ax = plt.subplot(111, projection='polar')
@@ -78,16 +127,50 @@ def polar_ts(df, ax=None):
     ax.set_xticklabels(df.index)
     return ax
 
+
 def seasonal_plot(df: pd.DataFrame, cycle, freq=None, polar=False, ax=None):
+    """
+    Seasonal plot function
+
+    Parameters
+    ----------
+    df : pd.DataFrame, input time series
+    cycle : str, cycle, calendar term ('year', 'quarter', 'month', 'week') or pandas offset string
+    freq : frequency, if specified, time series is resampled to it
+    polar : bool, polar format
+    ax : matplotlib axes to plot on
+
+    Returns
+    -------
+    ax : matplotlib axes
+
+    """
     df_seas = seasonal_split(df, cycle, freq)
+
     if polar:
-        ax = polar_ts(df_seas, ax=ax)
+        ax = seasonal_polar_ts(df_seas, ax=ax)
     else:
-        ax = basic_ts(df_seas, ax=ax)
+        ax = seasonal_line_plot(df_seas, ax=ax)
     return ax
 
 
-def acf_plot(df: pd.DataFrame, max_lags: int = 10, ci: float = 0.05, partial=False, ax=None):
+def acf_plot(df: pd.DataFrame, max_lags: int = 10, ci: float = 0.05, partial: bool = False, ax=None):
+    """
+    ACF plot function
+
+    Parameters
+    ----------
+    df : pd.DataFrame, input time series
+    max_lags : int, maximum number of lags to be calculated
+    ci : float, confidence interval for the estimate
+    partial : bool, whether to calculate partial autocorrelation instead of regular one
+    ax : matplotlib axes to plot on
+
+    Returns
+    -------
+    ax : matplotlib axes
+
+    """
     x = np.squeeze(df.values)
     if partial:
         acfs = pacf(x, max_lags)
@@ -106,9 +189,3 @@ def acf_plot(df: pd.DataFrame, max_lags: int = 10, ci: float = 0.05, partial=Fal
 
     return ax
 
-
-
-df_sp = pd.read_csv('https://storage.googleapis.com/l2f-open-models/giotto-time/examples/data/^GSPC.csv') # to replace with a link
-df_close = df_sp.set_index('Date')['Close']
-df_close.index = pd.to_datetime(df_close.index)
-seasonal_plot(df_close, 'year')
