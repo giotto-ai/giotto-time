@@ -3,13 +3,28 @@ import numpy as np
 from scipy.linalg import toeplitz
 
 
-def seasonal_split(df: pd.DataFrame, cycle='year', freq=None, agg='mean'):
+def seasonal_split(df: pd.DataFrame, cycle: str = 'year', freq=None, agg='mean'):
+    """
+    Converts time series to a DataFrame with columns for each ``cycle`` period.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+    cycle : str, cycle, calendar term ('year', 'quarter', 'month', 'week') or pandas offset string
+    freq : frequency, if specified, time series is resampled to it
+    agg : aggregation function used in resampling
+
+    Returns
+    -------
+    pd.DataFrame with seasonal columns
+
+    """
     if freq is None:
         freq = df.index.freqstr
     df = df.resample(freq).agg(agg)
     col_name = df.columns[0]
 
-    if isinstance(cycle, str):
+    if cycle in ['year', 'quarter', 'month', 'week']:
         if cycle == 'year':
             df['_Series'] = df.index.start_time.year
             if freq == 'D':
@@ -41,18 +56,29 @@ def seasonal_split(df: pd.DataFrame, cycle='year', freq=None, agg='mean'):
         else:
             raise ValueError("Incorrect cycle period name")
     else:
-        df['_Series'] = df.resample
+        df['_Series'] = df.resample(cycle)
         s = []
         for i, j in df.resample(freq):
             s += [i.__str__()] * len(j)
         df['_Season'] = s
-    d = df.set_index(['_Series', '_Season']).index.duplicated()
-    if any(d):
-        print('A')
+
     return df.set_index(['_Series', '_Season']).unstack(level=0)
 
 
 def acf(x, max_lags=None):
+
+    """ Autocorrelation estimate function
+
+    Parameters
+    ----------
+    x : np.array, a time series
+    max_lags : int, maximum number of lags to be calculated
+
+    Returns
+    -------
+    acf : np.array, partial autocorrelations for min(max_lags, len(x)) lags, including lag 0
+    """
+
     n = x.size
     if max_lags is None or max_lags > n:
         max_lags = n
@@ -61,13 +87,26 @@ def acf(x, max_lags=None):
     else:
         x = (x - np.mean(x)) / (np.std(x) * np.sqrt(n))
     if max_lags == n:
-        result = np.correlate(x, x, mode='full')[-n:]
+        acf = np.correlate(x, x, mode='full')[-n:]
     else:
-        result = np.correlate(x, x, mode='full')[-n:-n + max_lags]
-    return result
+        acf = np.correlate(x, x, mode='full')[-n:-n + max_lags]
+    return acf
 
 
 def yw(x: np.array, order=1, unbiased=False):
+    """ Estimate ``order`` parameters from a sequence using the Yule-Walker equations.
+    http://www-stat.wharton.upenn.edu/~steele/Courses/956/Resource/YWSourceFiles/YW-Eshel.pdf
+
+    Parameters
+    ----------
+    x : np.array, input time series
+    order : order of the autoregressive process
+    unbiased : bool, debiasing correction, False by default
+
+    Returns
+    -------
+    rho : np.array, autoregressive coefficients
+    """
 
     if order == 0:
         return np.array([1.0])
@@ -87,8 +126,21 @@ def yw(x: np.array, order=1, unbiased=False):
     return rho
 
 
-def pacf(x, max_lags=1):
-    n = len(x)
+def pacf(x, max_lags: int = 1):
+
+    """Partial autocorrelation estimate based on Yule-Walker equations
+
+    Parameters
+    ----------
+    x : np.array, a time series
+    max_lags : int, maximum number of lags to be calculated
+
+    Returns
+    -------
+    pacf : np.array, partial autocorrelations for min(max_lags, len(x)) lags, including lag 0
+    """
+
+    n = x.size
     if np.std(x) == 0:
         x = x - np.mean(x)
     else:
