@@ -6,6 +6,6 @@ from .base import HierarchicalBase
 from .naive import HierarchicalNaive
 
 __all__ = [
-    'HierarchicalBase',
-    'HierarchicalNaive',
+    "HierarchicalBase",
+    "HierarchicalNaive",
 ]

@@ -34,10 +34,10 @@ class HierarchicalBase(BaseEstimator, RegressorMixin):
     @staticmethod
     def _check_is_dict_of_dataframes_with_str_key(X: Any):
         if not isinstance(X, dict):
-            raise ValueError(f'X must be a dictionary of pd.DataFrame. Detected: {type(X)}')
+            raise ValueError(
+                f"X must be a dictionary of pd.DataFrame. Detected: {type(X)}"
+            )
         if not all(isinstance(key, str) for key in X):
-            raise ValueError('All X keys must be string')
+            raise ValueError("All X keys must be string")
         if not all(isinstance(df, pd.DataFrame) for df in X.values()):
-            raise ValueError('All values of X must be pd.DataFrame')
-
-
+            raise ValueError("All values of X must be pd.DataFrame")

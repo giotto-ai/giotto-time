@@ -8,7 +8,11 @@ from hypothesis.extra.numpy import arrays
 from pytest import fixture
 
 from gtime.hierarchical import HierarchicalNaive, HierarchicalBase
-from gtime.utils.fixtures import time_series_forecasting_model1_no_cache, features1, model1
+from gtime.utils.fixtures import (
+    time_series_forecasting_model1_no_cache,
+    features1,
+    model1,
+)
 from gtime.utils.hypothesis.time_indexes import giotto_time_series, period_indexes
 
 
@@ -69,7 +73,7 @@ class TestHierarchicalNaive:
 
     def test_error_fit_value_not_dataframe(self, hierarchical_naive_model):
         with pytest.raises(ValueError):
-            hierarchical_naive_model.fit({'wrong_field': 12})
+            hierarchical_naive_model.fit({"wrong_field": 12})
 
     @given(dataframes=n_time_series_with_same_index())
     def test_fit_n_dataframes(self, dataframes, hierarchical_naive_model):
