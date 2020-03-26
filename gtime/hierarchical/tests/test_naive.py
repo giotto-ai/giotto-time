@@ -7,14 +7,13 @@ import hypothesis.strategies as st
 from hypothesis.extra.numpy import arrays
 from pytest import fixture
 
-from gtime.hierarchical.base import HierarchicalBase
-from gtime.hierarchical.naive import HierarchicalNaive
-from gtime.utils.fixtures import time_series_forecasting_model1_no_cache, features1
+from gtime.hierarchical import HierarchicalNaive, HierarchicalBase
+from gtime.utils.fixtures import time_series_forecasting_model1_no_cache, features1, model1
 from gtime.utils.hypothesis.time_indexes import giotto_time_series, period_indexes
 
 
 @fixture(scope="function")
-def hierarchical_naive_model():
+def hierarchical_naive_model(time_series_forecasting_model1_no_cache):
     return HierarchicalNaive(time_series_forecasting_model1_no_cache)
 
 
@@ -52,7 +51,7 @@ class TestHierarchicalNaive:
         self, time_series_forecasting_model1_no_cache
     ):
         hierarchy_tree = {}
-        with pytest.raises(AttributeError):
+        with pytest.raises(TypeError):
             HierarchicalNaive(
                 model=time_series_forecasting_model1_no_cache,
                 hierarchy_tree=hierarchy_tree,
@@ -62,6 +61,15 @@ class TestHierarchicalNaive:
     def test_error_fit_dataframe(self, time_series, hierarchical_naive_model):
         with pytest.raises(ValueError):
             hierarchical_naive_model.fit(time_series)
+
+    @given(time_series=giotto_time_series(min_length=5))
+    def test_error_fit_key_not_string(self, time_series, hierarchical_naive_model):
+        with pytest.raises(ValueError):
+            hierarchical_naive_model.fit({1: time_series})
+
+    def test_error_fit_value_not_dataframe(self, hierarchical_naive_model):
+        with pytest.raises(ValueError):
+            hierarchical_naive_model.fit({'wrong_field': 12})
 
     @given(dataframes=n_time_series_with_same_index())
     def test_fit_n_dataframes(self, dataframes, hierarchical_naive_model):
@@ -81,7 +89,7 @@ class TestHierarchicalNaive:
     def test_fit_predict_on_subset_of_time_series(
         self, dataframes, hierarchical_naive_model
     ):
-        key = np.random.choice(dataframes.keys(), 1)[0]
+        key = np.random.choice(list(dataframes.keys()), 1)[0]
         hierarchical_naive_model.fit(dataframes)
         hierarchical_naive_model.predict({key: dataframes[key]})
 
@@ -91,8 +99,8 @@ class TestHierarchicalNaive:
 
     @given(dataframes=n_time_series_with_same_index())
     def test_error_with_bad_predict_key(self, dataframes, hierarchical_naive_model):
-        correct_key = np.random.choice(dataframes.keys(), 1)[0]
-        bad_key = "".join(dataframes.keys) + "bad_key"
+        correct_key = np.random.choice(list(dataframes.keys()), 1)[0]
+        bad_key = "".join(dataframes.keys()) + "bad_key"
         hierarchical_naive_model.fit(dataframes)
-        with pytest.raises(ValueError):
+        with pytest.raises(KeyError):
             hierarchical_naive_model.predict({bad_key: dataframes[correct_key]})

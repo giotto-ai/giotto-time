@@ -1,6 +1,7 @@
 import pytest
 import sklearn
 from hypothesis import given
+import hypothesis.strategies as st
 
 from gtime.utils.fixtures import (
     features1,
@@ -10,8 +11,24 @@ from gtime.utils.fixtures import (
     time_series_forecasting_model1_cache,
     time_series_forecasting_model1_no_cache,
 )
-from gtime.time_series_models import TimeSeriesForecastingModel
+from gtime.time_series_models import TimeSeriesForecastingModel, AR
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
+
+
+class TestAR:
+    @given(p=st.integers(min_value=1, max_value=5), horizon=st.integers(min_value=1, max_value=3))
+    def test_constructor(self, p, horizon):
+        ar = AR(p, horizon)
+        assert len(ar.features) == p
+        assert ar.horizon == horizon
+
+    @given(time_series=giotto_time_series(allow_nan=False, allow_infinity=False, min_length=7, max_length=200),
+           p=st.integers(min_value=1, max_value=5), horizon=st.integers(min_value=1, max_value=3))
+    def test_results(self, time_series, p, horizon):
+        ar = AR(p, horizon)
+        predictions = ar.fit(time_series).predict()
+        assert predictions.shape[0] == horizon
+        assert predictions.shape[1] == horizon
 
 
 class TestTimeSeriesForecastingModel:

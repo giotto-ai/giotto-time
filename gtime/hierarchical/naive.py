@@ -13,10 +13,12 @@ class HierarchicalNaive(HierarchicalBase):
         super().__init__(model=model, hierarchy_tree="infer")
 
     def fit(self, X: Dict[str, pd.DataFrame], y=None):
+        self._check_is_dict_of_dataframes_with_str_key(X)
         self._infer_hierarchy_tree(X)
         self._initialize_models(X)
         for key, time_series in X.items():
             self.models_[key].fit(time_series)
+        return self
 
     def predict(self, X: Dict[str, pd.DataFrame] = None):
         check_is_fitted(self)
@@ -29,6 +31,7 @@ class HierarchicalNaive(HierarchicalBase):
             }
 
     def _initialize_models(self, X: Dict[str, pd.DataFrame]):
+        print(self.model)
         self.models_ = {key: deepcopy(self.model) for key in X}
 
     def _infer_hierarchy_tree(self, X: Dict[str, pd.DataFrame]):
