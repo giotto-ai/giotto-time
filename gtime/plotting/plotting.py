@@ -5,7 +5,7 @@ from gtime.plotting.preprocessing import seasonal_split, acf, pacf
 from scipy.stats import norm
 
 
-def lagplot(df: pd.DataFrame, lags):
+def lagplot(df: pd.DataFrame, lags, plots_per_row: int = 4):
     """
     Lag scatter plots.
 
@@ -13,6 +13,7 @@ def lagplot(df: pd.DataFrame, lags):
     ----------
     df : pd.DataFrame, time series to plot
     lags : int or list of ints, lags to plot
+    plots_per_row : int, number of lag plots per one row of subplots
 
     Returns
     -------
@@ -23,23 +24,26 @@ def lagplot(df: pd.DataFrame, lags):
     if isinstance(lags, int):
         lags = list(range(1, lags + 1))
 
-    fig, ax = plt.subplots(df.shape[1], len(lags),
-                           sharey=True, sharex=True, figsize=(18, 6), squeeze=False,
-                           gridspec_kw={'wspace': 0.1})
-    i = 0
+    if len(lags) > plots_per_row:
+        rows = len(lags) // plots_per_row + 1
+        cols = plots_per_row
+    else:
+        rows = 1
+        cols = len(lags)
 
-    for col_name, col in df.iteritems():
-        j = 0
-        x_lim = [df.iloc[:, i].min(), df.iloc[:, i].max()]
-        for l in lags:
-            axes = ax[i, j]
-            axes.scatter(df.iloc[l:, i], df.iloc[:-l, i])
-            axes.set(title='Lag ' + str(l), ylabel=col_name)
-            axes.plot(x_lim, x_lim, ls="--", c=".7")
-            axes.set(xlim=x_lim, ylim=x_lim)
-            axes.label_outer()
-            j += 1
-        i += 1
+    fig, ax = plt.subplots(rows, cols,
+                           sharey=True, sharex=True, figsize=(20, 5 * rows), squeeze=False,
+                           gridspec_kw={'wspace': 0.05})
+    x_lim = df.agg(['min', 'max']).values
+
+    for i, l in enumerate(lags):
+        axes = ax[i // plots_per_row, i % plots_per_row]
+        axes.scatter(df.iloc[l:], df.iloc[:-l])
+        axes.set(title='Lag ' + str(l))
+        axes.plot(x_lim, x_lim, ls="--", c=".7")
+        axes.set(xlim=x_lim, ylim=x_lim)
+        axes.label_outer()
+
     return ax
 
 
