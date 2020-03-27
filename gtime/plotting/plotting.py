@@ -126,13 +126,13 @@ def seasonal_polar_ts(df, ax=None):
     angles = [x * 360 / (len(df) - 1) for x in range(len(df))]
     theta = [x / 360 * 2 * np.pi for x in angles]
     for col in df.columns:
-        plt.polar(theta, df[col], scalex=False)
+        plt.polar(theta, df[col], scalex=False, label=col)
     ax.set_thetagrids(angles=angles)
     ax.set_xticklabels(df.index)
     return ax
 
 
-def seasonal_plot(df: pd.DataFrame, cycle, freq=None, polar=False, ax=None):
+def seasonal_plot(df: pd.DataFrame, cycle, freq=None, polar=False, agg='mean', ax=None):
     """
     Seasonal plot function
 
@@ -149,12 +149,14 @@ def seasonal_plot(df: pd.DataFrame, cycle, freq=None, polar=False, ax=None):
     ax : matplotlib axes
 
     """
-    df_seas = seasonal_split(df, cycle, freq)
+    df_seas = seasonal_split(df, cycle, freq).droplevel(0, axis=1)
 
     if polar:
         ax = seasonal_polar_ts(df_seas, ax=ax)
     else:
         ax = seasonal_line_plot(df_seas, ax=ax)
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=4)
+    ax.set_xlabel(freq)
     return ax
 
 
