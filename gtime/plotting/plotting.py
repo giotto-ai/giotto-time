@@ -26,7 +26,7 @@ def lagplot(df: pd.DataFrame, lags, plots_per_row: int = 4):
         lags = list(range(1, lags + 1))
 
     if len(lags) > plots_per_row:
-        rows = len(lags) // plots_per_row + 1
+        rows = (len(lags) - 1) // plots_per_row + 1
         cols = plots_per_row
     else:
         rows = 1

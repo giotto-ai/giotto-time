@@ -6,6 +6,7 @@ import matplotlib
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
 
 from gtime.plotting import lagplot, acf_plot, subplots, seasonal_plot
+from gtime.plotting.preprocessing import seasonal_split
 
 class TestLagplots:
     @given(
@@ -19,9 +20,19 @@ class TestLagplots:
         assert num_plots == len(lags)
         matplotlib.pyplot.close('all')
 
+    @given(
+        df=giotto_time_series(min_length=1, allow_nan=False, allow_infinity=False),
+        lags=st.lists(st.integers(min_value=1), min_size=1, max_size=20),
+        plots_per_row=st.integers(min_value=1, max_value=7)
+    )
+    @settings(deadline=None)
+    def test_rows_and_cols(self, df, lags, plots_per_row):
+        ax = lagplot(df, lags, plots_per_row)
+        assert ax.shape == ((len(lags) - 1) // plots_per_row + 1, min(len(lags), plots_per_row))
+        matplotlib.pyplot.close('all')
+
 
 class TestACFplots:
-
     @given(
         df=giotto_time_series(min_length=2, allow_nan=False, allow_infinity=False),
         maxlags=st.integers(min_value=1),
@@ -49,3 +60,21 @@ class TestACFplots:
             ax = acf_plot(df, maxlags, ci, partial)
             assert len(ax.containers[0]) == min(len(df), maxlags)
             matplotlib.pyplot.close('all')
+
+
+class TestSubplots:
+    @given(df=giotto_time_series(min_length=3, max_length=50),
+           cycle=st.sampled_from(['year', 'quarter', 'month']),
+           freq=st.from_regex(r'[1-9][WMQ]', fullmatch=True),
+           agg=st.sampled_from(['mean', 'sum', 'last']),
+           box=st.booleans()
+           )
+    @settings(deadline=None)
+    def test_subplots_number(self, df, cycle, freq, agg, box):
+        ax = subplots(df, cycle, freq, agg, box)
+        split = seasonal_split(df, cycle, freq, agg)
+        assert ax.size == split.shape[0]
+        matplotlib.pyplot.close('all')
+
+# class TestSeasonalPlots:
+#
