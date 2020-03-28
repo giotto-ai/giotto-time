@@ -5,6 +5,7 @@ from gtime.plotting.preprocessing import seasonal_split, acf, pacf
 from scipy.stats import norm
 
 
+
 def lagplot(df: pd.DataFrame, lags, plots_per_row: int = 4):
     """
     Lag scatter plots.
@@ -106,7 +107,7 @@ def seasonal_line_plot(df, ax=None):
     return ax
 
 
-def seasonal_polar_ts(df, ax=None):
+def seasonal_polar_plot(df, ax=None):
     """
     Seasonal polar plot.
 
@@ -152,7 +153,7 @@ def seasonal_plot(df: pd.DataFrame, cycle, freq=None, polar=False, agg='mean', a
     df_seas = seasonal_split(df, cycle, freq).droplevel(0, axis=1)
 
     if polar:
-        ax = seasonal_polar_ts(df_seas, ax=ax)
+        ax = seasonal_polar_plot(df_seas, ax=ax)
     else:
         ax = seasonal_line_plot(df_seas, ax=ax)
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=4)
@@ -186,7 +187,7 @@ def acf_plot(df: pd.DataFrame, max_lags: int = 10, ci: float = 0.05, partial: bo
     if ax is None:
         ax = plt.subplot(111)
 
-    ax.bar(range(0, max_lags), acfs, 0.05)
+    ax.bar(range(len(acfs)), acfs, 0.05)
     ci = norm.ppf(1 - ci / 2) / np.sqrt(len(x))
     ax.axhline(ci, color='gray', linestyle='--')
     ax.axhline(0.0, color='black', linestyle='-')
