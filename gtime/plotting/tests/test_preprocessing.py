@@ -1,22 +1,32 @@
 import numpy as np
-import pandas as pd
-import pytest
 import hypothesis.strategies as st
-from pandas.util import testing as testing
-from hypothesis import given, note
+from hypothesis import given, settings
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
 from gtime.plotting.preprocessing import seasonal_split, acf, pacf
 
-
 class TestSplits:
-    @given(df=giotto_time_series(min_length=3, max_length=500))
-    def test_seasonal_split(self, df):
-        split = seasonal_split(df)
-        s = split.notna().sum().sum()
-        t = df.notna().sum().sum()
-        if t != s:
-            pass
-        assert split.notna().sum().sum() == df.notna().sum().sum()
+
+    @given(df=giotto_time_series(min_length=3, max_length=500),
+           cycle=st.sampled_from(['year', 'quarter', 'month', 'week']),
+           freq=st.from_regex(r'[1-9][DWMQ]', fullmatch=True),
+           agg=st.sampled_from(['mean', 'sum', 'last']))
+    @settings(deadline=None)
+    def test_seasonal_split_shape_named(self, df, cycle, freq, agg):
+        split = seasonal_split(df, cycle, freq, agg)
+        s = split.notna().mean()
+        t = df.notna().mean().mean()
+        assert split.stack().shape == df.resample(freq).agg(agg).dropna().shape
+
+    @given(df=giotto_time_series(min_length=3, max_length=500),
+           cycle=st.from_regex(r'[1-9][DWMQY]', fullmatch=True),
+           freq=st.from_regex(r'[1-9][DWMQ]', fullmatch=True),
+           agg=st.sampled_from(['mean', 'sum', 'last']))
+    @settings(deadline=None)
+    def test_seasonal_split_shape_freq(self, df, cycle, freq, agg):
+        split = seasonal_split(df, cycle, freq, agg)
+        s = split.notna().mean()
+        t = df.notna().mean().mean()
+        assert split.stack().shape == df.resample(freq).agg(agg).dropna().shape
 
 
 class TestAcf:
@@ -38,5 +48,3 @@ class TestAcf:
         res = pacf(df_array, max_lag)
         assert len(res) == min(max_lag, len(df))
 
-t = TestSplits()
-t.test_seasonal_split()
