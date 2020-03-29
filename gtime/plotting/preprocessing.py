@@ -25,6 +25,9 @@ def seasonal_split(df: pd.DataFrame, cycle: str = "year", freq=None, agg="mean")
         if t.start_time.weekofyear == 1 and t.start_time.month == 12:
             year = t.end_time.year
             week = t.start_time.weekofyear
+        elif t.start_time.weekofyear == 52 and t.end_time.month == 1:
+            year = t.end_time.year - 1
+            week = t.start_time.weekofyear
         else:
             year = t.start_time.year
             week = t.start_time.weekofyear
@@ -107,9 +110,6 @@ def seasonal_split(df: pd.DataFrame, cycle: str = "year", freq=None, agg="mean")
         df["_Season"] = (
             df[col_name].groupby(pd.Grouper(freq=cycle, convention="s")).cumcount() + 1
         )
-
-    if any(df.set_index(["_Series", "_Season"]).index.duplicated()):
-        print("BUG!!!")
 
     return df.set_index(["_Series", "_Season"]).unstack(level=0)
 
