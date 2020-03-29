@@ -3,7 +3,7 @@ import numpy as np
 from scipy.linalg import toeplitz
 
 
-def seasonal_split(df: pd.DataFrame, cycle: str = 'year', freq=None, agg='mean'):
+def seasonal_split(df: pd.DataFrame, cycle: str = "year", freq=None, agg="mean"):
     """
     Converts time series to a DataFrame with columns for each ``cycle`` period.
 
@@ -19,6 +19,7 @@ def seasonal_split(df: pd.DataFrame, cycle: str = 'year', freq=None, agg='mean')
     pd.DataFrame with seasonal columns
 
     """
+
     def _week_of_year(t: pd.Period):
         # pandas weekofyear inconsistency fix, according to ISO week date
         if t.start_time.weekofyear == 1 and t.start_time.month == 12:
@@ -27,54 +28,90 @@ def seasonal_split(df: pd.DataFrame, cycle: str = 'year', freq=None, agg='mean')
         else:
             year = t.start_time.year
             week = t.start_time.weekofyear
-        return '_'.join([str(year), str(week)])
+        return "_".join([str(year), str(week)])
 
     if freq is None:
         freq = df.index.freqstr
     df = df.resample(freq).agg(agg)
     col_name = df.columns[0]
 
-    if cycle in ['year', 'quarter', 'month', 'week']:
-        if cycle == 'year':
-            df['_Series'] = df.index.start_time.year
-            if freq == 'D':
-                df['_Season'] = df.index.dayofyear
-            elif freq in ['W', 'W-SUN']:
-                df['_Season'] = df.start_time.weekofyear
-            elif freq == 'M':
-                df['_Season'] = df.index.start_time.month
-            elif freq in ['Q', 'Q-DEC']:
-                df['_Season'] = df.index.start_time.quarter
+    if cycle in ["year", "quarter", "month", "week"]:
+        if cycle == "year":
+            df["_Series"] = df.index.start_time.year
+            if freq == "D":
+                df["_Season"] = df.index.dayofyear
+            elif freq in ["W", "W-SUN"]:
+                df["_Season"] = df.start_time.weekofyear
+            elif freq == "M":
+                df["_Season"] = df.index.start_time.month
+            elif freq in ["Q", "Q-DEC"]:
+                df["_Season"] = df.index.start_time.quarter
             else:
-                df['_Season'] = df[col_name].groupby(pd.Grouper(freq="Y", convention='s')).cumcount() + 1
+                df["_Season"] = (
+                    df[col_name]
+                    .groupby(pd.Grouper(freq="Y", convention="s"))
+                    .cumcount()
+                    + 1
+                )
 
-        elif cycle == 'quarter':
-            df['_Series'] = list(map(lambda x: '_'.join([str(x.start_time.year), str(x.start_time.quarter)]), df.index))
-            df['_Season'] = df[col_name].groupby(pd.Grouper(freq="Q", convention='s')).cumcount() + 1
+        elif cycle == "quarter":
+            df["_Series"] = list(
+                map(
+                    lambda x: "_".join(
+                        [str(x.start_time.year), str(x.start_time.quarter)]
+                    ),
+                    df.index,
+                )
+            )
+            df["_Season"] = (
+                df[col_name].groupby(pd.Grouper(freq="Q", convention="s")).cumcount()
+                + 1
+            )
 
-        elif cycle == 'month':
-            df['_Series'] = list(map(lambda x: '_'.join([str(x.start_time.year), str(x.start_time.month)]), df.index))
-            if freq == 'D':
-                df['_Season'] = df.index.day
+        elif cycle == "month":
+            df["_Series"] = list(
+                map(
+                    lambda x: "_".join(
+                        [str(x.start_time.year), str(x.start_time.month)]
+                    ),
+                    df.index,
+                )
+            )
+            if freq == "D":
+                df["_Season"] = df.index.day
             else:
-                df['_Season'] = df[col_name].groupby(pd.Grouper(freq="M", convention='s')).cumcount() + 1
+                df["_Season"] = (
+                    df[col_name]
+                    .groupby(pd.Grouper(freq="M", convention="s"))
+                    .cumcount()
+                    + 1
+                )
 
-        elif cycle == 'week':
-            df['_Series'] = list(map(_week_of_year, df.index))
-            if freq == 'D':
-                df['_Season'] = df.index.dayofweek
+        elif cycle == "week":
+            df["_Series"] = list(map(_week_of_year, df.index))
+            if freq == "D":
+                df["_Season"] = df.index.dayofweek
             else:
-                df['_Season'] = df[col_name].groupby(pd.Grouper(freq="W", convention='s')).cumcount() + 1
+                df["_Season"] = (
+                    df[col_name]
+                    .groupby(pd.Grouper(freq="W", convention="s"))
+                    .cumcount()
+                    + 1
+                )
         else:
             raise ValueError("Incorrect cycle period name")
     else:
-        df['_Series'] = df[col_name].groupby(pd.Grouper(freq=cycle, convention='s')).ngroup()
-        df['_Season'] = df[col_name].groupby(pd.Grouper(freq=cycle, convention='s')).cumcount() + 1
+        df["_Series"] = (
+            df[col_name].groupby(pd.Grouper(freq=cycle, convention="s")).ngroup()
+        )
+        df["_Season"] = (
+            df[col_name].groupby(pd.Grouper(freq=cycle, convention="s")).cumcount() + 1
+        )
 
-    if any(df.set_index(['_Series', '_Season']).index.duplicated()):
-        print('BUG!!!')
+    if any(df.set_index(["_Series", "_Season"]).index.duplicated()):
+        print("BUG!!!")
 
-    return df.set_index(['_Series', '_Season']).unstack(level=0)
+    return df.set_index(["_Series", "_Season"]).unstack(level=0)
 
 
 def acf(x, max_lags=None):
@@ -99,9 +136,9 @@ def acf(x, max_lags=None):
     else:
         x = (x - np.mean(x)) / (np.std(x) * np.sqrt(n))
     if max_lags == n:
-        acf = np.correlate(x, x, mode='full')[-n:]
+        acf = np.correlate(x, x, mode="full")[-n:]
     else:
-        acf = np.correlate(x, x, mode='full')[-n:-n + max_lags]
+        acf = np.correlate(x, x, mode="full")[-n : -n + max_lags]
     return acf
 
 
@@ -134,7 +171,7 @@ def yw(x: np.array, order=1, unbiased=False):
     try:
         rho = np.linalg.solve(R, r[1:])
     except np.linalg.LinAlgError:
-        print('Solution is not defined for singular matrices')
+        print("Solution is not defined for singular matrices")
         rho = [np.nan]
     return rho
 

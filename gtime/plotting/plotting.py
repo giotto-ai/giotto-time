@@ -5,7 +5,6 @@ from gtime.plotting.preprocessing import seasonal_split, acf, pacf
 from scipy.stats import norm
 
 
-
 def lagplot(df: pd.DataFrame, lags, plots_per_row: int = 4):
     """
     Lag scatter plots.
@@ -32,15 +31,21 @@ def lagplot(df: pd.DataFrame, lags, plots_per_row: int = 4):
         rows = 1
         cols = len(lags)
 
-    fig, ax = plt.subplots(rows, cols,
-                           sharey=True, sharex=True, figsize=(20, 5 * rows), squeeze=False,
-                           gridspec_kw={'wspace': 0.05})
-    x_lim = df.agg(['min', 'max']).values
+    fig, ax = plt.subplots(
+        rows,
+        cols,
+        sharey=True,
+        sharex=True,
+        figsize=(20, 5 * rows),
+        squeeze=False,
+        gridspec_kw={"wspace": 0.05},
+    )
+    x_lim = df.agg(["min", "max"]).values
 
     for i, l in enumerate(lags):
         axes = ax[i // plots_per_row, i % plots_per_row]
         axes.scatter(df.iloc[l:], df.iloc[:-l])
-        axes.set(title='Lag ' + str(l))
+        axes.set(title="Lag " + str(l))
         axes.plot(x_lim, x_lim, ls="--", c=".7")
         axes.set(xlim=x_lim, ylim=x_lim)
         axes.label_outer()
@@ -48,7 +53,7 @@ def lagplot(df: pd.DataFrame, lags, plots_per_row: int = 4):
     return ax
 
 
-def subplots(df: pd.DataFrame, cycle, freq=None, agg='mean', box=False):
+def subplots(df: pd.DataFrame, cycle, freq=None, agg="mean", box=False):
     """
     Seasonal subplots
 
@@ -65,9 +70,14 @@ def subplots(df: pd.DataFrame, cycle, freq=None, agg='mean', box=False):
 
     """
     ss = seasonal_split(df, cycle, freq, agg)
-    fig, ax = plt.subplots(ss.columns.levshape[0], ss.shape[0],
-                           sharey=True, figsize=(15, 6), squeeze=False,
-                           gridspec_kw={'wspace':0})
+    fig, ax = plt.subplots(
+        ss.columns.levshape[0],
+        ss.shape[0],
+        sharey=True,
+        figsize=(15, 6),
+        squeeze=False,
+        gridspec_kw={"wspace": 0},
+    )
     i = 0
     for _, table in ss.groupby(level=0, axis=1):
         j = 0
@@ -78,7 +88,7 @@ def subplots(df: pd.DataFrame, cycle, freq=None, agg='mean', box=False):
             else:
                 col.plot(ax=axes)
                 mean = col.mean()
-                axes.axhline(mean, color='gray', linestyle='--')
+                axes.axhline(mean, color="gray", linestyle="--")
             axes.set(xlabel=col.name)
             axes.set_xticklabels([])
             j += 1
@@ -123,7 +133,7 @@ def seasonal_polar_plot(df, ax=None):
     """
     df = df.append(df.iloc[0])
     if ax is None:
-        ax = plt.subplot(111, projection='polar')
+        ax = plt.subplot(111, projection="polar")
     angles = [x * 360 / (len(df) - 1) for x in range(len(df))]
     theta = [x / 360 * 2 * np.pi for x in angles]
     for col in df.columns:
@@ -133,7 +143,7 @@ def seasonal_polar_plot(df, ax=None):
     return ax
 
 
-def seasonal_plot(df: pd.DataFrame, cycle, freq=None, agg='mean', polar=False, ax=None):
+def seasonal_plot(df: pd.DataFrame, cycle, freq=None, agg="mean", polar=False, ax=None):
     """
     Seasonal plot function
 
@@ -157,12 +167,18 @@ def seasonal_plot(df: pd.DataFrame, cycle, freq=None, agg='mean', polar=False, a
         ax = seasonal_polar_plot(df_seas, ax=ax)
     else:
         ax = seasonal_line_plot(df_seas, ax=ax)
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=4)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.15), ncol=4)
     ax.set_xlabel(freq)
     return ax
 
 
-def acf_plot(df: pd.DataFrame, max_lags: int = 10, ci: float = 0.05, partial: bool = False, ax=None):
+def acf_plot(
+    df: pd.DataFrame,
+    max_lags: int = 10,
+    ci: float = 0.05,
+    partial: bool = False,
+    ax=None,
+):
     """
     ACF plot function
 
@@ -190,10 +206,9 @@ def acf_plot(df: pd.DataFrame, max_lags: int = 10, ci: float = 0.05, partial: bo
 
     ax.bar(range(len(acfs)), acfs, 0.05)
     ci = norm.ppf(1 - ci / 2) / np.sqrt(len(x))
-    ax.axhline(ci, color='gray', linestyle='--')
-    ax.axhline(0.0, color='black', linestyle='-')
-    ax.axhline(-ci, color='gray', linestyle='--')
-    ax.set_xlabel('Lags')
+    ax.axhline(ci, color="gray", linestyle="--")
+    ax.axhline(0.0, color="black", linestyle="-")
+    ax.axhline(-ci, color="gray", linestyle="--")
+    ax.set_xlabel("Lags")
 
     return ax
-
