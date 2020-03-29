@@ -5,7 +5,7 @@ from gtime.plotting.preprocessing import seasonal_split, acf, pacf
 from scipy.stats import norm
 
 
-def lagplot(df: pd.DataFrame, lags, plots_per_row: int = 4):
+def lag_plot(df: pd.DataFrame, lags, plots_per_row: int = 4):
     """
     Lag scatter plots.
 
@@ -18,6 +18,19 @@ def lagplot(df: pd.DataFrame, lags, plots_per_row: int = 4):
     Returns
     -------
     axes : plot axes
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> import matplotlib.pyplot as plt
+    >>> from gtime.plotting import lag_plot
+    >>> from gtime.forecasting import NaiveForecaster
+    >>> idx = pd.period_range(start='2011-01-01', end='2012-01-01')
+    >>> np.random.seed(1)
+    >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
+    >>> lag_plot(df, lags=[1, 5, 10])
+    >>> plt.show()
 
     """
 
@@ -67,6 +80,19 @@ def subplots(df: pd.DataFrame, cycle, freq=None, agg="mean", box=False):
 
     Returns
     -------
+    axes : plot axes
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> import matplotlib.pyplot as plt
+    >>> from gtime.plotting import subplots
+    >>> idx = pd.period_range(start='2011-01-01', end='2014-01-01')
+    >>> np.random.seed(1)
+    >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
+    >>> subplots(df, 'year', freq='1M', agg='last')
+    >>> plt.show()
 
     """
     ss = seasonal_split(df, cycle, freq, agg)
@@ -160,6 +186,18 @@ def seasonal_plot(df: pd.DataFrame, cycle, freq=None, agg="mean", polar=False, a
     -------
     ax : matplotlib axes
 
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> import matplotlib.pyplot as plt
+    >>> from gtime.plotting import seasonal_plot
+    >>> idx = pd.period_range(start='2011-01-01', end='2014-01-01')
+    >>> np.random.seed(1)
+    >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
+    >>> seasonal_plot(df, 'year', freq='1M', agg='last')
+    >>> plt.show()
+
     """
     df_seas = seasonal_split(df, cycle, freq, agg=agg).droplevel(0, axis=1)
 
@@ -193,6 +231,18 @@ def acf_plot(
     Returns
     -------
     ax : matplotlib axes
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> import matplotlib.pyplot as plt
+    >>> from gtime.plotting import acf_plot
+    >>> idx = pd.period_range(start='2011-01-01', end='2014-01-01')
+    >>> np.random.seed(1)
+    >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
+    >>> acf_plot(df, max_lags=20)
+    >>> plt.show()
 
     """
     x = np.squeeze(df.values)

@@ -5,7 +5,7 @@ import hypothesis.strategies as st
 import matplotlib
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
 
-from gtime.plotting import lagplot, acf_plot, subplots, seasonal_plot
+from gtime.plotting import lag_plot, acf_plot, subplots, seasonal_plot
 from gtime.plotting.preprocessing import seasonal_split
 
 
@@ -16,7 +16,7 @@ class TestLagplots:
     )
     @settings(deadline=None)
     def test_subplots_number(self, df, lags):
-        ax = lagplot(df, lags)
+        ax = lag_plot(df, lags)
         num_plots = sum(map(lambda x: x.has_data(), ax.flatten()))
         assert num_plots == len(lags)
         matplotlib.pyplot.close("all")
@@ -28,7 +28,7 @@ class TestLagplots:
     )
     @settings(deadline=None)
     def test_rows_and_cols(self, df, lags, plots_per_row):
-        ax = lagplot(df, lags, plots_per_row)
+        ax = lag_plot(df, lags, plots_per_row)
         assert ax.shape == (
             (len(lags) - 1) // plots_per_row + 1,
             min(len(lags), plots_per_row),
