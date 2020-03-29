@@ -76,5 +76,17 @@ class TestSubplots:
         assert ax.size == split.shape[0]
         matplotlib.pyplot.close('all')
 
-# class TestSeasonalPlots:
-#
+
+class TestSeasonalPlots:
+    @given(df=giotto_time_series(min_length=3, max_length=50),
+           cycle=st.sampled_from(['year', 'quarter', 'month', 'week']),
+           freq=st.from_regex(r'[1-9][WMQ]', fullmatch=True),
+           agg=st.sampled_from(['mean', 'sum', 'last']),
+           polar=st.booleans()
+           )
+    @settings(deadline=None)
+    def test_seasonal_num_lines(self, df, cycle, freq, agg, polar):
+        ax = seasonal_plot(df, cycle, freq, agg, polar)
+        split = seasonal_split(df, cycle, freq, agg)
+        assert len(ax.lines) == split.shape[1]
+        matplotlib.pyplot.close('all')

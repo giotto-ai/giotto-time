@@ -133,7 +133,7 @@ def seasonal_polar_plot(df, ax=None):
     return ax
 
 
-def seasonal_plot(df: pd.DataFrame, cycle, freq=None, polar=False, agg='mean', ax=None):
+def seasonal_plot(df: pd.DataFrame, cycle, freq=None, agg='mean', polar=False, ax=None):
     """
     Seasonal plot function
 
@@ -142,6 +142,7 @@ def seasonal_plot(df: pd.DataFrame, cycle, freq=None, polar=False, agg='mean', a
     df : pd.DataFrame, input time series
     cycle : str, cycle, calendar term ('year', 'quarter', 'month', 'week') or pandas offset string
     freq : frequency, if specified, time series is resampled to it
+    agg : aggregation function used in resampling
     polar : bool, polar format
     ax : matplotlib axes to plot on
 
@@ -150,7 +151,7 @@ def seasonal_plot(df: pd.DataFrame, cycle, freq=None, polar=False, agg='mean', a
     ax : matplotlib axes
 
     """
-    df_seas = seasonal_split(df, cycle, freq).droplevel(0, axis=1)
+    df_seas = seasonal_split(df, cycle, freq, agg=agg).droplevel(0, axis=1)
 
     if polar:
         ax = seasonal_polar_plot(df_seas, ax=ax)
