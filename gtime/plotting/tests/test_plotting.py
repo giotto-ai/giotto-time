@@ -1,11 +1,9 @@
-import pytest
-import numpy as np
-from hypothesis import given, settings, note
+from hypothesis import given, settings
 import hypothesis.strategies as st
-import matplotlib
+import matplotlib.pyplot as plt
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
 
-from gtime.plotting import lag_plot, acf_plot, subplots, seasonal_plot
+from gtime.plotting import lag_plot, acf_plot, seasonal_subplots, seasonal_plot
 from gtime.plotting.preprocessing import seasonal_split
 
 
@@ -19,7 +17,7 @@ class TestLagplots:
         ax = lag_plot(df, lags)
         num_plots = sum(map(lambda x: x.has_data(), ax.flatten()))
         assert num_plots == len(lags)
-        matplotlib.pyplot.close("all")
+        plt.close("all")
 
     @given(
         df=giotto_time_series(min_length=1, allow_nan=False, allow_infinity=False),
@@ -33,7 +31,7 @@ class TestLagplots:
             (len(lags) - 1) // plots_per_row + 1,
             min(len(lags), plots_per_row),
         )
-        matplotlib.pyplot.close("all")
+        plt.close("all")
 
 
 class TestACFplots:
@@ -50,7 +48,7 @@ class TestACFplots:
             assert len(ax.lines) == 3
             # num_plots = sum(map(lambda x: x.has_data(), ax.flatten()))
             # assert num_plots == len(lags)
-            matplotlib.pyplot.close("all")
+            plt.close("all")
 
     @given(
         df=giotto_time_series(min_length=2, allow_nan=False, allow_infinity=False),
@@ -63,7 +61,7 @@ class TestACFplots:
         if float(df.diff().sum()) > 0:
             ax = acf_plot(df, maxlags, ci, partial)
             assert len(ax.containers[0]) == min(len(df), maxlags)
-            matplotlib.pyplot.close("all")
+            plt.close("all")
 
 
 class TestSubplots:
@@ -76,10 +74,10 @@ class TestSubplots:
     )
     @settings(deadline=None)
     def test_subplots_number(self, df, cycle, freq, agg, box):
-        ax = subplots(df, cycle, freq, agg, box)
+        ax = seasonal_subplots(df, cycle, freq, agg, box)
         split = seasonal_split(df, cycle, freq, agg)
         assert ax.size == split.shape[0]
-        matplotlib.pyplot.close("all")
+        plt.close("all")
 
 
 class TestSeasonalPlots:
@@ -95,4 +93,4 @@ class TestSeasonalPlots:
         ax = seasonal_plot(df, cycle, freq, agg, polar)
         split = seasonal_split(df, cycle, freq, agg)
         assert len(ax.lines) == split.shape[1]
-        matplotlib.pyplot.close("all")
+        plt.close("all")

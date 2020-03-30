@@ -7,13 +7,14 @@ from scipy.stats import norm
 
 def lag_plot(df: pd.DataFrame, lags, plots_per_row: int = 4):
     """
-    Lag scatter plots.
+    Lag plots, scatter plot of x_i against x_i-k for every k in ``lags``.
+    https://www.itl.nist.gov/div898/handbook/eda/section3/lagplot.htm
 
     Parameters
     ----------
     df : pd.DataFrame, time series to plot
     lags : int or list of ints, lags to plot
-    plots_per_row : int, number of lag plots per one row of subplots
+    plots_per_row : int, number of lag plots per one row of seasonal_subplots
 
     Returns
     -------
@@ -66,9 +67,10 @@ def lag_plot(df: pd.DataFrame, lags, plots_per_row: int = 4):
     return ax
 
 
-def subplots(df: pd.DataFrame, cycle, freq=None, agg="mean", box=False):
+def seasonal_subplots(df: pd.DataFrame, cycle, freq=None, agg="mean", box=False):
     """
-    Seasonal subplots
+    Seasonal subplots, a series of subplots representing average values and cycle-over-cycle dynamics or box plots for each season.
+    https://www.itl.nist.gov/div898/handbook/pmc/section4/pmc4431.htm
 
     Parameters
     ----------
@@ -87,11 +89,11 @@ def subplots(df: pd.DataFrame, cycle, freq=None, agg="mean", box=False):
     >>> import pandas as pd
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
-    >>> from gtime.plotting import subplots
+    >>> from gtime.plotting import seasonal_subplots
     >>> idx = pd.period_range(start='2011-01-01', end='2014-01-01')
     >>> np.random.seed(1)
     >>> df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
-    >>> subplots(df, 'year', freq='1M', agg='last')
+    >>> seasonal_subplots(df, 'year', freq='1M', agg='last')
     >>> plt.show()
 
     """
@@ -122,7 +124,7 @@ def subplots(df: pd.DataFrame, cycle, freq=None, agg="mean", box=False):
     return ax
 
 
-def seasonal_line_plot(df, ax=None):
+def _seasonal_line_plot(df, ax=None):
     """
     Basic seasonal line plot.
 
@@ -143,7 +145,7 @@ def seasonal_line_plot(df, ax=None):
     return ax
 
 
-def seasonal_polar_plot(df, ax=None):
+def _seasonal_polar_plot(df, ax=None):
     """
     Seasonal polar plot.
 
@@ -202,9 +204,9 @@ def seasonal_plot(df: pd.DataFrame, cycle, freq=None, agg="mean", polar=False, a
     df_seas = seasonal_split(df, cycle, freq, agg=agg).droplevel(0, axis=1)
 
     if polar:
-        ax = seasonal_polar_plot(df_seas, ax=ax)
+        ax = _seasonal_polar_plot(df_seas, ax=ax)
     else:
-        ax = seasonal_line_plot(df_seas, ax=ax)
+        ax = _seasonal_line_plot(df_seas, ax=ax)
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.15), ncol=4)
     ax.set_xlabel(freq)
     return ax
@@ -218,7 +220,8 @@ def acf_plot(
     ax=None,
 ):
     """
-    ACF plot function
+    ACF plot function, showing autocorrelation or partial autucorrelation for lags up to ``max_lags``.
+    https://www.itl.nist.gov/div898/handbook/eda/section3/autocopl.htm
 
     Parameters
     ----------
