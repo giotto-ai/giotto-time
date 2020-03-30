@@ -873,7 +873,7 @@ class TestGMAE:
         assert expected_gmae == gmae_value
 
     def test_zero_in_difference_gmae(self):
-        #if absolute difference is zero then GMAE is zero
+        # if absolute difference is zero then GMAE is zero
         y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
         y_pred = pd.DataFrame([-1, 4, 5, 10, 4, 1])
 
@@ -891,6 +891,5 @@ class TestGMAE:
         expected_gmae = self._correct_gmae(y_true, y_pred)
         print(y_true)
         print(y_pred)
-        
-        assert expected_gmae == gmae_value
 
+        assert expected_gmae == gmae_value
