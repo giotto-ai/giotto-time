@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import math
+from datetime import date, datetime, timedelta
 
 
 def time_series_split(time_series, n_splits=4, split_on='index'):
@@ -25,7 +26,8 @@ def time_series_split(time_series, n_splits=4, split_on='index'):
 
     Yields
     -------
-    fold.index : list/lists of pandas indexes as folds
+    fold.index : list/lists of pandas indexes of folds
+    time_fold.index : list/lists of pandas indexes of folds
 
    Examples
    --------
@@ -39,32 +41,36 @@ def time_series_split(time_series, n_splits=4, split_on='index'):
       raise ValueError(
          "The number of splits is greater than number of samples"
       )
+   
+   if split_on == 'index':
+      n_set = n_samples // n_splits
+      start = 0
+      end = n_set
+      for itr in range(n_splits - 1):
+         fold = time_series[start:end]
+         yield fold.index
+         end += n_set
+      last_fold = time_series[start:]
 
-   month_count = time_series.resample('M').first().dropna().shape[0]
-   day_count = time_series.resample('D').first().dropna().shape[0]
-   hour_count = time_series.resample('H').first().dropna().shape[0]
+   elif split_on == 'time':
+      if isinstance(time_series.index, pd.DatetimeIndex):
+         start_date = time_series.index[0] 
+         end_date = time_series.index[-1]
+         n_days = len(time_series.resample('D'))
+         fold_length = n_days // n_splits
+         next_date = start_date + pd.Timedelta(days=fold_length)
 
-   n_set = n_samples // n_splits
-   start = 0
-   end = n_set
-   if isinstance(time_series.index, pd.DatetimeIndex):
-      n_set = month_count // n_splits
-      end = n_set 
-      if isinstance((month_count / n_splits), float) and (month_count < n_splits):
-         n_set = day_count // n_splits
-         end = n_set
-         if (n_set == 0) and (hour_count > 1):
-            n_set = hour_count // n_splits
-            end = n_set
+         for split in range(n_splits - 1):
+            time_fold = time_series[(time_series.index >= start_date) & (time_series.index < next_date)]
+            yield time_fold.index
+            next_date += pd.Timedelta(days=fold_length)
+         last_time_fold = time_series[0:]
       else:
-         n_set = math.floor(month_count / n_splits)
-         end = n_set
+         raise ValueError(
+            "The input parameter split_on is 'time' but the data does not have time index"
+      )
 
-   for itr in range(n_splits - 1):
-      fold = time_series[start:end]
-      yield fold.index
-      end += n_set
-   last_fold = time_series[start:]
+   
    
 
 
