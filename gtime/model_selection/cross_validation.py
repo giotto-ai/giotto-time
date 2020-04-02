@@ -5,26 +5,26 @@ def time_series_split(time_series: pd.DataFrame, n_splits=4, split_on='index'):
    """
    Split the input DataFrame into n_splits. If the data is not a timeries then the split
    is based on the number of samples.
-   If the data is is a timeseries then divide the time series into months, days or years.
+   If the data is a timeseries and split_on 'time' then divide the time series based on
+   time.
 
    Note: The split is based on the index, if split_on is timeseries then the data will be split 
    based on time
 
    Parameters
    ----------
-   time_series : pandas DataFrame, shape (n_samples,), required
-   The dataframe should have datetime as index if it is a timeseries data
+   time_series : pandas DataFrame, shape (n_samples, n_features), required
 
    n_splits : int, default = 4, required
    The number of splits/folds on the dataset
 
-   split_on : 'index', default parameter
-   If the index is a datetime then the dataset will be split based on time
+   split_on : 'index', default = 'index'. Optional - 'time' 
+   If the parameter is 'time' then DataFrame index must be DateTime. The dataset will be split based on time
 
    Yields
    -------
-   fold.index : list/lists of pandas indexes of folds
-   time_fold.index : list/lists of pandas indexes of folds
+   fold.index : RangeIndex indexes of folds 
+   time_fold.index : DateTimeIndex of folds if split_on 'time' 
 
    Examples
    --------
