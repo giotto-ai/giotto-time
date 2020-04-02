@@ -50,14 +50,14 @@ def _get_season_names(df: pd.DataFrame, cycle: str, freq: Optional[str] = None) 
     """
 
     calendar_map = {
-        ('year', 'D'): 'index.start_time.dayofyear',
-        ('year', 'W'): 'index.start_time.weekofyear',
-        ('year', 'W-SUN'): 'index.start_time.weekofyear',
-        ('year', 'M'): 'index.start_time.dayofyear',
-        ('year', 'Q'): 'index.start_time.quarter',
-        ('year', 'Q-DEC'): 'index.start_time.quarter',
-        ('month', 'D'): 'index.start_time.day',
-        ('week', 'D'): 'index.start_time.dayofweek',
+        ('year', 'D'): 'dayofyear',
+        ('year', 'W'): 'weekofyear',
+        ('year', 'W-SUN'): 'weekofyear',
+        ('year', 'M'): 'dayofyear',
+        ('year', 'Q'): 'quarter',
+        ('year', 'Q-DEC'): 'quarter',
+        ('month', 'D'): 'day',
+        ('week', 'D'): 'dayofweek',
     }
 
     freq_map = {
@@ -68,7 +68,7 @@ def _get_season_names(df: pd.DataFrame, cycle: str, freq: Optional[str] = None) 
     }
 
     if (cycle, freq) in calendar_map.keys():
-        return getattr(df, calendar_map[(cycle, freq)])
+        return getattr(df.index.start_time, calendar_map[(cycle, freq)])
     else:
         col_name = df.columns[0]
         if cycle in freq_map.keys():
@@ -97,7 +97,7 @@ def _get_cycle_names(df: pd.DataFrame, cycle: str):
         return list(map(lambda x: "_".join([str(x.start_time.year), str(x.start_time.quarter)]), df.index))
     elif cycle == 'month':
         return list(map(lambda x: "_".join([str(x.start_time.year), str(x.start_time.month)]), df.index))
-    elif cycle == 'quarter':
+    elif cycle == 'week':
         return list(map(_week_of_year, df.index))
     else:
         col_name = df.columns[0]
