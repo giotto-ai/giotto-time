@@ -1,11 +1,12 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+from typing import Union, List, Callable, Optional
 from gtime.plotting.preprocessing import seasonal_split, acf, pacf
 from scipy.stats import norm
 
 
-def lag_plot(df: pd.DataFrame, lags, plots_per_row: int = 4):
+def lag_plot(df: pd.DataFrame, lags: Union[int, List[int]], plots_per_row: int = 4):
     """
     Lag plots, scatter plot of x_i against x_i-k for every k in ``lags``.
     https://www.itl.nist.gov/div898/handbook/eda/section3/lagplot.htm
@@ -13,7 +14,7 @@ def lag_plot(df: pd.DataFrame, lags, plots_per_row: int = 4):
     Parameters
     ----------
     df : pd.DataFrame, time series to plot
-    lags : int or list of ints, lags to plot
+    lags : int or list of ints, lags to plot, if int n is given, first n lags are used
     plots_per_row : int, number of lag plots per one row of seasonal_subplots
 
     Returns
@@ -67,7 +68,7 @@ def lag_plot(df: pd.DataFrame, lags, plots_per_row: int = 4):
     return ax
 
 
-def seasonal_subplots(df: pd.DataFrame, cycle, freq=None, agg="mean", box=False):
+def seasonal_subplots(df: pd.DataFrame, cycle: str, freq: Optional[str] = None, agg: Union[str, Callable] = "mean", box: bool = False):
     """
     Seasonal subplots, a series of subplots representing average values and cycle-over-cycle dynamics or box plots for each season.
     https://www.itl.nist.gov/div898/handbook/pmc/section4/pmc4431.htm
@@ -77,7 +78,7 @@ def seasonal_subplots(df: pd.DataFrame, cycle, freq=None, agg="mean", box=False)
     df : pd.DataFrame, time series to plot
     cycle : str, cycle, calendar term ('year', 'quarter', 'month', 'week') or pandas offset string
     freq : frequency, if specified, time series is resampled to it
-    agg : aggregation function used in resampling
+    agg : str or function, aggregation function used in resampling
     box : bool, use box plots
 
     Returns
@@ -124,14 +125,14 @@ def seasonal_subplots(df: pd.DataFrame, cycle, freq=None, agg="mean", box=False)
     return ax
 
 
-def _seasonal_line_plot(df, ax=None):
+def _seasonal_line_plot(df: pd.DataFrame, ax: Optional[plt.Axes] = None) -> plt.Axes:
     """
     Basic seasonal line plot.
 
     Parameters
     ----------
     df : pd.DataFrame, input dataframe reformated by seasons
-    ax : matplotlib axes to plot on
+    ax : plt.Axes, matplotlib axes to plot on
 
     Returns
     -------
@@ -145,14 +146,14 @@ def _seasonal_line_plot(df, ax=None):
     return ax
 
 
-def _seasonal_polar_plot(df, ax=None):
+def _seasonal_polar_plot(df: pd.DataFrame, ax: Optional[plt.Axes] = None) -> plt.Axes:
     """
     Seasonal polar plot.
 
     Parameters
     ----------
     df : pd.DataFrame, input dataframe reformated by seasons
-    ax : matplotlib axes to plot on
+    ax : plt.Axes, matplotlib axes to plot on
 
     Returns
     -------
@@ -171,18 +172,18 @@ def _seasonal_polar_plot(df, ax=None):
     return ax
 
 
-def seasonal_plot(df: pd.DataFrame, cycle, freq=None, agg="mean", polar=False, ax=None):
+def seasonal_plot(df: pd.DataFrame, cycle: str, freq: Optional[str] = None, agg: Union[str, Callable] = "mean", polar: bool = False, ax: plt.Axes = None):
     """
     Seasonal plot function
 
     Parameters
     ----------
-    df : pd.DataFrame, input time series
+    df : pd.DataFrame, time series to plot
     cycle : str, cycle, calendar term ('year', 'quarter', 'month', 'week') or pandas offset string
     freq : frequency, if specified, time series is resampled to it
-    agg : aggregation function used in resampling
+    agg : str or function, aggregation function used in resampling
     polar : bool, polar format
-    ax : matplotlib axes to plot on
+    ax : plt.Axes, matplotlib axes to plot on
 
     Returns
     -------
