@@ -64,8 +64,8 @@ class TestACFplots:
 
 class TestSubplots:
 
-    @pytest.mark.parametrize('cycle', ["year", "quarter", '6M'])
-    @pytest.mark.parametrize('freq', ['M', None])
+    @pytest.mark.parametrize('cycle', ["year", '6M'])
+    @pytest.mark.parametrize('freq', ['M'])
     @pytest.mark.parametrize('box', [True, False])
     def test_subplots_number(self, time_series, cycle, freq, box):
         ax = seasonal_subplots(time_series, cycle=cycle, freq=freq, box=box)
