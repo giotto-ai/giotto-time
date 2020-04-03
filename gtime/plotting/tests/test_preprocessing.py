@@ -1,9 +1,10 @@
 import numpy as np
 import re
+import pytest
 import hypothesis.strategies as st
 from hypothesis import given, settings
 from gtime.utils.hypothesis.time_indexes import giotto_time_series, period_indexes
-from gtime.plotting.preprocessing import seasonal_split, acf, pacf, _get_cycle_names, _get_season_names, _autocorrelation, _scale, _solve_yw_equation, _week_of_year, yule_walker
+from gtime.plotting.preprocessing import seasonal_split, acf, pacf, _get_cycle_names, _get_season_names, _autocorrelation, _normalize, _solve_yw_equation, _week_of_year, yule_walker
 
 
 class TestSplits:
@@ -11,8 +12,8 @@ class TestSplits:
     @given(t=period_indexes(min_length=1, max_length=1))
     def test_week_of_year(self, t):
         period = t[0]
-        res = _week_of_year(period)
-        assert re.match(r'\d{4}_\d\d?$', res)
+        week = _week_of_year(period)
+        assert re.match(r'\d{4}_\d\d?$', week)
 
     @given(
         df=giotto_time_series(min_length=3, max_length=500),
@@ -56,6 +57,40 @@ class TestSplits:
 
 
 class TestAcf:
+
+    @given(
+        x=st.lists(st.floats(allow_nan=False), min_size=1)
+    )
+    def test_autocorrelation(self, x):
+        autocorr = _autocorrelation(np.array(x))
+        expected = np.correlate(x, x, mode="full")[-len(x):] / len(x)
+        np.testing.assert_array_equal(autocorr, expected)
+
+    @given(
+        x=st.lists(st.floats(allow_nan=False, allow_infinity=False, max_value=1e20, min_value=1e20), min_size=1)
+    )
+    def test_scale(self, x):
+        scaled_x = _normalize(np.array(x))
+        assert scaled_x.mean() == pytest.approx(0.0)
+        assert scaled_x.std() == pytest.approx(1.0) or scaled_x.std() == pytest.approx(0.0)
+
+    @given(
+        x=st.lists(st.floats(allow_nan=False, allow_infinity=False), min_size=2)
+    )
+    def test_solve_yw(self, x):
+        rho = _solve_yw_equation(np.array(x))
+        if not np.isnan(np.sum(rho)):
+            assert len(rho) == len(x) - 1
+
+    @given(
+        x=st.lists(st.floats(allow_nan=False, allow_infinity=False), min_size=2),
+        order=st.integers(min_value=1)
+    )
+    def test_yule_walker_abs(self, x, order):
+        pacf = yule_walker(np.array(x), order)
+        if not (np.isnan(np.sum(pacf)) or len(pacf) == 0):
+            assert all(abs(pacf) <= 1)
+
     @given(
         df=giotto_time_series(min_length=1, allow_nan=False, allow_infinity=False),
         max_lag=st.integers(min_value=1, max_value=1000),
