@@ -22,13 +22,11 @@ def _week_of_year(t: pd.Period) -> str:
 
     if t.start_time.weekofyear == 1 and t.start_time.month == 12:
         year = t.end_time.year
-        week = t.start_time.weekofyear
     elif t.start_time.weekofyear == 52 and t.end_time.month == 1:
         year = t.end_time.year - 1
-        week = t.start_time.weekofyear
     else:
         year = t.start_time.year
-        week = t.start_time.weekofyear
+    week = t.start_time.weekofyear
 
     return "_".join([str(year), str(week)])
 
@@ -52,8 +50,6 @@ def _get_season_names(df: pd.DataFrame, cycle: str, freq: Optional[str] = None) 
 
     calendar_map = {
         ('year', 'D'): 'dayofyear',
-        ('year', 'W'): 'weekofyear',
-        ('year', 'W-SUN'): 'weekofyear',
         ('year', 'M'): 'dayofyear',
         ('year', 'Q'): 'quarter',
         ('year', 'Q-DEC'): 'quarter',

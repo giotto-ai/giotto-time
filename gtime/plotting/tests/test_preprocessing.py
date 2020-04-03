@@ -100,18 +100,30 @@ class TestAcf:
 
     @given(
         df=giotto_time_series(min_length=1, allow_nan=False, allow_infinity=False),
-        max_lag=st.integers(min_value=1, max_value=1000),
+        max_lag=st.one_of(
+            st.integers(min_value=1, max_value=100),
+            st.none()
+        )
     )
     def test_acf_len(self, df, max_lag):
         df_array = np.ravel(df.values)
+        if max_lag is None:
+            max_lag = len(df)
         res = acf(df_array, max_lag)
         assert len(res) == min(max_lag, len(df))
 
     @given(
         df=giotto_time_series(min_length=1, allow_nan=False, allow_infinity=False),
-        max_lag=st.integers(min_value=1, max_value=100),
+        max_lag=st.one_of(
+            st.integers(min_value=1, max_value=100),
+            st.none()
+        )
     )
     def test_pacf_len(self, df, max_lag):
         df_array = np.ravel(df.values)
+        if max_lag is None and len(df) < 25:
+            max_lag = len(df)
+        else:
+            max_lag = 25
         res = pacf(df_array, max_lag)
         assert len(res) == min(max_lag, len(df))
