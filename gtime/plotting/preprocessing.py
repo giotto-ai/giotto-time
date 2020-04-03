@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from typing import Optional, Union, Callable
 from scipy.linalg import toeplitz
+from scipy.stats import zscore
 
 
 def _week_of_year(t: pd.Period) -> str:
@@ -131,7 +132,7 @@ def seasonal_split(df: pd.DataFrame, cycle: str, freq: Optional[str] = None, agg
     return df.set_index(["_Series", "_Season"]).unstack(level=0)
 
 
-def _scale(x: np.array) -> np.array:
+def _normalize(x: np.array) -> np.array:
     """
     Scales x to mean(x) == 0 and std(x) == 1
 
@@ -145,10 +146,10 @@ def _scale(x: np.array) -> np.array:
 
     """
 
-    if np.std(x) == 0:
-        return x - np.mean(x)
+    if len(x) <= 1 or x.std() == 0.0:
+        return np.zeros(len(x))
     else:
-        return (x - np.mean(x)) / (np.std(x) * np.sqrt(x.size))
+        return zscore(x)
 
 
 def _autocorrelation(x: np.array) -> np.array:
@@ -210,9 +211,8 @@ def yule_walker(x: np.array, order=1) -> np.array:
     if order == 0:
         return np.array([1.0])
 
-    r = _autocorrelation(x)
-    r = r[:order]
-    rho = _solve_yw_equation(r)
+    r= _autocorrelation(x)
+    rho = _solve_yw_equation(r[:order + 1])
     return rho
 
 
@@ -233,7 +233,7 @@ def pacf(x: np.array, max_lags: Optional[int] = None) -> np.array:
     n = x.size
     if max_lags is None or max_lags > n:
         max_lags = n
-    x = _scale(x)
+    x = _normalize(x)
     pacf = np.array([yule_walker(x, i)[-1] for i in range(max_lags)])
     return pacf
 
@@ -255,6 +255,6 @@ def acf(x: np.array, max_lags: Optional[int] = None) -> np.array:
     n = x.size
     if max_lags is None or max_lags > n:
         max_lags = n
-    x = _scale(x)
+    x = _normalize(x)
     acf = _autocorrelation(x)
     return acf[:max_lags]
