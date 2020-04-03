@@ -54,15 +54,9 @@ def time_series_split(time_series: pd.DataFrame, n_splits=4, split_on='index'):
    RangeIndex(start=0, stop=12, step=1)
    RangeIndex(start=0, stop=16, step=1)
 
-   """
+   """  
    
-   n_samples = len(time_series)
-   if n_samples < n_splits:
-      raise ValueError(
-         "The number of splits is greater than number of samples"
-      )
-   
-   if split_on == 'index':
+   def _time_series_split_on_index():
       n_set = n_samples // n_splits
       start = 0
       end = n_set
@@ -73,11 +67,11 @@ def time_series_split(time_series: pd.DataFrame, n_splits=4, split_on='index'):
       last_fold = time_series[start:]
       yield last_fold.index
 
-   elif split_on == 'time':
-      if isinstance(time_series.index, pd.DatetimeIndex):
+   def _time_series_split_on_time():
+      if isinstance(time_series.index, (pd.DatetimeIndex, pd.PeriodIndex, pd.TimedeltaIndex)):
          start_date = time_series.index[0] 
          end_date = time_series.index[-1]
-         split_length = ((end_date - start_date) / n_splits)
+         split_length = (end_date - start_date) / n_splits
          next_date = start_date + pd.Timedelta(split_length)
 
          for split in range(n_splits - 1):
@@ -91,6 +85,24 @@ def time_series_split(time_series: pd.DataFrame, n_splits=4, split_on='index'):
          raise ValueError(
             "The input parameter split_on is 'time' but the data does not have time index"
       )
+
+   n_samples = len(time_series)
+   if n_splits > n_samples:
+      raise ValueError(
+         ("Cannot have number of splits = {0} greater"
+          " than the number of samples: {1}.").format(n_splits, n_samples)
+         ) 
+
+   if split_on == 'index':
+      for index_yld in _time_series_split_on_index():
+         yield index_yld
+   elif split_on == 'time':
+      for time_yld in _time_series_split_on_time():
+         yield time_yld
+   else:
+      raise ValueError(
+         "The split_on parameter has to be either 'index' or 'time', but it is " f"{split_on}"
+   )
 
    
    

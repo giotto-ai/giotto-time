@@ -23,27 +23,27 @@ class TestTimeSeriesSplit:
         last_time_fold = time_series[0:]
         yield last_time_fold.index
 
-    def test_samples_split_counts(self):
+    def test_too_many_folds(self):
         date_rng = pd.date_range(start='1/1/2018', end='1/08/2018', freq='D')
         time_series = pd.DataFrame(date_rng, columns=['date'])
         time_series.set_index('date', inplace=True)
         time_series['data'] = np.random.randint(0,100,size=(len(date_rng)))
 
         with pytest.raises(ValueError):
-            for element in (time_series_split(time_series, n_splits=(len(time_series)+1), split_on='index')):
+            for element in time_series_split(time_series, n_splits=(len(time_series)+1), split_on='index'):
                 pass
 
-    def check_split_on_time_index_type(self):
+    def test_split_on_time_with_non_time_indexed_dataframe(self):
         # If the split_on is set to 'time' but index is not DateTime
         date_rng = pd.date_range(start='1/1/2018', end='1/08/2018', freq='D')
         time_series = pd.DataFrame(date_rng, columns=['date'])
         time_series['data'] = np.random.randint(0,100,size=(len(date_rng)))
 
         with pytest.raises(ValueError):
-            for element in (time_series_split(time_series, n_splits=5, split_on='time')):
+            for element in time_series_split(time_series, n_splits=5, split_on='time'):
                 pass
 
-    def split_on_index(self):
+    def test_split_on_index(self):
         date_rng = pd.date_range(start='1/1/2018', end='1/08/2018', freq='D')
         time_series = pd.DataFrame(date_rng, columns=['date'])
         time_series.set_index('date', inplace=True)
@@ -60,10 +60,10 @@ class TestTimeSeriesSplit:
             assert fold_length == length_list[index_length]
             fold_length += split_length 
         last_fold_length = len(time_series)
-        
+
         assert last_fold_length == length_list[-1]
 
-    def split_on_time(self):
+    def test_split_on_time(self):
         date_rng = pd.date_range(start='1/1/2018', end='1/08/2018', freq='D')
         time_series = pd.DataFrame(date_rng, columns=['date'])
         time_series.set_index('date', inplace=True)
