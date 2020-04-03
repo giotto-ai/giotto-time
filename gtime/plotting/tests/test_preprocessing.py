@@ -1,8 +1,9 @@
 import numpy as np
+import pandas as pd
 import re
 import pytest
 import hypothesis.strategies as st
-from hypothesis import given, settings
+from hypothesis import given, settings, example
 from gtime.utils.hypothesis.time_indexes import giotto_time_series, period_indexes
 from gtime.plotting.preprocessing import seasonal_split, acf, pacf, _get_cycle_names, _get_season_names, _autocorrelation, _normalize, _solve_yw_equation, _week_of_year, yule_walker
 
@@ -10,6 +11,8 @@ from gtime.plotting.preprocessing import seasonal_split, acf, pacf, _get_cycle_n
 class TestSplits:
 
     @given(t=period_indexes(min_length=1, max_length=1))
+    @example(t=pd.PeriodIndex(['1974-12-31'], freq='W'))
+    @settings(deadline=None)
     def test_week_of_year(self, t):
         period = t[0]
         week = _week_of_year(period)
@@ -45,14 +48,17 @@ class TestSplits:
             st.sampled_from(["year", "quarter", "month", "week"]),
             st.from_regex(r'[1-9][DWMQY]', fullmatch=True)
         ),
-        freq=st.from_regex(r"[1-9]?[DWMQ]", fullmatch=True),
+        freq=st.one_of(
+            st.from_regex(r"[1-9]?[DWMQ]", fullmatch=True),
+            st.none()
+        ),
         agg=st.sampled_from(["mean", "sum", "last"]),
     )
     @settings(deadline=None)
     def test_seasonal_split_shape_named(self, df, cycle, freq, agg):
-        split = seasonal_split(df, cycle, freq, agg)
-        s = split.notna().mean()
-        t = df.notna().mean().mean()
+        split = seasonal_split(df, cycle=cycle, freq=freq, agg=agg)
+        if freq is None:
+            freq = df.index.freqstr
         assert split.stack().shape == df.resample(freq).agg(agg).dropna().shape
 
 
