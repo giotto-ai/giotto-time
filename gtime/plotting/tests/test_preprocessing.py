@@ -12,6 +12,7 @@ class TestSplits:
 
     @given(t=period_indexes(min_length=1, max_length=1))
     @example(t=pd.PeriodIndex(['1974-12-31'], freq='W'))
+    @example(t=pd.PeriodIndex(['1972-01-01'], freq='W'))
     @settings(deadline=None)
     def test_week_of_year(self, t):
         period = t[0]
