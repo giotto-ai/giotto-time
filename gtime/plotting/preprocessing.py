@@ -50,7 +50,7 @@ def _get_season_names(df: pd.DataFrame, cycle: str, freq: Optional[str] = None) 
 
     calendar_map = {
         ('year', 'D'): 'dayofyear',
-        ('year', 'M'): 'dayofyear',
+        ('year', 'M'): 'month',
         ('year', 'Q'): 'quarter',
         ('year', 'Q-DEC'): 'quarter',
         ('month', 'D'): 'day',
@@ -125,7 +125,7 @@ def seasonal_split(df: pd.DataFrame, cycle: str, freq: Optional[str] = None, agg
     df["_Season"] = _get_cycle_names(df, cycle)
     df["_Series"] = _get_season_names(df, cycle, freq)
 
-    return df.set_index(["_Series", "_Season"]).unstack(level=0)
+    return df.set_index(["_Season", "_Series"]).unstack(level=0)
 
 
 def _normalize(x: np.array) -> np.array:

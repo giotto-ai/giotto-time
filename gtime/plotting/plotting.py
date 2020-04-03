@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from typing import Union, List, Callable, Optional
+from typing import Union, List, Callable, Optional, Dict
 from gtime.plotting.preprocessing import seasonal_split, acf, pacf
 from scipy.stats import norm
 
@@ -125,7 +125,7 @@ def seasonal_subplots(df: pd.DataFrame, cycle: str = 'year', freq: Optional[str]
     return ax
 
 
-def _seasonal_line_plot(df: pd.DataFrame, ax: Optional[plt.Axes] = None) -> plt.Axes:
+def _seasonal_line_plot(df: pd.DataFrame, ax: plt.Axes) -> plt.Axes:
     """
     Basic seasonal line plot.
 
@@ -140,9 +140,8 @@ def _seasonal_line_plot(df: pd.DataFrame, ax: Optional[plt.Axes] = None) -> plt.
 
     """
     if ax is None:
-        ax = df.plot(legend=False)
-    else:
-        df.plot(ax=ax, legend=False)
+        ax = plt.subplot(111)
+    df.plot(ax=ax)
     return ax
 
 
@@ -169,6 +168,8 @@ def _seasonal_polar_plot(df: pd.DataFrame, ax: Optional[plt.Axes] = None) -> plt
         plt.polar(theta, df[col], scalex=False, label=col)
     ax.set_thetagrids(angles=angles)
     ax.set_xticklabels(df.index)
+    ax.set_theta_zero_location("N")
+    ax.set_theta_direction(-1)
     return ax
 
 
@@ -208,6 +209,7 @@ def seasonal_plot(df: pd.DataFrame, cycle: str, freq: Optional[str] = None, agg:
         ax = _seasonal_polar_plot(df_seas, ax=ax)
     else:
         ax = _seasonal_line_plot(df_seas, ax=ax)
+
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.15), ncol=4)
     ax.set_xlabel(freq)
     return ax
