@@ -28,8 +28,8 @@ def n_time_series_with_same_index(
     n = draw(st.integers(min_value=min_n, max_value=max_n))
     index = draw(period_indexes(min_length=min_length))
     dictionary = {}
-    for _ in range(n):
-        key = draw(st.text(min_size=4, max_size=12))
+    for i in range(n):
+        key = str(i)
         df_values = draw(
             arrays(
                 dtype=np.float64,

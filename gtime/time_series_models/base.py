@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import sklearn
 from sklearn.base import BaseEstimator, RegressorMixin
@@ -26,7 +26,7 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         input of class FeatureCreation, which inherits from
         ``sklearn.compose.ColumnTransformer``. It is
         used internally to instantiate FeatureCreation
-    horizon : int, required
+    horizon : Union[int, List[int], required
         how many steps to predict in the future
     model: RegressorMixin, required
         forecasting model used for predictions
@@ -57,7 +57,7 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
     def __init__(
         self,
         features: List[Tuple],
-        horizon: int,
+        horizon: Union[int, List[int]],
         model: RegressorMixin,
         cache_features: bool = False,
     ):

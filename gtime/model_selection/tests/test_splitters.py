@@ -6,10 +6,13 @@ from sklearn.compose import make_column_selector
 
 from gtime.compose import FeatureCreation
 from gtime.feature_extraction import Shift, MovingAverage
+from gtime.model_selection import horizon_shift
 from gtime.model_selection.splitters import FeatureSplitter
 from gtime.utils.hypothesis.feature_matrices import X_y_matrices
 
 # TODO: refactor, make hypothesis generator instead of a full pipeline
+from gtime.utils.hypothesis.time_indexes import giotto_time_series
+
 df_transformer = FeatureCreation(
     [
         ("shift_0", Shift(0), make_column_selector(dtype_include=np.number)),
@@ -49,3 +52,29 @@ class TestFeatureSplitter:
         assert y_train.shape[0] == X_train.shape[0]
         assert X_test.shape[0] == min(max(0, X.shape[0] - 2), horizon)
         assert y_test.shape[0] == X_test.shape[0]
+
+
+class TestHorizonShift:
+    @given(
+        giotto_time_series(min_length=10, allow_infinity=False, allow_nan=False),
+        st.integers(1, 8),
+    )
+    def test_horizon_int(self, time_series, horizon):
+        y_shifted = horizon_shift(time_series, horizon)
+        assert y_shifted.shape[1] == horizon
+
+        # Check first line of y_shifted
+        for i in range(1, horizon + 1):
+            assert time_series.iloc[i, 0] == y_shifted.iloc[0, i - 1]
+
+    @given(
+        giotto_time_series(min_length=10, allow_infinity=False, allow_nan=False),
+        st.sets(elements=st.integers(1, 8), min_size=1, max_size=8),
+    )
+    def test_horizon_list(self, time_series, horizon):
+        y_shifted = horizon_shift(time_series, horizon)
+        assert y_shifted.shape[1] == len(horizon)
+
+        # Check first line of y_shifted
+        for i, elem in enumerate(horizon):
+            assert time_series.iloc[elem, 0] == y_shifted.iloc[0, i]
