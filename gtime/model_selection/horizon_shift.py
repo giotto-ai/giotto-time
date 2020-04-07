@@ -37,11 +37,18 @@ def horizon_shift(
     2020-01-03  3.0  4.0
     2020-01-04  4.0  NaN
     2020-01-05  NaN  NaN
+    >>> horizon_shift(X, horizon=[2])
+                y_2
+    2020-01-01  2.0
+    2020-01-02  3.0
+    2020-01-03  4.0
+    2020-01-04  NaN
+    2020-01-05  NaN
 
     """
     horizon = range(1, horizon + 1) if isinstance(horizon, (int, float)) else horizon
     y = pd.DataFrame(index=time_series.index)
-    for k in horizon:
+    for k in sorted(horizon):
         shift_feature = Shift(-k)
         y[f"y_{k}"] = shift_feature.fit_transform(time_series)
 
