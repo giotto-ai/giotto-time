@@ -10,5 +10,6 @@ __all__ = [
     "model_selection",
     "preprocessing",
     "regressors",
+    "time_series_models",
     "utils",
 ]

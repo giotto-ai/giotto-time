@@ -1,9 +1,13 @@
+from typing import List, Union
+
 import pandas as pd
 
 from gtime.feature_extraction import Shift
 
 
-def horizon_shift(time_series: pd.DataFrame, horizon: int = 5) -> pd.DataFrame:
+def horizon_shift(
+    time_series: pd.DataFrame, horizon: Union[int, List[int]] = 5
+) -> pd.DataFrame:
     """Perform a shift of the original ``time_series`` for each time step between 1 and
     ``horizon``.
 
@@ -35,8 +39,9 @@ def horizon_shift(time_series: pd.DataFrame, horizon: int = 5) -> pd.DataFrame:
     2020-01-05  NaN  NaN
 
     """
+    horizon = range(1, horizon + 1) if isinstance(horizon, (int, float)) else horizon
     y = pd.DataFrame(index=time_series.index)
-    for k in range(1, horizon + 1):
+    for k in horizon:
         shift_feature = Shift(-k)
         y[f"y_{k}"] = shift_feature.fit_transform(time_series)
 
