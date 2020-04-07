@@ -1,15 +1,49 @@
 import pandas as pd
 
 
+def _time_series_split_on_index(time_series, n_samples, n_splits):
+   n_set = n_samples // n_splits
+   start = 0
+   end = n_set
+   for itr in range(n_splits - 1):
+      fold = time_series[start:end]
+      yield fold
+      end += n_set
+   last_fold = time_series[start:]
+   yield last_fold
+
+def _time_series_split_on_time(time_series, n_samples, n_splits):
+   if isinstance(time_series, (pd.DatetimeIndex, pd.PeriodIndex, pd.TimedeltaIndex)):
+      start_date = time_series[0] 
+      end_date = time_series[-1]
+      split_length = (end_date - start_date) / n_splits
+      next_date = start_date + pd.Timedelta(split_length)
+
+      for split in range(n_splits - 1):
+         time_fold = time_series[(time_series >= start_date) & (time_series < next_date)]
+         yield time_fold
+         next_date += pd.Timedelta(split_length)
+      last_time_fold = time_series[0:]
+      yield last_time_fold
+
+   else:
+      raise ValueError(
+         "The input parameter split_on is 'time' but the data does not have time index"
+   )
+
+
 def time_series_split(time_series: pd.DataFrame, n_splits=4, split_on='index'):
    """
-   Split the input DataFrame into n_splits. If the data is not a timeries then the split
-   is based on the number of samples.
-   If the data is a timeseries and split_on 'time' then divide the time series based on
-   time.
+   Time Series cross-validator
+   
+   time_series_split provides indices to split time series data samples
+   that are observed at fixed time intervals, in the data sets.
+   In each split, subsequent indices must be higher than before, and thus shuffling
+   in cross validator is inappropriate. Split the input dataframe into n_splits.
 
-   Note: The split is based on the index, if split_on is timeseries then the data will be split 
-   based on time
+   If the data is not a timeries then the split is based on the number of samples.
+   If the data has a time index and split_on 'time' then divide the time series based on time.
+
 
    Parameters
    ----------
@@ -19,12 +53,13 @@ def time_series_split(time_series: pd.DataFrame, n_splits=4, split_on='index'):
    The number of splits/folds on the dataset
 
    split_on : 'index', default = 'index'. Optional - 'time' 
-   If the parameter is 'time' then DataFrame index must be DateTime. The dataset will be split based on time
+   If the parameter is 'time' then dataframe index must be DatetimeIndex or PeriodIndex or TimedeltaIndex. 
+   The dataset will be split based on time
 
    Yields
    -------
-   fold.index : RangeIndex indexes of folds 
-   time_fold.index : DateTimeIndex of folds if split_on 'time' 
+   fold : RangeIndex indexes of folds, or 
+   time_fold : DateTimeIndex of folds if split_on 'time' 
 
    Examples
    --------
@@ -55,36 +90,6 @@ def time_series_split(time_series: pd.DataFrame, n_splits=4, split_on='index'):
    RangeIndex(start=0, stop=16, step=1)
 
    """  
-   
-   def _time_series_split_on_index():
-      n_set = n_samples // n_splits
-      start = 0
-      end = n_set
-      for itr in range(n_splits - 1):
-         fold = time_series[start:end]
-         yield fold.index
-         end += n_set
-      last_fold = time_series[start:]
-      yield last_fold.index
-
-   def _time_series_split_on_time():
-      if isinstance(time_series.index, (pd.DatetimeIndex, pd.PeriodIndex, pd.TimedeltaIndex)):
-         start_date = time_series.index[0] 
-         end_date = time_series.index[-1]
-         split_length = (end_date - start_date) / n_splits
-         next_date = start_date + pd.Timedelta(split_length)
-
-         for split in range(n_splits - 1):
-            time_fold = time_series[(time_series.index >= start_date) & (time_series.index < next_date)]
-            yield time_fold.index
-            next_date += pd.Timedelta(split_length)
-         last_time_fold = time_series[0:]
-         yield last_time_fold.index
-
-      else:
-         raise ValueError(
-            "The input parameter split_on is 'time' but the data does not have time index"
-      )
 
    n_samples = len(time_series)
    if n_splits > n_samples:
@@ -94,11 +99,11 @@ def time_series_split(time_series: pd.DataFrame, n_splits=4, split_on='index'):
          ) 
 
    if split_on == 'index':
-      for index_yld in _time_series_split_on_index():
-         yield index_yld
+      time_series = time_series.index
+      yield from _time_series_split_on_index(time_series, n_samples, n_splits)
    elif split_on == 'time':
-      for time_yld in _time_series_split_on_time():
-         yield time_yld
+      time_series = time_series.index
+      yield from _time_series_split_on_time(time_series, n_samples, n_splits)
    else:
       raise ValueError(
          "The split_on parameter has to be either 'index' or 'time', but it is " f"{split_on}"
