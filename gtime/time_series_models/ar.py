@@ -1,3 +1,5 @@
+from typing import List, Union
+
 import numpy as np
 from sklearn.compose import make_column_selector
 from sklearn.linear_model import LinearRegression
@@ -34,7 +36,7 @@ class AR(TimeSeriesForecastingModel):
     2000-01-01 00:00:19 -0.107707  0.052031 -0.105526
     """
 
-    def __init__(self, p: int, horizon: int):
+    def __init__(self, p: int, horizon: Union[int, List[int]]):
         features = [
             tuple((f"s{i}", Shift(i), make_column_selector(dtype_include=np.number)))
             for i in range(1, p + 1)
