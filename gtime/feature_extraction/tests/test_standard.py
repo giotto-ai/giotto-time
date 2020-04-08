@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from pandas.testing import assert_frame_equal
 
 if pd.__version__ >= "1.0.0":
     import pandas._testing as testing
@@ -7,6 +8,7 @@ else:
     import pandas.util.testing as testing
 import pytest
 from hypothesis import given, strategies as st
+from hypothesis.extra.pandas import column, data_frames
 
 from gtime.feature_extraction import (
     Shift,
@@ -132,175 +134,27 @@ class TestMovingAverage:
         testing.assert_frame_equal(expected_df_ma, df_ma)
 
 
-# FIXME: refactor with pytest parametrize
-@pytest.mark.skip(reason="TODO: Use pytest parametrize")
 class TestExogenous:
-    def _correct_exog(self, exog: pd.DataFrame, df: pd.DataFrame) -> pd.DataFrame:
-        return exog.reindex(index=df.index)
+    @given(giotto_time_series(min_length=2))
+    def test_exogenous_single_column(self, time_series: pd.DataFrame):
+        exogenous = Exogenous()
+        transformed_time_series = exogenous.fit_transform(time_series)
+        transformed_time_series.columns = ['time_series']
+        assert_frame_equal(transformed_time_series, time_series, check_names=False)
 
-    def test_correct_exog_none_method(self):
-        method = None
-        exog = pd.DataFrame.from_dict({"x0": [0, 1, 2, 3]})
-        exog.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 2, 1),
-            pd.Timestamp(2000, 3, 1),
-            pd.Timestamp(2000, 4, 1),
-        ]
+    @given(data_frames([column('A', dtype=int), column('B', dtype=float)]))
+    def test_multiple_columns(self, time_series: pd.DataFrame):
+        exogenous = Exogenous()
+        transformed_time_series = exogenous.fit_transform(time_series)
+        transformed_time_series.columns = ['A', 'B']
+        assert_frame_equal(transformed_time_series, time_series, check_names=False)
 
-        df = pd.DataFrame.from_dict({"x1": [10, 11, 12, 13]})
-        df.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 1, 2),
-            pd.Timestamp(2000, 1, 3),
-            pd.Timestamp(2000, 1, 4),
-        ]
-
-        exog_feature = Exogenous(exogenous_time_series=exog, method=method)
-        feature_name = exog_feature.__class__.__name__
-
-        new_exog_feature = exog_feature.fit_transform(df)
-        expected_exog = pd.DataFrame.from_dict(
-            {f"x0__{feature_name}": [0, np.nan, np.nan, np.nan]}
-        )
-        expected_exog.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 1, 2),
-            pd.Timestamp(2000, 1, 3),
-            pd.Timestamp(2000, 1, 4),
-        ]
-
-        testing.assert_frame_equal(expected_exog, new_exog_feature)
-
-    def test_correct_exog_backfill_method(self):
-        method = "backfill"
-
-        exog = pd.DataFrame.from_dict({"x0": [0, 1, 2, 3]})
-        exog.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 2, 1),
-            pd.Timestamp(2000, 3, 1),
-            pd.Timestamp(2000, 4, 1),
-        ]
-
-        df = pd.DataFrame.from_dict({"x1": [10, 11, 12, 13]})
-        df.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 1, 2),
-            pd.Timestamp(2000, 1, 3),
-            pd.Timestamp(2000, 1, 4),
-        ]
-
-        exog_feature = Exogenous(exogenous_time_series=exog, method=method)
-
-        new_exog_feature = exog_feature.fit_transform(df)
-        expected_exog = pd.DataFrame.from_dict({"output_name": [0, 1, 1, 1]})
-        expected_exog.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 1, 2),
-            pd.Timestamp(2000, 1, 3),
-            pd.Timestamp(2000, 1, 4),
-        ]
-
-        testing.assert_frame_equal(expected_exog, new_exog_feature)
-
-    def test_correct_exog_pad_method(self):
-        method = "pad"
-        exog = pd.DataFrame.from_dict({"x_1": [0, 1, 2, 3]})
-        exog.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 2, 1),
-            pd.Timestamp(2000, 3, 1),
-            pd.Timestamp(2000, 4, 1),
-        ]
-
-        df = pd.DataFrame.from_dict({"x_2": [10, 11, 12, 13]})
-        df.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 1, 2),
-            pd.Timestamp(2000, 1, 3),
-            pd.Timestamp(2000, 1, 4),
-        ]
-
-        exog_feature = Exogenous(exogenous_time_series=exog, method=method)
-
-        new_exog_feature = exog_feature.fit_transform(df)
-        expected_exog = pd.DataFrame.from_dict({"output_name": [0, 0, 0, 0]})
-        expected_exog.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 1, 2),
-            pd.Timestamp(2000, 1, 3),
-            pd.Timestamp(2000, 1, 4),
-        ]
-
-        testing.assert_frame_equal(expected_exog, new_exog_feature)
-
-    def test_correct_nearest_pad_method(self):
-        method = "nearest"
-        exog = pd.DataFrame.from_dict({"x_1": [0, 1, 2, 3]})
-        exog.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 2, 1),
-            pd.Timestamp(2000, 3, 1),
-            pd.Timestamp(2000, 4, 1),
-        ]
-
-        df = pd.DataFrame.from_dict({"x_2": [10, 11, 12, 13]})
-        df.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 1, 2),
-            pd.Timestamp(2000, 1, 3),
-            pd.Timestamp(2000, 1, 29),
-        ]
-
-        exog_feature = Exogenous(exogenous_time_series=exog, method=method)
-
-        new_exog_feature = exog_feature.fit_transform(df)
-        expected_exog = pd.DataFrame.from_dict({"output_name": [0, 0, 0, 1]})
-        expected_exog.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 1, 2),
-            pd.Timestamp(2000, 1, 3),
-            pd.Timestamp(2000, 1, 29),
-        ]
-
-        testing.assert_frame_equal(expected_exog, new_exog_feature)
-
-    def test_correct_multi_columns_exog(self):
-        output_name = "exog"
-        exog = pd.DataFrame.from_dict({"x_0": [0, 1, 2, 3], "x_1": [5, 6, 7, 8]})
-        exog.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 2, 1),
-            pd.Timestamp(2000, 3, 1),
-            pd.Timestamp(2000, 4, 1),
-        ]
-
-        df = pd.DataFrame.from_dict({"x_2": [10, 11, 12, 13]})
-        df.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 1, 2),
-            pd.Timestamp(2000, 1, 3),
-            pd.Timestamp(2000, 1, 29),
-        ]
-
-        exog_feature = Exogenous(exogenous_time_series=exog)
-
-        new_exog_feature = exog_feature.fit_transform(df)
-        expected_exog = pd.DataFrame.from_dict(
-            {
-                f"{output_name}_0": [0, np.nan, np.nan, np.nan],
-                f"{output_name}_1": [5, np.nan, np.nan, np.nan],
-            }
-        )
-        expected_exog.index = [
-            pd.Timestamp(2000, 1, 1),
-            pd.Timestamp(2000, 1, 2),
-            pd.Timestamp(2000, 1, 3),
-            pd.Timestamp(2000, 1, 29),
-        ]
-
-        testing.assert_frame_equal(expected_exog, new_exog_feature)
+    @given(giotto_time_series(min_length=2))
+    def test_naming(self, time_series: pd.DataFrame):
+        exogenous = Exogenous()
+        transformed_time_series = exogenous.fit_transform(time_series)
+        expected_columns = [f'{column_name}__Exogenous' for column_name in time_series.columns]
+        assert expected_columns == list(transformed_time_series.columns)
 
 
 class TestPolynomial:

@@ -344,40 +344,20 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
     ``method`` are available, please refer to the pandas `documentation
     <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.reindex.html>`_.
 
-    Parameters
-    ----------
-    exogenous_time_series : pd.DataFrame, shape (n_samples, 1), required
-        The time series to reindex
-
-    method : str, optional, default: ``None``
-        The method used to re-index. This must be a method used by the
-        ``pandas.DataFrame.reindex`` method.
-
     Examples
     --------
     >>> import pandas as pd
     >>> from gtime.feature_extraction import Exogenous
-    >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5], index=[3, 4, 5, 6, 7, 8])
-    >>> exog_ts = pd.DataFrame([10, 8, 1, 3, 2, 7])
-    >>> exog = Exogenous(exog_ts)
+    >>> ts = pd.DataFrame({'exogenous': [10, 8, 1, 3, 2, 7]},  index=[3, 4, 5, 6, 7, 8])
+    >>> exog = Exogenous()
     >>> exog.fit_transform(ts)
-       0__Exogenous
-    3           3.0
-    4           2.0
-    5           7.0
-    6           NaN
-    7           NaN
-    8           NaN
-
-    >>> exog = Exogenous(exog_ts, method="nearest")
-    >>> exog.fit_transform(ts)
-       0__Exogenous
-    3             3
-    4             2
-    5             7
-    6             7
-    7             7
-    8             7
+        exogenous__Exogenous
+    3                    10
+    4                     8
+    5                     1
+    6                     3
+    7                     2
+    8                     7
 
     """
     def fit(self, time_series, y=None):
@@ -403,18 +383,17 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
 
     @add_class_name
     def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
-        """Reindex the ``exogenous_time_series`` with the index of ``time_series``.
+        """It returns the input time series adding the class name to it
 
         Parameters
         ----------
-        time_series : pd.DataFrame, shape (n_samples, 1), required
-            The input DataFrame. Used only for its index.
+        time_series : pd.DataFrame, shape (n_samples, n_features), required
+            The input DataFrame.
 
         Returns
         -------
-        time_series_t :  pd.DataFrame, shape (n_samples, 1)
-            The original ``exogenous_time_series``, re-indexed with the index
-            of ``time_series``.
+        time_series_t :  pd.DataFrame, shape (n_samples, n_features)
+            The original ``exogenous_time_series``, adding the class name to it
 
         """
         check_is_fitted(self)
