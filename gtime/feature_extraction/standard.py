@@ -380,14 +380,6 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
     8             7
 
     """
-
-    def __init__(
-        self, exogenous_time_series: pd.DataFrame, method: Optional[str] = None,
-    ):
-        super().__init__()
-        self.method = method
-        self.exogenous_time_series = exogenous_time_series
-
     def fit(self, time_series, y=None):
         """Fit the estimator.
 
@@ -426,12 +418,7 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
 
         """
         check_is_fitted(self)
-
-        exog_feature = self.exogenous_time_series.reindex(
-            index=time_series.index, method=self.method
-        )
-
-        return exog_feature
+        return time_series
 
 
 class CustomFeature(FunctionTransformer, FeatureMixin):
