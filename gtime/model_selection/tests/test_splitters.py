@@ -72,6 +72,7 @@ class TestHorizonShift:
         st.sets(elements=st.integers(1, 8), min_size=1, max_size=8),
     )
     def test_horizon_list(self, time_series, horizon):
+        horizon = list(sorted(horizon))
         y_shifted = horizon_shift(time_series, horizon)
         assert y_shifted.shape[1] == len(horizon)
 

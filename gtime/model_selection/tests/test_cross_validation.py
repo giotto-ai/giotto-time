@@ -21,14 +21,14 @@ def non_time_index():
 
 @pytest.fixture
 def period_index():
-    pidx = pd.PeriodIndex(start='2005-12-21 08:45', end='2005-12-31 11:55', freq='D') 
+    pidx = pd.period_range(start='2005-12-21 08:45', end='2005-12-31 11:55', freq='D')
     time_series = pd.DataFrame(index=pidx)
     time_series['data'] = np.random.randint(0, 100, size=(len(pidx)))
     return time_series
 
 @pytest.fixture
 def timedelta_index():
-    tidx = pd.TimedeltaIndex(start='1 days 02:00:12.001124', periods=25, freq='D')
+    tidx = pd.timedelta_range(start='1 days 02:00:12.001124', periods=25, freq='D')
     time_series = pd.DataFrame(index=tidx)
     time_series['data'] = np.random.randint(0, 100, size=(len(tidx)))
     return time_series
