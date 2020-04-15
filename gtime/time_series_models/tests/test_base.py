@@ -3,6 +3,7 @@ import sklearn
 from hypothesis import given
 import hypothesis.strategies as st
 
+from gtime.feature_extraction import Shift
 from gtime.utils.fixtures import (
     features1,
     features2,
@@ -32,11 +33,26 @@ class TestAR:
         p=st.integers(min_value=1, max_value=5),
         horizon=st.integers(min_value=1, max_value=3),
     )
+    def test_features_are_correct(self, time_series, p, horizon):
+        ar = AR(p, horizon)
+        for i, feature in enumerate(ar.features):
+            assert feature[0] == f's{i}'
+            assert isinstance(feature[1], Shift)
+            assert feature[1].shift == i
+
+    @given(
+        time_series=giotto_time_series(
+            allow_nan=False, allow_infinity=False, min_length=7, max_length=200
+        ),
+        p=st.integers(min_value=1, max_value=5),
+        horizon=st.integers(min_value=1, max_value=3),
+    )
     def test_results(self, time_series, p, horizon):
         ar = AR(p, horizon)
         predictions = ar.fit(time_series).predict()
         assert predictions.shape[0] == horizon
         assert predictions.shape[1] == horizon
+
 
 
 class TestTimeSeriesForecastingModel:

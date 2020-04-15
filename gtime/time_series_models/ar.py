@@ -37,9 +37,10 @@ class AR(TimeSeriesForecastingModel):
     """
 
     def __init__(self, p: int, horizon: Union[int, List[int]]):
+        self.p = p
         features = [
             tuple((f"s{i}", Shift(i), make_column_selector(dtype_include=np.number)))
-            for i in range(1, p + 1)
+            for i in range(p)
         ]
         model = GAR(LinearRegression())
         super().__init__(features=features, horizon=horizon, model=model)
