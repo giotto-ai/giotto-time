@@ -2,12 +2,20 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
+import pytest
 from hypothesis import given
+from hypothesis.strategies import data
 from sklearn.compose import make_column_selector
 
 from gtime.compose import FeatureCreation
 from gtime.feature_extraction import Shift, MovingAverage
-from gtime.utils.hypothesis.feature_matrices import X_y_matrices, X_matrices, y_matrices
+from gtime.utils.hypothesis.feature_matrices import (
+    X_y_matrices,
+    X_matrices,
+    y_matrices,
+    numpy_X_y_matrices,
+)
+from gtime.utils.hypothesis.general_strategies import shape_X_y_matrices, ordered_pair
 
 df_transformer = FeatureCreation(
     [
@@ -80,3 +88,48 @@ class TestYMatrices:
     @given(y_matrices(horizon=3, allow_nan_infinity=False))
     def test_allow_nan_false(self, y: pd.DataFrame):
         assert y.dropna(axis=0, how="any").shape[0] == max(y.shape[0] - 3, 0)
+
+
+class TestNumpyXyMatrices:
+    @given(data(), shape_X_y_matrices())
+    def test_input_as_tuples(self, data, shape_X_y):
+        X, y = data.draw(numpy_X_y_matrices(shape_X_y))
+        assert X.shape == shape_X_y[0]
+        assert y.shape == shape_X_y[1]
+
+    @given(data())
+    def test_input_as_strategy(self, data):
+        data.draw(numpy_X_y_matrices(shape_X_y_matrices()))
+
+    @given(data())
+    def test_error_shape_0_smaller_shape_1(self, data):
+        with pytest.raises(ValueError):
+            data.draw(numpy_X_y_matrices([[10, 20], [10, 1]]))
+
+    @given(data())
+    def test_error_shape_0_different(self, data):
+        with pytest.raises(ValueError):
+            data.draw(numpy_X_y_matrices([[10, 5], [4, 1]]))
+
+    @given(data(), shape_X_y_matrices(), ordered_pair(32, 47))
+    def test_min_max_values(self, data, shape_X_y, min_max_values):
+        min_value, max_value = min_max_values
+        X, y = data.draw(
+            numpy_X_y_matrices(shape_X_y, min_value=min_value, max_value=max_value)
+        )
+        assert X.min() >= min_value
+        assert y.min() >= min_value
+        assert X.max() <= max_value
+        assert y.max() <= max_value
+
+    @given(data(), shape_X_y_matrices())
+    def test_no_nan(self, data, shape_X_y):
+        X, y = data.draw(numpy_X_y_matrices(shape_X_y, allow_nan=False, allow_infinity=True))
+        assert not np.isnan(X).any()
+        assert not np.isnan(y).any()
+
+    @given(data(), shape_X_y_matrices())
+    def test_no_infinity(self, data, shape_X_y):
+        X, y = data.draw(numpy_X_y_matrices(shape_X_y, allow_nan=True, allow_infinity=False))
+        assert not np.isinf(X).any()
+        assert not np.isinf(y).any()

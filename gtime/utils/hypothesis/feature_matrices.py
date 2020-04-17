@@ -2,6 +2,8 @@ from typing import Optional
 
 import hypothesis.strategies as st
 import pandas as pd
+from hypothesis.extra.numpy import arrays
+from hypothesis.strategies import tuples, integers, floats
 
 from .time_indexes import giotto_time_series
 from ...compose import FeatureCreation
@@ -134,3 +136,32 @@ def y_matrices(
     y = horizon_shift(period_index_series, horizon=horizon)
 
     return y
+
+
+@st.composite
+def numpy_X_y_matrices(
+    draw,
+    X_y_shapes,
+    min_value: float = None,
+    max_value: float = None,
+    allow_nan: bool = False,
+    allow_infinity: bool = False,
+):
+    if isinstance(X_y_shapes, tuple) or isinstance(X_y_shapes, list):
+        X_shape, y_shape = X_y_shapes
+    else:
+        X_shape, y_shape = draw(X_y_shapes)
+    if X_shape[0] != y_shape[0]:
+        raise ValueError(f"X.shape[0] must be == y.shape[0]: {X_shape}, {y_shape}")
+    if X_shape[0] <= X_shape[1]:
+        raise ValueError(f"X.shape[0] must be <= X.shape[1]: {X_shape}")
+
+    elements = floats(
+        min_value=min_value,
+        max_value=max_value,
+        allow_nan=allow_nan,
+        allow_infinity=allow_infinity,
+    )
+    X = draw(arrays(dtype=float, shape=X_shape, elements=elements,))
+    y = draw(arrays(dtype=float, shape=y_shape, elements=elements,))
+    return X, y
