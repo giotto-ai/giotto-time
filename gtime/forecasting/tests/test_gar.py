@@ -7,7 +7,7 @@ import hypothesis.strategies as st
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.utils._testing import assert_almost_equal
 
-from gtime.forecasting.gar import MultiFeatureMultiOutputRegressor
+from gtime.forecasting.gar import MultiFeatureMultiOutputRegressor, MultiFeatureGAR
 
 if pd.__version__ >= "1.0.0":
     import pandas._testing as testing
@@ -137,7 +137,9 @@ class TestMultiFeatureMultiOutputRegressor:
             estimator
         )
         with pytest.raises(ValueError):
-            multi_feature_multi_output_regressor.fit(X, y, target_to_features_dict=target_to_feature_dict)
+            multi_feature_multi_output_regressor.fit(
+                X, y, target_to_features_dict=target_to_feature_dict
+            )
 
     @given(X_y=numpy_X_y_matrices(min_value=-10000, max_value=10000))
     def test_fit_as_multi_output_regressor_if_target_to_feature_none(
@@ -232,6 +234,16 @@ class TestMultiFeatureMultiOutputRegressor:
         X_predict = data.draw(numpy_X_matrix([100, 30]))
         with pytest.raises(ValueError):
             multi_feature_multi_output_regressor.predict(X_predict)
+
+
+class TestMultiFeatureGAR:
+    def test_constructor(self, estimator):
+        multi_feature_gar = MultiFeatureGAR(
+            estimator
+        )
+        assert multi_feature_gar.n_jobs == 1
+
+
 
 
 class TestFitPredict:
