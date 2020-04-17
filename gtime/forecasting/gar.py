@@ -70,6 +70,7 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
             for i in range(y.shape[1])
         ]
         self.target_to_features_dict_ = target_to_features_dict
+        self.expected_X_shape_ = X.shape[1]
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
@@ -78,9 +79,8 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
             return super().predict(X)
 
         X = check_array(X, accept_sparse=True)
-        minimum_X_shape = max([max(feature) for feature in self.target_to_features_dict_.values()])
-        if X.shape[1] < minimum_X_shape:
-            raise ValueError(f'Minimum X shape must be {minimum_X_shape}. Detected {X.shape[1]}')
+        if X.shape[1] != self.expected_X_shape_:
+            raise ValueError(f'Expected X shape is {self.expected_X_shape_}. Detected {X.shape[1]}')
         y = [
             estimator.predict(X[:, self.target_to_features_dict_[i]])
             for i, estimator in enumerate(self.estimators_)
