@@ -165,3 +165,29 @@ def numpy_X_y_matrices(
     X = draw(arrays(dtype=float, shape=X_shape, elements=elements,))
     y = draw(arrays(dtype=float, shape=y_shape, elements=elements,))
     return X, y
+
+
+@st.composite
+def numpy_X_matrix(
+    draw,
+    shape,
+    min_value: float = None,
+    max_value: float = None,
+    allow_nan: bool = False,
+    allow_infinity: bool = False,
+):
+    if not isinstance(shape, tuple) and not isinstance(shape, list):
+        shape = draw(shape)
+    if shape[0] <= shape[1]:
+        raise ValueError(f"X.shape[0] must be <= X.shape[1]: {shape}")
+
+    elements = floats(
+        min_value=min_value,
+        max_value=max_value,
+        allow_nan=allow_nan,
+        allow_infinity=allow_infinity,
+    )
+
+    X = draw(arrays(dtype=float, shape=shape, elements=elements,))
+    return X
+

@@ -14,8 +14,8 @@ from gtime.utils.hypothesis.feature_matrices import (
     X_matrices,
     y_matrices,
     numpy_X_y_matrices,
-)
-from gtime.utils.hypothesis.general_strategies import shape_X_y_matrices, ordered_pair
+    numpy_X_matrix)
+from gtime.utils.hypothesis.general_strategies import shape_X_y_matrices, ordered_pair, shape_matrix
 
 df_transformer = FeatureCreation(
     [
@@ -124,12 +124,56 @@ class TestNumpyXyMatrices:
 
     @given(data(), shape_X_y_matrices())
     def test_no_nan(self, data, shape_X_y):
-        X, y = data.draw(numpy_X_y_matrices(shape_X_y, allow_nan=False, allow_infinity=True))
+        X, y = data.draw(
+            numpy_X_y_matrices(shape_X_y, allow_nan=False, allow_infinity=True)
+        )
         assert not np.isnan(X).any()
         assert not np.isnan(y).any()
 
     @given(data(), shape_X_y_matrices())
     def test_no_infinity(self, data, shape_X_y):
-        X, y = data.draw(numpy_X_y_matrices(shape_X_y, allow_nan=True, allow_infinity=False))
+        X, y = data.draw(
+            numpy_X_y_matrices(shape_X_y, allow_nan=True, allow_infinity=False)
+        )
         assert not np.isinf(X).any()
         assert not np.isinf(y).any()
+
+
+class TestNumpyXMatrix:
+    @given(data(), shape_matrix())
+    def test_input_as_tuples(self, data, shape):
+        X = data.draw(numpy_X_matrix(shape))
+        assert X.shape == shape
+
+    @given(data())
+    def test_input_as_strategy(self, data):
+        data.draw(numpy_X_matrix(shape_matrix()))
+
+    @given(data())
+    def test_error_shape_0_smaller_shape_1(self, data):
+        with pytest.raises(ValueError):
+            data.draw(numpy_X_matrix([10, 20]))
+
+    @given(data(), shape_matrix(), ordered_pair(32, 47))
+    def test_min_max_values(self, data, shape, min_max_values):
+        min_value, max_value = min_max_values
+        X = data.draw(
+            numpy_X_matrix(shape, min_value=min_value, max_value=max_value)
+        )
+        assert X.min() >= min_value
+        assert X.max() <= max_value
+
+    @given(data(), shape_matrix())
+    def test_no_nan(self, data, shape):
+        X = data.draw(
+            numpy_X_matrix(shape, allow_nan=False, allow_infinity=True)
+        )
+        assert not np.isnan(X).any()
+
+    @given(data(), shape_matrix())
+    def test_no_infinity(self, data, shape):
+        X = data.draw(
+            numpy_X_matrix(shape, allow_nan=True, allow_infinity=False)
+        )
+        assert not np.isinf(X).any()
+
