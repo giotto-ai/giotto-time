@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 import pandas as pd
 from sklearn.base import RegressorMixin, is_classifier
@@ -14,6 +14,38 @@ from sklearn.utils.validation import check_is_fitted
 
 
 class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
+    """ Multi target regression with option to choose the features for each target.
+
+    This strategy consists of fitting one regressor per target. It is built over
+    sklearn.multioutput.MultiOutputRegressor. Compared to this, it allows to choose
+    different features for each regressor.
+
+    Parameters
+    ----------
+    estimator: RegressorMixin, required
+        An estimator object implementing fit and predict.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from gtime.forecasting import MultiFeatureMultiOutputRegressor
+    >>> from sklearn.ensemble import RandomForestRegressor
+    >>> X = np.random.random((30, 5))
+    >>> y = np.random.random((30, 3))
+    >>> X_train, y_train = X[:20], y[:20]
+    >>> X_test, y_test = X[20:], y[20:]
+    >>>
+    >>> random_forest = RandomForestRegressor()
+    >>> regressor = MultiFeatureMultiOutputRegressor(estimator=random_forest)
+    >>>
+    >>> target_to_features_dict = {0: [0,1,2], 1: [0,1,3], 2: [0,1,4]}
+    >>> regressor.fit(X_train, y_train, target_to_features_dict=target_to_features_dict)
+    >>>
+    >>> predictions = regressor.predict(X_test)
+    >>> predictions.shape
+    (10, 3)
+
+    """
     def __init__(self, estimator: RegressorMixin):
         super().__init__(estimator=estimator, n_jobs=1)
 
@@ -21,7 +53,7 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
         self,
         X: np.ndarray,
         y: np.ndarray,
-        target_to_features_dict: Dict[int, int] = None,
+        target_to_features_dict: Dict[int, List[int]] = None,
     ):
         if target_to_features_dict is None:
             super().fit(X, y)
@@ -40,12 +72,15 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
         self.target_to_features_dict_ = target_to_features_dict
         return self
 
-    def predict(self, X):
+    def predict(self, X: np.ndarray) -> np.ndarray:
         check_is_fitted(self)
         if self.target_to_features_dict_ is None:
             return super().predict(X)
 
         X = check_array(X, accept_sparse=True)
+        minimum_X_shape = max([max(feature) for feature in self.target_to_features_dict_.values()])
+        if X.shape[1] < minimum_X_shape:
+            raise ValueError(f'Minimum X shape must be {minimum_X_shape}. Detected {X.shape[1]}')
         y = [
             estimator.predict(X[:, self.target_to_features_dict_[i]])
             for i, estimator in enumerate(self.estimators_)

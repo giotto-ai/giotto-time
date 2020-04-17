@@ -3,7 +3,7 @@ The :mod:`gtime.forecasting` module contains a collection of machine learning mo
 for dealing with time series data.
 """
 
-from .gar import GAR, GARFF
+from .gar import GAR, GARFF, MultiFeatureMultiOutputRegressor
 from .trend_models import TrendForecaster
 from .online import HedgeForecaster
 from .simple_models import (
@@ -16,6 +16,7 @@ from .simple_models import (
 __all__ = [
     "GAR",
     "GARFF",
+    "MultiFeatureMultiOutputRegressor",
     "TrendForecaster",
     "HedgeForecaster",
     "NaiveForecaster",

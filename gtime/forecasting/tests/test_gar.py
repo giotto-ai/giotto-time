@@ -230,7 +230,8 @@ class TestMultiFeatureMultiOutputRegressor:
             X, y, target_to_features_dict=target_to_feature_dict
         )
         X_predict = data.draw(numpy_X_matrix([100, 30]))
-        multi_feature_multi_output_regressor.predict(X_predict)
+        with pytest.raises(ValueError):
+            multi_feature_multi_output_regressor.predict(X_predict)
 
 
 class TestFitPredict:
