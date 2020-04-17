@@ -68,7 +68,13 @@ def lag_plot(df: pd.DataFrame, lags: Union[int, List[int]], plots_per_row: int =
     return ax
 
 
-def seasonal_subplots(df: pd.DataFrame, cycle: str = 'year', freq: Optional[str] = None, agg: Union[str, Callable] = "mean", box: bool = False):
+def seasonal_subplots(
+    df: pd.DataFrame,
+    cycle: str = "year",
+    freq: Optional[str] = None,
+    agg: Union[str, Callable] = "mean",
+    box: bool = False,
+):
     """
     Seasonal subplots, a series of subplots representing average values and cycle-over-cycle dynamics or box plots for each season.
     https://www.itl.nist.gov/div898/handbook/pmc/section4/pmc4431.htm
@@ -173,7 +179,14 @@ def _seasonal_polar_plot(df: pd.DataFrame, ax: Optional[plt.Axes] = None) -> plt
     return ax
 
 
-def seasonal_plot(df: pd.DataFrame, cycle: str, freq: Optional[str] = None, agg: Union[str, Callable] = "mean", polar: bool = False, ax: plt.Axes = None):
+def seasonal_plot(
+    df: pd.DataFrame,
+    cycle: str,
+    freq: Optional[str] = None,
+    agg: Union[str, Callable] = "mean",
+    polar: bool = False,
+    ax: plt.Axes = None,
+):
     """
     Seasonal plot function
 

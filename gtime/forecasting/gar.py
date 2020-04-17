@@ -1,5 +1,63 @@
+from typing import Dict
+
 import pandas as pd
-from sklearn.multioutput import MultiOutputRegressor, RegressorChain
+from sklearn.base import RegressorMixin, is_classifier
+from sklearn.multioutput import (
+    MultiOutputRegressor,
+    RegressorChain,
+    _MultiOutputEstimator,
+    _fit_estimator,
+)
+import numpy as np
+from sklearn.utils import check_X_y, check_array
+from sklearn.utils.validation import check_is_fitted
+
+
+class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
+    def __init__(self, estimator: RegressorMixin):
+        super().__init__(estimator=estimator, n_jobs=1)
+
+    def fit(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        target_to_features_dict: Dict[int, int] = None,
+    ):
+        if target_to_features_dict is None:
+            super().fit(X, y)
+            self.target_to_features_dict_ = None
+            return self
+
+        if not hasattr(self.estimator, "fit"):
+            raise ValueError("The base estimator should implement a fit method")
+
+        X, y = check_X_y(X, y, multi_output=True, accept_sparse=True)
+
+        if y.ndim == 1:
+            raise ValueError("y must have at least two dimensions")
+
+        self.estimators_ = [
+            _fit_estimator(self.estimator, X[:, target_to_features_dict[i]], y[:, i])
+            for i in range(y.shape[1])
+        ]
+        self.target_to_features_dict_ = target_to_features_dict
+        return self
+
+    def predict(self, X):
+        check_is_fitted(self)
+        if self.target_to_features_dict_ is None:
+            return super().predict(X)
+
+        if not hasattr(self.estimator, "predict"):
+            raise ValueError("The base estimator should implement" " a predict method")
+
+        X = check_array(X, accept_sparse=True)
+        y = [
+            estimator.predict(X[:, self.target_to_features_dict_[i]])
+            for i, estimator in enumerate(self.estimators_)
+        ]
+
+        return np.asarray(y).T
 
 
 class GAR(MultiOutputRegressor):

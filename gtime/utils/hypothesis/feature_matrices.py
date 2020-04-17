@@ -5,6 +5,7 @@ import pandas as pd
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import tuples, integers, floats
 
+from gtime.utils.hypothesis.general_strategies import shape_X_y_matrices, shape_matrix
 from .time_indexes import giotto_time_series
 from ...compose import FeatureCreation
 from ...model_selection import horizon_shift
@@ -141,7 +142,7 @@ def y_matrices(
 @st.composite
 def numpy_X_y_matrices(
     draw,
-    X_y_shapes,
+    X_y_shapes=shape_X_y_matrices(),
     min_value: float = None,
     max_value: float = None,
     allow_nan: bool = False,
@@ -170,7 +171,7 @@ def numpy_X_y_matrices(
 @st.composite
 def numpy_X_matrix(
     draw,
-    shape,
+    shape=shape_matrix(),
     min_value: float = None,
     max_value: float = None,
     allow_nan: bool = False,
@@ -190,4 +191,3 @@ def numpy_X_matrix(
 
     X = draw(arrays(dtype=float, shape=shape, elements=elements,))
     return X
-

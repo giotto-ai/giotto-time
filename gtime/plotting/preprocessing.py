@@ -31,7 +31,9 @@ def _week_of_year(t: pd.Period) -> str:
     return "_".join([str(year), str(week)])
 
 
-def _get_season_names(df: pd.DataFrame, cycle: str, freq: Optional[str] = None) -> pd.DataFrame:
+def _get_season_names(
+    df: pd.DataFrame, cycle: str, freq: Optional[str] = None
+) -> pd.DataFrame:
 
     """
     Gets names of each season (days of week, months of year etc.) of ``df`` period index
@@ -49,20 +51,15 @@ def _get_season_names(df: pd.DataFrame, cycle: str, freq: Optional[str] = None) 
     """
 
     calendar_map = {
-        ('year', 'D'): 'dayofyear',
-        ('year', 'M'): 'month',
-        ('year', 'Q'): 'quarter',
-        ('year', 'Q-DEC'): 'quarter',
-        ('month', 'D'): 'day',
-        ('week', 'D'): 'dayofweek',
+        ("year", "D"): "dayofyear",
+        ("year", "M"): "month",
+        ("year", "Q"): "quarter",
+        ("year", "Q-DEC"): "quarter",
+        ("month", "D"): "day",
+        ("week", "D"): "dayofweek",
     }
 
-    freq_map = {
-        'year': 'Y',
-        'quarter': 'Q',
-        'month': 'M',
-        'week': 'W'
-    }
+    freq_map = {"year": "Y", "quarter": "Q", "month": "M", "week": "W"}
 
     if (cycle, freq) in calendar_map.keys():
         return getattr(df.index.start_time, calendar_map[(cycle, freq)])
@@ -70,7 +67,9 @@ def _get_season_names(df: pd.DataFrame, cycle: str, freq: Optional[str] = None) 
         col_name = df.columns[0]
         if cycle in freq_map.keys():
             cycle = freq_map[cycle]
-        return df[col_name].groupby(pd.Grouper(freq=cycle, convention="s")).cumcount()+ 1
+        return (
+            df[col_name].groupby(pd.Grouper(freq=cycle, convention="s")).cumcount() + 1
+        )
 
 
 def _get_cycle_names(df: pd.DataFrame, cycle: str):
@@ -88,20 +87,35 @@ def _get_cycle_names(df: pd.DataFrame, cycle: str):
 
     """
 
-    if cycle == 'year':
+    if cycle == "year":
         return df.index.start_time.year
-    elif cycle == 'quarter':
-        return list(map(lambda x: "_".join([str(x.start_time.year), str(x.start_time.quarter)]), df.index))
-    elif cycle == 'month':
-        return list(map(lambda x: "_".join([str(x.start_time.year), str(x.start_time.month)]), df.index))
-    elif cycle == 'week':
+    elif cycle == "quarter":
+        return list(
+            map(
+                lambda x: "_".join([str(x.start_time.year), str(x.start_time.quarter)]),
+                df.index,
+            )
+        )
+    elif cycle == "month":
+        return list(
+            map(
+                lambda x: "_".join([str(x.start_time.year), str(x.start_time.month)]),
+                df.index,
+            )
+        )
+    elif cycle == "week":
         return list(map(_week_of_year, df.index))
     else:
         col_name = df.columns[0]
         return df[col_name].groupby(pd.Grouper(freq=cycle, convention="s")).ngroup()
 
 
-def seasonal_split(df: pd.DataFrame, cycle: str, freq: Optional[str] = None, agg: Union[str, Callable] = "mean") -> pd.DataFrame:
+def seasonal_split(
+    df: pd.DataFrame,
+    cycle: str,
+    freq: Optional[str] = None,
+    agg: Union[str, Callable] = "mean",
+) -> pd.DataFrame:
     """
     Converts time series to a DataFrame with columns for each ``cycle`` period.
 
@@ -207,8 +221,8 @@ def yule_walker(x: np.array, order=1) -> np.array:
     if order == 0:
         return np.array([1.0])
 
-    r= _autocorrelation(x)
-    rho = _solve_yw_equation(r[:order + 1])
+    r = _autocorrelation(x)
+    rho = _solve_yw_equation(r[: order + 1])
     return rho
 
 

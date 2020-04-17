@@ -36,7 +36,7 @@ class TestAR:
     def test_features_are_correct(self, time_series, p, horizon):
         ar = AR(p, horizon)
         for i, feature in enumerate(ar.features):
-            assert feature[0] == f's{i}'
+            assert feature[0] == f"s{i}"
             assert isinstance(feature[1], Shift)
             assert feature[1].shift == i
 
@@ -52,7 +52,6 @@ class TestAR:
         predictions = ar.fit(time_series).predict()
         assert predictions.shape[0] == horizon
         assert predictions.shape[1] == horizon
-
 
 
 class TestTimeSeriesForecastingModel:

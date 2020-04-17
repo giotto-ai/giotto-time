@@ -360,6 +360,7 @@ class Exogenous(BaseEstimator, TransformerMixin, FeatureMixin):
     8                     7
 
     """
+
     def fit(self, time_series, y=None):
         """Fit the estimator.
 

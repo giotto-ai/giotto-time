@@ -14,8 +14,13 @@ from gtime.utils.hypothesis.feature_matrices import (
     X_matrices,
     y_matrices,
     numpy_X_y_matrices,
-    numpy_X_matrix)
-from gtime.utils.hypothesis.general_strategies import shape_X_y_matrices, ordered_pair, shape_matrix
+    numpy_X_matrix,
+)
+from gtime.utils.hypothesis.general_strategies import (
+    shape_X_y_matrices,
+    ordered_pair,
+    shape_matrix,
+)
 
 df_transformer = FeatureCreation(
     [
@@ -157,23 +162,16 @@ class TestNumpyXMatrix:
     @given(data(), shape_matrix(), ordered_pair(32, 47))
     def test_min_max_values(self, data, shape, min_max_values):
         min_value, max_value = min_max_values
-        X = data.draw(
-            numpy_X_matrix(shape, min_value=min_value, max_value=max_value)
-        )
+        X = data.draw(numpy_X_matrix(shape, min_value=min_value, max_value=max_value))
         assert X.min() >= min_value
         assert X.max() <= max_value
 
     @given(data(), shape_matrix())
     def test_no_nan(self, data, shape):
-        X = data.draw(
-            numpy_X_matrix(shape, allow_nan=False, allow_infinity=True)
-        )
+        X = data.draw(numpy_X_matrix(shape, allow_nan=False, allow_infinity=True))
         assert not np.isnan(X).any()
 
     @given(data(), shape_matrix())
     def test_no_infinity(self, data, shape):
-        X = data.draw(
-            numpy_X_matrix(shape, allow_nan=True, allow_infinity=False)
-        )
+        X = data.draw(numpy_X_matrix(shape, allow_nan=True, allow_infinity=False))
         assert not np.isinf(X).any()
-
