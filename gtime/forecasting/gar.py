@@ -28,9 +28,6 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
             self.target_to_features_dict_ = None
             return self
 
-        if not hasattr(self.estimator, "fit"):
-            raise ValueError("The base estimator should implement a fit method")
-
         X, y = check_X_y(X, y, multi_output=True, accept_sparse=True)
 
         if y.ndim == 1:
@@ -47,9 +44,6 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
         check_is_fitted(self)
         if self.target_to_features_dict_ is None:
             return super().predict(X)
-
-        if not hasattr(self.estimator, "predict"):
-            raise ValueError("The base estimator should implement" " a predict method")
 
         X = check_array(X, accept_sparse=True)
         y = [
