@@ -364,9 +364,10 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor):
         """
         self.X_columns_ = X.columns
         self.y_columns_ = y.columns
-        target_to_features_dict = self._feature_name_to_index(
-            target_to_features_dict, X.columns, y.columns
-        )
+        if target_to_features_dict is not None:
+            target_to_features_dict = self._feature_name_to_index(
+                target_to_features_dict, X.columns, y.columns
+            )
         return super().fit(X.values, y.values, target_to_features_dict)
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -384,14 +385,15 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor):
             The predictions, one for each timestep in horizon.
 
         """
+        check_is_fitted(self)
         self._check_X_columns(X)
         y_p = super().predict(X.values)
         y_p_df = pd.DataFrame(data=y_p, columns=self.y_columns_, index=X.index)
 
         return y_p_df
 
+    @staticmethod
     def _feature_name_to_index(
-        self,
         target_to_features_dict: Dict[str, List[str]],
         X_columns: List[str],
         y_columns: List[str],

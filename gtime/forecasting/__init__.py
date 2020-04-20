@@ -17,8 +17,7 @@ __all__ = [
     "GAR",
     "GARFF",
     "MultiFeatureMultiOutputRegressor",
-    "MultiFeatureGAR"
-    "TrendForecaster",
+    "MultiFeatureGAR" "TrendForecaster",
     "HedgeForecaster",
     "NaiveForecaster",
     "SeasonalNaiveForecaster",
