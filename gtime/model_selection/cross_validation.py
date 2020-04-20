@@ -2,67 +2,75 @@ import pandas as pd
 
 
 def _time_series_split_on_index(time_series, n_samples, n_splits):
-   n_set = n_samples // n_splits
-   start = 0
-   end = n_set
-   for itr in range(n_splits - 1):
-      fold = time_series[start:end]
-      yield fold
-      end += n_set
-   last_fold = time_series[start:]
-   yield last_fold
+    n_set = n_samples // n_splits
+    start = 0
+    end = n_set
+    for itr in range(n_splits - 1):
+        fold = time_series[start:end]
+        yield fold
+        end += n_set
+    last_fold = time_series[start:]
+    yield last_fold
+
 
 def _time_series_split_on_time(time_series, n_samples, n_splits):
-   if isinstance(time_series, (pd.DatetimeIndex, pd.PeriodIndex, pd.TimedeltaIndex)):
-      start_date = time_series[0] 
-      end_date = time_series[-1]
-      split_length = (end_date - start_date) / n_splits
-      next_date = start_date + pd.Timedelta(split_length)
+    if isinstance(time_series, (pd.DatetimeIndex, pd.PeriodIndex, pd.TimedeltaIndex)):
+        start_date = time_series[0]
+        end_date = time_series[-1]
+        split_length = (end_date - start_date) / n_splits
+        next_date = start_date + pd.Timedelta(split_length)
 
-      for split in range(n_splits - 1):
-         time_fold = time_series[(time_series >= start_date) & (time_series < next_date)]
-         yield time_fold
-         next_date += pd.Timedelta(split_length)
-      last_time_fold = time_series[0:]
-      yield last_time_fold
+        for split in range(n_splits - 1):
+            time_fold = time_series[
+                (time_series >= start_date) & (time_series < next_date)
+            ]
+            yield time_fold
+            next_date += pd.Timedelta(split_length)
+        last_time_fold = time_series[0:]
+        yield last_time_fold
 
-   else:
-      raise ValueError(
-         "The input parameter split_on is 'time' but the data does not have time index"
-   )
+    else:
+        raise ValueError(
+            "The input parameter split_on is 'time' but the data does not have time index"
+        )
+
 
 def _blocking_time_series_split_on_index(time_series, n_samples, n_splits):
-   n_split_size = n_samples // n_splits
-   for itr in range(n_splits - 1):
-      start = itr * n_split_size
-      end = start + n_split_size
-      fold = time_series[start:end]
-      yield fold
-   last_fold = time_series[end:]
-   yield last_fold 
+    n_split_size = n_samples // n_splits
+    for itr in range(n_splits - 1):
+        start = itr * n_split_size
+        end = start + n_split_size
+        fold = time_series[start:end]
+        yield fold
+    last_fold = time_series[end:]
+    yield last_fold
+
 
 def _blocking_time_series_split_on_time(time_series, n_samples, n_splits):
-   if isinstance(time_series, (pd.DatetimeIndex, pd.PeriodIndex, pd.TimedeltaIndex)):
-      start_date = time_series[0] 
-      end_date = time_series[-1]
-      split_length = (end_date - start_date) / n_splits
-      next_date = start_date + pd.Timedelta(split_length)
+    if isinstance(time_series, (pd.DatetimeIndex, pd.PeriodIndex, pd.TimedeltaIndex)):
+        start_date = time_series[0]
+        end_date = time_series[-1]
+        split_length = (end_date - start_date) / n_splits
+        next_date = start_date + pd.Timedelta(split_length)
 
-      for split in range(n_splits - 1):
-         time_fold = time_series[(time_series >= start_date) & (time_series < next_date)]
-         yield time_fold
-         start_date = next_date 
-         next_date += pd.Timedelta(split_length)
-      last_time_fold = time_series[(time_series >= start_date)]
-      yield last_time_fold
+        for split in range(n_splits - 1):
+            time_fold = time_series[
+                (time_series >= start_date) & (time_series < next_date)
+            ]
+            yield time_fold
+            start_date = next_date
+            next_date += pd.Timedelta(split_length)
+        last_time_fold = time_series[(time_series >= start_date)]
+        yield last_time_fold
 
-   else:
-      raise ValueError(
-         "The input parameter split_on is 'time' but the data does not have time index"
-   )
+    else:
+        raise ValueError(
+            "The input parameter split_on is 'time' but the data does not have time index"
+        )
 
-def time_series_split(time_series: pd.DataFrame, n_splits=4, split_on='index'):
-   """
+
+def time_series_split(time_series: pd.DataFrame, n_splits=4, split_on="index"):
+    """
    Time Series cross-validator
    
    time_series_split provides indices to split time series data samples
@@ -118,29 +126,32 @@ def time_series_split(time_series: pd.DataFrame, n_splits=4, split_on='index'):
    RangeIndex(start=0, stop=12, step=1)
    RangeIndex(start=0, stop=16, step=1)
 
-   """  
-
-   n_samples = len(time_series)
-   if n_splits > n_samples:
-      raise ValueError(
-         ("Cannot have number of splits = {0} greater"
-          " than the number of samples: {1}.").format(n_splits, n_samples)
-         ) 
-
-   if split_on == 'index':
-      time_series = time_series.index
-      yield from _time_series_split_on_index(time_series, n_samples, n_splits)
-   elif split_on == 'time':
-      time_series = time_series.index
-      yield from _time_series_split_on_time(time_series, n_samples, n_splits)
-   else:
-      raise ValueError(
-         "The split_on parameter has to be either 'index' or 'time', but it is " f"{split_on}"
-   )
-
-   
-def blocking_time_series_split(time_series: pd.DataFrame, n_splits=4, split_on='index'):
    """
+
+    n_samples = len(time_series)
+    if n_splits > n_samples:
+        raise ValueError(
+            (
+                "Cannot have number of splits = {0} greater"
+                " than the number of samples: {1}."
+            ).format(n_splits, n_samples)
+        )
+
+    if split_on == "index":
+        time_series = time_series.index
+        yield from _time_series_split_on_index(time_series, n_samples, n_splits)
+    elif split_on == "time":
+        time_series = time_series.index
+        yield from _time_series_split_on_time(time_series, n_samples, n_splits)
+    else:
+        raise ValueError(
+            "The split_on parameter has to be either 'index' or 'time', but it is "
+            f"{split_on}"
+        )
+
+
+def blocking_time_series_split(time_series: pd.DataFrame, n_splits=4, split_on="index"):
+    """
    Time Series cross-validator
    
    Blocking Time Series Split works by adding margin after each split. 
@@ -190,25 +201,27 @@ def blocking_time_series_split(time_series: pd.DataFrame, n_splits=4, split_on='
    RangeIndex(start=8, stop=12, step=1)
    RangeIndex(start=12, stop=16, step=1)
 
-   """  
-   
-   n_samples = len(time_series)
-   if n_splits > n_samples:
-      raise ValueError(
-         ("Cannot have number of splits = {0} greater"
-          " than the number of samples: {1}.").format(n_splits, n_samples)
-         ) 
+   """
 
-   if split_on == 'index':
-      time_series = time_series.index
-      yield from _blocking_time_series_split_on_index(time_series, n_samples, n_splits)
-   elif split_on == 'time':
-      time_series = time_series.index
-      yield from _blocking_time_series_split_on_time(time_series, n_samples, n_splits)
-   else:
-      raise ValueError(
-         "The split_on parameter has to be either 'index' or 'time', but it is " f"{split_on}"
-   )
+    n_samples = len(time_series)
+    if n_splits > n_samples:
+        raise ValueError(
+            (
+                "Cannot have number of splits = {0} greater"
+                " than the number of samples: {1}."
+            ).format(n_splits, n_samples)
+        )
 
-
-   
+    if split_on == "index":
+        time_series = time_series.index
+        yield from _blocking_time_series_split_on_index(
+            time_series, n_samples, n_splits
+        )
+    elif split_on == "time":
+        time_series = time_series.index
+        yield from _blocking_time_series_split_on_time(time_series, n_samples, n_splits)
+    else:
+        raise ValueError(
+            "The split_on parameter has to be either 'index' or 'time', but it is "
+            f"{split_on}"
+        )

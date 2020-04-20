@@ -139,21 +139,23 @@ class TestExogenous:
     def test_exogenous_single_column(self, time_series: pd.DataFrame):
         exogenous = Exogenous()
         transformed_time_series = exogenous.fit_transform(time_series)
-        transformed_time_series.columns = ['time_series']
+        transformed_time_series.columns = ["time_series"]
         assert_frame_equal(transformed_time_series, time_series, check_names=False)
 
-    @given(data_frames([column('A', dtype=int), column('B', dtype=float)]))
+    @given(data_frames([column("A", dtype=int), column("B", dtype=float)]))
     def test_multiple_columns(self, time_series: pd.DataFrame):
         exogenous = Exogenous()
         transformed_time_series = exogenous.fit_transform(time_series)
-        transformed_time_series.columns = ['A', 'B']
+        transformed_time_series.columns = ["A", "B"]
         assert_frame_equal(transformed_time_series, time_series, check_names=False)
 
     @given(giotto_time_series(min_length=2))
     def test_naming(self, time_series: pd.DataFrame):
         exogenous = Exogenous()
         transformed_time_series = exogenous.fit_transform(time_series)
-        expected_columns = [f'{column_name}__Exogenous' for column_name in time_series.columns]
+        expected_columns = [
+            f"{column_name}__Exogenous" for column_name in time_series.columns
+        ]
         assert expected_columns == list(transformed_time_series.columns)
 
 
