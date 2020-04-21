@@ -12,6 +12,7 @@ from .standard import (
     Exogenous,
     CustomFeature,
 )
+from .custom import SortedDensity, CrestFactorDetrending
 
 from .trend import Detrender
 
@@ -24,4 +25,6 @@ __all__ = [
     "Calendar",
     "Detrender",
     "CustomFeature",
+    "SortedDensity",
+    "CrestFactorDetrending",
 ]
