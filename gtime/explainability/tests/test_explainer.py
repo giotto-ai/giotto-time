@@ -3,11 +3,12 @@ import numpy as np
 import pytest
 from hypothesis import given
 from hypothesis.strategies import floats, sampled_from, data, lists, text
+from lime.explanation import Explanation
 from shap.explainers.explainer import Explainer
 from sklearn.ensemble import (
     GradientBoostingRegressor,
     RandomForestRegressor,
-)
+    AdaBoostRegressor)
 from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import (
     LinearRegression,
@@ -31,6 +32,9 @@ def lime_explainer():
 def shap_explainer():
     return ShapExplainer()
 
+@pytest.fixture(scope='function')
+def unrecognized_regressor():
+    return AdaBoostRegressor()
 
 @st.composite
 def models(draw):
@@ -45,7 +49,6 @@ def models(draw):
         RandomForestRegressor(),
     ]
     return draw(sampled_from(regressors))
-
 
 @given(models())
 def test_models(regressor):
@@ -133,7 +136,7 @@ class TestAllExplainers:
         explainer.fit(regressor, X)
 
         test_matrix = X[:2, :]
-        predictions = explainer.predict(X[:2, :])
+        predictions = explainer.predict(test_matrix)
         self._check_predict_output(explainer, predictions, test_matrix)
 
     @pytest.mark.parametrize(
@@ -145,6 +148,41 @@ class TestAllExplainers:
             explainer.predict(X[:2, :])
 
 
+class TestLime:
+    @given(regressor=models(), X_y=numpy_X_y_matrices(min_value=-100, max_value=100))
+    def test_predict(self, lime_explainer, regressor, X_y):
+        X, y = X_y
+        regressor.fit(X, y)
+        lime_explainer.fit(regressor, X)
+
+        test_matrix = X[:2, :]
+        lime_explainer.predict(test_matrix)
+        self._check_explanations(lime_explainer)
+
+    def _check_explanations(self, lime_explainer: LimeExplainer):
+        assert isinstance(lime_explainer._explanations_, list)
+        assert all(isinstance(explanation, Explanation) for explanation in lime_explainer._explanations_)
+
+
 class TestShap:
-    def test_constructor(self, shap_explainer):
-        assert len(shap_explainer.allowed_explainer) == 2
+    @given(regressor=models(), X_y=numpy_X_y_matrices(min_value=-100, max_value=100))
+    def test_predict(self, shap_explainer, regressor, X_y):
+        X, y = X_y
+        regressor.fit(X, y)
+        shap_explainer.fit(regressor, X)
+
+        test_matrix = X[:2, :]
+        shap_explainer.predict(test_matrix)
+        self._check_shap_values(shap_explainer, test_matrix)
+
+    def _check_shap_values(self, shap_explainer: Explainer, test_matrix: np.ndarray):
+        assert isinstance(shap_explainer.shap_values_, np.ndarray)
+        assert shap_explainer.shap_values_.shape == test_matrix.shape
+
+    @given(X_y=numpy_X_y_matrices(min_value=-100, max_value=100))
+    def test_fit_no_feature_names(self, shap_explainer, unrecognized_regressor, X_y):
+        X, y = X_y
+        unrecognized_regressor.fit(X, y)
+        with pytest.raises(ValueError):
+            shap_explainer.fit(unrecognized_regressor, X)
+

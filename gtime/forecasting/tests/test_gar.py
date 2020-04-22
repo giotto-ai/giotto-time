@@ -183,7 +183,7 @@ class TestMultiFeatureMultiOutputRegressor:
         )
         assert multi_feature_multi_output_regressor.n_jobs == 1
 
-    @given(data=data(), X_y=numpy_X_y_matrices(min_value=-10000, max_value=10000))
+    @given(data=data(), X_y=numpy_X_y_matrices(y_vector=False, min_value=-10000, max_value=10000))
     def test_fit_bad_y(self, data, estimator, X_y):
         X, y = X_y
         y = y[:, 0].flatten()
@@ -198,7 +198,7 @@ class TestMultiFeatureMultiOutputRegressor:
                 X, y, target_to_features_dict=target_to_feature_dict
             )
 
-    @given(X_y=numpy_X_y_matrices(min_value=-10000, max_value=10000))
+    @given(X_y=numpy_X_y_matrices(y_vector=False, min_value=-10000, max_value=10000))
     def test_fit_as_multi_output_regressor_if_target_to_feature_none(
         self, estimator, X_y
     ):
@@ -222,7 +222,7 @@ class TestMultiFeatureMultiOutputRegressor:
         with pytest.raises(NotFittedError):
             regressor.predict(X)
 
-    @given(data=data(), X_y=numpy_X_y_matrices(min_value=-10000, max_value=10000))
+    @given(data=data(), X_y=numpy_X_y_matrices(y_vector=False, min_value=-10000, max_value=10000))
     def test_fit_target_to_feature_dict_working(self, data, X_y, estimator):
         X, y = X_y
         target_to_feature_dict = data.draw(
@@ -236,7 +236,7 @@ class TestMultiFeatureMultiOutputRegressor:
         )
 
     @given(
-        data=data(), X_y=numpy_X_y_matrices(min_value=-10000, max_value=10000),
+        data=data(), X_y=numpy_X_y_matrices(y_vector=False, min_value=-10000, max_value=10000),
     )
     def test_fit_target_to_feature_dict_consistent(self, data, X_y, estimator):
         X, y = X_y
@@ -256,7 +256,7 @@ class TestMultiFeatureMultiOutputRegressor:
             assert len(estimator_.coef_) == expected_n_features
 
     @given(
-        data=data(), X_y=numpy_X_y_matrices(min_value=-10000, max_value=10000),
+        data=data(), X_y=numpy_X_y_matrices(y_vector=False, min_value=-10000, max_value=10000),
     )
     def test_predict_target_to_feature_dict(self, data, X_y, estimator):
         X, y = X_y
@@ -273,7 +273,7 @@ class TestMultiFeatureMultiOutputRegressor:
         multi_feature_multi_output_regressor.predict(X_predict)
 
     @given(
-        data=data(), X_y=numpy_X_y_matrices(min_value=-10000, max_value=10000),
+        data=data(), X_y=numpy_X_y_matrices(y_vector=False, min_value=-10000, max_value=10000),
     )
     def test_error_predict_target_to_feature_dict_wrong_X_shape(
         self, data, X_y, estimator

@@ -98,7 +98,7 @@ class TestYMatrices:
 class TestNumpyXyMatrices:
     @given(data(), shape_X_y_matrices())
     def test_input_as_tuples(self, data, shape_X_y):
-        X, y = data.draw(numpy_X_y_matrices(shape_X_y))
+        X, y = data.draw(numpy_X_y_matrices(shape_X_y, y_vector=False))
         assert X.shape == shape_X_y[0]
         assert y.shape == shape_X_y[1]
 
