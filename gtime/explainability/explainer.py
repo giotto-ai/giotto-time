@@ -10,7 +10,7 @@ from sklearn.base import RegressorMixin
 from sklearn.utils.validation import check_is_fitted
 
 
-class RegressorExplainer:
+class _RegressorExplainer:
     @abstractmethod
     def fit(
         self, model: RegressorMixin, X: np.ndarray, feature_names: List[str] = None
@@ -29,7 +29,7 @@ class RegressorExplainer:
         return [f"{i}" for i in range(X.shape[1])]
 
 
-class LimeExplainer(RegressorExplainer):
+class _LimeExplainer(_RegressorExplainer):
     def fit(
         self, model: RegressorMixin, X: np.ndarray, feature_names: List[str] = None
     ):
@@ -79,7 +79,7 @@ class LimeExplainer(RegressorExplainer):
         ]
 
 
-class ShapExplainer(RegressorExplainer):
+class _ShapExplainer(_RegressorExplainer):
     def __init__(self):
         self.allowed_explainer = [shap.LinearExplainer, shap.TreeExplainer]
 
@@ -95,6 +95,7 @@ class ShapExplainer(RegressorExplainer):
             model=model, X=X, feature_names=feature_names
         )
         self.feature_names_ = feature_names
+        return self
 
     def predict(self, X: np.ndarray):
         check_is_fitted(self)

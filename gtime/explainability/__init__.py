@@ -1,3 +1,3 @@
-from .explainer import ShapExplainer, LimeExplainer
+from .explainer import _ShapExplainer, _LimeExplainer
 
-__all__ = ["ShapExplainer", "LimeExplainer"]
+__all__ = ["_ShapExplainer", "_LimeExplainer"]

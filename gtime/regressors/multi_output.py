@@ -10,7 +10,7 @@ from sklearn.multioutput import (
 from sklearn.utils import check_X_y, check_array
 from sklearn.utils.validation import check_is_fitted
 
-from gtime.explainability.explainer import Explainer, LimeExplainer, ShapExplainer
+from gtime.explainability.explainer import Explainer, _LimeExplainer, _ShapExplainer
 
 
 class ExplainableMultiOutputRegressor(MultiOutputRegressor):
@@ -23,12 +23,12 @@ class ExplainableMultiOutputRegressor(MultiOutputRegressor):
         pass
 
     def _initialize_explainer(self, explainer_type: str) -> Explainer:
-        if explainer_type == 'lime':
-            return LimeExplainer()
-        elif explainer_type == 'shap':
-            return ShapExplainer()
+        if explainer_type == "lime":
+            return _LimeExplainer()
+        elif explainer_type == "shap":
+            return _ShapExplainer()
         else:
-            raise ValueError(f'Explainer type not valid: {explainer_type}')
+            raise ValueError(f"Explainer type not valid: {explainer_type}")
 
 
 class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):

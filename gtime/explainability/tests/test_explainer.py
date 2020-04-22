@@ -8,7 +8,8 @@ from shap.explainers.explainer import Explainer
 from sklearn.ensemble import (
     GradientBoostingRegressor,
     RandomForestRegressor,
-    AdaBoostRegressor)
+    AdaBoostRegressor,
+)
 from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import (
     LinearRegression,
@@ -18,23 +19,25 @@ from sklearn.linear_model import (
 from sklearn.tree import ExtraTreeRegressor
 from sklearn.utils.validation import check_is_fitted
 
-from gtime.explainability import LimeExplainer, ShapExplainer
+from gtime.explainability import _LimeExplainer, _ShapExplainer
 from gtime.utils.fixtures import lazy_fixtures
 from gtime.utils.hypothesis.feature_matrices import numpy_X_matrices, numpy_X_y_matrices
 
 
 @pytest.fixture(scope="function")
 def lime_explainer():
-    return LimeExplainer()
+    return _LimeExplainer()
 
 
 @pytest.fixture(scope="function")
 def shap_explainer():
-    return ShapExplainer()
+    return _ShapExplainer()
 
-@pytest.fixture(scope='function')
+
+@pytest.fixture(scope="function")
 def unrecognized_regressor():
     return AdaBoostRegressor()
+
 
 @st.composite
 def models(draw):
@@ -49,6 +52,7 @@ def models(draw):
         RandomForestRegressor(),
     ]
     return draw(sampled_from(regressors))
+
 
 @given(models())
 def test_models(regressor):
@@ -159,9 +163,12 @@ class TestLime:
         lime_explainer.predict(test_matrix)
         self._check_explanations(lime_explainer)
 
-    def _check_explanations(self, lime_explainer: LimeExplainer):
+    def _check_explanations(self, lime_explainer: _LimeExplainer):
         assert isinstance(lime_explainer._explanations_, list)
-        assert all(isinstance(explanation, Explanation) for explanation in lime_explainer._explanations_)
+        assert all(
+            isinstance(explanation, Explanation)
+            for explanation in lime_explainer._explanations_
+        )
 
 
 class TestShap:
@@ -185,4 +192,3 @@ class TestShap:
         unrecognized_regressor.fit(X, y)
         with pytest.raises(ValueError):
             shap_explainer.fit(unrecognized_regressor, X)
-
