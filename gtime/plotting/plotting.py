@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from typing import Union, List, Callable, Optional, Dict
-from gtime.plotting.preprocessing import seasonal_split, acf, pacf
+from typing import Union, List, Callable, Optional
+from gtime.plotting.preprocessing import seasonal_split
+from gtime.stat_tools.tools import acf, pacf
 from scipy.stats import norm
 
 
