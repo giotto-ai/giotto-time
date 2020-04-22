@@ -46,7 +46,7 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
     Examples
     --------
     >>> import numpy as np
-    >>> from gtime.forecasting import MultiFeatureMultiOutputRegressor
+    >>> from gtime.regressors import MultiFeatureMultiOutputRegressor
     >>> from sklearn.ensemble import RandomForestRegressor
     >>> X = np.random.random((30, 5))
     >>> y = np.random.random((30, 3))

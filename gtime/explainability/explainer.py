@@ -30,9 +30,55 @@ class _RegressorExplainer:
 
 
 class _LimeExplainer(_RegressorExplainer):
+    """ LIME explainer for the predictions of a scikit-learn regressor.
+    It is built around lime_tabular.LimeTabularExplainer.
+    This class is not supposed to be used directly by the user. Use `ExplainableRegressor` instead.
+
+    The choice of a superset of LimeTabularExplainer has been made to provide a unique interface, compatible
+    also with the SHAP explainer.
+
+    This is used as a backbone of gtime.regressors.ExplainableRegressor.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from gtime.explainability import _LimeExplainer
+    >>> from sklearn.ensemble import RandomForestRegressor
+    >>> X = np.random.random((30, 5))
+    >>> y = np.random.random(30)
+    >>> X_train, y_train = X[:20], y[:20]
+    >>> X_test, y_test = X[20:], y[20:]
+    >>>
+    >>> random_forest = RandomForestRegressor()
+    >>> random_forest.fit(X, y)
+    >>> explainer = _LimeExplainer()
+    >>>
+    >>> explainer.fit(random_forest, X_train, feature_names=['a', 'b', 'c', 'd', 'e'])
+    >>> explainer.predict(X_test)
+    array([0.52152573, 0.66515405, 0.49843039, 0.36233978, 0.48702524,
+           0.49387234, 0.50727344, 0.74125629, 0.73243989, 0.59242504])
+    >>> explainer.explanations_[0]
+    {'d': -0.10406889434277307, 'c': 0.07973507022816899, 'b': 0.02312395991550859, 'a': 0.006403509251399996, 'e': 0.006272607738125953}
+    """
     def fit(
         self, model: RegressorMixin, X: np.ndarray, feature_names: List[str] = None
     ):
+        """ Fit function. The initialization of `LimeTabular` is made here.
+        This choice has been made, since it needs a fitted scikit-learn model as input.
+
+        Parameters
+        ----------
+        model: RegressorMixin, required
+            scikit-learn model given as input
+        X: np.ndarray, required
+            train matrix
+        feature_names: List[str], optional, (default=``None``)
+            the name of the feature column of X
+
+        Returns
+        -------
+        Fitted _LimeExplainer
+        """
         check_is_fitted(model)
         if feature_names is None:
             feature_names = self._define_feature_names(X)
@@ -45,6 +91,19 @@ class _LimeExplainer(_RegressorExplainer):
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
+        """ Predict function. It returns the predictions of the model given as input in fit()
+        It stores in  `self.explanations_` a float value per each feature that gives an indication of the
+        impact of that feature on the predictions.
+
+        Parameters
+        ----------
+        X: np.ndarray, required
+            test matrix
+
+        Returns
+        -------
+        predictions: np.ndarray
+        """
         check_is_fitted(self)
 
         self._explanations_ = self._compute_lime_explanations(X)
@@ -80,12 +139,59 @@ class _LimeExplainer(_RegressorExplainer):
 
 
 class _ShapExplainer(_RegressorExplainer):
-    def __init__(self):
-        self.allowed_explainer = [shap.LinearExplainer, shap.TreeExplainer]
+    """ SHAP explainer for the predictions of a scikit-learn regressor.
+    It is built around `shap.Explainer`. The choice of the explainer is made automatically based on
+    the scikit-learn model.
+    This class is not supposed to be used directly by the user. Use `ExplainableRegressor` instead.
+
+    The choice of a superset of shap.Explainer has been made to provide a unique interface, compatible
+    also with the LIME explainer.
+
+    This is used as a backbone of gtime.regressors.ExplainableRegressor.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from gtime.explainability import _ShapExplainer
+    >>> from sklearn.ensemble import RandomForestRegressor
+    >>> X = np.random.random((30, 5))
+    >>> y = np.random.random(30)
+    >>> X_train, y_train = X[:20], y[:20]
+    >>> X_test, y_test = X[20:], y[20:]
+    >>>
+    >>> random_forest = RandomForestRegressor()
+    >>> random_forest.fit(X, y)
+    >>> explainer = _ShapExplainer()
+    >>>
+    >>> explainer.fit(random_forest, X_train, feature_names=['a', 'b', 'c', 'd', 'e'])
+    >>> explainer.predict(X_test)
+    array([0.52152573, 0.66515403, 0.4984304 , 0.36233976, 0.48702522,
+           0.49387233, 0.50727345, 0.74125631, 0.7324399 , 0.59242503])
+    >>> explainer.explanations_[0]
+    {'a': -0.04801958111784188, 'b': -0.03872758470097324, 'c': -0.09502661560291017, 'd': 0.07797206658942742, 'e': -0.015306016394606558}
+    """
+
+    allowed_explainer = [shap.LinearExplainer, shap.TreeExplainer]
 
     def fit(
         self, model: RegressorMixin, X: np.ndarray, feature_names: List[str] = None
     ):
+        """ Fit function. The initialization of `shap.Explainer` is made here.
+        This choice has been made, since it needs a fitted scikit-learn model as input.
+
+        Parameters
+        ----------
+        model: RegressorMixin, required
+           scikit-learn model given as input
+        X: np.ndarray, required
+           train matrix
+        feature_names: List[str], optional, (default=``None``)
+           the name of the feature column of X
+
+        Returns
+        -------
+        Fitted _ShapExplainer
+        """
         check_is_fitted(model)
         if feature_names is None:
             feature_names = self._define_feature_names(X)
@@ -98,6 +204,19 @@ class _ShapExplainer(_RegressorExplainer):
         return self
 
     def predict(self, X: np.ndarray):
+        """ Predict function. It returns the predictions of the model given as input in fit()
+        It stores in  `self.explanations_` a float value per each feature that gives an indication of the
+        impact of that feature on the predictions.
+
+        Parameters
+        ----------
+        X: np.ndarray, required
+            test matrix
+
+        Returns
+        -------
+        predictions: np.ndarray
+        """
         check_is_fitted(self)
 
         self.shap_values_ = self.explainer_.shap_values(X)
