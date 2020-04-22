@@ -9,7 +9,7 @@ from numpy.testing import assert_array_equal
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.utils._testing import assert_almost_equal
 
-from gtime.forecasting.gar import MultiFeatureMultiOutputRegressor, MultiFeatureGAR
+from gtime.forecasting.gar import MultiFeatureGAR
 
 if pd.__version__ >= "1.0.0":
     import pandas._testing as testing
@@ -25,12 +25,12 @@ from sklearn.linear_model import LinearRegression
 from gtime.compose import FeatureCreation
 from gtime.feature_extraction import MovingAverage, Shift
 from gtime.feature_generation import Constant
-from gtime.forecasting import GAR, GARFF
+from gtime.forecasting import GAR, GARFF, MultiFeatureMultiOutputRegressor
 from gtime.model_selection import FeatureSplitter
 from gtime.utils.hypothesis.feature_matrices import (
     X_y_matrices,
     numpy_X_y_matrices,
-    numpy_X_matrix,
+    numpy_X_matrices,
     X_matrices,
 )
 
@@ -216,7 +216,7 @@ class TestMultiFeatureMultiOutputRegressor:
             multi_output_regressor.predict(X),
         )
 
-    @given(X=numpy_X_matrix(min_value=-10000, max_value=10000))
+    @given(X=numpy_X_matrices(min_value=-10000, max_value=10000))
     def test_error_predict_with_no_fit(self, estimator, X):
         regressor = MultiFeatureMultiOutputRegressor(estimator)
         with pytest.raises(NotFittedError):
@@ -269,7 +269,7 @@ class TestMultiFeatureMultiOutputRegressor:
         multi_feature_multi_output_regressor.fit(
             X, y, target_to_features_dict=target_to_feature_dict
         )
-        X_predict = data.draw(numpy_X_matrix([100, X.shape[1]]))
+        X_predict = data.draw(numpy_X_matrices([100, X.shape[1]]))
         multi_feature_multi_output_regressor.predict(X_predict)
 
     @given(
@@ -288,7 +288,7 @@ class TestMultiFeatureMultiOutputRegressor:
         multi_feature_multi_output_regressor.fit(
             X, y, target_to_features_dict=target_to_feature_dict
         )
-        X_predict = data.draw(numpy_X_matrix([100, 30]))
+        X_predict = data.draw(numpy_X_matrices([100, 30]))
         with pytest.raises(ValueError):
             multi_feature_multi_output_regressor.predict(X_predict)
 
@@ -375,7 +375,10 @@ class TestMultiFeatureGAR:
     @given(
         data=data(),
         X_y=X_y_matrices(
-            horizon=4, df_transformer=df_transformer, min_length=10, allow_nan_infinity=False
+            horizon=4,
+            df_transformer=df_transformer,
+            min_length=10,
+            allow_nan_infinity=False,
         ),
     )
     def test_fit_target_to_feature_dict_working(self, data, X_y, estimator):
@@ -385,12 +388,17 @@ class TestMultiFeatureGAR:
             str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
         multi_feature_gar = MultiFeatureGAR(estimator)
-        multi_feature_gar.fit(X_train, y_train, target_to_features_dict=target_to_feature_dict)
+        multi_feature_gar.fit(
+            X_train, y_train, target_to_features_dict=target_to_feature_dict
+        )
 
     @given(
         data=data(),
         X_y=X_y_matrices(
-            horizon=4, df_transformer=df_transformer, min_length=10, allow_nan_infinity=False
+            horizon=4,
+            df_transformer=df_transformer,
+            min_length=10,
+            allow_nan_infinity=False,
         ),
     )
     def test_fit_target_to_feature_dict_consistent(self, data, X_y, estimator):
@@ -400,7 +408,9 @@ class TestMultiFeatureGAR:
             str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
         multi_feature_gar = MultiFeatureGAR(estimator)
-        multi_feature_gar.fit(X_train, y_train, target_to_features_dict=target_to_feature_dict)
+        multi_feature_gar.fit(
+            X_train, y_train, target_to_features_dict=target_to_feature_dict
+        )
         for i, estimator_ in enumerate(multi_feature_gar.estimators_):
             expected_n_features = len(target_to_feature_dict[y.columns[i]])
             assert len(estimator_.coef_) == expected_n_features
@@ -408,7 +418,10 @@ class TestMultiFeatureGAR:
     @given(
         data=data(),
         X_y=X_y_matrices(
-            horizon=4, df_transformer=df_transformer, min_length=10, allow_nan_infinity=False
+            horizon=4,
+            df_transformer=df_transformer,
+            min_length=10,
+            allow_nan_infinity=False,
         ),
     )
     def test_predict_target_to_feature_dict(self, data, X_y, estimator):
@@ -418,13 +431,18 @@ class TestMultiFeatureGAR:
             str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
         multi_feature_gar = MultiFeatureGAR(estimator)
-        multi_feature_gar.fit(X_train, y_train, target_to_features_dict=target_to_feature_dict)
+        multi_feature_gar.fit(
+            X_train, y_train, target_to_features_dict=target_to_feature_dict
+        )
         multi_feature_gar.predict(X_test)
 
     @given(
         data=data(),
         X_y=X_y_matrices(
-            horizon=4, df_transformer=df_transformer, min_length=10, allow_nan_infinity=False
+            horizon=4,
+            df_transformer=df_transformer,
+            min_length=10,
+            allow_nan_infinity=False,
         ),
     )
     def test_error_predict_target_to_feature_dict_wrong_X_shape(
@@ -436,7 +454,9 @@ class TestMultiFeatureGAR:
             str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
         multi_feature_gar = MultiFeatureGAR(estimator)
-        multi_feature_gar.fit(X_train, y_train, target_to_features_dict=target_to_feature_dict)
+        multi_feature_gar.fit(
+            X_train, y_train, target_to_features_dict=target_to_feature_dict
+        )
         X_test = X_test.iloc[:, :2]
         with pytest.raises(ValueError):
             multi_feature_gar.predict(X_test)

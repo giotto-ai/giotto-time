@@ -169,7 +169,7 @@ def numpy_X_y_matrices(
 
 
 @st.composite
-def numpy_X_matrix(
+def numpy_X_matrices(
     draw,
     shape=shape_matrix(),
     min_value: float = None,

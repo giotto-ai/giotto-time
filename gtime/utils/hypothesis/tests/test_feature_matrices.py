@@ -14,7 +14,7 @@ from gtime.utils.hypothesis.feature_matrices import (
     X_matrices,
     y_matrices,
     numpy_X_y_matrices,
-    numpy_X_matrix,
+    numpy_X_matrices,
 )
 from gtime.utils.hypothesis.general_strategies import (
     shape_X_y_matrices,
@@ -147,31 +147,31 @@ class TestNumpyXyMatrices:
 class TestNumpyXMatrix:
     @given(data(), shape_matrix())
     def test_input_as_tuples(self, data, shape):
-        X = data.draw(numpy_X_matrix(shape))
+        X = data.draw(numpy_X_matrices(shape))
         assert X.shape == shape
 
     @given(data())
     def test_input_as_strategy(self, data):
-        data.draw(numpy_X_matrix(shape_matrix()))
+        data.draw(numpy_X_matrices(shape_matrix()))
 
     @given(data())
     def test_error_shape_0_smaller_shape_1(self, data):
         with pytest.raises(ValueError):
-            data.draw(numpy_X_matrix([10, 20]))
+            data.draw(numpy_X_matrices([10, 20]))
 
     @given(data(), shape_matrix(), ordered_pair(32, 47))
     def test_min_max_values(self, data, shape, min_max_values):
         min_value, max_value = min_max_values
-        X = data.draw(numpy_X_matrix(shape, min_value=min_value, max_value=max_value))
+        X = data.draw(numpy_X_matrices(shape, min_value=min_value, max_value=max_value))
         assert X.min() >= min_value
         assert X.max() <= max_value
 
     @given(data(), shape_matrix())
     def test_no_nan(self, data, shape):
-        X = data.draw(numpy_X_matrix(shape, allow_nan=False, allow_infinity=True))
+        X = data.draw(numpy_X_matrices(shape, allow_nan=False, allow_infinity=True))
         assert not np.isnan(X).any()
 
     @given(data(), shape_matrix())
     def test_no_infinity(self, data, shape):
-        X = data.draw(numpy_X_matrix(shape, allow_nan=True, allow_infinity=False))
+        X = data.draw(numpy_X_matrices(shape, allow_nan=True, allow_infinity=False))
         assert not np.isinf(X).any()
