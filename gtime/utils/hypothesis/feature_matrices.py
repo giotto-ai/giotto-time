@@ -158,7 +158,7 @@ def numpy_X_y_matrices(
     if X_shape[0] <= X_shape[1]:
         raise ValueError(f"X.shape[0] must be <= X.shape[1]: {X_shape}")
     if y_vector and len(y_shape) > 1:
-        y_shape = (y_shape[0], )
+        y_shape = (y_shape[0],)
 
     elements = floats(
         min_value=min_value,

@@ -15,15 +15,15 @@ class RegressorExplainer:
     def fit(
         self, model: RegressorMixin, X: np.ndarray, feature_names: List[str] = None
     ):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def predict(self, X: np.ndarray):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def plot_explanation(self, i: int):
-        pass
+        raise NotImplementedError
 
     def _define_feature_names(self, X: np.ndarray):
         return [f"{i}" for i in range(X.shape[1])]
@@ -45,6 +45,8 @@ class LimeExplainer(RegressorExplainer):
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
+        check_is_fitted(self)
+
         self._explanations_ = self._compute_lime_explanations(X)
         predictions = self._extract_predictions_from_explanations(self._explanations_)
         self.explanations_ = self._reformat_explanations(self._explanations_)
@@ -52,7 +54,8 @@ class LimeExplainer(RegressorExplainer):
         return predictions
 
     def plot_explanation(self, i: int):
-        self._explanations_[i].show_in_notebook(show_tale=True)
+        raise NotImplementedError
+        # self._explanations_[i].show_in_notebook(show_tale=True)
 
     def _compute_lime_explanations(self, X: np.ndarray) -> List[Explanation]:
         return [
@@ -67,10 +70,12 @@ class LimeExplainer(RegressorExplainer):
     def _reformat_explanations(
         self, explanations: List[Explanation]
     ) -> List[Dict[str, float]]:
-        explanations_maps = [exp.as_map() for exp in explanations]
+        explanations_lists = [
+            exp.as_map()[0] for exp in explanations
+        ]  # not clear why 0
         return [
-            {self.feature_names_[key]: item for key, item in exp.items()}
-            for exp in explanations_maps
+            {self.feature_names_[name]: value for name, value in exp}
+            for exp in explanations_lists
         ]
 
 
@@ -92,13 +97,15 @@ class ShapExplainer(RegressorExplainer):
         self.feature_names_ = feature_names
 
     def predict(self, X: np.ndarray):
+        check_is_fitted(self)
+
         self.shap_values_ = self.explainer_.shap_values(X)
         predictions = self._compute_predictions_from_shap_values(self.shap_values_)
         self.explanations_ = self._reformat_shap_values(self.shap_values_)
         return predictions
 
     def plot_explanation(self, i: int):
-        pass
+        raise NotImplementedError
 
     def _infer_explainer(
         self, model: RegressorMixin, X: np.ndarray, feature_names: List[str]

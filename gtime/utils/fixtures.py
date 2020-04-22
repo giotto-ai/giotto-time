@@ -59,10 +59,10 @@ def time_series_forecasting_model1_cache(features1, model1):
 
 
 def _single_element_lazy_fixtures(*args):
-    return [pytest.lazy_fixture(arg.__name__) for arg in args]
+    return [pytest.lazy_fixture(arg.__name__) for arg in args[0]]
 
 
-def lazy_fixtures(*args) -> List:
+def lazy_fixtures(*args):
     if isinstance(args[0], tuple):
         return [tuple([pytest.lazy_fixture(arg[0].__name__), *arg[1:]]) for arg in args]
     else:
