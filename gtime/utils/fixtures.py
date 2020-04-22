@@ -1,3 +1,6 @@
+from typing import List
+
+import pytest
 from pytest import fixture
 import numpy as np
 from sklearn.compose import make_column_selector
@@ -53,3 +56,14 @@ def time_series_forecasting_model1_cache(features1, model1):
     return TimeSeriesForecastingModel(
         features=features1, horizon=2, model=model1, cache_features=True,
     )
+
+
+def _single_element_lazy_fixtures(*args):
+    return [pytest.lazy_fixture(arg.__name__) for arg in args]
+
+
+def lazy_fixtures(*args) -> List:
+    if isinstance(args[0], tuple):
+        return [tuple([pytest.lazy_fixture(arg[0].__name__), *arg[1:]]) for arg in args]
+    else:
+        return _single_element_lazy_fixtures(*args)

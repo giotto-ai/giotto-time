@@ -12,7 +12,9 @@ from sklearn.utils.validation import check_is_fitted
 
 class RegressorExplainer:
     @abstractmethod
-    def fit(self, model: RegressorMixin, X: np.ndarray, feature_names: List[str]):
+    def fit(
+        self, model: RegressorMixin, X: np.ndarray, feature_names: List[str] = None
+    ):
         pass
 
     @abstractmethod
@@ -23,10 +25,17 @@ class RegressorExplainer:
     def plot_explanation(self, i: int):
         pass
 
+    def _define_feature_names(self, X: np.ndarray):
+        return [f"{i}" for i in range(X.shape[1])]
+
 
 class LimeExplainer(RegressorExplainer):
-    def fit(self, model: RegressorMixin, X: np.ndarray, feature_names: List[str]):
+    def fit(
+        self, model: RegressorMixin, X: np.ndarray, feature_names: List[str] = None
+    ):
         check_is_fitted(model)
+        if feature_names is None:
+            feature_names = self._define_feature_names(X)
 
         self.model_ = model
         self.explainer_ = lime_tabular.LimeTabularExplainer(
@@ -69,8 +78,12 @@ class ShapExplainer(RegressorExplainer):
     def __init__(self):
         self.allowed_explainer = [shap.LinearExplainer, shap.TreeExplainer]
 
-    def fit(self, model: RegressorMixin, X: np.ndarray, feature_names: List[str]):
+    def fit(
+        self, model: RegressorMixin, X: np.ndarray, feature_names: List[str] = None
+    ):
         check_is_fitted(model)
+        if feature_names is None:
+            feature_names = self._define_feature_names(X)
 
         self.model_ = model
         self.explainer_ = self._infer_explainer(

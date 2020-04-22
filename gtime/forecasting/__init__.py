@@ -4,7 +4,7 @@ for dealing with time series data.
 """
 
 from .gar import GAR, GARFF, MultiFeatureGAR
-from gtime.forecasting.multi_output import MultiFeatureMultiOutputRegressor
+from .multi_output import MultiFeatureMultiOutputRegressor
 from .trend_models import TrendForecaster
 from .online import HedgeForecaster
 from .simple_models import (
@@ -17,10 +17,12 @@ from .simple_models import (
 __all__ = [
     "GAR",
     "GARFF",
-    "MultiFeatureGAR" "TrendForecaster",
+    "MultiFeatureGAR",
+    "TrendForecaster",
     "HedgeForecaster",
     "NaiveForecaster",
     "SeasonalNaiveForecaster",
     "DriftForecaster",
     "AverageForecaster",
+    "MultiFeatureMultiOutputRegressor",
 ]

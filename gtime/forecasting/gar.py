@@ -9,7 +9,7 @@ from sklearn.multioutput import (
 import numpy as np
 from sklearn.utils.validation import check_is_fitted
 
-from gtime.forecasting import MultiFeatureMultiOutputRegressor
+from .multi_output import MultiFeatureMultiOutputRegressor
 
 
 class GAR(MultiOutputRegressor):
