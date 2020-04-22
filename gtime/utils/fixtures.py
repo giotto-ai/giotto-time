@@ -58,6 +58,11 @@ def time_series_forecasting_model1_cache(features1, model1):
     )
 
 
+@pytest.fixture(scope="function")
+def estimator():
+    return LinearRegression()
+
+
 def _single_element_lazy_fixtures(*args):
     return [pytest.lazy_fixture(arg.__name__) for arg in args[0]]
 

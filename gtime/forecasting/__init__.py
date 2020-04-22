@@ -4,7 +4,7 @@ for dealing with time series data.
 """
 
 from .gar import GAR, GARFF, MultiFeatureGAR
-from .multi_output import MultiFeatureMultiOutputRegressor
+from gtime.regressors.multi_output import MultiFeatureMultiOutputRegressor
 from .trend_models import TrendForecaster
 from .online import HedgeForecaster
 from .simple_models import (
