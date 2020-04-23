@@ -8,6 +8,7 @@ from gtime.utils.hypothesis.general_strategies import (
     ordered_pair,
     shape_matrix,
     shape_X_y_matrices,
+    regressors,
 )
 
 
@@ -35,12 +36,20 @@ def test_shape_X(data, shape_0, shape_1):
     assert shape_1[0] <= shape[1] <= shape_1[1]
 
 
-@given(shape_X_y_matrices(123, 243, 12, 34, 1, 6))
-def test_shape_X_y_matrices(shape_X_y):
+@given(shape_X_y_matrices(123, 243, 12, 34, 1, 6, y_as_vector=False))
+def test_shape_X_y_matrices_y_matrix(shape_X_y):
     shape_X, shape_y = shape_X_y
     assert shape_X[0] == shape_y[0]
     assert 12 <= shape_X[1] <= 34
     assert 1 <= shape_y[1] <= 6
+
+
+@given(shape_X_y_matrices(123, 243, 12, 34, 1, 6, y_as_vector=True))
+def test_shape_X_y_matrices_y_vector(shape_X_y):
+    shape_X, shape_y = shape_X_y
+    assert shape_X[0] == shape_y[0]
+    assert 12 <= shape_X[1] <= 34
+    assert len(shape_y) == 1
 
 
 @given(shape_X_y_matrices(10, 20, 10, 20, 1, 6))
@@ -53,3 +62,9 @@ def test_shape_1_X_smaller_shape_0(shape_X_y):
 def test_shape_X_Y_value_error(data):
     with pytest.raises(ValueError):
         data.draw(shape_X_y_matrices(1, 8, 9, 10, 10, 20))
+
+
+@given(regressors())
+def test_regressors(regressor):
+    assert hasattr(regressor, "fit")
+    assert hasattr(regressor, "predict")

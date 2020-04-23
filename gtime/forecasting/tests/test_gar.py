@@ -1,3 +1,4 @@
+import itertools
 import random
 from typing import List
 
@@ -6,10 +7,11 @@ import pandas as pd
 from hypothesis.strategies import data, integers, lists, text
 import hypothesis.strategies as st
 from numpy.testing import assert_array_equal
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.utils._testing import assert_almost_equal
 
-from gtime.forecasting.gar import MultiFeatureMultiOutputRegressor, MultiFeatureGAR
+from gtime.explainability import _ShapExplainer
+from gtime.explainability.tests.test_explainer import models
+from gtime.forecasting.gar import MultiFeatureGAR, initialize_estimator
+from gtime.regressors import ExplainableRegressor
 
 if pd.__version__ >= "1.0.0":
     import pandas._testing as testing
@@ -29,10 +31,9 @@ from gtime.forecasting import GAR, GARFF
 from gtime.model_selection import FeatureSplitter
 from gtime.utils.hypothesis.feature_matrices import (
     X_y_matrices,
-    numpy_X_y_matrices,
-    numpy_X_matrix,
     X_matrices,
 )
+from gtime.utils.fixtures import estimator
 
 df_transformer = FeatureCreation(
     [
@@ -47,15 +48,38 @@ df_transformer = FeatureCreation(
 )
 
 
+forecasters = [GAR, GARFF, MultiFeatureGAR]
+explainers = [
+    "shap",
+]  # "lime"] for speed reason
+
+
+@pytest.mark.parametrize(
+    "forecaster,explainer", itertools.product(forecasters, explainers)
+)
+@given(
+    X_y=X_y_matrices(
+        horizon=4,
+        df_transformer=df_transformer,
+        min_length=10,
+        allow_nan_infinity=False,
+    )
+)
+def test_predict_has_explainers(forecaster, explainer, X_y):
+    X, y = X_y
+    X_train, y_train, X_test, y_test = FeatureSplitter().transform(X, y)
+    model = forecaster(LinearRegression(), explainer_type=explainer)
+    model.fit(X_train, y_train)
+    model.predict(X_test.iloc[:1, :])
+    assert len(model.estimators_) == y_test.shape[1]
+    for estimator in model.estimators_:
+        assert len(estimator.explainer_.explanations_) == 1
+
+
 @pytest.fixture
 def time_series():
     testing.N, testing.K = 200, 1
     return testing.makeTimeDataFrame(freq="MS")
-
-
-@pytest.fixture(scope="function")
-def estimator():
-    return LinearRegression()
 
 
 def arbitrary_features(feature_length):
@@ -74,53 +98,6 @@ def arbitrary_features(feature_length):
         random_features.append(feature)
 
     return random_features, feature_names
-
-
-@st.composite
-def numeric_target_to_feature_dicts(
-    draw,
-    n_targets: int,
-    n_features: int,
-    min_features_per_target: int = 1,
-    max_features_per_target: int = None,
-):
-    if max_features_per_target is None:
-        max_features_per_target = n_features
-    target_to_feature_dict = {}
-    for i in range(n_targets):
-        n_target_features = draw(
-            integers(min_features_per_target, max_features_per_target)
-        )
-        target_features = sorted(
-            np.random.choice(n_features, n_target_features, replace=False)
-        )
-        target_to_feature_dict[i] = target_features
-    return target_to_feature_dict
-
-
-@given(
-    data=data(),
-    n_targets=integers(1, 10),
-    n_features=integers(1, 10),
-    min_features_per_target=integers(1, 4),
-    max_features_per_target=integers(5, 10),
-)
-def test_numeric_target_to_feature_dicts(
-    data, n_targets, n_features, min_features_per_target, max_features_per_target
-):
-    assume(min_features_per_target <= n_features)
-    assume(max_features_per_target <= n_features)
-    target_to_feature_dict = data.draw(
-        numeric_target_to_feature_dicts(
-            n_targets, n_features, min_features_per_target, max_features_per_target
-        )
-    )
-    assert len(target_to_feature_dict) == n_targets
-    for target, features in target_to_feature_dict.items():
-        assert max(features) < n_features
-        assert min(features) >= 0
-        assert len(set(features)) == len(features)
-        assert min_features_per_target <= len(features) <= max_features_per_target
 
 
 @st.composite
@@ -176,121 +153,16 @@ def test_str_target_to_feature_dicts(
         )
 
 
-class TestMultiFeatureMultiOutputRegressor:
-    def test_constructor(self, estimator):
-        multi_feature_multi_output_regressor = MultiFeatureMultiOutputRegressor(
-            estimator
-        )
-        assert multi_feature_multi_output_regressor.n_jobs == 1
+@given(models())
+def test_initialize_estimator(estimator):
+    assert estimator == initialize_estimator(estimator, explainer_type=None)
 
-    @given(data=data(), X_y=numpy_X_y_matrices(min_value=-10000, max_value=10000))
-    def test_fit_bad_y(self, data, estimator, X_y):
-        X, y = X_y
-        y = y[:, 0].flatten()
-        target_to_feature_dict = data.draw(
-            numeric_target_to_feature_dicts(n_targets=1, n_features=X.shape[1])
-        )
-        multi_feature_multi_output_regressor = MultiFeatureMultiOutputRegressor(
-            estimator
-        )
-        with pytest.raises(ValueError):
-            multi_feature_multi_output_regressor.fit(
-                X, y, target_to_features_dict=target_to_feature_dict
-            )
 
-    @given(X_y=numpy_X_y_matrices(min_value=-10000, max_value=10000))
-    def test_fit_as_multi_output_regressor_if_target_to_feature_none(
-        self, estimator, X_y
-    ):
-        X, y = X_y
-        multi_feature_multi_output_regressor = MultiFeatureMultiOutputRegressor(
-            estimator
-        )
-        multi_feature_multi_output_regressor.fit(X, y)
-
-        multi_output_regressor = MultiOutputRegressor(estimator)
-        multi_output_regressor.fit(X, y)
-
-        assert_almost_equal(
-            multi_feature_multi_output_regressor.predict(X),
-            multi_output_regressor.predict(X),
-        )
-
-    @given(X=numpy_X_matrix(min_value=-10000, max_value=10000))
-    def test_error_predict_with_no_fit(self, estimator, X):
-        regressor = MultiFeatureMultiOutputRegressor(estimator)
-        with pytest.raises(NotFittedError):
-            regressor.predict(X)
-
-    @given(data=data(), X_y=numpy_X_y_matrices(min_value=-10000, max_value=10000))
-    def test_fit_target_to_feature_dict_working(self, data, X_y, estimator):
-        X, y = X_y
-        target_to_feature_dict = data.draw(
-            numeric_target_to_feature_dicts(n_targets=y.shape[1], n_features=X.shape[1])
-        )
-        multi_feature_multi_output_regressor = MultiFeatureMultiOutputRegressor(
-            estimator
-        )
-        multi_feature_multi_output_regressor.fit(
-            X, y, target_to_features_dict=target_to_feature_dict
-        )
-
-    @given(
-        data=data(), X_y=numpy_X_y_matrices(min_value=-10000, max_value=10000),
-    )
-    def test_fit_target_to_feature_dict_consistent(self, data, X_y, estimator):
-        X, y = X_y
-        target_to_feature_dict = data.draw(
-            numeric_target_to_feature_dicts(n_targets=y.shape[1], n_features=X.shape[1])
-        )
-        multi_feature_multi_output_regressor = MultiFeatureMultiOutputRegressor(
-            estimator
-        )
-        multi_feature_multi_output_regressor.fit(
-            X, y, target_to_features_dict=target_to_feature_dict
-        )
-        for i, estimator_ in enumerate(
-            multi_feature_multi_output_regressor.estimators_
-        ):
-            expected_n_features = len(target_to_feature_dict[i])
-            assert len(estimator_.coef_) == expected_n_features
-
-    @given(
-        data=data(), X_y=numpy_X_y_matrices(min_value=-10000, max_value=10000),
-    )
-    def test_predict_target_to_feature_dict(self, data, X_y, estimator):
-        X, y = X_y
-        target_to_feature_dict = data.draw(
-            numeric_target_to_feature_dicts(n_targets=y.shape[1], n_features=X.shape[1])
-        )
-        multi_feature_multi_output_regressor = MultiFeatureMultiOutputRegressor(
-            estimator
-        )
-        multi_feature_multi_output_regressor.fit(
-            X, y, target_to_features_dict=target_to_feature_dict
-        )
-        X_predict = data.draw(numpy_X_matrix([100, X.shape[1]]))
-        multi_feature_multi_output_regressor.predict(X_predict)
-
-    @given(
-        data=data(), X_y=numpy_X_y_matrices(min_value=-10000, max_value=10000),
-    )
-    def test_error_predict_target_to_feature_dict_wrong_X_shape(
-        self, data, X_y, estimator
-    ):
-        X, y = X_y
-        target_to_feature_dict = data.draw(
-            numeric_target_to_feature_dicts(n_targets=y.shape[1], n_features=X.shape[1])
-        )
-        multi_feature_multi_output_regressor = MultiFeatureMultiOutputRegressor(
-            estimator
-        )
-        multi_feature_multi_output_regressor.fit(
-            X, y, target_to_features_dict=target_to_feature_dict
-        )
-        X_predict = data.draw(numpy_X_matrix([100, 30]))
-        with pytest.raises(ValueError):
-            multi_feature_multi_output_regressor.predict(X_predict)
+@given(models())
+def test_initialize_estimator_explainable(estimator):
+    explainable_estimator = initialize_estimator(estimator, explainer_type="shap")
+    assert isinstance(explainable_estimator, ExplainableRegressor)
+    assert isinstance(explainable_estimator.explainer, _ShapExplainer)
 
 
 class TestMultiFeatureGAR:
@@ -375,7 +247,10 @@ class TestMultiFeatureGAR:
     @given(
         data=data(),
         X_y=X_y_matrices(
-            horizon=4, df_transformer=df_transformer, min_length=10, allow_nan_infinity=False
+            horizon=4,
+            df_transformer=df_transformer,
+            min_length=10,
+            allow_nan_infinity=False,
         ),
     )
     def test_fit_target_to_feature_dict_working(self, data, X_y, estimator):
@@ -385,12 +260,17 @@ class TestMultiFeatureGAR:
             str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
         multi_feature_gar = MultiFeatureGAR(estimator)
-        multi_feature_gar.fit(X_train, y_train, target_to_features_dict=target_to_feature_dict)
+        multi_feature_gar.fit(
+            X_train, y_train, target_to_features_dict=target_to_feature_dict
+        )
 
     @given(
         data=data(),
         X_y=X_y_matrices(
-            horizon=4, df_transformer=df_transformer, min_length=10, allow_nan_infinity=False
+            horizon=4,
+            df_transformer=df_transformer,
+            min_length=10,
+            allow_nan_infinity=False,
         ),
     )
     def test_fit_target_to_feature_dict_consistent(self, data, X_y, estimator):
@@ -400,7 +280,9 @@ class TestMultiFeatureGAR:
             str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
         multi_feature_gar = MultiFeatureGAR(estimator)
-        multi_feature_gar.fit(X_train, y_train, target_to_features_dict=target_to_feature_dict)
+        multi_feature_gar.fit(
+            X_train, y_train, target_to_features_dict=target_to_feature_dict
+        )
         for i, estimator_ in enumerate(multi_feature_gar.estimators_):
             expected_n_features = len(target_to_feature_dict[y.columns[i]])
             assert len(estimator_.coef_) == expected_n_features
@@ -408,7 +290,10 @@ class TestMultiFeatureGAR:
     @given(
         data=data(),
         X_y=X_y_matrices(
-            horizon=4, df_transformer=df_transformer, min_length=10, allow_nan_infinity=False
+            horizon=4,
+            df_transformer=df_transformer,
+            min_length=10,
+            allow_nan_infinity=False,
         ),
     )
     def test_predict_target_to_feature_dict(self, data, X_y, estimator):
@@ -418,13 +303,18 @@ class TestMultiFeatureGAR:
             str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
         multi_feature_gar = MultiFeatureGAR(estimator)
-        multi_feature_gar.fit(X_train, y_train, target_to_features_dict=target_to_feature_dict)
+        multi_feature_gar.fit(
+            X_train, y_train, target_to_features_dict=target_to_feature_dict
+        )
         multi_feature_gar.predict(X_test)
 
     @given(
         data=data(),
         X_y=X_y_matrices(
-            horizon=4, df_transformer=df_transformer, min_length=10, allow_nan_infinity=False
+            horizon=4,
+            df_transformer=df_transformer,
+            min_length=10,
+            allow_nan_infinity=False,
         ),
     )
     def test_error_predict_target_to_feature_dict_wrong_X_shape(
@@ -436,7 +326,9 @@ class TestMultiFeatureGAR:
             str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
         multi_feature_gar = MultiFeatureGAR(estimator)
-        multi_feature_gar.fit(X_train, y_train, target_to_features_dict=target_to_feature_dict)
+        multi_feature_gar.fit(
+            X_train, y_train, target_to_features_dict=target_to_feature_dict
+        )
         X_test = X_test.iloc[:, :2]
         with pytest.raises(ValueError):
             multi_feature_gar.predict(X_test)
