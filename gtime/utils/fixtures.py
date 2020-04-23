@@ -69,6 +69,7 @@ def _single_element_lazy_fixtures(*args):
 
 def lazy_fixtures(*args):
     if isinstance(args[0], tuple):
-        return [tuple([pytest.lazy_fixture(arg[0].__name__), *arg[1:]]) for arg in args]
+        raise NotImplementedError
+        # return [tuple([pytest.lazy_fixture(arg[0].__name__), *arg[1:]]) for arg in args]
     else:
         return _single_element_lazy_fixtures(*args)

@@ -21,12 +21,6 @@ def ordered_pair(min_value: int, max_value: int):
     )
 
 
-def shape_vector(min_shape=30, max_shape=200):
-    return tuples(
-        integers(min_shape, max_shape)
-    )
-
-
 def shape_matrix(min_shape_0=30, max_shape_0=200, min_shape_1=5, max_shape_1=10):
     return tuples(
         integers(min_shape_0, max_shape_0), integers(min_shape_1, max_shape_1)

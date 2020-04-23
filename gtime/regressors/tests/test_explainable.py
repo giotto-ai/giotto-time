@@ -39,7 +39,7 @@ class TestExplainableRegressor:
     @given(estimator=regressors())
     def test_constructor_bad_explainer(self, estimator):
         with pytest.raises(ValueError):
-            ExplainableRegressor(estimator, 'bad')
+            ExplainableRegressor(estimator, "bad")
 
     @pytest.mark.parametrize("explainer_type", ["lime", "shap"])
     @given(bad_estimator=bad_regressors())
@@ -84,7 +84,7 @@ class TestExplainableRegressor:
     )
     def test_predict_values(self, estimator, explainer_type, X_y):
         X, y = X_y
-        X_test = X[:2, :]
+        X_test = X[:1, :]
         regressor = ExplainableRegressor(estimator, explainer_type)
         regressor_predictions = regressor.fit(X, y).predict(X_test)
 
@@ -92,4 +92,3 @@ class TestExplainableRegressor:
         estimator_predictions = cloned_estimator.fit(X, y).predict(X_test)
 
         assert regressor_predictions.shape == estimator_predictions.shape
-

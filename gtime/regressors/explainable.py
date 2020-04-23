@@ -53,8 +53,8 @@ class ExplainableRegressor(BaseEstimator, RegressorMixin):
         self.explainer = self._initialize_explainer()
 
     def _check_estimator(self, estimator: RegressorMixin) -> RegressorMixin:
-        if not hasattr(estimator, 'fit') or not hasattr(estimator, 'predict'):
-            raise TypeError(f'Estimator not compatible: {estimator}')
+        if not hasattr(estimator, "fit") or not hasattr(estimator, "predict"):
+            raise TypeError(f"Estimator not compatible: {estimator}")
         return estimator
 
     def _initialize_explainer(self) -> Union[_LimeExplainer, _ShapExplainer]:
@@ -82,7 +82,9 @@ class ExplainableRegressor(BaseEstimator, RegressorMixin):
         Fitted `ExplainableRegressor`
         """
         self.estimator_ = self.estimator.fit(X, y)
-        self.explainer_ = self.explainer.fit(self.estimator_, X, feature_names=feature_names)
+        self.explainer_ = self.explainer.fit(
+            self.estimator_, X, feature_names=feature_names
+        )
         return self
 
     def predict(self, X: np.ndarray):

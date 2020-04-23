@@ -1,3 +1,4 @@
+import itertools
 import random
 from typing import List
 
@@ -45,6 +46,34 @@ df_transformer = FeatureCreation(
         ),
     ]
 )
+
+
+forecasters = [GAR, GARFF, MultiFeatureGAR]
+explainers = [
+    "shap",
+]  # "lime"] for speed reason
+
+
+@pytest.mark.parametrize(
+    "forecaster,explainer", itertools.product(forecasters, explainers)
+)
+@given(
+    X_y=X_y_matrices(
+        horizon=4,
+        df_transformer=df_transformer,
+        min_length=10,
+        allow_nan_infinity=False,
+    )
+)
+def test_predict_has_explainers(forecaster, explainer, X_y):
+    X, y = X_y
+    X_train, y_train, X_test, y_test = FeatureSplitter().transform(X, y)
+    model = forecaster(LinearRegression(), explainer_type=explainer)
+    model.fit(X_train, y_train)
+    model.predict(X_test.iloc[:1, :])
+    assert len(model.estimators_) == y_test.shape[1]
+    for estimator in model.estimators_:
+        assert len(estimator.explainer_.explanations_) == 1
 
 
 @pytest.fixture
@@ -131,7 +160,7 @@ def test_initialize_estimator(estimator):
 
 @given(models())
 def test_initialize_estimator_explainable(estimator):
-    explainable_estimator = initialize_estimator(estimator, explainer_type='shap')
+    explainable_estimator = initialize_estimator(estimator, explainer_type="shap")
     assert isinstance(explainable_estimator, ExplainableRegressor)
     assert isinstance(explainable_estimator.explainer, _ShapExplainer)
 

@@ -60,6 +60,7 @@ class _LimeExplainer(_RegressorExplainer):
     >>> explainer.explanations_[0]
     {'d': -0.10406889434277307, 'c': 0.07973507022816899, 'b': 0.02312395991550859, 'a': 0.006403509251399996, 'e': 0.006272607738125953}
     """
+
     def fit(
         self, model: RegressorMixin, X: np.ndarray, feature_names: List[str] = None
     ):

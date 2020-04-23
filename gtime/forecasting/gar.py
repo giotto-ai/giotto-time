@@ -13,7 +13,9 @@ from gtime.regressors import ExplainableRegressor
 from gtime.regressors.multi_output import MultiFeatureMultiOutputRegressor
 
 
-def initialize_estimator(estimator: RegressorMixin, explainer_type: Optional[str]) -> RegressorMixin:
+def initialize_estimator(
+    estimator: RegressorMixin, explainer_type: Optional[str]
+) -> RegressorMixin:
     if explainer_type is None:
         return estimator
     else:
