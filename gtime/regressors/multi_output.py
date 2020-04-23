@@ -13,24 +13,6 @@ from sklearn.utils.validation import check_is_fitted
 from gtime.explainability.explainer import Explainer, _LimeExplainer, _ShapExplainer
 
 
-class ExplainableMultiOutputRegressor(MultiOutputRegressor):
-    def __init__(self, estimator, explainer_type: str, n_jobs=None):
-        super().__init__(estimator, n_jobs)
-        self.explainer_type = explainer_type
-        self._explainer = self._initialize_explainer(explainer_type)
-
-    def predict(self, X):
-        pass
-
-    def _initialize_explainer(self, explainer_type: str) -> Explainer:
-        if explainer_type == "lime":
-            return _LimeExplainer()
-        elif explainer_type == "shap":
-            return _ShapExplainer()
-        else:
-            raise ValueError(f"Explainer type not valid: {explainer_type}")
-
-
 class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
     """ Multi target regression with option to choose the features for each target.
 

@@ -9,6 +9,7 @@ from sklearn.multioutput import MultiOutputRegressor
 from gtime.regressors.multi_output import MultiFeatureMultiOutputRegressor
 from gtime.utils.hypothesis.feature_matrices import numpy_X_y_matrices, numpy_X_matrices
 from gtime.utils.fixtures import estimator
+from gtime.utils.hypothesis.general_strategies import shape_X_y_matrices
 
 
 @st.composite
@@ -67,7 +68,7 @@ class TestMultiFeatureMultiOutputRegressor:
 
     @given(
         data=data(),
-        X_y=numpy_X_y_matrices(y_vector=False, min_value=-10000, max_value=10000),
+        X_y=numpy_X_y_matrices(X_y_shapes=shape_X_y_matrices(y_as_vector=False), min_value=-10000, max_value=10000),
     )
     def test_fit_bad_y(self, data, estimator, X_y):
         X, y = X_y
@@ -83,7 +84,7 @@ class TestMultiFeatureMultiOutputRegressor:
                 X, y, target_to_features_dict=target_to_feature_dict
             )
 
-    @given(X_y=numpy_X_y_matrices(y_vector=False, min_value=-10000, max_value=10000))
+    @given(X_y=numpy_X_y_matrices(X_y_shapes=shape_X_y_matrices(y_as_vector=False), min_value=-10000, max_value=10000))
     def test_fit_as_multi_output_regressor_if_target_to_feature_none(
         self, estimator, X_y
     ):
@@ -109,7 +110,7 @@ class TestMultiFeatureMultiOutputRegressor:
 
     @given(
         data=data(),
-        X_y=numpy_X_y_matrices(y_vector=False, min_value=-10000, max_value=10000),
+        X_y=numpy_X_y_matrices(X_y_shapes=shape_X_y_matrices(y_as_vector=False), min_value=-10000, max_value=10000),
     )
     def test_fit_target_to_feature_dict_working(self, data, X_y, estimator):
         X, y = X_y
@@ -125,7 +126,7 @@ class TestMultiFeatureMultiOutputRegressor:
 
     @given(
         data=data(),
-        X_y=numpy_X_y_matrices(y_vector=False, min_value=-10000, max_value=10000),
+        X_y=numpy_X_y_matrices(X_y_shapes=shape_X_y_matrices(y_as_vector=False), min_value=-10000, max_value=10000),
     )
     def test_fit_target_to_feature_dict_consistent(self, data, X_y, estimator):
         X, y = X_y
@@ -146,7 +147,7 @@ class TestMultiFeatureMultiOutputRegressor:
 
     @given(
         data=data(),
-        X_y=numpy_X_y_matrices(y_vector=False, min_value=-10000, max_value=10000),
+        X_y=numpy_X_y_matrices(X_y_shapes=shape_X_y_matrices(y_as_vector=False), min_value=-10000, max_value=10000),
     )
     def test_predict_target_to_feature_dict(self, data, X_y, estimator):
         X, y = X_y
@@ -164,7 +165,7 @@ class TestMultiFeatureMultiOutputRegressor:
 
     @given(
         data=data(),
-        X_y=numpy_X_y_matrices(y_vector=False, min_value=-10000, max_value=10000),
+        X_y=numpy_X_y_matrices(X_y_shapes=shape_X_y_matrices(y_as_vector=False), min_value=-10000, max_value=10000),
     )
     def test_error_predict_target_to_feature_dict_wrong_X_shape(
         self, data, X_y, estimator

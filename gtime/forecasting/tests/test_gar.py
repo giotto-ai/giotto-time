@@ -7,7 +7,10 @@ from hypothesis.strategies import data, integers, lists, text
 import hypothesis.strategies as st
 from numpy.testing import assert_array_equal
 
-from gtime.forecasting.gar import MultiFeatureGAR
+from gtime.explainability import _ShapExplainer
+from gtime.explainability.tests.test_explainer import models
+from gtime.forecasting.gar import MultiFeatureGAR, initialize_estimator
+from gtime.regressors import ExplainableRegressor
 
 if pd.__version__ >= "1.0.0":
     import pandas._testing as testing
@@ -119,6 +122,18 @@ def test_str_target_to_feature_dicts(
         assert (
             min_features_per_target <= len(target_features) <= max_features_per_target
         )
+
+
+@given(models())
+def test_initialize_estimator(estimator):
+    assert estimator == initialize_estimator(estimator, explainer_type=None)
+
+
+@given(models())
+def test_initialize_estimator_explainable(estimator):
+    explainable_estimator = initialize_estimator(estimator, explainer_type='shap')
+    assert isinstance(explainable_estimator, ExplainableRegressor)
+    assert isinstance(explainable_estimator.explainer, _ShapExplainer)
 
 
 class TestMultiFeatureGAR:

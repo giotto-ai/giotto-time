@@ -1,15 +1,23 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
+import numpy as np
 import pandas as pd
 from sklearn.base import RegressorMixin
 from sklearn.multioutput import (
     MultiOutputRegressor,
     RegressorChain,
 )
-import numpy as np
 from sklearn.utils.validation import check_is_fitted
 
+from gtime.regressors import ExplainableRegressor
 from gtime.regressors.multi_output import MultiFeatureMultiOutputRegressor
+
+
+def initialize_estimator(estimator: RegressorMixin, explainer_type: Optional[str]) -> RegressorMixin:
+    if explainer_type is None:
+        return estimator
+    else:
+        return ExplainableRegressor(estimator, explainer_type)
 
 
 class GAR(MultiOutputRegressor):
@@ -50,7 +58,9 @@ class GAR(MultiOutputRegressor):
 
     """
 
-    def __init__(self, estimator, n_jobs: int = None):
+    def __init__(self, estimator, explainer_type: str = None, n_jobs: int = None):
+        self.explainer_type = explainer_type
+        estimator = initialize_estimator(estimator, explainer_type)
         super().__init__(estimator, n_jobs)
 
     def fit(self, X: pd.DataFrame, y: pd.DataFrame, sample_weight=None):
@@ -135,7 +145,9 @@ class GARFF(RegressorChain):
 
     """
 
-    def __init__(self, estimator):
+    def __init__(self, estimator, explainer_type: str = None):
+        self.explainer_type = explainer_type
+        estimator = initialize_estimator(estimator, explainer_type)
         super().__init__(
             base_estimator=estimator, order=None, cv=None, random_state=None
         )
@@ -224,7 +236,9 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor):
 
     """
 
-    def __init__(self, estimator: RegressorMixin):
+    def __init__(self, estimator: RegressorMixin, explainer_type: str = None):
+        self.explainer_type = explainer_type
+        estimator = initialize_estimator(estimator, explainer_type)
         super().__init__(estimator)
 
     def fit(

@@ -98,9 +98,17 @@ class TestYMatrices:
 class TestNumpyXyMatrices:
     @given(data(), shape_X_y_matrices())
     def test_input_as_tuples(self, data, shape_X_y):
-        X, y = data.draw(numpy_X_y_matrices(shape_X_y, y_vector=False))
+        X, y = data.draw(numpy_X_y_matrices(shape_X_y))
         assert X.shape == shape_X_y[0]
         assert y.shape == shape_X_y[1]
+        assert len(y.shape) == 1
+
+    @given(data(), shape_X_y_matrices(y_as_vector=False))
+    def test_input_as_tuples_y_matrix(self, data, shape_X_y):
+        X, y = data.draw(numpy_X_y_matrices(shape_X_y))
+        assert X.shape == shape_X_y[0]
+        assert y.shape == shape_X_y[1]
+        assert len(y.shape) == 2
 
     @given(data())
     def test_input_as_strategy(self, data):

@@ -21,6 +21,12 @@ def ordered_pair(min_value: int, max_value: int):
     )
 
 
+def shape_vector(min_shape=30, max_shape=200):
+    return tuples(
+        integers(min_shape, max_shape)
+    )
+
+
 def shape_matrix(min_shape_0=30, max_shape_0=200, min_shape_1=5, max_shape_1=10):
     return tuples(
         integers(min_shape_0, max_shape_0), integers(min_shape_1, max_shape_1)
@@ -36,6 +42,7 @@ def shape_X_y_matrices(
     max_shape_1_X=10,
     min_shape_1_y=1,
     max_shape_1_y=3,
+    y_as_vector=True,
 ):
     if max_shape_0 <= min_shape_1_X:
         raise ValueError(
@@ -44,7 +51,10 @@ def shape_X_y_matrices(
         )
     shape_0 = draw(integers(min_shape_0, max_shape_0))
     shape_X = draw(shape_matrix(shape_0, shape_0, min_shape_1_X, max_shape_1_X))
-    shape_y = draw(shape_matrix(shape_0, shape_0, min_shape_1_y, max_shape_1_y))
+    if y_as_vector:
+        shape_y = (shape_0,)
+    else:
+        shape_y = draw(shape_matrix(shape_0, shape_0, min_shape_1_y, max_shape_1_y))
     assume(shape_X[1] < shape_X[0])
     return shape_X, shape_y
 

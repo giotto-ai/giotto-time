@@ -143,7 +143,6 @@ def y_matrices(
 def numpy_X_y_matrices(
     draw,
     X_y_shapes=shape_X_y_matrices(),
-    y_vector=True,
     min_value: float = None,
     max_value: float = None,
     allow_nan: bool = False,
@@ -157,8 +156,6 @@ def numpy_X_y_matrices(
         raise ValueError(f"X.shape[0] must be == y.shape[0]: {X_shape}, {y_shape}")
     if X_shape[0] <= X_shape[1]:
         raise ValueError(f"X.shape[0] must be <= X.shape[1]: {X_shape}")
-    if y_vector and len(y_shape) > 1:
-        y_shape = (y_shape[0],)
 
     elements = floats(
         min_value=min_value,
