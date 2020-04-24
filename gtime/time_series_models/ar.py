@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Optional
 
 import numpy as np
 from sklearn.compose import make_column_selector
@@ -36,11 +36,12 @@ class AR(TimeSeriesForecastingModel):
     2000-01-01 00:00:19 -0.107707  0.052031 -0.105526
     """
 
-    def __init__(self, p: int, horizon: Union[int, List[int]]):
+    def __init__(self, p: int, horizon: Union[int, List[int]], explainer_type: Optional[str] = None):
         self.p = p
+        self.explainer_type = explainer_type
         features = [
             tuple((f"s{i}", Shift(i), make_column_selector(dtype_include=np.number)))
             for i in range(p)
         ]
-        model = GAR(LinearRegression())
+        model = GAR(LinearRegression(), explainer_type=explainer_type)
         super().__init__(features=features, horizon=horizon, model=model)

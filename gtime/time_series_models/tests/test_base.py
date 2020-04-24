@@ -17,14 +17,17 @@ from gtime.utils.hypothesis.time_indexes import giotto_time_series
 
 
 class TestAR:
+    @pytest.mark.parametrize('explainer_type', [None, 'lime', 'shap'])
     @given(
         p=st.integers(min_value=1, max_value=5),
         horizon=st.integers(min_value=1, max_value=3),
     )
-    def test_constructor(self, p, horizon):
-        ar = AR(p, horizon)
+    def test_constructor(self, p, horizon, explainer_type):
+        ar = AR(p, horizon, explainer_type=explainer_type)
         assert len(ar.features) == p
         assert ar.horizon == horizon
+        assert ar.explainer_type == explainer_type
+        assert ar.model.explainer_type == explainer_type
 
     @given(
         time_series=giotto_time_series(
