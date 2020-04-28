@@ -17,7 +17,7 @@ from gtime.utils.hypothesis.time_indexes import giotto_time_series
 
 
 class TestAR:
-    @pytest.mark.parametrize('explainer_type', [None, 'lime', 'shap'])
+    @pytest.mark.parametrize("explainer_type", [None, "lime", "shap"])
     @given(
         p=st.integers(min_value=1, max_value=5),
         horizon=st.integers(min_value=1, max_value=3),

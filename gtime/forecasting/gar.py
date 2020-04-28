@@ -104,7 +104,15 @@ class GAR(MultiOutputRegressor):
         y_p = super().predict(X)
         y_p_df = pd.DataFrame(data=y_p, columns=self._y_columns, index=X.index)
 
+        if self.explainer_type is not None:
+            self.explanations_ = self._explanations_as_dataframe(y_p_df.index)
         return y_p_df
+
+    def _explanations_as_dataframe(self, index: pd.Index) -> List[pd.DataFrame]:
+        return [
+            pd.DataFrame(estimator.explainer_.explanations_, index=index)
+            for estimator in self.estimators_
+        ]
 
 
 # TODO: See #99
