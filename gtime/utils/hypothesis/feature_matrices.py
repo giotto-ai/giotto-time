@@ -51,11 +51,7 @@ def X_y_matrices(
             allow_infinity=allow_nan_infinity,
         )
     )
-    #  feature_creation = FeatureCreation(horizon=horizon, time_series_features=time_series_features)
-    #  X, y = feature_creation.fit_transform(period_index_series)
-
     X = df_transformer.fit_transform(period_index_series)
-
     y = horizon_shift(period_index_series, horizon=horizon)
 
     return X, y

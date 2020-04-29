@@ -8,10 +8,17 @@ from sklearn.cluster import DBSCAN, KMeans, SpectralClustering
 from sklearn.decomposition import PCA
 from sklearn.exceptions import NotFittedError
 import numpy as np
+import pandas as pd
 
 from gtime.explainability import _LimeExplainer, _ShapExplainer
+from gtime.forecasting.tests.test_gar import df_transformer
+from gtime.model_selection import FeatureSplitter
 from gtime.regressors import ExplainableRegressor
-from gtime.utils.hypothesis.feature_matrices import numpy_X_matrices, numpy_X_y_matrices
+from gtime.utils.hypothesis.feature_matrices import (
+    numpy_X_matrices,
+    numpy_X_y_matrices,
+    X_y_matrices,
+)
 from gtime.utils.hypothesis.general_strategies import regressors
 from gtime.utils.hypothesis.time_indexes import samples_from
 
@@ -92,3 +99,4 @@ class TestExplainableRegressor:
         estimator_predictions = cloned_estimator.fit(X, y).predict(X_test)
 
         assert regressor_predictions.shape == estimator_predictions.shape
+        assert regressor_predictions.shape[0] == len(regressor.explanations_)

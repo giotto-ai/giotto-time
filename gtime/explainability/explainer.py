@@ -83,6 +83,8 @@ class _LimeExplainer(_RegressorExplainer):
         check_is_fitted(model)
         if feature_names is None:
             feature_names = self._define_feature_names(X)
+        else:
+            feature_names = list(feature_names)
 
         self.model_ = model
         self.explainer_ = lime_tabular.LimeTabularExplainer(

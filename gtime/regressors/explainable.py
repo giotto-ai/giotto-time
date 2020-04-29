@@ -1,8 +1,9 @@
-from typing import Union, List
+from typing import Union, List, Tuple
 
 from sklearn.base import BaseEstimator, RegressorMixin
 import numpy as np
 from sklearn.utils.validation import check_is_fitted
+import pandas as pd
 
 from gtime.explainability import _LimeExplainer, _ShapExplainer
 
@@ -65,7 +66,9 @@ class ExplainableRegressor(BaseEstimator, RegressorMixin):
         else:
             raise ValueError(f"Explainer not available: {self.explainer_type}")
 
-    def fit(self, X: np.ndarray, y: np.ndarray, feature_names: List[str] = None):
+    def fit(
+        self, X: np.ndarray, y: np.ndarray, feature_names: List[str] = None,
+    ):
         """ Fit function that calls the fit on the estimator and on the explainer.
 
         Parameters
@@ -103,4 +106,6 @@ class ExplainableRegressor(BaseEstimator, RegressorMixin):
         predictions: np.ndarray
         """
         check_is_fitted(self)
-        return self.explainer_.predict(X)
+        predictions = self.explainer_.predict(X)
+        self.explanations_ = self.explainer_.explanations_
+        return predictions
