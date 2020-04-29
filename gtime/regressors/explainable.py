@@ -67,10 +67,7 @@ class ExplainableRegressor(BaseEstimator, RegressorMixin):
             raise ValueError(f"Explainer not available: {self.explainer_type}")
 
     def fit(
-        self,
-        X: Union[np.ndarray, pd.DataFrame],
-        y: Union[np.ndarray, pd.Series],
-        feature_names: List[str] = None,
+        self, X: np.ndarray, y: np.ndarray, feature_names: List[str] = None,
     ):
         """ Fit function that calls the fit on the estimator and on the explainer.
 
@@ -87,14 +84,13 @@ class ExplainableRegressor(BaseEstimator, RegressorMixin):
         -------
         Fitted `ExplainableRegressor`
         """
-        X, y, feature_names = self._check_X_y_feature_names(X, y, feature_names)
         self.estimator_ = self.estimator.fit(X, y)
         self.explainer_ = self.explainer.fit(
             self.estimator_, X, feature_names=feature_names
         )
         return self
 
-    def predict(self, X: Union[np.ndarray, pd.DataFrame]):
+    def predict(self, X: np.ndarray):
         """ Predict function that call the predict function of the explainer.
 
         You can access to the explanation of the predictions via
@@ -110,24 +106,6 @@ class ExplainableRegressor(BaseEstimator, RegressorMixin):
         predictions: np.ndarray
         """
         check_is_fitted(self)
-        X = X.values if isinstance(X, pd.DataFrame) else X
         predictions = self.explainer_.predict(X)
         self.explanations_ = self.explainer_.explanations_
         return predictions
-
-    def _check_X_y_feature_names(
-        self,
-        X: Union[np.ndarray, pd.DataFrame],
-        y: Union[np.ndarray, pd.Series],
-        feature_names: List[str] = None,
-    ) -> Tuple[np.ndarray, np.ndarray, List[str]]:
-        if not isinstance(X, pd.DataFrame):
-            return X, y, feature_names
-        else:
-            feature_names = X.columns if feature_names is None else feature_names
-            y = y.values if isinstance(y, pd.Series) else y
-
-            if feature_names is None:
-                return X.values, y.values, X.columns
-            else:
-                return X.values, y.values, feature_names

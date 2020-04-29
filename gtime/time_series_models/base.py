@@ -1,8 +1,7 @@
 from typing import List, Tuple, Union
 
-import sklearn
-from sklearn.base import BaseEstimator, RegressorMixin
 import pandas as pd
+from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.linear_model import LinearRegression
 from sklearn.utils.validation import check_is_fitted
 

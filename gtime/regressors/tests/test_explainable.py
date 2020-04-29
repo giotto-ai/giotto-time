@@ -87,50 +87,6 @@ class TestExplainableRegressor:
 
     @pytest.mark.parametrize("explainer_type", ["lime", "shap"])
     @given(
-        estimator=regressors(),
-        X_y=numpy_X_y_matrices(
-            min_value=-100,
-            max_value=100
-        ),
-    )
-    def test_feature_names_pandas(self, estimator, explainer_type, X_y):
-        X, y = X_y
-        X_train, y_train = pd.DataFrame(X), pd.DataFrame(y)
-        X_test = X_train.iloc[:2, :]
-        features = set(X_train.columns)
-
-        regressor = ExplainableRegressor(estimator, explainer_type)
-        regressor.fit(X_train, y_train)
-        regressor.predict(X_test)
-
-        explanations = regressor.explainer_.explanations_
-        for explanation in explanations:
-            assert set(explanation.keys()) == features
-
-    @pytest.mark.parametrize("explainer_type", ["lime", "shap"])
-    @given(
-        estimator=regressors(),
-        X_y=numpy_X_y_matrices(
-            min_value=-100,
-            max_value=100,
-        ),
-    )
-    def test_custom_feature_names_pandas(self, estimator, explainer_type, X_y):
-        X, y = X_y
-        X_train, y_train = pd.DataFrame(X), pd.DataFrame(y)
-        X_test = X_train.iloc[:2, :]
-        feature_names = {f"{i+5}" for i in range(len(X_train.columns))}
-
-        regressor = ExplainableRegressor(estimator, explainer_type)
-        regressor.fit(X_train, y_train, feature_names=feature_names)
-        regressor.predict(X_test)
-
-        explanations = regressor.explainer_.explanations_
-        for explanation in explanations:
-            assert set(explanation.keys()) == feature_names
-
-    @pytest.mark.parametrize("explainer_type", ["lime", "shap"])
-    @given(
         estimator=regressors(), X_y=numpy_X_y_matrices(min_value=-100, max_value=100)
     )
     def test_predict_values(self, estimator, explainer_type, X_y):

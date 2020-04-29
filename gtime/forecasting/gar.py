@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -22,7 +22,40 @@ def initialize_estimator(
         return ExplainableRegressor(estimator, explainer_type)
 
 
-class GAR(MultiOutputRegressor):
+class _ExplanationsMixin:
+    def _explanations_as_dataframe(
+        self,
+        index: pd.Index,
+        y_columns: List[str],
+        X_columns: Union[List[str], Dict[str, List[str]]],
+    ) -> Dict[str, pd.DataFrame]:
+        explanations = self._dict_explanations(index, y_columns)
+        explanations = self._rename_columns(explanations, X_columns)
+        return explanations
+
+    def _dict_explanations(self, index: pd.Index, y_columns: List[str]):
+        return {
+            y_column: pd.DataFrame(estimator.explanations_, index=index)
+            for y_column, estimator in zip(y_columns, self.estimators_)
+        }
+
+    def _rename_columns(
+        self,
+        dict_explanations: Dict[str, pd.DataFrame],
+        X_columns: Union[List[str], Dict[str, List[str]]],
+    ):
+        if isinstance(X_columns, list):
+            for column, explanation in dict_explanations.items():
+                explanation.columns = X_columns
+        elif isinstance(X_columns, dict):
+            for y_column, columns in X_columns.items():
+                dict_explanations[y_column].columns = columns
+        else:
+            raise TypeError(f'X_columns must be a list or a dict. Detected: {type(X_columns)}')
+        return dict_explanations
+
+
+class GAR(MultiOutputRegressor, _ExplanationsMixin):
     """Generalized Auto Regression model.
 
     This model is a wrapper of ``sklearn.multioutput.MultiOutputRegressor`` but returns
@@ -83,8 +116,8 @@ class GAR(MultiOutputRegressor):
         self : object
 
         """
-        self._y_columns = y.columns
-        return super().fit(X, y, sample_weight)
+        self.y_columns_ = y.columns
+        return super().fit(X, y)
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         """For each row in ``X``, make a prediction for each fitted model, from 1 to
@@ -102,21 +135,17 @@ class GAR(MultiOutputRegressor):
 
         """
         y_p = super().predict(X)
-        y_p_df = pd.DataFrame(data=y_p, columns=self._y_columns, index=X.index)
+        y_p_df = pd.DataFrame(data=y_p, columns=self.y_columns_, index=X.index)
 
         if self.explainer_type is not None:
-            self.explanations_ = self._explanations_as_dataframe(y_p_df.index)
+            self.explanations_ = self._explanations_as_dataframe(
+                index=y_p_df.index, y_columns=self.y_columns_, X_columns=list(X.columns),
+            )
         return y_p_df
-
-    def _explanations_as_dataframe(self, index: pd.Index) -> List[pd.DataFrame]:
-        return [
-            pd.DataFrame(estimator.explainer_.explanations_, index=index)
-            for estimator in self.estimators_
-        ]
 
 
 # TODO: See #99
-class GARFF(RegressorChain):
+class GARFF(RegressorChain, _ExplanationsMixin):
     """Generalized Auto Regression model with feedforward training. This model is a
     wrapper of ``sklearn.multioutput.RegressorChain`` but returns  a ``pd.DataFrame``.
 
@@ -180,7 +209,8 @@ class GARFF(RegressorChain):
             The fitted object.
 
         """
-        self._y_columns = y.columns
+        self.y_columns_ = y.columns
+        self.target_to_features_dict_ = self._compute_target_to_features_dict(X.columns, y.columns)
         return super().fit(X, y)
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -199,12 +229,24 @@ class GARFF(RegressorChain):
 
         """
         y_p = super().predict(X)
-        y_p_df = pd.DataFrame(data=y_p, columns=self._y_columns, index=X.index)
+        y_p_df = pd.DataFrame(data=y_p, columns=self.y_columns_, index=X.index)
 
+        if self.explainer_type is not None:
+            self.explanations_ = self._explanations_as_dataframe(
+                index=y_p_df.index, y_columns=self.y_columns_, X_columns=self.target_to_features_dict_
+            )
         return y_p_df
 
+    def _compute_target_to_features_dict(self, X_columns: List[str], y_columns: List[str]) -> Dict[str, List[str]]:
+        X_columns, y_columns = list(X_columns), list(y_columns)
 
-class MultiFeatureGAR(MultiFeatureMultiOutputRegressor):
+        target_to_features_dict = {}
+        for i, y_column in enumerate(y_columns):
+            target_to_features_dict[y_column] = X_columns + y_columns[:i]
+        return target_to_features_dict
+
+
+class MultiFeatureGAR(MultiFeatureMultiOutputRegressor, _ExplanationsMixin):
     """Generalized Auto Regression model.
 
     This model is a wrapper of ``MultiFeatureMultiOutputRegressor`` but returns
@@ -275,6 +317,7 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor):
         """
         self.X_columns_ = X.columns
         self.y_columns_ = y.columns
+        self.target_to_features_dict_ = target_to_features_dict
         if target_to_features_dict is not None:
             target_to_features_dict = self._feature_name_to_index(
                 target_to_features_dict, X.columns, y.columns
@@ -301,6 +344,11 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor):
         y_p = super().predict(X.values)
         y_p_df = pd.DataFrame(data=y_p, columns=self.y_columns_, index=X.index)
 
+        if self.explainer_type is not None:
+            X_columns = list(X.columns) if self.target_to_features_dict_ is None else self.target_to_features_dict_
+            self.explanations_ = self._explanations_as_dataframe(
+                index=y_p_df.index, y_columns=self.y_columns_, X_columns=X_columns
+            )
         return y_p_df
 
     @staticmethod
