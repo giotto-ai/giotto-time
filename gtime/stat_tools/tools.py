@@ -41,6 +41,31 @@ def loglikelihood_ns(nu: np.array, F: np.array):
     return -0.5 * (np.log(2 * np.pi * np.abs(F)) + mat_square(np.linalg.inv(F), nu))
 
 
+def durbin_levinson_recursion(x: np.array):
+    """
+    Durbin-Levinson algorithm to fix autocorrelation
+    # TODO theoretical review required
+
+    Parameters
+    ----------
+    x: np.array, input data, model parameters
+
+    Returns
+    -------
+    x: np.array, transformed array
+
+    """
+
+    t = x.copy()
+    x = x.copy()
+    for i in range(1, len(x)):
+        a = x[i]
+        for j in range(i):
+            t[j] += a * x[i - j - 1]
+        x[:i] = t[:i]
+    return x
+
+
 def arma_polynomial_roots(params: np.array, len_p: int):
     """
     Checks stationarity and invertibility of ARMA model returning roots of its backshift operator polynomials.
