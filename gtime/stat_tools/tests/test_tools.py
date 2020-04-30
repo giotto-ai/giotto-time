@@ -4,7 +4,7 @@ import hypothesis.strategies as st
 from hypothesis.extra.numpy import arrays
 from hypothesis import given
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
-from gtime.stat_tools.tools import normalize, autocorrelation, solve_yw_equation, yule_walker, acf, pacf, mat_square, arma_polynomial_roots, loglikelihood_ns
+from gtime.stat_tools.tools import normalize, autocorrelation, solve_yw_equation, yule_walker, acf, pacf, arma_polynomial_roots, durbin_levinson_recursion
 
 
 
@@ -78,12 +78,6 @@ def arma_params(draw, max_dim):
     return params, p
 
 class TestMLETools:
-    @given(m=st.integers(min_value=1, max_value=100), n=st.integers(min_value=1, max_value=100))
-    def test_mat_square(self, m, n):
-        x = np.random.random((m, n))
-        q = np.random.random((n, n))
-        res = mat_square(q, x)
-        assert res.shape == (m, m)
 
     @given(data=arma_params(max_dim=10))
     def test_arma_polynomial_roots_abs(self, data):
@@ -91,9 +85,15 @@ class TestMLETools:
         res = arma_polynomial_roots(params, len_p)
         assert all(res >= 0)
 
-    @given(nu=st.floats(allow_nan=False, allow_infinity=False),
-           F=st.floats(min_value=1e-10, allow_nan=False, allow_infinity=False))
-    def test_loglikelihood_ns(self, nu, F):
-        loglike = loglikelihood_ns(np.array([[nu]]), np.array([[F]]))
-        expected = -0.5 * (np.log(2 * np.pi * np.abs(F)) + nu*nu/F)
-        assert float(loglike) == pytest.approx(expected)
+    @given(x=arrays(dtype=float, shape=st.integers(min_value=1, max_value=10),
+                    elements=st.floats(allow_nan=False, allow_infinity=False, min_value=-1, max_value=1, exclude_min=True, exclude_max=True)))
+    def test_durbin_levinson_recursion(self, x):
+        transformed_x = durbin_levinson_recursion(x)
+        y = transformed_x.copy()
+        y2 = transformed_x.copy()
+        for j in range(len(y) - 1, 0, -1):
+            b = y[j]
+            for kiter in range(j):
+                y2[kiter] = (y[kiter] - b * y[j - kiter - 1]) / (1 - b ** 2)
+            y[:j] = y2[:j]
+        np.testing.assert_array_almost_equal(x, y, decimal=4)
