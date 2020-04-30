@@ -4,43 +4,6 @@ from scipy.linalg import toeplitz
 from scipy.stats import zscore
 
 
-def mat_square(q: np.array, x: np.array):
-    """
-    Quadratic form x'Qx for vector or matrix x
-
-    Parameters
-    ----------
-    x : np.array, variable
-    q : np.array, coeficient matrix
-
-    Returns
-    -------
-    np.array
-
-    """
-
-    return np.linalg.multi_dot([x, q, np.transpose(x)])
-
-
-def loglikelihood_ns(nu: np.array, F: np.array):
-
-    """
-    Conditional loglikelihood value for one observation
-
-    Parameters
-    ----------
-    nu : np.array, residual
-    F : np.array, residual variance matrix
-
-    Returns
-    -------
-    np.array
-
-    """
-
-    return -0.5 * (np.log(2 * np.pi * np.abs(F)) + mat_square(np.linalg.inv(F), nu))
-
-
 def durbin_levinson_recursion(x: np.array):
     """
     Durbin-Levinson algorithm to fix autocorrelation
