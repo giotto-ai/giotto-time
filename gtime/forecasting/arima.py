@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from typing import Tuple
 from gtime.forecasting.simple_models import SimpleForecaster
-from gtime.stat_tools import MLEModel
+from gtime.stat_tools import ARMAMLEModel
 
 
 def _arma_forecast(n: int, x0: np.array, eps0: np.array, mu: float, phi: np.array, theta: np.array) -> np.array:
@@ -146,7 +146,7 @@ class ARIMAForecaster(SimpleForecaster):
             X = np.concatenate([self.diff_vals[:, [-i-1]], X], axis=1).cumsum(axis=1)
         return X
 
-    def _set_params(self, model: MLEModel, x: np.array):
+    def _set_params(self, model: ARMAMLEModel, x: np.array):
         """
         Extracts fitted model parameters for easier access
 
@@ -182,7 +182,7 @@ class ARIMAForecaster(SimpleForecaster):
         self.last_train_values_ = X.iloc[-len_stored_values:] if len_stored_values > 0 else X.iloc[:0]
         np_x = X.to_numpy().flatten()
         np_x = self._deintegrate(np_x)
-        model = MLEModel((self.n_ar, self.n_ma), self.method)
+        model = ARMAMLEModel((self.n_ar, self.n_ma), self.method)
         model.fit(np_x)
         self._set_params(model, np_x)
         super().fit(X, y)

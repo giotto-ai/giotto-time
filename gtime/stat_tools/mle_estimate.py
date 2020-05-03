@@ -65,16 +65,60 @@ def _transform_params(param: np.array):
     return durbin_levinson_recursion(param)
 
 
-class MLEModel:
+def _np_shift(x: np.array, max_lag: int): # TODO possible merge somehow with Shift()
+    """
+    Lag matrix up to ``max_lags`` for a time series ``x``
 
-    def __init__(self, order, method='mle'):
+    Parameters
+    ----------
+    x: np.array, input array
+    max_lag: int,  number of lags
+
+    Returns
+    -------
+    res: np.array, lag matrix
+    """
+
+    n = len(x)
+    res = np.zeros((n, max_lag))
+    for i in range(n-1):
+        lim = min(i, max_lag)
+        start = max(0, i - max_lag + 1)
+        res[i+1, :lim+1] = x[start:i+1][::-1]
+    return res
+
+
+def _ols_arma_estimate(X: np.array, n_ar: int, n_ma: int):
+    """
+    Simple OLS estimate for ARMA(n_ar, n_ma) process fitted on ``X``
+
+    Parameters
+    ----------
+    X: np.array, input array
+    n_ar: int, degree of autoregressive components
+    n_ma: int, degree of moving average components
+
+    Returns
+    -------
+    params: fitted parameters array
+
+    """
+    lags = _np_shift(X, n_ar)
+    ar_coef = np.linalg.lstsq(lags, X, rcond=None)[0]
+    residuals = X[n_ar:] - np.dot(lags[n_ar:], ar_coef)
+    ols_lags = np.c_[lags[n_ar:], _np_shift(residuals, n_ma)]
+    params = np.linalg.lstsq(ols_lags, X[n_ar:], rcond=None)[0]
+    return params
+
+
+class ARMAMLEModel:
+
+    def __init__(self, order, method='css'):
 
         self.length = max(order[0], order[1] + 1)
         self.order = order
         self.method = method
-        p0 = np.random.random(order[0]) #TODO can be better?
-        q0 = np.random.random(order[1])
-        self.parameters = np.r_[0.0, 0.0, p0, q0]
+        self.parameters = np.zeros(order[0] + order[1] + 2)
 
     def fit(self, X: np.array):
         """
@@ -86,13 +130,15 @@ class MLEModel:
 
         Returns
         -------
-        self: MLEModel
+        self: ARMAMLEModel
 
         """
         mu = X.mean(keepdims=True)
         sigma = X.std(keepdims=True) / np.sqrt(len(X))
         self.parameters[0] = mu
         self.parameters[1] = sigma
+        self.parameters[2:] = _ols_arma_estimate(X, self.order[0], self.order[1])
+
 
         Xmin = minimize(lambda phi: _run_css(phi, X, len_p=self.order[0]), x0=self.parameters, method='L-BFGS-B')
 
