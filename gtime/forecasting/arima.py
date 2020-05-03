@@ -179,6 +179,7 @@ class ARIMAForecaster(SimpleForecaster):
 
         """
         len_stored_values = self.n_ar + self.order[1]
+        self.last_train_date_ = X.index.max().end_time
         self.last_train_values_ = X.iloc[-len_stored_values:] if len_stored_values > 0 else X.iloc[:0]
         np_x = X.to_numpy().flatten()
         np_x = self._deintegrate(np_x)
@@ -204,7 +205,7 @@ class ARIMAForecaster(SimpleForecaster):
         errors: np.array, error forecast required for predictions
         """
         n = len(X)
-        train_test_diff = X.index.min().start_time - self.last_train_values_.index.max().end_time
+        train_test_diff = X.index.min().start_time - self.last_train_date_
         if train_test_diff.value == 1:
             X = pd.concat([self.last_train_values_, X])
             errors = self.errors_[-self.n_ma:]

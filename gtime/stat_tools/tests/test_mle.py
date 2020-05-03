@@ -7,9 +7,7 @@ from gtime.stat_tools import ARMAMLEModel
 
 
 class TestMLEModel:
-    # test (0,0,0)
-    # test roots!!!
-    # test on constant
+
     def test_zeros(self):
         x = np.zeros(100)
         model = ARMAMLEModel(order=(0, 0), method='css')
