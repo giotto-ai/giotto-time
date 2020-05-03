@@ -91,6 +91,7 @@ def _np_shift(x: np.array, max_lag: int): # TODO possible merge somehow with Shi
 def _ols_arma_estimate(X: np.array, n_ar: int, n_ma: int):
     """
     Simple OLS estimate for ARMA(n_ar, n_ma) process fitted on ``X``
+    Based on Box, G. E. P., G. M. Jenkins, and G. C. Reinsel. Time Series Analysis: Forecasting and Control.
 
     Parameters
     ----------
