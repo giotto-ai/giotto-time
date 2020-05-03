@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from typing import Tuple
 from gtime.forecasting.simple_models import SimpleForecaster
-from gtime.stat_tools.mle_estimate import MLEModel # TODO better import
+from gtime.stat_tools import MLEModel
 
 
 def _arma_forecast(n: int, x0: np.array, eps0: np.array, mu: float, phi: np.array, theta: np.array) -> np.array:
