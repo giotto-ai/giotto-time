@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import pytest
 from pandas.util import testing as testing
-from hypothesis import given, note
+from hypothesis import given
 import hypothesis.strategies as st
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
 
@@ -52,7 +52,6 @@ class TestSeasonalNaiveForecast:
         model = SeasonalNaive(horizon=horizon, seasonal_length=seasonal_length)
         model.fit(df)
         y_pred = model.predict()
-        note(y_pred)
         assert y_pred.shape[1] == horizon
         if seasonal_length < horizon:
             assert all(y_pred.iloc[:, 0] == y_pred.iloc[:, seasonal_length])
@@ -65,7 +64,6 @@ class TestAverageForecast:
         model = Average(horizon=horizon)
         model.fit(df)
         y_pred = model.predict()
-        note(y_pred)
         assert y_pred.shape == (horizon, horizon)
         assert pytest.approx(y_pred.diff(axis=1).sum().sum(), 0)
         means = [df.mean()] + [df.iloc[:-i].mean() for i in range(1, horizon)]
@@ -79,6 +77,5 @@ class TestDriftForecast:
         model = Drift(horizon=horizon)
         model.fit(df)
         y_pred = model.predict()
-        note(y_pred)
         assert len(y_pred) == horizon
         assert pytest.approx(y_pred.diff().diff().sum().sum(), 0)
