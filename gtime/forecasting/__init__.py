@@ -6,6 +6,7 @@ for dealing with time series data.
 from .gar import GAR, GARFF, MultiFeatureMultiOutputRegressor, MultiFeatureGAR
 from .trend import TrendForecaster
 from .online import HedgeForecaster
+from .base import BaseForecaster
 from .naive import (
     NaiveForecaster,
     SeasonalNaiveForecaster,
@@ -15,6 +16,7 @@ from .naive import (
 from .arima import ARIMAForecaster
 
 __all__ = [
+    "BaseForecaster",
     "GAR",
     "GARFF",
     "MultiFeatureGAR",

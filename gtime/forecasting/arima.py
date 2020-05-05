@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from typing import Tuple
-from gtime.forecasting.simple_models import SimpleForecaster
+from gtime.forecasting import BaseForecaster
 from gtime.stat_tools import ARMAMLEModel
 
 
@@ -68,7 +68,7 @@ def _arma_insample_errors(x: np.array, eps0: np.array, mu: float, phi: np.array,
     return eps
 
 
-class ARIMAForecaster(SimpleForecaster):
+class ARIMAForecaster(BaseForecaster):
     """
     ARIMA forecaster
 
