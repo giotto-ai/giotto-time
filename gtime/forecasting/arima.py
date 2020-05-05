@@ -31,7 +31,10 @@ def _arma_forecast(n: int, x0: np.array, eps0: np.array, mu: float, phi: np.arra
     eps = np.r_[eps0, np.zeros(n)]
     trend = mu * (1 - phi.sum())
     for i in range(n):
-        x[i + len_ar] = trend + np.dot(phi, x[i:i + len_ar]) + np.dot(theta, eps[i:i + len_ma])
+        try:
+            x[i + len_ar] = trend + np.dot(phi, x[i:i + len_ar]) + np.dot(theta, eps[i:i + len_ma])
+        except:
+            print(i, x, phi, theta)
     return x[len_ar:]
 
 
@@ -223,7 +226,7 @@ class ARIMAForecaster(BaseForecaster):
         -------
         np.array
         """
-
+        len_test = len(X)
         X, errors = self._extend_x_test(X)
         X_numpy = X.values.flatten()
         X_numpy = self._deintegrate(X_numpy)
@@ -236,7 +239,7 @@ class ARIMAForecaster(BaseForecaster):
                               phi=self.model.phi,
                               theta=self.model.theta
                               )
-               for i in range(1, len(X)+1)]
+               for i in range(1, len_test+1)]
         y_pred = self._integrate(np.array(res))
 
         return y_pred[:, self.d:]

@@ -56,7 +56,7 @@ class NaiveForecaster(BaseForecaster):
         return predictions
 
 
-class SeasonalNaiveForecaster(BaseNaiveForecaster):
+class SeasonalNaiveForecaster(BaseForecaster):
     """Seasonal naïve model. The forecast is expected to follow a seasonal pattern of ``seasonal_length`` data points, which is determined by the last ``seasonal_length`` observations of a training dataset available.
 
     Parameters
