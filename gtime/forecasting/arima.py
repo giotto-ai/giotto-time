@@ -100,16 +100,13 @@ class ARIMAForecaster(BaseForecaster):
     """
 
     def __init__(self, order: Tuple[int, int, int], method: str = 'css-mle'):
-        self.order = order
-        self.max_degree = max(order[0], order[2])
-        self.n_ar = order[0]
-        self.n_ma = order[2]
+        self.p, self.d, self.q = order
         self.method = method
         self.model = None
 
     def _deintegrate(self, X: np.array) -> np.array:
         """
-        Desintegrates X returning its difference of ``self.order[1]`` order and recording initial values to ``self.diff_vals`` for invertability
+        Desintegrates X returning its difference of ``self.d`` order and recording initial values to ``self.diff_vals`` for invertability
 
         Parameters
         ----------
@@ -117,16 +114,14 @@ class ARIMAForecaster(BaseForecaster):
 
         Returns
         -------
-        X: np.array, difference of ``self.order[1]`` order of X
+        X: np.array, difference of ``self.d`` order of X
 
         """
-        n = len(X)
-        i_order = self.order[1]
-        target_lenth = n - i_order - self.n_ar
-        self.diff_vals = np.zeros((target_lenth, i_order))
-        for i in range(i_order):
-            self.diff_vals[:, i] = np.diff(X, n=i)[self.n_ar + 1:self.n_ar + target_lenth + 1]
-        X = np.diff(X, n=i_order)
+        target_lenth = len(X) - self.d - self.p
+        self.diff_vals = np.zeros((target_lenth, self.d))
+        for i in range(self.d):
+            self.diff_vals[:, i] = np.diff(X, n=i)[self.p + 1:self.p + target_lenth + 1]
+        X = np.diff(X, n=self.d)
         return X
 
     def _integrate(self, X: np.array) -> np.array:
@@ -142,7 +137,7 @@ class ARIMAForecaster(BaseForecaster):
         np.array, integrated time series
 
         """
-        for i in range(self.order[1]):
+        for i in range(self.d):
             X = np.concatenate([self.diff_vals[:, [-i-1]], X], axis=1).cumsum(axis=1)
         return X
 
@@ -178,12 +173,12 @@ class ARIMAForecaster(BaseForecaster):
             Returns self.
 
         """
-        len_stored_values = self.n_ar + self.order[1]
+        len_stored_values = self.p + self.d
         self.last_train_date_ = X.index.max().end_time
         self.last_train_values_ = X.iloc[-len_stored_values:] if len_stored_values > 0 else X.iloc[:0]
         np_x = X.to_numpy().flatten()
         np_x = self._deintegrate(np_x)
-        model = ARMAMLEModel((self.n_ar, self.n_ma), self.method)
+        model = ARMAMLEModel((self.p, self.q), self.method)
         model.fit(np_x)
         self._set_params(model, np_x)
         super().fit(X, y)
@@ -208,12 +203,12 @@ class ARIMAForecaster(BaseForecaster):
         train_test_diff = X.index.min().start_time - self.last_train_date_
         if train_test_diff.value == 1:
             X = pd.concat([self.last_train_values_, X])
-            errors = self.errors_[-self.n_ma:]
+            errors = self.errors_[-self.q:]
         else:
-            last_index = pd.period_range(periods=self.n_ar + self.order[1] + 1, end=X.index[0])[:-1]
+            last_index = pd.period_range(periods=self.p + self.d + 1, end=X.index[0])[:-1]
             last_values = pd.DataFrame([X.iloc[0].values[0]] * len(last_index), index=last_index, columns=X.columns)
             X = pd.concat([last_values, X])
-            errors = np.zeros(self.n_ma)
+            errors = np.zeros(self.q)
         return X, errors
 
     def _predict(self, X: pd.DataFrame) -> np.array:
@@ -236,8 +231,8 @@ class ARIMAForecaster(BaseForecaster):
         errors = _arma_insample_errors(np_x, errors, self.mu_, self.phi_, self.theta_)
 
         res = [_arma_forecast(n=self.horizon_,
-                              x0=np_x[i:i+self.n_ar],
-                              eps0=errors[i:i+self.n_ma],
+                              x0=np_x[i:i+self.p],
+                              eps0=errors[i:i+self.q],
                               mu=self.model.mu,
                               phi=self.model.phi,
                               theta=self.model.theta
@@ -245,4 +240,4 @@ class ARIMAForecaster(BaseForecaster):
                for i in range(1, n+1)]
         y_pred = self._integrate(np.array(res))
 
-        return y_pred[:, self.order[1]:]
+        return y_pred[:, self.d:]
