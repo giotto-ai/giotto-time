@@ -31,10 +31,7 @@ def _arma_forecast(n: int, x0: np.array, eps0: np.array, mu: float, phi: np.arra
     eps = np.r_[eps0, np.zeros(n)]
     trend = mu * (1 - phi.sum())
     for i in range(n):
-        try:
-            x[i + len_ar] = trend + np.dot(phi, x[i:i + len_ar]) + np.dot(theta, eps[i:i + len_ma])
-        except:
-            print(i, x, phi, theta)
+        x[i + len_ar] = trend + np.dot(phi, x[i:i + len_ar]) + np.dot(theta, eps[i:i + len_ma])
     return x[len_ar:]
 
 
