@@ -23,3 +23,6 @@ class TestARIMA:
         x_test_oos = x.iloc[[-1]]
         y_pred = model.predict(x_test_oos)
         assert y_pred.shape == (1, horizon)
+
+
+

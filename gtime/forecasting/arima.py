@@ -118,9 +118,9 @@ class ARIMAForecaster(BaseForecaster):
 
         """
         target_lenth = len(X) - self.d - self.p
-        self.diff_vals = np.zeros((target_lenth, self.d))
+        self.deintegration_partial_value = np.zeros((target_lenth, self.d))
         for i in range(self.d):
-            self.diff_vals[:, i] = np.diff(X, n=i)[self.p + 1:self.p + target_lenth + 1]
+            self.deintegration_partial_value[:, i] = np.diff(X, n=i)[self.p + 1:self.p + target_lenth + 1]
         X = np.diff(X, n=self.d)
         return X
 
@@ -138,7 +138,7 @@ class ARIMAForecaster(BaseForecaster):
 
         """
         for i in range(self.d):
-            X = np.concatenate([self.diff_vals[:, [-i-1]], X], axis=1).cumsum(axis=1)
+            X = np.concatenate([self.deintegration_partial_value[:, [-i - 1]], X], axis=1).cumsum(axis=1)
         return X
 
     def _set_params(self, model: ARMAMLEModel, x: np.array):
@@ -176,11 +176,11 @@ class ARIMAForecaster(BaseForecaster):
         len_stored_values = self.p + self.d
         self.last_train_date_ = X.index.max().end_time
         self.last_train_values_ = X.iloc[-len_stored_values:] if len_stored_values > 0 else X.iloc[:0]
-        np_x = X.to_numpy().flatten()
-        np_x = self._deintegrate(np_x)
+        X_numpy = X.to_numpy().flatten()
+        X_numpy = self._deintegrate(X_numpy)
         model = ARMAMLEModel((self.p, self.q), self.method)
-        model.fit(np_x)
-        self._set_params(model, np_x)
+        model.fit(X_numpy)
+        self._set_params(model, X_numpy)
         super().fit(X, y)
         return self
 
@@ -199,7 +199,6 @@ class ARIMAForecaster(BaseForecaster):
         X: pd.DataFrame, extended time series required for predictions
         errors: np.array, error forecast required for predictions
         """
-        n = len(X)
         train_test_diff = X.index.min().start_time - self.last_train_date_
         if train_test_diff.value == 1:
             X = pd.concat([self.last_train_values_, X])
@@ -224,20 +223,20 @@ class ARIMAForecaster(BaseForecaster):
         -------
         np.array
         """
-        n = len(X)
+
         X, errors = self._extend_x_test(X)
-        np_x = X.values.flatten()
-        np_x = self._deintegrate(np_x)
-        errors = _arma_insample_errors(np_x, errors, self.mu_, self.phi_, self.theta_)
+        X_numpy = X.values.flatten()
+        X_numpy = self._deintegrate(X_numpy)
+        errors = _arma_insample_errors(X_numpy, errors, self.mu_, self.phi_, self.theta_)
 
         res = [_arma_forecast(n=self.horizon_,
-                              x0=np_x[i:i+self.p],
+                              x0=X_numpy[i:i+self.p],
                               eps0=errors[i:i+self.q],
                               mu=self.model.mu,
                               phi=self.model.phi,
                               theta=self.model.theta
                               )
-               for i in range(1, n+1)]
+               for i in range(1, len(X)+1)]
         y_pred = self._integrate(np.array(res))
 
         return y_pred[:, self.d:]

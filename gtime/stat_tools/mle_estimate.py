@@ -23,7 +23,6 @@ def _run_css(params: np.array, X: np.array, len_p: int, errors: bool = False, tr
     errors: np.array, residuals
     """
 
-
     mu = params[0]
     nobs = len(X) - len_p
     if transform:
