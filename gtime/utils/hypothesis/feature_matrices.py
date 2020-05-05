@@ -51,11 +51,7 @@ def X_y_matrices(
             allow_infinity=allow_nan_infinity,
         )
     )
-    #  feature_creation = FeatureCreation(horizon=horizon, time_series_features=time_series_features)
-    #  X, y = feature_creation.fit_transform(period_index_series)
-
     X = df_transformer.fit_transform(period_index_series)
-
     y = horizon_shift(period_index_series, horizon=horizon)
 
     return X, y
@@ -169,7 +165,7 @@ def numpy_X_y_matrices(
 
 
 @st.composite
-def numpy_X_matrix(
+def numpy_X_matrices(
     draw,
     shape=shape_matrix(),
     min_value: float = None,

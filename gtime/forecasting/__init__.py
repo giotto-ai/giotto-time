@@ -16,11 +16,12 @@ from .naive import (
 __all__ = [
     "GAR",
     "GARFF",
-    "MultiFeatureMultiOutputRegressor",
-    "MultiFeatureGAR" "TrendForecaster",
+    "MultiFeatureGAR",
+    "TrendForecaster",
     "HedgeForecaster",
     "NaiveForecaster",
     "SeasonalNaiveForecaster",
     "DriftForecaster",
     "AverageForecaster",
+    "MultiFeatureMultiOutputRegressor",
 ]
