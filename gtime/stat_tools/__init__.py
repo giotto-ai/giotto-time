@@ -5,8 +5,4 @@ The :mod:`gtime.stat_tools` module contains statistical functions: autocorrelati
 from .mle_estimate import ARMAMLEModel
 from .tools import acf, pacf
 
-__all__ = [
-    "ARMAMLEModel",
-    "acf",
-    "pacf"
-]
+__all__ = ["ARMAMLEModel", "acf", "pacf"]

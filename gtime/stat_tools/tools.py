@@ -44,11 +44,13 @@ def arma_polynomial_roots(params: np.array, len_p: int):
 
     """
     passing_value = 2.0
-    phi = params[2:2 + len_p]
-    theta = params[2 + len_p:]
+    phi = params[2 : 2 + len_p]
+    theta = params[2 + len_p :]
     phi_roots = np.abs(np.roots(np.r_[-phi[::-1], 1.0]))
     theta_roots = np.abs(np.roots(np.r_[theta[::-1], 1.0]))
-    return np.r_[passing_value, passing_value, phi_roots, theta_roots]  # TODO refactor 2.0
+    return np.r_[
+        passing_value, passing_value, phi_roots, theta_roots
+    ]  # TODO refactor 2.0
 
 
 def normalize(x: np.array) -> np.array:

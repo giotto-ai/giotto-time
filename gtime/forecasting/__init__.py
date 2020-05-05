@@ -27,5 +27,5 @@ __all__ = [
     "DriftForecaster",
     "AverageForecaster",
     "MultiFeatureMultiOutputRegressor",
-    "ARIMAForecaster"
+    "ARIMAForecaster",
 ]

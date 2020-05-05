@@ -4,8 +4,16 @@ import hypothesis.strategies as st
 from hypothesis.extra.numpy import arrays
 from hypothesis import given
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
-from gtime.stat_tools.tools import normalize, autocorrelation, solve_yw_equation, yule_walker, acf, pacf, arma_polynomial_roots, durbin_levinson_recursion
-
+from gtime.stat_tools.tools import (
+    normalize,
+    autocorrelation,
+    solve_yw_equation,
+    yule_walker,
+    acf,
+    pacf,
+    arma_polynomial_roots,
+    durbin_levinson_recursion,
+)
 
 
 class TestAcf:
@@ -74,19 +82,39 @@ class TestAcf:
 def arma_params(draw, max_dim):
     p = draw(st.integers(min_value=0, max_value=max_dim))
     q = draw(st.integers(min_value=0, max_value=max_dim))
-    params = draw(arrays(np.float, shape=(p + q + 2), elements=st.floats(min_value=1e-10, max_value=1e10, allow_nan=False, allow_infinity=False)))
+    params = draw(
+        arrays(
+            np.float,
+            shape=(p + q + 2),
+            elements=st.floats(
+                min_value=1e-10, max_value=1e10, allow_nan=False, allow_infinity=False
+            ),
+        )
+    )
     return params, p
 
-class TestMLETools:
 
+class TestMLETools:
     @given(data=arma_params(max_dim=10))
     def test_arma_polynomial_roots_abs(self, data):
         params, len_p = data
         res = arma_polynomial_roots(params, len_p)
         assert all(res >= 0)
 
-    @given(x=arrays(dtype=float, shape=st.integers(min_value=1, max_value=10),
-                    elements=st.floats(allow_nan=False, allow_infinity=False, min_value=-1, max_value=1, exclude_min=True, exclude_max=True)))
+    @given(
+        x=arrays(
+            dtype=float,
+            shape=st.integers(min_value=1, max_value=10),
+            elements=st.floats(
+                allow_nan=False,
+                allow_infinity=False,
+                min_value=-1,
+                max_value=1,
+                exclude_min=True,
+                exclude_max=True,
+            ),
+        )
+    )
     def test_durbin_levinson_recursion(self, x):
         transformed_x = durbin_levinson_recursion(x)
         y = transformed_x.copy()

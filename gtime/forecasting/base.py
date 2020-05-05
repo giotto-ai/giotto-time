@@ -4,7 +4,6 @@ from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_is_fitted
 
 
-
 class BaseForecaster(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
 
     """Base abstract class for simple models """

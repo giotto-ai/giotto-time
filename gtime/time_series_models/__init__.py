@@ -19,5 +19,5 @@ __all__ = [
     "SeasonalNaive",
     "Average",
     "Drift",
-    "ARIMA"
+    "ARIMA",
 ]

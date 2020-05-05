@@ -5,7 +5,9 @@ from gtime.forecasting import BaseForecaster
 from gtime.stat_tools import ARMAMLEModel
 
 
-def _arma_forecast(n: int, x0: np.array, eps0: np.array, mu: float, phi: np.array, theta: np.array) -> np.array:
+def _arma_forecast(
+    n: int, x0: np.array, eps0: np.array, mu: float, phi: np.array, theta: np.array
+) -> np.array:
     """
     Forecasts next ``n`` steps of ARIMA process.
 
@@ -31,11 +33,15 @@ def _arma_forecast(n: int, x0: np.array, eps0: np.array, mu: float, phi: np.arra
     eps = np.r_[eps0, np.zeros(n)]
     trend = mu * (1 - phi.sum())
     for i in range(n):
-        x[i + len_ar] = trend + np.dot(phi, x[i:i + len_ar]) + np.dot(theta, eps[i:i + len_ma])
+        x[i + len_ar] = (
+            trend + np.dot(phi, x[i : i + len_ar]) + np.dot(theta, eps[i : i + len_ma])
+        )
     return x[len_ar:]
 
 
-def _arma_insample_errors(x: np.array, eps0: np.array, mu: float, phi: np.array, theta: np.array) -> np.array:
+def _arma_insample_errors(
+    x: np.array, eps0: np.array, mu: float, phi: np.array, theta: np.array
+) -> np.array:
 
     """
     Forecasts next ``n`` steps of ARIMA process.
@@ -63,7 +69,9 @@ def _arma_insample_errors(x: np.array, eps0: np.array, mu: float, phi: np.array,
     eps = np.r_[eps0, np.zeros(n)]
     trend = mu * (1 - phi.sum())
     for i in range(n):
-        x_f[i] = trend + np.dot(phi, x[i:i + len_ar]) + np.dot(theta, eps[i:i + len_ma])
+        x_f[i] = (
+            trend + np.dot(phi, x[i : i + len_ar]) + np.dot(theta, eps[i : i + len_ma])
+        )
         eps[i + len_ma] = x[i + len_ar] - x_f[i]
     return eps
 
@@ -99,7 +107,7 @@ class ARIMAForecaster(BaseForecaster):
 
     """
 
-    def __init__(self, order: Tuple[int, int, int], method: str = 'css-mle'):
+    def __init__(self, order: Tuple[int, int, int], method: str = "css-mle"):
         self.p, self.d, self.q = order
         self.method = method
         self.model = None
@@ -120,7 +128,9 @@ class ARIMAForecaster(BaseForecaster):
         target_lenth = len(X) - self.d - self.p
         self.deintegration_partial_value = np.zeros((target_lenth, self.d))
         for i in range(self.d):
-            self.deintegration_partial_value[:, i] = np.diff(X, n=i)[self.p + 1:self.p + target_lenth + 1]
+            self.deintegration_partial_value[:, i] = np.diff(X, n=i)[
+                self.p + 1 : self.p + target_lenth + 1
+            ]
         X = np.diff(X, n=self.d)
         return X
 
@@ -138,7 +148,9 @@ class ARIMAForecaster(BaseForecaster):
 
         """
         for i in range(self.d):
-            X = np.concatenate([self.deintegration_partial_value[:, [-i - 1]], X], axis=1).cumsum(axis=1)
+            X = np.concatenate(
+                [self.deintegration_partial_value[:, [-i - 1]], X], axis=1
+            ).cumsum(axis=1)
         return X
 
     def _set_params(self, model: ARMAMLEModel, x: np.array):
@@ -175,7 +187,9 @@ class ARIMAForecaster(BaseForecaster):
         """
         len_stored_values = self.p + self.d
         self.last_train_date_ = X.index.max().end_time
-        self.last_train_values_ = X.iloc[-len_stored_values:] if len_stored_values > 0 else X.iloc[:0]
+        self.last_train_values_ = (
+            X.iloc[-len_stored_values:] if len_stored_values > 0 else X.iloc[:0]
+        )
         X_numpy = X.to_numpy().flatten()
         X_numpy = self._deintegrate(X_numpy)
         model = ARMAMLEModel((self.p, self.q), self.method)
@@ -202,10 +216,16 @@ class ARIMAForecaster(BaseForecaster):
         train_test_diff = X.index.min().start_time - self.last_train_date_
         if train_test_diff.value == 1:
             X = pd.concat([self.last_train_values_, X])
-            errors = self.errors_[-self.q:]
+            errors = self.errors_[-self.q :]
         else:
-            last_index = pd.period_range(periods=self.p + self.d + 1, end=X.index[0])[:-1]
-            last_values = pd.DataFrame([X.iloc[0].values[0]] * len(last_index), index=last_index, columns=X.columns)
+            last_index = pd.period_range(periods=self.p + self.d + 1, end=X.index[0])[
+                :-1
+            ]
+            last_values = pd.DataFrame(
+                [X.iloc[0].values[0]] * len(last_index),
+                index=last_index,
+                columns=X.columns,
+            )
             X = pd.concat([last_values, X])
             errors = np.zeros(self.q)
         return X, errors
@@ -227,16 +247,21 @@ class ARIMAForecaster(BaseForecaster):
         X, errors = self._extend_x_test(X)
         X_numpy = X.values.flatten()
         X_numpy = self._deintegrate(X_numpy)
-        errors = _arma_insample_errors(X_numpy, errors, self.mu_, self.phi_, self.theta_)
+        errors = _arma_insample_errors(
+            X_numpy, errors, self.mu_, self.phi_, self.theta_
+        )
 
-        res = [_arma_forecast(n=self.horizon_,
-                              x0=X_numpy[i:i+self.p],
-                              eps0=errors[i:i+self.q],
-                              mu=self.model.mu,
-                              phi=self.model.phi,
-                              theta=self.model.theta
-                              )
-               for i in range(1, len_test+1)]
+        res = [
+            _arma_forecast(
+                n=self.horizon_,
+                x0=X_numpy[i : i + self.p],
+                eps0=errors[i : i + self.q],
+                mu=self.model.mu,
+                phi=self.model.phi,
+                theta=self.model.theta,
+            )
+            for i in range(1, len_test + 1)
+        ]
         y_pred = self._integrate(np.array(res))
 
-        return y_pred[:, self.d:]
+        return y_pred[:, self.d :]
