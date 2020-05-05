@@ -4,9 +4,9 @@ for dealing with time series data.
 """
 
 from .gar import GAR, GARFF, MultiFeatureMultiOutputRegressor, MultiFeatureGAR
-from .trend_models import TrendForecaster
+from .trend import TrendForecaster
 from .online import HedgeForecaster
-from .simple_models import (
+from .naive import (
     NaiveForecaster,
     SeasonalNaiveForecaster,
     DriftForecaster,

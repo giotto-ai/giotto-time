@@ -5,7 +5,7 @@ from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_is_fitted
 
 
-class SimpleForecaster(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
+class BaseNaiveForecaster(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
 
     """Base abstract class for simple models """
 
@@ -21,7 +21,7 @@ class SimpleForecaster(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
 
         Returns
         -------
-        self : SimpleForecaster
+        self : BaseNaiveForecaster
             Returns self.
         """
 
@@ -74,7 +74,7 @@ class SimpleForecaster(BaseEstimator, RegressorMixin, metaclass=ABCMeta):
         return predictions_df
 
 
-class NaiveForecaster(SimpleForecaster):
+class NaiveForecaster(BaseNaiveForecaster):
 
     """Naïve model, all predicted values are equal to the most recent available observation.
 
@@ -127,7 +127,7 @@ class NaiveForecaster(SimpleForecaster):
         return predictions
 
 
-class SeasonalNaiveForecaster(SimpleForecaster):
+class SeasonalNaiveForecaster(BaseNaiveForecaster):
     """Seasonal naïve model. The forecast is expected to follow a seasonal pattern of ``seasonal_length`` data points, which is determined by the last ``seasonal_length`` observations of a training dataset available.
 
     Parameters
@@ -251,7 +251,7 @@ class SeasonalNaiveForecaster(SimpleForecaster):
             )
 
 
-class DriftForecaster(SimpleForecaster):
+class DriftForecaster(BaseNaiveForecaster):
 
     """Simple drift model, calculates drift as the difference between the first and the last elements of the train series, divided by the number of periods.
 
