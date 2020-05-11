@@ -1,5 +1,6 @@
 import pandas as pd
-
+from sklearn.model_selection import train_test_split
+from typing import Union
 
 def _time_series_split_on_index(time_series, n_samples, n_splits):
     n_set = n_samples // n_splits
@@ -225,3 +226,17 @@ def blocking_time_series_split(time_series: pd.DataFrame, n_splits=4, split_on="
             "The split_on parameter has to be either 'index' or 'time', but it is "
             f"{split_on}"
         )
+
+
+def cv_split(time_series: pd.DataFrame, n_splits=4, split_on="index", test_size: Union[int, float] = 0.3, blocking=False):
+
+    ts_size = len(time_series)
+    if isinstance(test_size, float):
+
+        test_size = round(test_size * ts_size)
+    if test_size >= ts_size or test_size <= 0:
+        ValueError('Invalid test size value')
+    ts_split_generator = blocking_time_series_split if blocking else time_series_split
+    ts_split_generator = ts_split_generator(time_series, n_splits, split_on=split_on)
+    for ts in ts_split_generator:
+        yield ts.iloc[:-test_size], ts.iloc[-test_size:]
