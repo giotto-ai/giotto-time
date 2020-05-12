@@ -16,14 +16,19 @@ from sklearn.utils.validation import check_is_fitted
 from gtime.feature_extraction import Shift
 
 
-
-# def _fit_one(model, X, y, horizon, model_params=None):
+# def _fit_one(model, X, metrics):
+#
+#     # result_idx = pd.MultiIndex.from_product([[model], metrics.keys()])
+#     # results = pd.DataFrame(np.nan, index=result_idx, columns=['Fit time', 'Train score', 'Test score'])
 #     start_time = time()
-#     model = model(horizon=horizon) if model_params == None else model(model_params)
-#     # model.
-#     score = model.score(X.loc[test], y.loc[test])
+#     model.cache_features = True
+#     model.fit(X)
 #     fit_time = time() - start_time
-#     return model, score, fit_time
+#     scores = model.score(metrics=metrics)
+#     # results.loc[(model, metrics), ['Train score', 'Test score']] = scores.values
+#     # results.loc[(model, metrics), 'Fit time'] = fit_time
+#     return scores, fit_time
+
 
 def _default_selection(results):
     first_metric = results.index.levels[1][0]
@@ -55,8 +60,8 @@ class CVPipeline(BaseEstimator, RegressorMixin):
 
 
         result_idx = pd.MultiIndex.from_product([self.model_list, self.metrics.keys()])
-        results = pd.DataFrame(np.nan, index=result_idx, columns=['Fit time', 'Train score', 'Test score'])
-        # self.models_ = dict(zip(self.model_list, [np.nan] * len(self.model_list)))
+        results = pd.DataFrame(0.0, index=result_idx, columns=['Fit time', 'Train score', 'Test score'])
+        self.cv_results_ = results.copy()
         for idx in self.cv(X, self.n_splits):
             X_split = X.loc[idx]
             for model in self.model_list:
@@ -67,8 +72,18 @@ class CVPipeline(BaseEstimator, RegressorMixin):
                 scores = model.score(metrics=self.metrics)
                 results.loc[(model, self.metrics), ['Train score', 'Test score']] = scores.values
                 results.loc[(model, self.metrics), 'Fit time'] = fit_time
+            self.cv_results_ += results
 
-        self.cv_results_ = results
+        # for idx in self.cv(X, self.n_splits):
+        #     X_split = X.loc[idx]
+        #     start_time = time()
+        #     # for model in self.model_list:
+        #     #     res = _fit_one(model, X_split, self.metrics)
+        #     res = Parallel(n_jobs=-1)(delayed(_fit_one)(x, X_split, self.metrics) for x in self.model_list)
+        #     print(f'Fit time = {time() - start_time}')
+        #     results += pd.concat(res)
+
+        self.cv_results_ = self.cv_results_ / self.n_splits
         self.best_model_ = self.selection(results)
 
         for model in self.model_list:
@@ -78,3 +93,21 @@ class CVPipeline(BaseEstimator, RegressorMixin):
     def predict(self, X=None):
         check_is_fitted(self)
         return self.best_model_.predict(X)
+
+
+if __name__ == '__main__':
+    from gtime.time_series_models import Naive, AR
+    from gtime.metrics import rmse, mape
+    idx = pd.period_range(start='2011-01-01', end='2012-01-01')
+    np.random.seed(0)
+    df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
+    scoring = {'RMSE': rmse,
+               'MAPE': mape}
+    models = {
+        Naive: {'horizon': [3, 5, 9]},
+        AR: {'horizon': [3, 5, 7],
+             'p': [2, 3, 4]}
+    }
+    c = CVPipeline(models_sets=models, metrics=scoring)
+    c.fit(df)
+    print('A')
