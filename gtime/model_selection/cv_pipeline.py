@@ -14,7 +14,7 @@ from joblib import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted
 
 from gtime.feature_extraction import Shift
-from gtime.time_series_models import Naive, AR
+
 
 
 # def _fit_one(model, X, y, horizon, model_params=None):
@@ -70,25 +70,7 @@ class CVPipeline(BaseEstimator, RegressorMixin):
 
         self.cv_results_ = results
         self.best_model_ = self.selection(results)
-        print('AAA')
 
     def predict(self, X=None):
         check_is_fitted(self)
         return self.best_model_.predict(X)
-
-
-if __name__ == '__main__':
-    idx = pd.period_range(start='2011-01-01', end='2012-01-01')
-    np.random.seed(2)
-    df = pd.DataFrame(np.random.random((len(idx), 1)), index=idx, columns=['1'])
-    scoring = {'MSE': mse,
-               'Max': max_error}
-    feat = [('s1', Shift(1), [0])]
-    models = {
-        Naive: {'horizon': [3, 5, 9]},
-        AR: {'horizon': [3, 5, 7],
-             'p': [2, 3, 4]}
-    }
-    c = CVPipeline(models_sets=models, metrics=scoring, features=feat)
-    c.fit(df)
-    print('AAA')
