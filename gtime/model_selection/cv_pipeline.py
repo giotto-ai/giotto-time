@@ -71,6 +71,10 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         self.cv_results_ = results
         self.best_model_ = self.selection(results)
 
+        for model in self.model_list:
+            model.fit(X)
+
+
     def predict(self, X=None):
         check_is_fitted(self)
         return self.best_model_.predict(X)
