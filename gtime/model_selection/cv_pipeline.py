@@ -25,6 +25,8 @@ def _default_selection(results: pd.DataFrame) -> RegressorMixin:
     best_model: RegressorMixin - selected model
 
     """
+    if len(results) == 0:
+        return None
     first_metric = results.index.levels[1][0]
     scores = results.loc[pd.IndexSlice[:, first_metric], "Test score"]
     best_model = scores.argmin()[0]
@@ -116,7 +118,7 @@ class CVPipeline(BaseEstimator, RegressorMixin):
             self.cv_results_ += self._cv_fit_one(X_split)
 
         self.cv_results_ = self.cv_results_ / self.n_splits
-        self.best_model_ = self.selection(self.cv_results_)
+        self.best_model_ = self.selection(self.cv_results_.dropna())
         for model in self.model_list:
             model.fit(X)
         return self
