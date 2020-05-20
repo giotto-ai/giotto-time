@@ -18,10 +18,9 @@ class HierarchicalBottomUp(HierarchicalNaive):
     model: BaseEstimator, required
         time series forecasting model that is applied to each of the time series. A cross validation model
         can also be passed.
-    hierarchy_tree: String or Dict[str, List], optional, default: 'Infer'
-        DiGraph to import the structure of the hierarchical tree. Keys must be the same as in the
-        dictionary X containing the dataframes. The items are lists containing the name of the children
-        of each key. In case there are no children (the key is a leaf) the item must be an empty list.
+    hierarchy_tree: String or nx.DiGraph, optional, default: 'Infer'
+        Networkx Digraph containing the structure of the hierarchy tree.
+        If 'Infer' the selected root will have as many children as the remaining keys.
     Examples
     --------
     >>> import pandas._testing as testing
