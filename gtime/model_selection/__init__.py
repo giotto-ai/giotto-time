@@ -7,4 +7,6 @@ from .splitters import FeatureSplitter
 from .cv_pipeline import CVPipeline
 from .cross_validation import time_series_split, blocking_time_series_split
 
-__all__ = ["FeatureSplitter", "horizon_shift", "CVPipeline", "time_series_split", "blocking_time_series_split"]
+__all__ = ["FeatureSplitter", "horizon_shift",
+           "CVPipeline",
+           "time_series_split", "blocking_time_series_split"]
