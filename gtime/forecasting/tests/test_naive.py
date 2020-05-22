@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from pandas.util import testing as testing
-from hypothesis import given, note
+from hypothesis import given
 import hypothesis.strategies as st
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
 from gtime.model_selection import horizon_shift, FeatureSplitter
@@ -16,13 +16,13 @@ from gtime.forecasting import (
 
 
 @st.composite
-def forecast_input(draw, max_lenth):
-    length = draw(st.integers(min_value=2, max_value=max_lenth))
-    horizon = draw(st.integers(min_value=1, max_value=length - 1))
+def forecast_input(draw, max_length, min_length=2):
+    length = draw(st.integers(min_value=min_length + 1, max_value=max_length))
+    horizon = draw(st.integers(min_value=1, max_value=length - min_length))
     X = draw(
         giotto_time_series(
             min_length=length,
-            max_length=max_lenth,
+            max_length=max_length,
             allow_nan=False,
             allow_infinity=False,
         )
@@ -33,9 +33,9 @@ def forecast_input(draw, max_lenth):
 
 
 class SimplePipelineTest:
-    def setup(self, data, Model):
+    def setup(self, data, model):
         X_train, y_train, X_test = data
-        self.model = Model
+        self.model = model
         self.model.fit(X_train, y_train)
         self.X_test = X_test
         self.y_pred = self.model.predict(X_test)

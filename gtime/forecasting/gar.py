@@ -51,7 +51,9 @@ class _ExplanationsMixin:
             for y_column, columns in X_columns.items():
                 dict_explanations[y_column].columns = columns
         else:
-            raise TypeError(f'X_columns must be a list or a dict. Detected: {type(X_columns)}')
+            raise TypeError(
+                f"X_columns must be a list or a dict. Detected: {type(X_columns)}"
+            )
         return dict_explanations
 
 
@@ -139,7 +141,9 @@ class GAR(MultiOutputRegressor, _ExplanationsMixin):
 
         if self.explainer_type is not None:
             self.explanations_ = self._explanations_as_dataframe(
-                index=y_p_df.index, y_columns=self.y_columns_, X_columns=list(X.columns),
+                index=y_p_df.index,
+                y_columns=self.y_columns_,
+                X_columns=list(X.columns),
             )
         return y_p_df
 
@@ -210,7 +214,9 @@ class GARFF(RegressorChain, _ExplanationsMixin):
 
         """
         self.y_columns_ = y.columns
-        self.target_to_features_dict_ = self._compute_target_to_features_dict(X.columns, y.columns)
+        self.target_to_features_dict_ = self._compute_target_to_features_dict(
+            X.columns, y.columns
+        )
         return super().fit(X, y)
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -233,11 +239,15 @@ class GARFF(RegressorChain, _ExplanationsMixin):
 
         if self.explainer_type is not None:
             self.explanations_ = self._explanations_as_dataframe(
-                index=y_p_df.index, y_columns=self.y_columns_, X_columns=self.target_to_features_dict_
+                index=y_p_df.index,
+                y_columns=self.y_columns_,
+                X_columns=self.target_to_features_dict_,
             )
         return y_p_df
 
-    def _compute_target_to_features_dict(self, X_columns: List[str], y_columns: List[str]) -> Dict[str, List[str]]:
+    def _compute_target_to_features_dict(
+        self, X_columns: List[str], y_columns: List[str]
+    ) -> Dict[str, List[str]]:
         X_columns, y_columns = list(X_columns), list(y_columns)
 
         target_to_features_dict = {}
@@ -345,7 +355,11 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor, _ExplanationsMixin):
         y_p_df = pd.DataFrame(data=y_p, columns=self.y_columns_, index=X.index)
 
         if self.explainer_type is not None:
-            X_columns = list(X.columns) if self.target_to_features_dict_ is None else self.target_to_features_dict_
+            X_columns = (
+                list(X.columns)
+                if self.target_to_features_dict_ is None
+                else self.target_to_features_dict_
+            )
             self.explanations_ = self._explanations_as_dataframe(
                 index=y_p_df.index, y_columns=self.y_columns_, X_columns=X_columns
             )
