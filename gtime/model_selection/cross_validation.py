@@ -1,6 +1,4 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from typing import Union
 
 
 def _time_series_split_on_index(time_series, n_samples, n_splits):
