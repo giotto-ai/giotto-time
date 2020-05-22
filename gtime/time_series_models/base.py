@@ -1,13 +1,14 @@
 from typing import List, Tuple, Union
 
 import pandas as pd
+import numpy as np
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.linear_model import LinearRegression
 from sklearn.utils.validation import check_is_fitted
 
 from gtime.compose import FeatureCreation
 from gtime.model_selection import horizon_shift, FeatureSplitter
-
+from gtime.metrics import rmse
 
 class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
     """ Base class for a generic time series forecasting model.
@@ -87,12 +88,12 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         self
         """
         if not only_model:
-            X_train, y_train, X_test = self._compute_train_test_matrices(X, y)
+            X_train, y_train, X_test, y_test = self._compute_train_test_matrices(X, y)
         elif not self.cache_features:
             raise AttributeError("cache_feature must be True to fit only model")
         else:
             check_is_fitted(self)  # only_model works if the model is already fitted
-            X_train, y_train, X_test = self.X_train_, self.y_train_, self.X_test_
+            X_train, y_train, X_test, y_test = self.X_train_, self.y_train_, self.X_test_, self.y_test_
 
         self.model_ = self._fit_model(X_train, y_train)
         self.X_test_ = X_test
@@ -126,14 +127,15 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
 
     def _compute_train_test_matrices(
         self, X: pd.DataFrame, y: pd.DataFrame
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         X, y = self._create_X_y_feature_matrices(X, y)
         X_train, y_train, X_test, y_test = self._split_train_test(X, y)
         if self.cache_features:
             self.X_train_ = X_train
             self.y_train_ = y_train
             self.X_test_ = X_test
-        return X_train, y_train, X_test
+            self.y_test_ = y_test
+        return X_train, y_train, X_test, y_test
 
     def _create_X_y_feature_matrices(
         self, X, y=None
@@ -157,3 +159,37 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         ]
         for attribute in attributes:
             delattr(self, attribute)
+
+    def score(self, X=None, y=None, metrics=None):
+
+        check_is_fitted(self)
+        if X is None:
+            y_pred_test = self.predict()
+        else:
+            y_pred_test = self.predict(X)
+        y_pred_train = self.model_.predict(self.X_train_)
+
+        y_test = self.y_test_ if y is None else y
+
+        if metrics is None:
+            metrics = {'rmse': rmse}
+        score = pd.DataFrame(columns=metrics.keys(), index=['Train score', 'Test score'])
+        score.loc[['Train score'], :] = self._score(self.y_train_, y_pred_train, metrics=metrics, type='Train score')
+        score.loc[['Test score'], :] = self._score(y_test, y_pred_test, metrics=metrics, type='Test score')
+        return score.T
+
+    def _score(self, y, y_pred, metrics=None, type='Test'):
+        score = pd.DataFrame(columns=metrics.keys(), index=[type])
+        for name, metric in metrics.items():
+            scores = []
+            for col in y.columns:
+                na_mask = ~y[col].isna()
+                y_pred_i = y_pred[col][na_mask]
+                y_true_i = y[col][na_mask]
+                if len(y_true_i) > 0:
+                    scores.append(metric(y_true_i, y_pred_i))
+            score[name] = np.mean(scores)
+        return score
+
+    def set_model(self, model):
+        self.model = model
