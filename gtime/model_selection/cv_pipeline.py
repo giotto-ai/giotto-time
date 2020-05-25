@@ -1,8 +1,9 @@
-from typing import Dict, Callable
+from typing import Dict, Callable, Union, List
 
 import pandas as pd
 from time import time
 from sklearn.model_selection import ParameterGrid
+from gtime.time_series_models import TimeSeriesForecastingModel
 from sklearn.base import BaseEstimator, RegressorMixin
 from gtime.metrics import mse
 from gtime.model_selection.cross_validation import (
@@ -52,7 +53,7 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         self.n_splits = n_splits
 
     @staticmethod
-    def _default_selection(results: pd.DataFrame) -> RegressorMixin:
+    def _default_selection(results: pd.DataFrame) -> str:
         """
         Selects a model with lowest test score according to the first of the provided metrics
 
@@ -62,7 +63,7 @@ class CVPipeline(BaseEstimator, RegressorMixin):
 
         Returns
         -------
-        best_model: RegressorMixin - selected model
+        best_model_index: str, model index
 
         """
         if len(results) == 0:
@@ -72,13 +73,38 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         best_model_index = scores.idxmin()
         return best_model_index
 
-    def _models_are_equal(self, target):
+    def _models_are_equal(self, target: TimeSeriesForecastingModel) -> str:
+        """
+        Finds a model in ``self.model_list`` based on its horizon and features and returns its index
+
+        Parameters
+        ----------
+        target: BaseEstimator, a target model
+
+        Returns
+        -------
+        idx: str, model index in ``self.model_list``
+        """
         for idx, model in self.model_list.items():
             if (model.model == target.model) & (model.features == target.features) & (model.horizon == target.horizon):
                 return idx
         return None
 
-    def _fit_one_model(self, X_split: pd.DataFrame, model, results, only_model=False):
+    def _fit_one_model(self, model: BaseEstimator, X_split: pd.DataFrame, results: pd.DataFrame, only_model: bool = False) -> pd.DataFrame:
+        """
+        Fits one model on a split and calculates its score and fit time
+
+        Parameters
+        ----------
+        model: BaseEstimator, model to fit
+        X_split: pd.DataFrame, subset of training data to fit on
+        results: pd.DataFrame, results dataframe to add score results
+        only_model: bool, use ``only_model`` property to reuse the fitted features
+
+        Returns
+        -------
+
+        """
         start_time = time()
         model_index = self._models_are_equal(model)
         model.cache_features = True
@@ -89,21 +115,49 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         results.loc[model_index, "Fit time"] = fit_time
         return results
 
-    def _fit_ts_forecaster_model(self, model, params, X_split, results):
+    def _fit_ts_forecaster_model(self, model: TimeSeriesForecastingModel, params: Dict, X_split: pd.DataFrame, results: pd.DataFrame) -> pd.DataFrame:
+        """
+        Fit and score for a TimeSeriesForecastingModel model with different parameters
 
+        Parameters
+        ----------
+        model: BaseEstimator, model to fit
+        params: Dict, model parameters dictionary
+        X_split: pd.DataFrame, subset of training data to fit on
+        results: pd.DataFrame, results dataframe to add score results
+
+        Returns
+        -------
+        results: pd.DataFrame
+
+        """
         for feature in params['features']:
             for horizon in params['horizon']:
                 submodel = model(features=feature, horizon=horizon, model=params['model'][0])
-                results = self._fit_one_model(X_split, submodel, results)
+                results = self._fit_one_model(submodel, X_split, results)
                 for next_model in params['model'][1:]:
                     submodel.set_model(next_model)
-                    results = self._fit_one_model(X_split, submodel, results, only_model=True)
+                    results = self._fit_one_model(submodel, X_split, results, only_model=True)
         return results
 
-    def _fit_other_models(self, model, X_split, results):
+    def _fit_other_models(self, model: BaseEstimator, X_split: pd.DataFrame, results: pd.DataFrame) -> pd.DataFrame:
+        """
+        Fit and score for a model with pre-defined features to a split.
+
+        Parameters
+        ----------
+        model: BaseEstimator, model to fit
+        X_split: pd.DataFrame, subset of training data to fit on
+        results: pd.DataFrame, results dataframe to add score results
+
+        Returns
+        -------
+        results: pd.DataFrame
+
+        """
         model_list = list(filter(lambda x: isinstance(x, model), self.model_list.values()))
         for submodel in model_list:
-            results = self._fit_one_model(X_split, submodel, results)
+            results = self._fit_one_model(submodel, X_split, results)
         return results
 
     def _cv_fit_one_split(self, X_split: pd.DataFrame) -> pd.DataFrame:
@@ -119,7 +173,7 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         results: pd.DataFrame, results table
 
         """
-        from gtime.time_series_models import TimeSeriesForecastingModel
+
         results = self.cv_results_.copy()
         for model, params in self.models_sets.items():
             if model == TimeSeriesForecastingModel:
@@ -128,7 +182,7 @@ class CVPipeline(BaseEstimator, RegressorMixin):
                 results = self._fit_other_models(model, X_split, results)
         return results
 
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame = None, refit = 'best'):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame = None, refit: Union[str, List] = 'best'):
         """
         Performs cross-validation, selecting the best model from ``self.model_list`` according to ``self.selection``
         and refits all the models on all available data.
@@ -137,6 +191,7 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         ----------
         X: pd.DataFrame, input time series
         y: pd.DataFrame, left for compatibility, not used
+        refit: Union[str, List], models to refit on whole train data, ``all``, ``best`` or a list of model keys
 
         Returns
         -------
@@ -183,37 +238,3 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         """
         check_is_fitted(self)
         return self.best_model_.predict(X)
-
-
-if __name__ == '__main__':
-    from gtime.preprocessing import TimeSeriesPreparation
-    from gtime.metrics import rmse, mape
-    from gtime.time_series_models import Naive, AR, TimeSeriesForecastingModel
-    from gtime.forecasting import NaiveForecaster, DriftForecaster
-    from gtime.feature_extraction import MovingAverage, Polynomial, Shift
-    from sklearn.model_selection import ParameterGrid
-
-    df_sp = pd.read_csv('https://storage.googleapis.com/l2f-open-models/giotto-time/examples/data/^GSPC.csv')
-    df_sp.head()
-    df_close = df_sp.set_index('Date')['Close']
-    df_close.index = pd.to_datetime(df_close.index)
-    time_series_preparation = TimeSeriesPreparation()
-    period_index_time_series = time_series_preparation.transform(df_close)
-
-    shift_feature = [('s3', Shift(1), ['time_series'])]
-    ma_feature = [('ma10', MovingAverage(10), ['time_series'])]
-    scoring = {'RMSE': rmse,
-               'MAPE': mape}
-    models = {
-        TimeSeriesForecastingModel: {'features': [shift_feature, ma_feature],
-                                     'horizon': [3, 5],
-                                     'model': [NaiveForecaster(), DriftForecaster()]},
-        Naive: {'horizon': [3, 5, 9]},
-        AR: {'horizon': [3, 5, 7],
-             'p': [2, 3, 4]}
-    }
-
-    c = CVPipeline(models_sets=models, metrics=scoring)
-    c.fit(period_index_time_series, refit='all')
-    print(c.predict())
-    print(c.model_list['AR: {\'horizon\': 7, \'p\': 2}'].predict())
