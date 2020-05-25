@@ -10,6 +10,7 @@ from .simple_models import (
     Average,
     Drift,
 )
+from .cv_pipeline import CVPipeline
 
 __all__ = [
     "TimeSeriesForecastingModel",
@@ -18,4 +19,5 @@ __all__ = [
     "SeasonalNaive",
     "Average",
     "Drift",
+    "CVPipeline",
 ]

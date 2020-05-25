@@ -3,9 +3,11 @@ import pandas as pd
 import numpy as np
 from hypothesis import given, settings
 import hypothesis.strategies as st
-from gtime.model_selection import CVPipeline
+from gtime.time_series_models import CVPipeline
 from gtime.metrics import max_error, mae, rmse, log_mse
-from gtime.time_series_models import AR, Naive, SeasonalNaive
+from gtime.time_series_models import AR, Naive, SeasonalNaive, TimeSeriesForecastingModel
+from gtime.feature_extraction import MovingAverage, Shift
+from gtime.forecasting import NaiveForecaster, DriftForecaster
 
 
 @st.composite
@@ -74,6 +76,26 @@ class TestCVPipeline:
         idx = pd.period_range(start='2011-01-01', end='2012-01-01')
         df = pd.DataFrame(np.random.standard_normal((len(idx), 1)), index=idx, columns=['1'])
         cv_pipeline.fit(df)
+        assert cv_pipeline.cv_results_.shape == (len(cv_pipeline.model_list) * len(metrics), 4)
+        y_pred = cv_pipeline.predict()
+        horizon = cv_pipeline.best_model_.horizon
+        assert y_pred.shape == (horizon, horizon)
+
+
+
+    @pytest.mark.parametrize('models', [ {TimeSeriesForecastingModel: {'features': [[('s3', Shift(1), ['1'])]
+        , [('ma10', MovingAverage(10), ['1'])]],
+                                 'horizon': [4],
+                                 'model': [NaiveForecaster(), DriftForecaster()]}}])
+    @pytest.mark.parametrize('metrics', [{'RMSE': rmse,
+                                          'MAE': mae}])
+    @pytest.mark.parametrize('n_splits', [5])
+    @pytest.mark.parametrize('fit_all', ['all', 'best'])
+    def test_model_assembly(self, models, n_splits, metrics, fit_all):
+        cv_pipeline = CVPipeline(models_sets=models, n_splits=n_splits, metrics=metrics)
+        idx = pd.period_range(start='2011-01-01', end='2012-01-01')
+        df = pd.DataFrame(np.random.standard_normal((len(idx), 1)), index=idx, columns=['1'])
+        cv_pipeline.fit(df, refit=fit_all)
         assert cv_pipeline.cv_results_.shape == (len(cv_pipeline.model_list) * len(metrics), 4)
         y_pred = cv_pipeline.predict()
         horizon = cv_pipeline.best_model_.horizon

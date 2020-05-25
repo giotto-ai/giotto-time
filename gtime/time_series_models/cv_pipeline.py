@@ -238,3 +238,4 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         """
         check_is_fitted(self)
         return self.best_model_.predict(X)
+
