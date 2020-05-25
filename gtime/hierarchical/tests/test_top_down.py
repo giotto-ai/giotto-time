@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from pandas._testing import assert_frame_equal
 import pytest
 import sklearn
 from hypothesis import given
@@ -8,6 +9,7 @@ import random
 import hypothesis.strategies as st
 from hypothesis.extra.numpy import arrays
 from pytest import fixture
+from gtime.time_series_models import AR
 
 from gtime.hierarchical import HierarchicalTopDown
 from gtime.utils.fixtures import (
@@ -113,7 +115,7 @@ class TestHierarchicalTopDown:
     def test_basic_constructor(self, time_series_forecasting_model1_no_cache):
         HierarchicalTopDown(model=time_series_forecasting_model1_no_cache, hierarchy_tree='infer')
 
-    @given(dataframes=n_time_series_with_same_index())
+    @given(dataframes=n_time_series_with_same_index(min_n=5))
     def test_fit_predict_basic_top_down_on_different_data(self, dataframes, hierarchical_basic_top_down_model):
         hierarchical_basic_top_down_model.fit(dataframes).predict(dataframes)
 
@@ -121,7 +123,7 @@ class TestHierarchicalTopDown:
     def test_fit_predict_basic_top_down(self, dataframes, hierarchical_basic_top_down_model):
         hierarchical_basic_top_down_model.fit(dataframes).predict()
 
-    @given(dataframes=n_time_series_with_same_index())
+    @given(dataframes=n_time_series_with_same_index(min_n=5))
     def test_constructor(self, time_series_forecasting_model1_no_cache, dataframes):
         tree = tree_construction(dataframes)
         HierarchicalTopDown(time_series_forecasting_model1_no_cache, tree)
@@ -176,3 +178,65 @@ class TestHierarchicalTopDown:
     def test_error_fit_value_not_dataframe(self, hierarchical_basic_top_down_model):
         with pytest.raises(ValueError):
             hierarchical_basic_top_down_model.fit({"wrong_field": 12})
+
+    def test_prediction_values_top_down_tdsga_tdsgf(self):
+        index = ['2000-01-01 00:00:00', '2000-01-01 00:00:01',
+               '2000-01-01 00:00:02', '2000-01-01 00:00:03',
+               '2000-01-01 00:00:04', '2000-01-01 00:00:05',
+               '2000-01-01 00:00:06', '2000-01-01 00:00:07',
+               '2000-01-01 00:00:08', '2000-01-01 00:00:09',
+               '2000-01-01 00:00:10', '2000-01-01 00:00:11',
+               '2000-01-01 00:00:12', '2000-01-01 00:00:13',
+               '2000-01-01 00:00:14', '2000-01-01 00:00:15',
+               '2000-01-01 00:00:16', '2000-01-01 00:00:17',
+               '2000-01-01 00:00:18', '2000-01-01 00:00:19']
+        time_series_model = AR(p=2, horizon=3)
+        data1_list = [1 for i in range(20)]
+        data2_list = [1 for i in range(10)]+[0 for i in range(10)]
+        data3_list = [0 for i in range(10)]+[1 for i in range(10)]
+        data1 = pd.DataFrame(index=index, data=data1_list)
+        data2 = pd.DataFrame(index=index, data=data2_list)
+        data3 = pd.DataFrame(index=index, data=data3_list)
+        data = {'data1': data1, 'data2': data2, 'data3': data3}
+        tree_adj = {'data1': ['data2', 'data3'], 'data2': [], 'data3': []}
+        values_prediction_data1 = [[1., 1., 1.], [1., 1., 1.], [1., 1., 1.]]
+        values_prediction_child = [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5], [0.5, 0.5, 0.5]]
+        test_prediction_data1 = pd.DataFrame(data=values_prediction_data1, columns=['y_1', 'y_2', 'y_3'], index=['2000-01-01 00:00:17', '2000-01-01 00:00:18', '2000-01-01 00:00:19'])
+        test_prediction_data2 = pd.DataFrame(data=values_prediction_child, columns=['y_1', 'y_2', 'y_3'], index=['2000-01-01 00:00:17', '2000-01-01 00:00:18', '2000-01-01 00:00:19'])
+        test_prediction_data3 = pd.DataFrame(data=values_prediction_child, columns=['y_1', 'y_2', 'y_3'], index=['2000-01-01 00:00:17', '2000-01-01 00:00:18', '2000-01-01 00:00:19'])
+        prediction = HierarchicalTopDown(model=time_series_model, hierarchy_tree=tree_adj, root='data1', method='tdsga')
+        test_prediction_data = {'data1': test_prediction_data1, 'data2': test_prediction_data2, 'data3': test_prediction_data3}
+        prediction = prediction.fit(data).predict()
+        for key in test_prediction_data.keys():
+            assert_frame_equal(test_prediction_data[key], prediction[key])
+
+    def test_prediction_values_top_down_tdfp(self):
+        index = ['2000-01-01 00:00:00', '2000-01-01 00:00:01',
+               '2000-01-01 00:00:02', '2000-01-01 00:00:03',
+               '2000-01-01 00:00:04', '2000-01-01 00:00:05',
+               '2000-01-01 00:00:06', '2000-01-01 00:00:07',
+               '2000-01-01 00:00:08', '2000-01-01 00:00:09',
+               '2000-01-01 00:00:10', '2000-01-01 00:00:11',
+               '2000-01-01 00:00:12', '2000-01-01 00:00:13',
+               '2000-01-01 00:00:14', '2000-01-01 00:00:15',
+               '2000-01-01 00:00:16', '2000-01-01 00:00:17',
+               '2000-01-01 00:00:18', '2000-01-01 00:00:19']
+        time_series_model = AR(p=2, horizon=3)
+        data1_list = [1 for i in range(20)]
+        data2_list = [1 for i in range(10)]+[0 for i in range(10)]
+        data3_list = [0 for i in range(10)]+[1 for i in range(10)]
+        data1 = pd.DataFrame(index=index, data=data1_list)
+        data2 = pd.DataFrame(index=index, data=data2_list)
+        data3 = pd.DataFrame(index=index, data=data3_list)
+        data = {'data1': data1, 'data2': data2, 'data3': data3}
+        tree_adj = {'data1': ['data2', 'data3'], 'data2': [], 'data3': []}
+        values_prediction_data1 = [[1., 1., 1.], [1., 1., 1.], [1., 1., 1.]]
+        values_prediction_child = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+        test_prediction_data1 = pd.DataFrame(data=values_prediction_data1, columns=['y_1', 'y_2', 'y_3'], index=['2000-01-01 00:00:17', '2000-01-01 00:00:18', '2000-01-01 00:00:19'])
+        test_prediction_data2 = pd.DataFrame(data=values_prediction_child, columns=['y_1', 'y_2', 'y_3'], index=['2000-01-01 00:00:17', '2000-01-01 00:00:18', '2000-01-01 00:00:19'])
+        test_prediction_data3 = pd.DataFrame(data=values_prediction_data1, columns=['y_1', 'y_2', 'y_3'], index=['2000-01-01 00:00:17', '2000-01-01 00:00:18', '2000-01-01 00:00:19'])
+        prediction = HierarchicalTopDown(model=time_series_model, hierarchy_tree=tree_adj, root='data1', method='tdfp')
+        test_prediction_data = {'data1': test_prediction_data1, 'data2': test_prediction_data2, 'data3': test_prediction_data3}
+        prediction = prediction.fit(data).predict()
+        for key in test_prediction_data.keys():
+            assert_frame_equal(test_prediction_data[key], prediction[key])

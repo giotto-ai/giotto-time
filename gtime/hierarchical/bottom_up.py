@@ -18,7 +18,7 @@ class HierarchicalBottomUp(HierarchicalNaive):
     model: BaseEstimator, required
         time series forecasting model that is applied to each of the time series. A cross validation model
         can also be passed.
-    hierarchy_tree: String or nx.DiGraph, optional, default: 'Infer'
+    hierarchy_tree: String, nx.DiGraph, Dict[str, dict] or Dict[str, list], optional, default: 'Infer'
         Networkx Digraph containing the structure of the hierarchy tree.
         If 'Infer' the selected root will have as many children as the remaining keys.
     Examples
@@ -53,10 +53,16 @@ class HierarchicalBottomUp(HierarchicalNaive):
 
     """
     def __init__(self, model: BaseEstimator,
-                 hierarchy_tree: Union[str, nx.DiGraph] = "infer"
+                 hierarchy_tree: Union[str, nx.DiGraph, Dict[str, dict], Dict[str, list]] = "infer"
                  ):
         super().__init__(model=model)
-        self.hierarchy_tree = hierarchy_tree
+        if type(hierarchy_tree) == dict:
+            if type(hierarchy_tree[list(hierarchy_tree.keys())[0]]) == list:
+                self.hierarchy_tree = nx.from_dict_of_lists(hierarchy_tree, create_using=nx.DiGraph)
+            elif type(hierarchy_tree[list(hierarchy_tree.keys())[0]]) == dict:
+                self.hierarchy_tree = nx.from_dict_of_dicts(hierarchy_tree, create_using=nx.DiGraph)
+        else:
+            self.hierarchy_tree = hierarchy_tree
 
 
     def fit(self, X: Dict[str, pd.DataFrame], y: pd.DataFrame = None):
@@ -98,7 +104,7 @@ class HierarchicalBottomUp(HierarchicalNaive):
         if X is None:
             return self._predict_fitted_time_series()
         else:
-            return super()._predict_new_time_series(X)
+            return self._predict_new_time_series(X)
 
     def _infer_hierarchy_tree(self, X: Dict[str, pd.DataFrame]):
         self.hierarchy_tree = nx.DiGraph()
@@ -111,14 +117,14 @@ class HierarchicalBottomUp(HierarchicalNaive):
     def _predict_fitted_time_series(self) -> Dict[str, pd.DataFrame]:
         bottom_up_dictionary = {}
         for key, model in self.models_.items():
-            self._bottom_up_addiction_to_dictionary(key, model, bottom_up_dictionary)
+            self._bottom_up_addiction_to_dictionary(key, bottom_up_dictionary)
         return bottom_up_dictionary
 
-    def _bottom_up_addiction_to_dictionary(self, key, model, dict_bottom_up):
-        if self._is_a_leaf(key):
-            dict_bottom_up[key] = model.predict()
-        else:
-            self._check_predict_children_computed(dict_bottom_up, key)
+    def _bottom_up_addiction_to_dictionary(self, key, dict_bottom_up, timeseries=None):
+        if self._is_a_leaf(key) and key not in dict_bottom_up.keys():
+            dict_bottom_up[key] = self.models_[key].predict(timeseries)
+        elif not self._is_a_leaf(key):
+            self._check_predict_children_computed(dict_bottom_up, key, timeseries)
             self._sum_children_prediction(key, dict_bottom_up)
 
     def _is_a_leaf(self, key) -> bool:
@@ -134,12 +140,19 @@ class HierarchicalBottomUp(HierarchicalNaive):
         dict_bottom_up[parent_key] = temp
         return
 
-    def _check_predict_children_computed(self, dict_bottom_up, tested_key):
+    def _check_predict_children_computed(self, dict_bottom_up, tested_key, timeseries=None):
         for child in list(self.hierarchy_tree[tested_key]):
             if child not in dict_bottom_up:  # If child model not computed yet
                 if self._is_a_leaf(child):
-                    dict_bottom_up[child] = self.models_[child].predict()
+                    dict_bottom_up[child] = self.models_[child].predict(timeseries)
                 else:
                     self._check_predict_children_computed(dict_bottom_up, child)
                     self._sum_children_prediction(child, dict_bottom_up)
         return
+
+    def _predict_new_time_series(self, X: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+        new_time_series_dictionary = {}
+        for key, time_series in X.items():
+            self._bottom_up_addiction_to_dictionary(key, new_time_series_dictionary, time_series)
+        return new_time_series_dictionary
+

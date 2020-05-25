@@ -70,7 +70,7 @@ class TestHierarchicalBottomUp:
     def test_basic_constructor(self, time_series_forecasting_model1_no_cache):
         HierarchicalBottomUp(model=time_series_forecasting_model1_no_cache, hierarchy_tree='infer')
 
-    @given(dataframes=n_time_series_with_same_index())
+    @given(dataframes=n_time_series_with_same_index(min_n=5))
     def test_fit_predict_basic_bottom_up_on_different_data(self, dataframes, hierarchical_basic_bottom_up_model):
         hierarchical_basic_bottom_up_model.fit(dataframes).predict(dataframes)
 
@@ -86,7 +86,10 @@ class TestHierarchicalBottomUp:
     @given(data=st.data(), dataframes=n_time_series_with_same_index(min_n=5))
     def test_fit_predict_bottom_up(self, data, dataframes, time_series_forecasting_model1_no_cache):
         model = data.draw(hierarchical_bottom_up_model(time_series_forecasting_model1_no_cache))
-        model.fit(dataframes).predict()
+        prediction = model.fit(dataframes).predict()
+        for key in dataframes.keys():
+            if key not in prediction.keys():
+                raise ValueError
 
     @given(dataframes=n_time_series_with_same_index())
     def test_fit_predict_on_subset_of_time_series(
