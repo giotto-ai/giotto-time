@@ -10,6 +10,7 @@ from gtime.compose import FeatureCreation
 from gtime.model_selection import horizon_shift, FeatureSplitter
 from gtime.metrics import rmse
 
+
 class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
     """ Base class for a generic time series forecasting model.
 
@@ -93,7 +94,12 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
             raise AttributeError("cache_feature must be True to fit only model")
         else:
             check_is_fitted(self)  # only_model works if the model is already fitted
-            X_train, y_train, X_test, y_test = self.X_train_, self.y_train_, self.X_test_, self.y_test_
+            X_train, y_train, X_test, y_test = (
+                self.X_train_,
+                self.y_train_,
+                self.X_test_,
+                self.y_test_,
+            )
 
         self.model_ = self._fit_model(X_train, y_train)
         self.X_test_ = X_test
@@ -172,13 +178,19 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         y_test = self.y_test_ if y is None else y
 
         if metrics is None:
-            metrics = {'rmse': rmse}
-        score = pd.DataFrame(columns=metrics.keys(), index=['Train score', 'Test score'])
-        score.loc[['Train score'], :] = self._score(self.y_train_, y_pred_train, metrics=metrics, type='Train score')
-        score.loc[['Test score'], :] = self._score(y_test, y_pred_test, metrics=metrics, type='Test score')
+            metrics = {"rmse": rmse}
+        score = pd.DataFrame(
+            columns=metrics.keys(), index=["Train score", "Test score"]
+        )
+        score.loc[["Train score"], :] = self._score(
+            self.y_train_, y_pred_train, metrics=metrics, type="Train score"
+        )
+        score.loc[["Test score"], :] = self._score(
+            y_test, y_pred_test, metrics=metrics, type="Test score"
+        )
         return score.T
 
-    def _score(self, y, y_pred, metrics=None, type='Test'):
+    def _score(self, y, y_pred, metrics=None, type="Test"):
         score = pd.DataFrame(columns=metrics.keys(), index=[type])
         for name, metric in metrics.items():
             scores = []

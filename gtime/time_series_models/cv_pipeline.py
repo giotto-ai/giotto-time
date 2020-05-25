@@ -44,7 +44,7 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         for model, param_grid in models_sets.items():
             param_iterator = ParameterGrid(param_grid)
             for params in param_iterator:
-                model_index = model.__name__ + ': ' + str(params)
+                model_index = model.__name__ + ": " + str(params)
                 model_list[model_index] = model(**params)
         self.model_list = model_list
         self.metrics = mse if metrics is None else metrics
@@ -68,8 +68,8 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         """
         if len(results) == 0:
             return None
-        first_metric = results['Metric'].iloc[0]
-        scores = results[results['Metric'] == first_metric]['Test score']
+        first_metric = results["Metric"].iloc[0]
+        scores = results[results["Metric"] == first_metric]["Test score"]
         best_model_index = scores.idxmin()
         return best_model_index
 
@@ -86,11 +86,21 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         idx: str, model index in ``self.model_list``
         """
         for idx, model in self.model_list.items():
-            if (model.model == target.model) & (model.features == target.features) & (model.horizon == target.horizon):
+            if (
+                (model.model == target.model)
+                & (model.features == target.features)
+                & (model.horizon == target.horizon)
+            ):
                 return idx
         return None
 
-    def _fit_one_model(self, model: BaseEstimator, X_split: pd.DataFrame, results: pd.DataFrame, only_model: bool = False) -> pd.DataFrame:
+    def _fit_one_model(
+        self,
+        model: BaseEstimator,
+        X_split: pd.DataFrame,
+        results: pd.DataFrame,
+        only_model: bool = False,
+    ) -> pd.DataFrame:
         """
         Fits one model on a split and calculates its score and fit time
 
@@ -115,7 +125,13 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         results.loc[model_index, "Fit time"] = fit_time
         return results
 
-    def _fit_ts_forecaster_model(self, model: TimeSeriesForecastingModel, params: Dict, X_split: pd.DataFrame, results: pd.DataFrame) -> pd.DataFrame:
+    def _fit_ts_forecaster_model(
+        self,
+        model: TimeSeriesForecastingModel,
+        params: Dict,
+        X_split: pd.DataFrame,
+        results: pd.DataFrame,
+    ) -> pd.DataFrame:
         """
         Fit and score for a TimeSeriesForecastingModel model with different parameters
 
@@ -131,16 +147,22 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         results: pd.DataFrame
 
         """
-        for feature in params['features']:
-            for horizon in params['horizon']:
-                submodel = model(features=feature, horizon=horizon, model=params['model'][0])
+        for feature in params["features"]:
+            for horizon in params["horizon"]:
+                submodel = model(
+                    features=feature, horizon=horizon, model=params["model"][0]
+                )
                 results = self._fit_one_model(submodel, X_split, results)
-                for next_model in params['model'][1:]:
+                for next_model in params["model"][1:]:
                     submodel.set_model(next_model)
-                    results = self._fit_one_model(submodel, X_split, results, only_model=True)
+                    results = self._fit_one_model(
+                        submodel, X_split, results, only_model=True
+                    )
         return results
 
-    def _fit_other_models(self, model: BaseEstimator, X_split: pd.DataFrame, results: pd.DataFrame) -> pd.DataFrame:
+    def _fit_other_models(
+        self, model: BaseEstimator, X_split: pd.DataFrame, results: pd.DataFrame
+    ) -> pd.DataFrame:
         """
         Fit and score for a model with pre-defined features to a split.
 
@@ -155,7 +177,9 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         results: pd.DataFrame
 
         """
-        model_list = list(filter(lambda x: isinstance(x, model), self.model_list.values()))
+        model_list = list(
+            filter(lambda x: isinstance(x, model), self.model_list.values())
+        )
         for submodel in model_list:
             results = self._fit_one_model(submodel, X_split, results)
         return results
@@ -182,7 +206,9 @@ class CVPipeline(BaseEstimator, RegressorMixin):
                 results = self._fit_other_models(model, X_split, results)
         return results
 
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame = None, refit: Union[str, List] = 'best'):
+    def fit(
+        self, X: pd.DataFrame, y: pd.DataFrame = None, refit: Union[str, List] = "best"
+    ):
         """
         Performs cross-validation, selecting the best model from ``self.model_list`` according to ``self.selection``
         and refits all the models on all available data.
@@ -200,22 +226,26 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         """
 
         result_idx = pd.MultiIndex.from_product([self.model_list, self.metrics.keys()])
-        result_idx.names = ['Model', 'Metric']
-        self.cv_results_ = pd.DataFrame(
-            0.0, index=result_idx, columns=result_cols
-        ).reset_index().set_index('Model')
+        result_idx.names = ["Model", "Metric"]
+        self.cv_results_ = (
+            pd.DataFrame(0.0, index=result_idx, columns=result_cols)
+            .reset_index()
+            .set_index("Model")
+        )
 
         for idx in self.cv(X, self.n_splits):
             X_split = X.loc[idx]
-            self.cv_results_[result_cols] += self._cv_fit_one_split(X_split)[result_cols]
+            self.cv_results_[result_cols] += self._cv_fit_one_split(X_split)[
+                result_cols
+            ]
 
         self.cv_results_[result_cols] /= self.n_splits
         self.best_model_ = self.model_list[self.selection(self.cv_results_.dropna())]
 
-        if refit == 'all':
+        if refit == "all":
             for model in self.model_list.values():
                 model.fit(X)
-        elif refit == 'best':
+        elif refit == "best":
             self.best_model_.fit(X)
         else:
             for idx in refit:
@@ -238,4 +268,3 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         """
         check_is_fitted(self)
         return self.best_model_.predict(X)
-
