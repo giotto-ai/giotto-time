@@ -60,6 +60,10 @@ def tree_construction(
 def hierarchical_basic_top_down_model(time_series_forecasting_model1_no_cache):
     return HierarchicalTopDown(time_series_forecasting_model1_no_cache, 'infer')
 
+@fixture(scope="function")
+def hierarchical_basic_top_down_model_fp_method(time_series_forecasting_model1_no_cache):
+    return HierarchicalTopDown(time_series_forecasting_model1_no_cache, hierarchy_tree='infer', method='tdfp')
+
 @st.composite
 def hierarchical_top_down_model_sga(draw, time_series_forecasting_model1_no_cache):
     dataframes = draw(n_time_series_with_same_index(min_n=5))
@@ -118,6 +122,10 @@ class TestHierarchicalTopDown:
     @given(dataframes=n_time_series_with_same_index(min_n=5))
     def test_fit_predict_basic_top_down_on_different_data(self, dataframes, hierarchical_basic_top_down_model):
         hierarchical_basic_top_down_model.fit(dataframes).predict(dataframes)
+
+    @given(dataframes=n_time_series_with_same_index(min_n=5))
+    def test_fit_predict_basic_top_down_fp_method(self, dataframes, hierarchical_basic_top_down_model_fp_method):
+        hierarchical_basic_top_down_model_fp_method.fit(dataframes).predict(dataframes)
 
     @given(dataframes=n_time_series_with_same_index(min_n=5))
     def test_fit_predict_basic_top_down(self, dataframes, hierarchical_basic_top_down_model):

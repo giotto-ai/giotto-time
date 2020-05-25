@@ -120,7 +120,7 @@ class HierarchicalTopDown(HierarchicalBottomUp):
     def _compute_children_proportions_sga_method(self, parent, X):
         for child in self.hierarchy_tree[parent]:
             try:
-                self.proportions[child] = mean(X[child].values / X[parent].values)
+                self.proportions[child] = mean(X[child] / X[parent]).values[0]
             except ZeroDivisionError:
                 self.proportions[child] = 0
             if not self._is_a_leaf(child):
@@ -129,7 +129,7 @@ class HierarchicalTopDown(HierarchicalBottomUp):
     def _compute_children_proportions_sgf_method(self, parent, X):
         for child in self.hierarchy_tree[parent]:
             try:
-                self.proportions[child] = mean(X[child].values)/mean(X[parent].values)
+                self.proportions[child] = (mean(X[child])/mean(X[parent])).values[0]
             except ZeroDivisionError:
                 self.proportions[child] = 0
             if not self._is_a_leaf(child):
@@ -171,7 +171,7 @@ class HierarchicalTopDown(HierarchicalBottomUp):
 
     def _predict_fitted_time_series_fp(self, top_down_dictionary) -> Dict[str, pd.DataFrame]:
         basic_predictions = {key: model.predict() for key, model in self.models_.items()}
-        self.proportions[self.root] = pd.Series([1.0 for i in range(self.model.horizon)], index=basic_predictions[self.root].index)
+        self.proportions[self.root] = pd.Series([1.0 for i in range(self.model.horizon)], index=basic_predictions[self.root].columns)
         self._compute_children_proportions_fp_method(basic_predictions, self.root)
         self._top_down_fp_children_predict_computation(top_down_dictionary, basic_predictions)
         return top_down_dictionary
@@ -184,13 +184,13 @@ class HierarchicalTopDown(HierarchicalBottomUp):
 
     def _compute_parent_child_proportion_fp_method(self, parent_key, child_key, base_predictions):
         try:
-            return mean(base_predictions[child_key], axis=1)/mean(base_predictions[parent_key], axis=1)
+            return (mean(base_predictions[child_key])/mean(base_predictions[parent_key])).values
         except ZeroDivisionError:
             return 0
 
     def _top_down_fp_children_predict_computation(self, top_down_dictionary, prediction):
         for key in prediction.keys():
-            top_down_dictionary[key] = prediction[self.root] * self.proportions[key].values.T
+            top_down_dictionary[key] = prediction[self.root] * self.proportions[key].values
 
     def _predict_new_time_series(self, X: pd.DataFrame) -> Dict[str, pd.DataFrame]:
         new_time_series_dictionary = {}
@@ -203,11 +203,8 @@ class HierarchicalTopDown(HierarchicalBottomUp):
     
     def _predict_new_time_series_fp(self, top_down_dictionary, X) -> Dict[str, pd.DataFrame]:
         basic_predictions = {key: self.models_[key].predict(timeseries) for key, timeseries in X.items()}
-        if X is None:
-            proportion_length = len(self.model.horizon)
-        else:
-            proportion_length = len(X[self.root])-1
-        self.proportions[self.root] = pd.Series([1.0 for i in range(proportion_length)], index=basic_predictions[self.root].index)
+        proportion_length = self.model.horizon
+        self.proportions[self.root] = pd.Series([1.0 for i in range(proportion_length)], index=basic_predictions[self.root].columns)
         self._compute_children_proportions_fp_method(basic_predictions, self.root)
         self._top_down_fp_children_predict_computation(top_down_dictionary, basic_predictions)
         return top_down_dictionary

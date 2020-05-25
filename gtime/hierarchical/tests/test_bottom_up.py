@@ -91,7 +91,7 @@ class TestHierarchicalBottomUp:
             if key not in prediction.keys():
                 raise ValueError
 
-    @given(dataframes=n_time_series_with_same_index())
+    @given(dataframes=n_time_series_with_same_index(min_n=5))
     def test_fit_predict_on_subset_of_time_series(
             self, dataframes, hierarchical_basic_bottom_up_model
     ):
