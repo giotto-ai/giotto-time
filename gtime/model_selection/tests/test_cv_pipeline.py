@@ -15,21 +15,21 @@ def draw_unique_subset(draw, lst):
 
 @st.composite
 def naive_model(draw):
-    horizon = draw(st.lists(st.integers(min_value=1, max_value=20), min_size=1, max_size=4))
+    horizon = draw(st.lists(st.integers(min_value=1, max_value=20), min_size=1, max_size=4, unique=True))
     return (Naive, {'horizon': horizon})
 
 
 @st.composite
 def seasonal_naive_model(draw):
-    horizon = draw(st.lists(st.integers(min_value=1, max_value=20), min_size=1, max_size=4))
-    seasonal_length = draw(st.lists(st.integers(min_value=1, max_value=10), min_size=1, max_size=4))
+    horizon = draw(st.lists(st.integers(min_value=1, max_value=20), min_size=1, max_size=4, unique=True))
+    seasonal_length = draw(st.lists(st.integers(min_value=1, max_value=10), min_size=1, max_size=4, unique=True))
     return (SeasonalNaive, {'horizon': horizon, 'seasonal_length': seasonal_length})
 
 
 @st.composite
 def ar_model(draw):
-    horizon = draw(st.lists(st.integers(min_value=1, max_value=20), min_size=1, max_size=4))
-    p = draw(st.lists(st.integers(min_value=1, max_value=20), min_size=1, max_size=4))
+    horizon = draw(st.lists(st.integers(min_value=1, max_value=20), min_size=1, max_size=4, unique=True))
+    p = draw(st.lists(st.integers(min_value=1, max_value=20), min_size=1, max_size=4, unique=True))
     explainer = draw(st.sampled_from([None, "lime", "shap"]))
     return (AR, {'horizon': horizon, 'p': p, 'explainer_type': [explainer]})
 
@@ -74,7 +74,7 @@ class TestCVPipeline:
         idx = pd.period_range(start='2011-01-01', end='2012-01-01')
         df = pd.DataFrame(np.random.standard_normal((len(idx), 1)), index=idx, columns=['1'])
         cv_pipeline.fit(df)
-        assert cv_pipeline.cv_results_.shape == (len(cv_pipeline.model_list) * len(metrics), 5)
+        assert cv_pipeline.cv_results_.shape == (len(cv_pipeline.model_list) * len(metrics), 4)
         y_pred = cv_pipeline.predict()
         horizon = cv_pipeline.best_model_.horizon
         assert y_pred.shape == (horizon, horizon)

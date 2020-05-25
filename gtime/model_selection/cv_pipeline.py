@@ -11,31 +11,8 @@ from gtime.model_selection.cross_validation import (
 )
 from sklearn.utils.validation import check_is_fitted
 
+
 result_cols = ["Fit time", "Train score", "Test score"]
-
-
-def _default_selection(results: pd.DataFrame) -> RegressorMixin:
-    """
-    Selects a model with lowest test score according to the first of the provided metrics
-
-    Parameters
-    ----------
-    results: pd.DataFrame - cross-validation results
-
-    Returns
-    -------
-    best_model: RegressorMixin - selected model
-
-    """
-    if len(results) == 0:
-        return None
-    first_metric = results['Metric'].iloc[0]
-    scores = results[results['Metric'] == first_metric]['Test score']
-    best_model_index = scores.idxmin()
-    return results.loc[best_model_index, 'Model']
-
-def _models_are_equal(models, target):
-    return [(model.model == target.model) & (model.features == target.features) & (model.horizon == target.horizon) for model in models]
 
 
 class CVPipeline(BaseEstimator, RegressorMixin):
@@ -62,33 +39,71 @@ class CVPipeline(BaseEstimator, RegressorMixin):
     ):
 
         self.models_sets = models_sets
-        model_list = []
+        model_list = {}
         for model, param_grid in models_sets.items():
             param_iterator = ParameterGrid(param_grid)
             for params in param_iterator:
-                model_list.append(model(**params))
+                model_index = model.__name__ + ': ' + str(params)
+                model_list[model_index] = model(**params)
         self.model_list = model_list
-        self.models = models_sets
         self.metrics = mse if metrics is None else metrics
-        self.selection = _default_selection if selection is None else selection
+        self.selection = self._default_selection if selection is None else selection
         self.cv = blocking_time_series_split if blocking else time_series_split
         self.n_splits = n_splits
-        result_idx = pd.MultiIndex.from_product([self.model_list, self.metrics.keys()])
-        result_idx.names = ['Model', 'Metric']
-        self.cv_results_ = pd.DataFrame(
-            0.0, index=result_idx, columns=result_cols
-        ).reset_index()
 
+    @staticmethod
+    def _default_selection(results: pd.DataFrame) -> RegressorMixin:
+        """
+        Selects a model with lowest test score according to the first of the provided metrics
+
+        Parameters
+        ----------
+        results: pd.DataFrame - cross-validation results
+
+        Returns
+        -------
+        best_model: RegressorMixin - selected model
+
+        """
+        if len(results) == 0:
+            return None
+        first_metric = results['Metric'].iloc[0]
+        scores = results[results['Metric'] == first_metric]['Test score']
+        best_model_index = scores.idxmin()
+        return best_model_index
+
+    def _models_are_equal(self, target):
+        for idx, model in self.model_list.items():
+            if (model.model == target.model) & (model.features == target.features) & (model.horizon == target.horizon):
+                return idx
+        return None
 
     def _fit_one_model(self, X_split: pd.DataFrame, model, results, only_model=False):
         start_time = time()
-        model_index = results[_models_are_equal(results['Model'], model)].index
+        model_index = self._models_are_equal(model)
         model.cache_features = True
         model.fit(X_split, only_model=only_model)
         scores = model.score(metrics=self.metrics)
         results.loc[model_index, ["Train score", "Test score"]] = scores.values
         fit_time = time() - start_time
         results.loc[model_index, "Fit time"] = fit_time
+        return results
+
+    def _fit_ts_forecaster_model(self, model, params, X_split, results):
+
+        for feature in params['features']:
+            for horizon in params['horizon']:
+                submodel = model(features=feature, horizon=horizon, model=params['model'][0])
+                results = self._fit_one_model(X_split, submodel, results)
+                for next_model in params['model'][1:]:
+                    submodel.set_model(next_model)
+                    results = self._fit_one_model(X_split, submodel, results, only_model=True)
+        return results
+
+    def _fit_other_models(self, model, X_split, results):
+        model_list = list(filter(lambda x: isinstance(x, model), self.model_list.values()))
+        for submodel in model_list:
+            results = self._fit_one_model(X_split, submodel, results)
         return results
 
     def _cv_fit_one_split(self, X_split: pd.DataFrame) -> pd.DataFrame:
@@ -108,20 +123,12 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         results = self.cv_results_.copy()
         for model, params in self.models_sets.items():
             if model == TimeSeriesForecastingModel:
-                for feature in params['features']:
-                    for horizon in params['horizon']:
-                        submodel = model(features=feature, horizon=horizon, model=params['model'][0])
-                        results = self._fit_one_model(X_split, submodel, results)
-                        for next_model in params['model'][1:]:
-                            submodel.set_model(next_model)
-                            results = self._fit_one_model(X_split, submodel, results, only_model=True)
+                results = self._fit_ts_forecaster_model(model, params, X_split, results)
             else:
-                model_list = list(filter(lambda x: isinstance(x, model), self.model_list))
-                for submodel in model_list:
-                    results = self._fit_one_model(X_split, submodel, results)
+                results = self._fit_other_models(model, X_split, results)
         return results
 
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame = None):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame = None, refit = 'best'):
         """
         Performs cross-validation, selecting the best model from ``self.model_list`` according to ``self.selection``
         and refits all the models on all available data.
@@ -136,14 +143,28 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         self: CVPipeline
 
         """
+
+        result_idx = pd.MultiIndex.from_product([self.model_list, self.metrics.keys()])
+        result_idx.names = ['Model', 'Metric']
+        self.cv_results_ = pd.DataFrame(
+            0.0, index=result_idx, columns=result_cols
+        ).reset_index().set_index('Model')
+
         for idx in self.cv(X, self.n_splits):
             X_split = X.loc[idx]
             self.cv_results_[result_cols] += self._cv_fit_one_split(X_split)[result_cols]
 
         self.cv_results_[result_cols] /= self.n_splits
-        self.best_model_ = self.selection(self.cv_results_.dropna())
-        for model in self.model_list:
-            model.fit(X)
+        self.best_model_ = self.model_list[self.selection(self.cv_results_.dropna())]
+
+        if refit == 'all':
+            for model in self.model_list.values():
+                model.fit(X)
+        elif refit == 'best':
+            self.best_model_.fit(X)
+        else:
+            for idx in refit:
+                self.model_list[idx].fit(X)
         return self
 
     def predict(self, X: pd.DataFrame = None) -> pd.DataFrame:
@@ -166,7 +187,6 @@ class CVPipeline(BaseEstimator, RegressorMixin):
 
 if __name__ == '__main__':
     from gtime.preprocessing import TimeSeriesPreparation
-    # from gtime.model_selection import CVPipeline
     from gtime.metrics import rmse, mape
     from gtime.time_series_models import Naive, AR, TimeSeriesForecastingModel
     from gtime.forecasting import NaiveForecaster, DriftForecaster
@@ -194,4 +214,6 @@ if __name__ == '__main__':
     }
 
     c = CVPipeline(models_sets=models, metrics=scoring)
-    c.fit(period_index_time_series)
+    c.fit(period_index_time_series, refit='all')
+    print(c.predict())
+    print(c.model_list['AR: {\'horizon\': 7, \'p\': 2}'].predict())
