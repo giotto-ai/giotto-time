@@ -28,6 +28,40 @@ class CVPipeline(BaseEstimator, RegressorMixin):
     metrics: Dict, a dictionary with metric names as keys and metric functions as values
     selection: Callable, a function to select the best model given score table
 
+    Examples
+    --------
+    >>> from gtime.preprocessing import TimeSeriesPreparation
+    >>> from gtime.time_series_models import CVPipeline
+    >>> from gtime.metrics import rmse, mape
+    >>> import numpy as np
+    >>> import pandas as pd
+    >>> from gtime.time_series_models import Naive, AR, TimeSeriesForecastingModel
+    >>> from gtime.forecasting import NaiveForecaster, DriftForecaster
+    >>> from gtime.feature_extraction import MovingAverage, Polynomial, Shift
+    >>> from sklearn.model_selection import ParameterGrid
+    >>> idx = pd.period_range(start="2011-01-01", end="2012-01-01")
+    >>> np.random.seed(5)
+    >>> df = pd.DataFrame(np.random.standard_normal((len(idx), 1)), index=idx, columns=["time_series"])
+    >>> shift_feature = [('s3', Shift(1), ['time_series'])]
+    >>> ma_feature = [('ma10', MovingAverage(10), ['time_series'])]
+    >>> scoring = {'RMSE': rmse, 'MAPE': mape}
+    >>> models = {
+    ...     TimeSeriesForecastingModel: {'features': [shift_feature, ma_feature],
+    ...                                  'horizon': [3, 5],
+    ...                                  'model': [NaiveForecaster(), DriftForecaster()]},
+    ...     Naive: {'horizon': [3, 5, 9]},
+    ...     AR: {'horizon': [3, 5],
+    ...          'p': [2, 3]}
+    ... }
+    >>> c = CVPipeline(models_sets=models, metrics=scoring)
+    >>> c.fit(df).predict()
+                     y_1       y_2       y_3       y_4       y_5
+    2011-12-28  0.025198  0.005753  0.041398  0.008531 -0.053772
+    2011-12-29  0.024587  0.004619 -0.021253 -0.086931 -0.012732
+    2011-12-30  0.000045  0.011903 -0.055153  0.007690  0.151219
+    2011-12-31  0.025556  0.006280  0.071624  0.054207 -0.073940
+    2012-01-01 -0.017229  0.018712 -0.000043  0.199268  0.219392
+
     """
 
     def __init__(
