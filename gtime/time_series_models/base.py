@@ -66,7 +66,7 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         self.model = model
         self.cache_features = cache_features
 
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame = None, only_model: bool = False):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame = None, only_model: bool = False, **kwargs):
         """ Fit function for a time series forecasting model.
 
         It does the following:
@@ -95,11 +95,11 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
             check_is_fitted(self)  # only_model works if the model is already fitted
             X_train, y_train, X_test, y_test = self.X_train_, self.y_train_, self.X_test_, self.y_test_
 
-        self.model_ = self._fit_model(X_train, y_train)
+        self.model_ = self._fit_model(X_train, y_train, **kwargs)
         self.X_test_ = X_test
         return self
 
-    def predict(self, X=None):
+    def predict(self, X=None, **kwargs):
         """ Predict
 
         Parameters
@@ -115,10 +115,10 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         check_is_fitted(self)
 
         if X is None:
-            return self.model_.predict(self.X_test_)
+            return self.model_.predict(self.X_test_, **kwargs)
         else:
             X_test = self.feature_creation_.transform(X).dropna()
-            return self.model_.predict(X_test)
+            return self.model_.predict(X_test, **kwargs)
 
     def set_params(self, **params):
         if "features" in params:
@@ -150,8 +150,8 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         feature_splitter = FeatureSplitter()
         return feature_splitter.transform(X, y)
 
-    def _fit_model(self, X_train, y_train):
-        return self.model.fit(X_train, y_train)
+    def _fit_model(self, X_train, y_train, **kwargs):
+        return self.model.fit(X_train, y_train, **kwargs)
 
     def _reset(self):
         attributes = [
