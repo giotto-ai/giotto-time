@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Dict
 
 import pandas as pd
 import numpy as np
@@ -127,6 +127,15 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
             return self.model_.predict(X_test)
 
     def set_params(self, **params):
+        """
+        Sets model parameters
+
+        Parameters
+        ----------
+        params: Dict or name=value pair, parameters
+
+
+        """
         if "features" in params:
             self._reset()
         super(TimeSeriesForecastingModel, self).set_params(**params)
@@ -134,6 +143,21 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
     def _compute_train_test_matrices(
         self, X: pd.DataFrame, y: pd.DataFrame
     ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        """
+        Creates features and splits the result into train and test samples
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, 1).
+            The input data.
+
+        y : pd.DataFrame, shape (n_samples, 1).
+            The matrix containing the target variables.
+
+        Returns
+        -------
+        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]: train-test split
+
+        """
         X, y = self._create_X_y_feature_matrices(X, y)
         X_train, y_train, X_test, y_test = self._split_train_test(X, y)
         if self.cache_features:
@@ -146,28 +170,92 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
     def _create_X_y_feature_matrices(
         self, X, y=None
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        """
+        Creates feature matrix based on ``self.features`` pipeline
+
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, 1).
+            The input data.
+
+        y : pd.DataFrame, shape (n_samples, 1).
+            The matrix containing the target variables.
+
+        Returns
+        -------
+        feature_X, feature_y: pd.DataFrame
+
+        """
         self.feature_creation_ = FeatureCreation(self.features)
         feature_X = self.feature_creation_.fit_transform(X, y)
 
         feature_y = horizon_shift(X, horizon=self.horizon)
         return feature_X, feature_y
 
-    def _split_train_test(self, X, y):
+    def _split_train_test(self, X: pd.DataFrame, y: pd.DataFrame):
+        """
+        Train-test split for generated features
+
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, n_features).
+            The input data.
+
+        y : pd.DataFrame, shape (n_samples, horizon).
+            The matrix containing the target variables.
+
+        Returns
+        -------
+        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]: train-test split
+
+        """
         feature_splitter = FeatureSplitter()
         return feature_splitter.transform(X, y)
 
-    def _fit_model(self, X_train, y_train):
+    def _fit_model(self, X_train: pd.DataFrame, y_train: pd.DataFrame) -> BaseEstimator:
+        """
+        Fits a model to provided train data
+
+        Parameters
+        ----------
+        X_train : pd.DataFrame, shape (n_samples, n_features).
+            The input data.
+
+        y_train : pd.DataFrame, shape (n_samples, horizon).
+            The matrix containing the target variables.
+
+        Returns
+        -------
+        BaseEstimator, fitted model
+
+        """
         return self.model.fit(X_train, y_train)
 
     def _reset(self):
+        """
+        Resets all fitted attributes
+        """
         attributes = [
             v for v in vars(self) if v.endswith("_") and not v.startswith("__")
         ]
         for attribute in attributes:
             delattr(self, attribute)
 
-    def score(self, X=None, y=None, metrics=None):
+    def score(self, X: pd.DataFrame = None, y: pd.DataFrame = None, metrics: Dict = None) -> pd.DataFrame:
+        """
+        Returns a pd.DataFrame of train and test scores of all metrics provided
 
+        Parameters
+        ----------
+        X: pd.DataFrame, test data, if None self.X_test_ is used
+        y: pd.DataFrame, true y values, if None self.y_test_ is used
+        metrics: Dict, a dictionary of metric names and callables, default is ``rmse``
+
+        Returns
+        -------
+        score: pd.DataFrame
+
+        """
         check_is_fitted(self)
         if X is None:
             y_pred_test = self.predict()
@@ -190,7 +278,23 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         )
         return score.T
 
-    def _score(self, y, y_pred, metrics=None, type="Test"):
+    def _score(self, y: pd.DataFrame, y_pred: pd.DataFrame, metrics: Dict = None, type: str = "Test score") -> pd.DataFrame:
+        """
+        Helper function to calculate train or test score
+
+        Parameters
+        ----------
+        y_pred: pd.DataFrame, true y values
+        y: pd.DataFrame, predicted y values
+        metrics: Dict, a dictionary of metric names and callables, default is ``rmse``
+        type: str, score name for the results dataframe
+
+        Returns
+        -------
+        score: pd.DataFrame
+
+        """
+
         score = pd.DataFrame(columns=metrics.keys(), index=[type])
         for name, metric in metrics.items():
             scores = []
@@ -203,5 +307,13 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
             score[name] = np.mean(scores)
         return score
 
-    def set_model(self, model):
+    def set_model(self, model: BaseEstimator):
+        """
+        Changes the model in the pipeline
+
+        Parameters
+        ----------
+        model: BaseEstimator, should be compatible with the features
+
+        """
         self.model = model
