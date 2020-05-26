@@ -14,6 +14,7 @@ from gtime.utils.fixtures import (
 )
 from gtime.time_series_models import TimeSeriesForecastingModel, AR
 from gtime.utils.hypothesis.time_indexes import giotto_time_series
+from gtime.metrics import mae, rmse
 
 
 class TestAR:
@@ -211,3 +212,26 @@ class TestTimeSeriesForecastingModel:
         time_series_forecasting_model1_cache.fit(time_series)
         time_series_forecasting_model1_cache.set_params(model=model2)
         time_series_forecasting_model1_cache.fit(time_series, only_model=True)
+
+    @given(
+        time_series=giotto_time_series(
+            allow_infinity=False, allow_nan=False, min_length=5
+        )
+    )
+    @pytest.mark.parametrize("metrics", [{"RMSE": rmse, "MAE": mae}])
+    def test_score_custom(self, time_series, time_series_forecasting_model1_cache, metrics):
+        time_series_forecasting_model1_cache.fit(time_series)
+        score = time_series_forecasting_model1_cache.score(metrics=metrics)
+        assert score.shape == (2, 2)
+        assert all(map(lambda x: x >= 0.0, score.iloc[0]))
+
+    @given(
+        time_series=giotto_time_series(
+            allow_infinity=False, allow_nan=False, min_length=5
+        )
+    )
+    def test_score_default(self, time_series, time_series_forecasting_model1_cache):
+        time_series_forecasting_model1_cache.fit(time_series)
+        score = time_series_forecasting_model1_cache.score()
+        assert score.shape == (1, 2)
+        assert all(map(lambda x: x >= 0.0, score.iloc[0]))
