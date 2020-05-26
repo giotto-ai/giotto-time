@@ -241,7 +241,9 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         for attribute in attributes:
             delattr(self, attribute)
 
-    def score(self, X: pd.DataFrame = None, y: pd.DataFrame = None, metrics: Dict = None) -> pd.DataFrame:
+    def score(
+        self, X: pd.DataFrame = None, y: pd.DataFrame = None, metrics: Dict = None
+    ) -> pd.DataFrame:
         """
         Returns a pd.DataFrame of train and test scores of all metrics provided
 
@@ -278,7 +280,13 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         )
         return score.T
 
-    def _score(self, y: pd.DataFrame, y_pred: pd.DataFrame, metrics: Dict = None, type: str = "Test score") -> pd.DataFrame:
+    def _score(
+        self,
+        y: pd.DataFrame,
+        y_pred: pd.DataFrame,
+        metrics: Dict = None,
+        type: str = "Test score",
+    ) -> pd.DataFrame:
         """
         Helper function to calculate train or test score
 

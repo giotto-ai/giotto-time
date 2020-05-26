@@ -219,7 +219,9 @@ class TestTimeSeriesForecastingModel:
         )
     )
     @pytest.mark.parametrize("metrics", [{"RMSE": rmse, "MAE": mae}])
-    def test_score_custom(self, time_series, time_series_forecasting_model1_cache, metrics):
+    def test_score_custom(
+        self, time_series, time_series_forecasting_model1_cache, metrics
+    ):
         time_series_forecasting_model1_cache.fit(time_series)
         score = time_series_forecasting_model1_cache.score(metrics=metrics)
         assert score.shape == (2, 2)
