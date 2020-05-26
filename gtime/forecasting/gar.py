@@ -98,7 +98,7 @@ class GAR(MultiOutputRegressor, _ExplanationsMixin):
         estimator = initialize_estimator(estimator, explainer_type)
         super().__init__(estimator, n_jobs)
 
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame, sample_weight=None):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame, sample_weight=None, **kwargs):
         """Fit the model.
 
         Train the models, one for each target variable in y.
@@ -119,7 +119,7 @@ class GAR(MultiOutputRegressor, _ExplanationsMixin):
         self.y_columns_ = y.columns
         return super().fit(X, y)
 
-    def predict(self, X: pd.DataFrame) -> pd.DataFrame:
+    def predict(self, X: pd.DataFrame, **kwargs) -> pd.DataFrame:
         """For each row in ``X``, make a prediction for each fitted model, from 1 to
         ``horizon``.
 
@@ -191,7 +191,7 @@ class GARFF(RegressorChain, _ExplanationsMixin):
             base_estimator=estimator, order=None, cv=None, random_state=None
         )
 
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame):
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame, **kwargs):
         """Fit the models, one for each time step. Each model is trained on the initial
         set of features and on the true values of the previous steps.
 
@@ -213,7 +213,7 @@ class GARFF(RegressorChain, _ExplanationsMixin):
         self.target_to_features_dict_ = self._compute_target_to_features_dict(X.columns, y.columns)
         return super().fit(X, y)
 
-    def predict(self, X: pd.DataFrame) -> pd.DataFrame:
+    def predict(self, X: pd.DataFrame, **kwargs) -> pd.DataFrame:
         """For each row in ``X``, make a prediction for each fitted model, from 1 to
         ``horizon``.
 
