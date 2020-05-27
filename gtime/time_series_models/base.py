@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Dict
 
 import pandas as pd
 import numpy as np
@@ -9,6 +9,7 @@ from sklearn.utils.validation import check_is_fitted
 from gtime.compose import FeatureCreation
 from gtime.model_selection import horizon_shift, FeatureSplitter
 from gtime.metrics import rmse
+
 
 class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
     """ Base class for a generic time series forecasting model.
@@ -93,7 +94,12 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
             raise AttributeError("cache_feature must be True to fit only model")
         else:
             check_is_fitted(self)  # only_model works if the model is already fitted
-            X_train, y_train, X_test, y_test = self.X_train_, self.y_train_, self.X_test_, self.y_test_
+            X_train, y_train, X_test, y_test = (
+                self.X_train_,
+                self.y_train_,
+                self.X_test_,
+                self.y_test_,
+            )
 
         self.model_ = self._fit_model(X_train, y_train, **kwargs)
         self.X_test_ = X_test
@@ -121,6 +127,15 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
             return self.model_.predict(X_test, **kwargs)
 
     def set_params(self, **params):
+        """
+        Sets model parameters
+
+        Parameters
+        ----------
+        params: Dict or name=value pair, parameters
+
+
+        """
         if "features" in params:
             self._reset()
         super(TimeSeriesForecastingModel, self).set_params(**params)
@@ -146,11 +161,11 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         feature_y = horizon_shift(X, horizon=self.horizon)
         return feature_X, feature_y
 
-    def _split_train_test(self, X, y):
+    def _split_train_test(self, X: pd.DataFrame, y: pd.DataFrame):
         feature_splitter = FeatureSplitter()
         return feature_splitter.transform(X, y)
 
-    def _fit_model(self, X_train, y_train, **kwargs):
+    def _fit_model(self, X_train: pd.DataFrame, y_train: pd.DataFrame, **kwargs) -> BaseEstimator:
         return self.model.fit(X_train, y_train, **kwargs)
 
     def _reset(self):
@@ -160,8 +175,23 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         for attribute in attributes:
             delattr(self, attribute)
 
-    def score(self, X=None, y=None, metrics=None):
+    def score(
+        self, X: pd.DataFrame = None, y: pd.DataFrame = None, metrics: Dict = None
+    ) -> pd.DataFrame:
+        """
+        Returns a pd.DataFrame of train and test scores of all metrics provided
 
+        Parameters
+        ----------
+        X: pd.DataFrame, test data, if None self.X_test_ is used
+        y: pd.DataFrame, true y values, if None self.y_test_ is used
+        metrics: Dict, a dictionary of metric names and callables, default is ``rmse``
+
+        Returns
+        -------
+        score: pd.DataFrame
+
+        """
         check_is_fitted(self)
         if X is None:
             y_pred_test = self.predict()
@@ -172,13 +202,25 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         y_test = self.y_test_ if y is None else y
 
         if metrics is None:
-            metrics = {'rmse': rmse}
-        score = pd.DataFrame(columns=metrics.keys(), index=['Train score', 'Test score'])
-        score.loc[['Train score'], :] = self._score(self.y_train_, y_pred_train, metrics=metrics, type='Train score')
-        score.loc[['Test score'], :] = self._score(y_test, y_pred_test, metrics=metrics, type='Test score')
+            metrics = {"rmse": rmse}
+        score = pd.DataFrame(
+            columns=metrics.keys(), index=["Train score", "Test score"]
+        )
+        score.loc[["Train score"], :] = self._score(
+            self.y_train_, y_pred_train, metrics=metrics, type="Train score"
+        )
+        score.loc[["Test score"], :] = self._score(
+            y_test, y_pred_test, metrics=metrics, type="Test score"
+        )
         return score.T
 
-    def _score(self, y, y_pred, metrics=None, type='Test'):
+    def _score(
+        self,
+        y: pd.DataFrame,
+        y_pred: pd.DataFrame,
+        metrics: Dict = None,
+        type: str = "Test score",
+    ) -> pd.DataFrame:
         score = pd.DataFrame(columns=metrics.keys(), index=[type])
         for name, metric in metrics.items():
             scores = []
@@ -191,5 +233,13 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
             score[name] = np.mean(scores)
         return score
 
-    def set_model(self, model):
+    def set_model(self, model: BaseEstimator):
+        """
+        Changes the model in the pipeline
+
+        Parameters
+        ----------
+        model: BaseEstimator, should be compatible with the features
+
+        """
         self.model = model
