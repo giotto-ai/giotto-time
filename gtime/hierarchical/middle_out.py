@@ -39,7 +39,6 @@ class HierarchicalMiddleOut(HierarchicalTopDown):
        >>> from gtime.hierarchical import HierarchicalMiddleOut
        >>>
        >>> testing.N, testing.K = 20, 1
-       >>>
        >>> data1 = testing.makeTimeDataFrame(freq="s")
        >>> data2 = testing.makeTimeDataFrame(freq="s")
        >>> data3 = testing.makeTimeDataFrame(freq="s")
