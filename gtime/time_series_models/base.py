@@ -158,7 +158,7 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         self.feature_creation_ = FeatureCreation(self.features)
         feature_X = self.feature_creation_.fit_transform(X, y)
 
-        feature_y = horizon_shift(X, horizon=self.horizon)
+        feature_y = horizon_shift(X.iloc[:, :1], horizon=self.horizon)
         return feature_X, feature_y
 
     def _split_train_test(self, X: pd.DataFrame, y: pd.DataFrame):
