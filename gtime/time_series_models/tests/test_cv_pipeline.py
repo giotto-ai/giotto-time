@@ -134,18 +134,33 @@ class TestCVPipeline:
     )
     @pytest.mark.parametrize("metrics", [{"RMSE": rmse, "MAE": mae}])
     @pytest.mark.parametrize("n_splits", [5])
-    @pytest.mark.parametrize("fit_all", ["all", "best"])
-    def test_model_assembly(self, models, n_splits, metrics, fit_all):
+    def test_model_assembly(self, models, n_splits, metrics):
         cv_pipeline = CVPipeline(models_sets=models, n_splits=n_splits, metrics=metrics)
         idx = pd.period_range(start="2011-01-01", end="2012-01-01")
         df = pd.DataFrame(
             np.random.standard_normal((len(idx), 1)), index=idx, columns=["1"]
         )
-        cv_pipeline.fit(df, refit=fit_all)
+        cv_pipeline.fit(df)
         assert cv_pipeline.cv_results_.shape == (
             len(cv_pipeline.model_list) * len(metrics),
             4,
         )
+        y_pred = cv_pipeline.predict()
+        horizon = cv_pipeline.best_model_.horizon
+        assert y_pred.shape == (horizon, horizon)
+
+    @pytest.mark.parametrize(
+        "models", [{Naive: {"horizon": [3]}, AR: {"horizon": [3], "p": [2, 3]}}]
+    )
+    @pytest.mark.parametrize("refit", ["all", "best", ["Naive: {'horizon': 3}"]])
+    def test_models_refit(self, models, refit):
+        cv_pipeline = CVPipeline(models_sets=models)
+        idx = pd.period_range(start="2011-01-01", end="2012-01-01")
+        df = pd.DataFrame(
+            np.random.standard_normal((len(idx), 1)), index=idx, columns=["1"]
+        )
+        cv_pipeline.fit(df, refit=refit)
+        assert cv_pipeline.cv_results_.shape == (len(cv_pipeline.model_list), 4,)
         y_pred = cv_pipeline.predict()
         horizon = cv_pipeline.best_model_.horizon
         assert y_pred.shape == (horizon, horizon)

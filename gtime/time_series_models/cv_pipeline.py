@@ -81,7 +81,7 @@ class CVPipeline(BaseEstimator, RegressorMixin):
                 model_index = model.__name__ + ": " + str(params)
                 model_list[model_index] = model(**params)
         self.model_list = model_list
-        self.metrics = mse if metrics is None else metrics
+        self.metrics = {"MSE": mse} if metrics is None else metrics
         self.selection = self._default_selection if selection is None else selection
         self.cv = blocking_time_series_split if blocking else time_series_split
         self.n_splits = n_splits
@@ -100,8 +100,6 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         best_model_index: str, model index
 
         """
-        if len(results) == 0:
-            return None
         first_metric = results["Metric"].iloc[0]
         scores = results[results["Metric"] == first_metric]["Test score"]
         best_model_index = scores.idxmin()
@@ -126,11 +124,10 @@ class CVPipeline(BaseEstimator, RegressorMixin):
                 & (model.horizon == target.horizon)
             ):
                 return idx
-        return None
 
     def _fit_one_model(
         self,
-        model: BaseEstimator,
+        model: TimeSeriesForecastingModel,
         X_split: pd.DataFrame,
         results: pd.DataFrame,
         only_model: bool = False,
@@ -154,7 +151,7 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         model.cache_features = True
         model.fit(X_split, only_model=only_model)
         scores = model.score(metrics=self.metrics)
-        results.loc[model_index, ["Train score", "Test score"]] = scores.values
+        results.loc[[model_index], ["Train score", "Test score"]] = scores.values
         fit_time = time() - start_time
         results.loc[model_index, "Fit time"] = fit_time
         return results
@@ -195,7 +192,10 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         return results
 
     def _fit_other_models(
-        self, model: BaseEstimator, X_split: pd.DataFrame, results: pd.DataFrame
+        self,
+        model: TimeSeriesForecastingModel,
+        X_split: pd.DataFrame,
+        results: pd.DataFrame,
     ) -> pd.DataFrame:
         """
         Fit and score for a model with pre-defined features to a split.

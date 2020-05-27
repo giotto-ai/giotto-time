@@ -237,3 +237,16 @@ class TestTimeSeriesForecastingModel:
         score = time_series_forecasting_model1_cache.score()
         assert score.shape == (1, 2)
         assert all(map(lambda x: x >= 0.0, score.iloc[0]))
+
+    @given(
+        time_series=giotto_time_series(
+            allow_infinity=False, allow_nan=False, min_length=5
+        )
+    )
+    def test_score_y_test(self, time_series, time_series_forecasting_model1_cache):
+        time_series_forecasting_model1_cache.fit(time_series)
+        len_test = time_series_forecasting_model1_cache.horizon + 2
+        X_test = time_series.iloc[-len_test:]
+        score = time_series_forecasting_model1_cache.score(X=X_test)
+        assert score.shape == (1, 2)
+        assert all(map(lambda x: x >= 0.0, score.iloc[0]))
