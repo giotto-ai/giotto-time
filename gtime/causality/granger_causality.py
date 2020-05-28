@@ -265,20 +265,23 @@ class GrangerCausality(BaseEstimator):
 
         linreg_single = LinearRegression()
         linreg_joint = LinearRegression()
-        y_pred_single = linreg_single.fit(
-            data_single, data[self.x_col].loc[data_single.index]
-        ).predict(data_single)
-        y_pred_joint = linreg_joint.fit(
-            data_joint, data[self.x_col].loc[data_joint.index]
-        ).predict(data_joint)
+        linreg_single.fit(data_single, data[self.x_col].loc[data_single.index])
+        linreg_joint.fit(data_joint, data[self.x_col].loc[data_joint.index])
+        if "likelihood_chi2" in self.statistics or "zero_f" in self.statistics:
+            y_pred_single = linreg_single.predict(data_single)
+            y_pred_joint = linreg_joint.predict(data_joint)
+        else:
+            y_pred_single = None
+            y_pred_joint = None
 
-        dof_single = float(data_single.shape[0] - data_single.shape[1])
+        # dof_single = float(data_single.shape[0] - data_single.shape[1])
         dof_joint = float(data_joint.shape[0] - data_joint.shape[1]) - 1
 
         linreg_single_residues = linreg_single._residues
         linreg_joint_residues = linreg_joint._residues
 
         self.results_ = []
+
         stat_test_input = {
             "linreg_single_residues": linreg_single_residues,
             "linreg_joint_residues": linreg_joint_residues,
