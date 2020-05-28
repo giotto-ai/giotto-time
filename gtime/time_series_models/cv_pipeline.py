@@ -318,7 +318,7 @@ CVSplitter = Union[Callable, KFold]
 
 
 class CrossValidationModel(TimeSeriesForecastingModel):
-    results_index_names = ['Model', 'Regressor', 'Metric']
+    results_index_names = ["Model", "Regressor", "Metric"]
 
     def __init__(
         self, time_series_models: Dict, cv: CVSplitter = None, metrics: Dict = None,
@@ -332,50 +332,66 @@ class CrossValidationModel(TimeSeriesForecastingModel):
         results = []
         for model_name, model_params in self.time_series_models.items():
             self._check_and_set_model_params(model_params)
-            (
-                X_all_train,
-                y_all_train,
-                X_test,
-                y_test,
-            ) = self._compute_train_test_matrices(X, y)
-
-            model_results = []
-            for i, (train_index, validation_index) in enumerate(
-                self.cv.split(X_all_train)
-            ):
-                split_results = []
-                X_train, y_train = (
-                    X_all_train.iloc[train_index, :],
-                    y_all_train.iloc[train_index, :],
-                )
-                X_validation, y_validation = (
-                    X_all_train.iloc[validation_index, :],
-                    y_all_train.iloc[validation_index, :],
-                )
-
-                for forecaster_name, forecaster in model_params["models"].items():
-                    forecaster.fit(X_train, y_train)
-                    y_predictions = forecaster.predict(X_validation)
-
-                    for metric_name, metric in self.metrics.items():
-                        error = metric(y_validation, y_predictions)
-                        if isinstance(error, np.ndarray):
-                            error = np.mean(error)
-                        split_results.append(
-                            self._result_row(
-                                error=error,
-                                model_name=model_name,
-                                forecaster_name=forecaster_name,
-                                metric_name=metric_name,
-                                split_num=i,
-                            )
-                        )
-                model_results.append(pd.concat(split_results))
-            results.append(pd.concat(model_results, axis=1))
+            model_results = self._cross_validate_time_series_model(
+                X, y, model_params, model_name
+            )
+            results.append(model_results)
         self.results_ = pd.concat(results)
 
-    def predict(self, X: pd.DataFrame):
-        pass
+    def _cross_validate_time_series_model(
+        self, X: pd.DataFrame, y: pd.DataFrame, model_params: Dict, model_name: str
+    ) -> pd.DataFrame:
+        model_results = []
+
+        X, y, X_test, y_test = self._compute_train_test_matrices(X, y)
+        for i, (train_index, validation_index) in enumerate(self.cv.split(X)):
+            X_train, y_train = X.iloc[train_index, :], y.iloc[train_index, :]
+            X_validation, y_validation = (
+                X.iloc[validation_index, :],
+                y.iloc[validation_index, :],
+            )
+            split_results = self._cross_validate_forecasters_on(
+                X_train=X_train,
+                y_train=y_train,
+                X_validation=X_validation,
+                y_validation=y_validation,
+                model_params=model_params,
+                model_name=model_name,
+                split_num=i,
+            )
+
+            model_results.append(split_results)
+        return pd.concat(model_results, axis=1)
+
+    def _cross_validate_forecasters_on(
+        self,
+        X_train: pd.DataFrame,
+        y_train: pd.DataFrame,
+        X_validation: pd.DataFrame,
+        y_validation: pd.DataFrame,
+        model_params: Dict,
+        model_name: str,
+        split_num: int,
+    ) -> pd.DataFrame:
+        split_results = []
+        for forecaster_name, forecaster in model_params["models"].items():
+            forecaster.fit(X_train, y_train)
+            y_predictions = forecaster.predict(X_validation)
+
+            for metric_name, metric in self.metrics.items():
+                error = metric(y_validation, y_predictions)
+                if isinstance(error, np.ndarray):
+                    error = np.mean(error)
+                split_results.append(
+                    self._result_row(
+                        error=error,
+                        model_name=model_name,
+                        forecaster_name=forecaster_name,
+                        metric_name=metric_name,
+                        split_num=split_num,
+                    )
+                )
+        return pd.concat(split_results)
 
     def _check_and_set_model_params(self, model_params: Dict[str, Any]):
         if "features" not in model_params:
@@ -398,3 +414,6 @@ class CrossValidationModel(TimeSeriesForecastingModel):
         index = pd.MultiIndex.from_tuples([(model_name, forecaster_name, metric_name)])
         index.names = self.results_index_names
         return pd.DataFrame(index=index, data={f"Split {split_num}": [error]})
+
+    def predict(self, X: pd.DataFrame = None, **kwargs):
+        pass
