@@ -67,7 +67,13 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         self.model = model
         self.cache_features = cache_features
 
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame = None, only_model: bool = False, **kwargs):
+    def fit(
+        self,
+        X: pd.DataFrame,
+        y: pd.DataFrame = None,
+        only_model: bool = False,
+        **kwargs
+    ):
         """ Fit function for a time series forecasting model.
 
         It does the following:
@@ -165,7 +171,9 @@ class TimeSeriesForecastingModel(BaseEstimator, RegressorMixin):
         feature_splitter = FeatureSplitter()
         return feature_splitter.transform(X, y)
 
-    def _fit_model(self, X_train: pd.DataFrame, y_train: pd.DataFrame, **kwargs) -> BaseEstimator:
+    def _fit_model(
+        self, X_train: pd.DataFrame, y_train: pd.DataFrame, **kwargs
+    ) -> BaseEstimator:
         return self.model.fit(X_train, y_train, **kwargs)
 
     def _reset(self):

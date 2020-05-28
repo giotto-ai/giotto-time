@@ -84,9 +84,7 @@ class TestMultiFeatureMultiOutputRegressor:
             estimator, target_to_features_dict=target_to_features_dict
         )
         with pytest.raises(ValueError):
-            multi_feature_multi_output_regressor.fit(
-                X, y
-            )
+            multi_feature_multi_output_regressor.fit(X, y)
 
     @given(
         X_y=numpy_X_y_matrices(
@@ -129,15 +127,17 @@ class TestMultiFeatureMultiOutputRegressor:
     def test_fit_target_to_features_dict_working(self, data, X_y, estimator):
         X, y = X_y
         target_to_features_dict = data.draw(
-            numeric_target_to_features_dicts(n_targets=y.shape[1], n_features=X.shape[1])
+            numeric_target_to_features_dicts(
+                n_targets=y.shape[1], n_features=X.shape[1]
+            )
         )
         multi_feature_multi_output_regressor = MultiFeatureMultiOutputRegressor(
             estimator
         )
-        multi_feature_multi_output_regressor.target_to_features_dict = target_to_features_dict
-        multi_feature_multi_output_regressor.fit(
-            X, y
+        multi_feature_multi_output_regressor.target_to_features_dict = (
+            target_to_features_dict
         )
+        multi_feature_multi_output_regressor.fit(X, y)
 
     @given(
         data=data(),
@@ -150,14 +150,14 @@ class TestMultiFeatureMultiOutputRegressor:
     def test_fit_target_to_features_dict_consistent(self, data, X_y, estimator):
         X, y = X_y
         target_to_features_dict = data.draw(
-            numeric_target_to_features_dicts(n_targets=y.shape[1], n_features=X.shape[1])
+            numeric_target_to_features_dicts(
+                n_targets=y.shape[1], n_features=X.shape[1]
+            )
         )
         multi_feature_multi_output_regressor = MultiFeatureMultiOutputRegressor(
             estimator, target_to_features_dict=target_to_features_dict
         )
-        multi_feature_multi_output_regressor.fit(
-            X, y
-        )
+        multi_feature_multi_output_regressor.fit(X, y)
         for i, estimator_ in enumerate(
             multi_feature_multi_output_regressor.estimators_
         ):
@@ -175,15 +175,17 @@ class TestMultiFeatureMultiOutputRegressor:
     def test_predict_target_to_features_dict(self, data, X_y, estimator):
         X, y = X_y
         target_to_features_dict = data.draw(
-            numeric_target_to_features_dicts(n_targets=y.shape[1], n_features=X.shape[1])
+            numeric_target_to_features_dicts(
+                n_targets=y.shape[1], n_features=X.shape[1]
+            )
         )
         multi_feature_multi_output_regressor = MultiFeatureMultiOutputRegressor(
             estimator
         )
-        multi_feature_multi_output_regressor.target_to_features_dict = target_to_features_dict
-        multi_feature_multi_output_regressor.fit(
-            X, y
+        multi_feature_multi_output_regressor.target_to_features_dict = (
+            target_to_features_dict
         )
+        multi_feature_multi_output_regressor.fit(X, y)
         X_predict = data.draw(numpy_X_matrices([100, X.shape[1]]))
         multi_feature_multi_output_regressor.predict(X_predict)
 
@@ -200,14 +202,14 @@ class TestMultiFeatureMultiOutputRegressor:
     ):
         X, y = X_y
         target_to_features_dict = data.draw(
-            numeric_target_to_features_dicts(n_targets=y.shape[1], n_features=X.shape[1])
+            numeric_target_to_features_dicts(
+                n_targets=y.shape[1], n_features=X.shape[1]
+            )
         )
         multi_feature_multi_output_regressor = MultiFeatureMultiOutputRegressor(
             estimator, target_to_features_dict=target_to_features_dict
         )
-        multi_feature_multi_output_regressor.fit(
-            X, y
-        )
+        multi_feature_multi_output_regressor.fit(X, y)
         X_predict = data.draw(numpy_X_matrices([100, 30]))
         with pytest.raises(ValueError):
             multi_feature_multi_output_regressor.predict(X_predict)
