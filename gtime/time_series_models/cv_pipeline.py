@@ -1,8 +1,9 @@
-from typing import Dict, Callable, Union, List
+from typing import Dict, Callable, Union, List, Any
 
+import numpy as np
 import pandas as pd
 from time import time
-from sklearn.model_selection import ParameterGrid
+from sklearn.model_selection import ParameterGrid, KFold
 from gtime.time_series_models import TimeSeriesForecastingModel
 from sklearn.base import BaseEstimator, RegressorMixin
 from gtime.metrics import mse
@@ -302,3 +303,98 @@ class CVPipeline(BaseEstimator, RegressorMixin):
         """
         check_is_fitted(self)
         return self.best_model_.predict(X)
+
+
+CVSplitter = Union[Callable, KFold]
+
+
+# {
+#     'AR': {
+#         'features': [('s1', Shift(1), ['NumOfContainers']), ('s2', Shift(2), ['NumOfContainers'])],
+#         'models': [GAR(LinearRegression()), MultiFeatureGAR(RandomForest()), ...],
+#         'horizon': 12
+#     }
+# }
+
+
+class CrossValidationModel(TimeSeriesForecastingModel):
+    results_index_names = ['Model', 'Regressor', 'Metric']
+
+    def __init__(
+        self, time_series_models: Dict, cv: CVSplitter = None, metrics: Dict = None,
+    ):
+        super().__init__(features=None, horizon=None, model=None, cache_features=False)
+        self.time_series_models = time_series_models
+        self.cv = cv
+        self.metrics = metrics
+
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame = None, **kwargs):
+        results = []
+        for model_name, model_params in self.time_series_models.items():
+            self._check_and_set_model_params(model_params)
+            (
+                X_all_train,
+                y_all_train,
+                X_test,
+                y_test,
+            ) = self._compute_train_test_matrices(X, y)
+
+            model_results = []
+            for i, (train_index, validation_index) in enumerate(
+                self.cv.split(X_all_train)
+            ):
+                split_results = []
+                X_train, y_train = (
+                    X_all_train.iloc[train_index, :],
+                    y_all_train.iloc[train_index, :],
+                )
+                X_validation, y_validation = (
+                    X_all_train.iloc[validation_index, :],
+                    y_all_train.iloc[validation_index, :],
+                )
+
+                for forecaster_name, forecaster in model_params["models"].items():
+                    forecaster.fit(X_train, y_train)
+                    y_predictions = forecaster.predict(X_validation)
+
+                    for metric_name, metric in self.metrics.items():
+                        error = metric(y_validation, y_predictions)
+                        if isinstance(error, np.ndarray):
+                            error = np.mean(error)
+                        split_results.append(
+                            self._result_row(
+                                error=error,
+                                model_name=model_name,
+                                forecaster_name=forecaster_name,
+                                metric_name=metric_name,
+                                split_num=i,
+                            )
+                        )
+                model_results.append(pd.concat(split_results))
+            results.append(pd.concat(model_results, axis=1))
+        self.results_ = pd.concat(results)
+
+    def predict(self, X: pd.DataFrame):
+        pass
+
+    def _check_and_set_model_params(self, model_params: Dict[str, Any]):
+        if "features" not in model_params:
+            raise KeyError("features must be a key of model_params")
+        if "horizon" not in model_params:
+            raise KeyError("horizon must be a key of model_params")
+        if "models" not in model_params:
+            raise KeyError("models must be a key of model_params")
+        self.features = model_params["features"]
+        self.horizon = model_params["horizon"]
+
+    def _result_row(
+        self,
+        error: float,
+        model_name: str,
+        forecaster_name: str,
+        metric_name: str,
+        split_num: int,
+    ):
+        index = pd.MultiIndex.from_tuples([(model_name, forecaster_name, metric_name)])
+        index.names = self.results_index_names
+        return pd.DataFrame(index=index, data={f"Split {split_num}": [error]})
