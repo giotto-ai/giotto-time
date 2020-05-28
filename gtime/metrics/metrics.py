@@ -81,12 +81,14 @@ def smape(
     smape = (2 / len(y_pred)) * non_normalized_smape_filled
     return smape
 
+
 def non_zero_smape(
         y_true: Union[pd.DataFrame, List, np.ndarray],
         y_pred: Union[pd.DataFrame, List, np.ndarray],
+        raise_error: bool = False
 ) -> float:
     """Compute the 'Symmetric Mean Absolute Percentage Error' (SMAPE) between two
-    vectors. Documentation
+    vectors without considering the 0 in the true values. Documentation
     `here <https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error>_`.
 
     Parameters
@@ -104,19 +106,23 @@ def non_zero_smape(
 
     Examples
     --------
-    >>> from gtime.metrics import smape
+    >>> from gtime.metrics import non_zero_smape
     >>> y_true = [0, 1, 2, 3, 4, 5]
     >>> y_pred = [1.1, 2.3, 0.4, 3.9, 3.1, 4.6]
-    >>> smape(y_true, y_pred)
+    >>> non_zero_smape(y_true, y_pred)
     0.7864893577539014
 
     """
     y_true, y_pred = _convert_to_ndarray(y_true, y_pred)
     _check_input(y_true, y_pred)
+
     y_pred = y_pred[y_true != 0]
     y_true = y_true[y_true != 0]
     if len(y_pred) == 0:
-        return 3
+        if raise_error:
+            raise ValueError('y_true is only compose by 0')
+        else:
+            return np.NaN
 
     non_normalized_smape = sum(
         np.abs(y_pred - y_true) / (np.abs(y_pred) + np.abs(y_true))
