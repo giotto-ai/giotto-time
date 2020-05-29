@@ -321,7 +321,7 @@ class CrossValidationModel(TimeSeriesForecastingModel):
     results_index_names = ["Model", "Regressor", "Metric"]
 
     def __init__(
-        self, time_series_models: Dict, cv: CVSplitter = None, metrics: Dict = None,
+        self, time_series_models: Dict, cv: CVSplitter = None, metrics: Dict = None
     ):
         super().__init__(features=None, horizon=None, model=None, cache_features=False)
         self.time_series_models = time_series_models
@@ -329,6 +329,7 @@ class CrossValidationModel(TimeSeriesForecastingModel):
         self.metrics = metrics
 
     def fit(self, X: pd.DataFrame, y: pd.DataFrame = None, **kwargs):
+        self.best_models_ = {}
         results = []
         for model_name, model_params in self.time_series_models.items():
             self._check_and_set_model_params(model_params)
@@ -337,6 +338,7 @@ class CrossValidationModel(TimeSeriesForecastingModel):
             )
             results.append(model_results)
         self.results_ = pd.concat(results)
+        return self
 
     def _cross_validate_time_series_model(
         self, X: pd.DataFrame, y: pd.DataFrame, model_params: Dict, model_name: str
@@ -361,7 +363,18 @@ class CrossValidationModel(TimeSeriesForecastingModel):
             )
 
             model_results.append(split_results)
-        return pd.concat(model_results, axis=1)
+        model_results = pd.concat(model_results, axis=1)
+        self._refit_best_models(model_results=model_results, model_params=model_params, X=X, y=y, model_name=model_name)
+        return model_results
+
+    def _refit_best_models(self, model_results: pd.DataFrame, model_params: Dict, X: pd.DataFrame, y: pd.DataFrame, model_name: str):
+        best_models = {}
+        for metric in self.metrics:
+            metric_results = model_results.xs(metric, level=-1)
+            best_index = metric_results.mean(axis=1).argmin()
+            best_model = model_params['models'][model_results.index[best_index][1]]
+            best_models[metric] = best_model.fit(X, y)
+        self.best_models_[model_name] = best_models
 
     def _cross_validate_forecasters_on(
         self,
@@ -417,3 +430,4 @@ class CrossValidationModel(TimeSeriesForecastingModel):
 
     def predict(self, X: pd.DataFrame = None, **kwargs):
         pass
+
