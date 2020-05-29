@@ -121,11 +121,14 @@ class HierarchicalBottomUp(HierarchicalNaive):
         return bottom_up_dictionary
 
     def _bottom_up_addiction_to_dictionary(self, key, dict_bottom_up, timeseries=None):
-        if self._is_a_leaf(key) and key not in dict_bottom_up.keys():
+        if self._is_a_leaf(key) and key not in dict_bottom_up:
             dict_bottom_up[key] = self.models_[key].predict(timeseries)
+        elif key in dict_bottom_up:
+            pass
         elif not self._is_a_leaf(key):
             self._check_predict_children_computed(dict_bottom_up, key, timeseries)
             self._sum_children_prediction(key, dict_bottom_up)
+
 
     def _is_a_leaf(self, key) -> bool:
         if self.hierarchy_tree.out_degree[key] == 0:
@@ -142,7 +145,7 @@ class HierarchicalBottomUp(HierarchicalNaive):
 
     def _check_predict_children_computed(self, dict_bottom_up, tested_key, timeseries=None):
         for child in list(self.hierarchy_tree[tested_key]):
-            if child not in dict_bottom_up:  # If child model not computed yet
+            if child not in dict_bottom_up.keys():  # If child model not computed yet
                 if self._is_a_leaf(child):
                     dict_bottom_up[child] = self.models_[child].predict(timeseries)
                 else:
@@ -152,7 +155,26 @@ class HierarchicalBottomUp(HierarchicalNaive):
 
     def _predict_new_time_series(self, X: pd.DataFrame) -> Dict[str, pd.DataFrame]:
         new_time_series_dictionary = {}
-        for key, time_series in X.items():
-            self._bottom_up_addiction_to_dictionary(key, new_time_series_dictionary, time_series)
+        for key in X.keys():
+            self._bottom_up_addiction_to_dictionary_new_timeseries(key, new_time_series_dictionary, X)
         return new_time_series_dictionary
+
+    def _bottom_up_addiction_to_dictionary_new_timeseries(self, key, dict_bottom_up, X):
+        if self._is_a_leaf(key) and key not in dict_bottom_up:
+            dict_bottom_up[key] = self.models_[key].predict(X[key])
+        elif key in dict_bottom_up:
+            pass
+        elif not self._is_a_leaf(key):
+            self._check_predict_children_computed_new_timeseries(dict_bottom_up, key, X)
+            self._sum_children_prediction(key, dict_bottom_up)
+
+    def _check_predict_children_computed_new_timeseries(self, dict_bottom_up, tested_key, X):
+        for child in list(self.hierarchy_tree[tested_key]):
+            if child not in dict_bottom_up.keys():  # If child model not computed yet
+                if self._is_a_leaf(child):
+                    dict_bottom_up[child] = self.models_[child].predict(X[child])
+                else:
+                    self._check_predict_children_computed_new_timeseries(dict_bottom_up, child, X)
+                    self._sum_children_prediction(child, dict_bottom_up)
+        return
 

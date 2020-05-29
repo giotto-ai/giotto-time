@@ -1,14 +1,14 @@
 from typing import Union, Dict
 import networkx as nx
 import pandas as pd
-from numpy import mean
 from sklearn.base import BaseEstimator
 from gtime.hierarchical import HierarchicalTopDown
+from gtime.hierarchical import HierarchicalBottomUp
 from sklearn.utils.validation import check_is_fitted
 
 
 
-class HierarchicalMiddleOut(HierarchicalTopDown):
+class HierarchicalMiddleOut(HierarchicalTopDown, HierarchicalBottomUp):
     """ Hierarchical model with prediction following the Top-Down procedure.
            It computes the forecast of the root and finds, with different methods the proportion between
            the root model and the children ones. Then it proceed to compute the forecast of these using the
@@ -31,7 +31,7 @@ class HierarchicalMiddleOut(HierarchicalTopDown):
                           of the means in the data provided.
                 -'tdfp':  Iterative method computing the proportions using the forecast of each
                           time series as if it is indipendent.
-           level: Int, optional default = 0
+           level: Int, optional default = 1
     Examples
        --------
        >>> import pandas._testing as testing
@@ -81,7 +81,7 @@ class HierarchicalMiddleOut(HierarchicalTopDown):
                  hierarchy_tree: Union[str, nx.DiGraph] = "infer",
                  root: str = None,
                  method: str = 'tdsga',
-                 level: int = 0):
+                 level: int = 1):
         super().__init__(model=model, hierarchy_tree=hierarchy_tree, root=root, method=method)
         self.level = level
         self.proportions = {}
@@ -103,7 +103,8 @@ class HierarchicalMiddleOut(HierarchicalTopDown):
 
         super().fit(X, y)
         self._find_levels()
-        self._sub_trees_dictionary_construction()
+        if self.level>0:
+            self._sub_trees_dictionary_construction()
         return self
 
     def _find_levels(self):
@@ -162,19 +163,22 @@ class HierarchicalMiddleOut(HierarchicalTopDown):
 
     def _predict_fitted_time_series(self) -> Dict[str, pd.DataFrame]:
         prediction_dictionary = {}
-        self._predict_fitted_time_series_top_down(prediction_dictionary)
-        self._predict_fitted_time_series_bottom_up(prediction_dictionary)
+        if self.level == 0:
+            prediction_dictionary = super()._predict_fitted_time_series()
+        elif self.level == max(list(self.level_nodes.keys())):
+            prediction_dictionary = HierarchicalBottomUp._predict_fitted_time_series(self)
+        else:
+            self._predict_time_series_top_down(prediction_dictionary)
+            self._predict_fitted_time_series_bottom_up(prediction_dictionary)
         return prediction_dictionary
 
-    def _predict_fitted_time_series_top_down(self, dictionary):
+    def _predict_time_series_top_down(self, dictionary, X=None):
         for key in self.level_nodes[self.level]:
             submodel = HierarchicalTopDown(model=self.model, hierarchy_tree=self.sub_trees_dictionary[key],
                                            root=key, method=self.method)
             submodel.models_ = self._extract_fitted_models(key)
             submodel.proportions = self._extract_proportions(key)
-            submodel_prediction = submodel.predict()
-            for submodel_key, prediction in submodel_prediction.items():
-                dictionary.update({submodel_key: prediction})
+            dictionary.update(submodel.predict(X))
         return
 
     def _extract_fitted_models(self, sub_tree_root):
@@ -192,5 +196,24 @@ class HierarchicalMiddleOut(HierarchicalTopDown):
 
     def _predict_fitted_time_series_bottom_up(self, dictionary):
         for key, model in self.models_.items():
-            self._bottom_up_addiction_to_dictionary(key, model, dictionary)
+            self._bottom_up_addiction_to_dictionary(key, dictionary)
         return
+
+    def _predict_new_time_series(self, X: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+        new_time_series_dictionary = {}
+        if self.level == 0:
+            new_time_series_dictionary = HierarchicalTopDown._predict_new_time_series(self, X)
+        elif self.level == max(list(self.level_nodes.keys())):
+            new_time_series_dictionary = HierarchicalBottomUp._predict_new_time_series(self, X)
+        else:
+            self._predict_time_series_top_down(new_time_series_dictionary, X)
+            self._predict_new_time_series_bottom_up(new_time_series_dictionary, X)
+        return new_time_series_dictionary
+
+    def _predict_new_time_series_bottom_up(self, dictionary, X):
+        for key, timeseries in X.items():
+            self._bottom_up_addiction_to_dictionary(key, dictionary, timeseries)
+
+
+
+
