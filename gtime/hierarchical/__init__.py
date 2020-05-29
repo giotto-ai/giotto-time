@@ -13,5 +13,5 @@ __all__ = [
     "HierarchicalNaive",
     "HierarchicalBottomUp",
     "HierarchicalTopDown",
-    "HierarchicalMiddleOut"
+    "HierarchicalMiddleOut",
 ]

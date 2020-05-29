@@ -1,8 +1,9 @@
-from typing import Dict, Callable, Union, List
+from typing import Dict, Callable, Union, List, Any
 
+import numpy as np
 import pandas as pd
 from time import time
-from sklearn.model_selection import ParameterGrid
+from sklearn.model_selection import ParameterGrid, KFold
 from gtime.time_series_models import TimeSeriesForecastingModel
 from sklearn.base import BaseEstimator, RegressorMixin
 from gtime.metrics import mse

@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Dict, List, Optional, Union
 
 import numpy as np
@@ -51,7 +52,9 @@ class _ExplanationsMixin:
             for y_column, columns in X_columns.items():
                 dict_explanations[y_column].columns = columns
         else:
-            raise TypeError(f'X_columns must be a list or a dict. Detected: {type(X_columns)}')
+            raise TypeError(
+                f"X_columns must be a list or a dict. Detected: {type(X_columns)}"
+            )
         return dict_explanations
 
 
@@ -139,7 +142,9 @@ class GAR(MultiOutputRegressor, _ExplanationsMixin):
 
         if self.explainer_type is not None:
             self.explanations_ = self._explanations_as_dataframe(
-                index=y_p_df.index, y_columns=self.y_columns_, X_columns=list(X.columns),
+                index=y_p_df.index,
+                y_columns=self.y_columns_,
+                X_columns=list(X.columns),
             )
         return y_p_df
 
@@ -210,7 +215,9 @@ class GARFF(RegressorChain, _ExplanationsMixin):
 
         """
         self.y_columns_ = y.columns
-        self.target_to_features_dict_ = self._compute_target_to_features_dict(X.columns, y.columns)
+        self.target_to_features_dict_ = self._compute_target_to_features_dict(
+            X.columns, y.columns
+        )
         return super().fit(X, y)
 
     def predict(self, X: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -233,11 +240,15 @@ class GARFF(RegressorChain, _ExplanationsMixin):
 
         if self.explainer_type is not None:
             self.explanations_ = self._explanations_as_dataframe(
-                index=y_p_df.index, y_columns=self.y_columns_, X_columns=self.target_to_features_dict_
+                index=y_p_df.index,
+                y_columns=self.y_columns_,
+                X_columns=self.target_to_features_dict_,
             )
         return y_p_df
 
-    def _compute_target_to_features_dict(self, X_columns: List[str], y_columns: List[str]) -> Dict[str, List[str]]:
+    def _compute_target_to_features_dict(
+        self, X_columns: List[str], y_columns: List[str]
+    ) -> Dict[str, List[str]]:
         X_columns, y_columns = list(X_columns), list(y_columns)
 
         target_to_features_dict = {}
@@ -288,17 +299,17 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor, _ExplanationsMixin):
 
     """
 
-    def __init__(self, estimator: RegressorMixin, explainer_type: str = None):
-        self.explainer_type = explainer_type
-        estimator = initialize_estimator(estimator, explainer_type)
-        super().__init__(estimator)
-
-    def fit(
+    def __init__(
         self,
-        X: pd.DataFrame,
-        y: pd.DataFrame,
+        estimator: RegressorMixin,
+        explainer_type: str = None,
         target_to_features_dict: Dict[str, List[str]] = None,
     ):
+        self.explainer_type = explainer_type
+        estimator = initialize_estimator(estimator, explainer_type)
+        super().__init__(estimator, target_to_features_dict=target_to_features_dict)
+
+    def fit(self, X: pd.DataFrame, y: pd.DataFrame, **kwargs):
         """Fit the model.
 
         Train the models, one for each target variable in y.
@@ -317,12 +328,17 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor, _ExplanationsMixin):
         """
         self.X_columns_ = X.columns
         self.y_columns_ = y.columns
-        self.target_to_features_dict_ = target_to_features_dict
-        if target_to_features_dict is not None:
-            target_to_features_dict = self._feature_name_to_index(
-                target_to_features_dict, X.columns, y.columns
+        if self.target_to_features_dict is not None:
+            numeric_target_to_features_dict = self._feature_name_to_index(
+                self.target_to_features_dict, X.columns, y.columns
             )
-        return super().fit(X.values, y.values, target_to_features_dict)
+            return super().fit(
+                X.values,
+                y.values,
+                target_to_features_dict=numeric_target_to_features_dict,
+            )
+        else:
+            return super().fit(X.values, y.values)
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         """For each row in ``X``, make a prediction for each fitted model, from 1 to
@@ -345,10 +361,18 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor, _ExplanationsMixin):
         y_p_df = pd.DataFrame(data=y_p, columns=self.y_columns_, index=X.index)
 
         if self.explainer_type is not None:
-            X_columns = list(X.columns) if self.target_to_features_dict_ is None else self.target_to_features_dict_
-            self.explanations_ = self._explanations_as_dataframe(
-                index=y_p_df.index, y_columns=self.y_columns_, X_columns=X_columns
-            )
+            if self.target_to_features_dict_ is None:
+                self.explanations_ = self._explanations_as_dataframe(
+                    index=y_p_df.index,
+                    y_columns=self.y_columns_,
+                    X_columns=list(X.columns),
+                )
+            else:
+                self.explanations_ = self._explanations_as_dataframe(
+                    index=y_p_df.index,
+                    y_columns=self.y_columns_,
+                    X_columns=self.target_to_features_dict,
+                )
         return y_p_df
 
     @staticmethod

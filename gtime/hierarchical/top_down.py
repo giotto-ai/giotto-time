@@ -7,7 +7,6 @@ from gtime.hierarchical import HierarchicalBottomUp
 from sklearn.utils.validation import check_is_fitted
 
 
-
 class HierarchicalTopDown(HierarchicalBottomUp):
     """ Hierarchical model with prediction following the Top-Down procedure.
        It computes the forecast of the root and finds, with different methods the proportion between
@@ -63,10 +62,14 @@ class HierarchicalTopDown(HierarchicalBottomUp):
     2000-01-01 00:00:18  0.004552 -0.127764 -0.078228
     2000-01-01 00:00:19 -0.005122 -0.016190 -0.047581
        """
-    def __init__(self, model: BaseEstimator,
-                 hierarchy_tree: Union[str, nx.DiGraph] = "infer",
-                 root: str = None,
-                 method: str = 'tdsga'):
+
+    def __init__(
+        self,
+        model: BaseEstimator,
+        hierarchy_tree: Union[str, nx.DiGraph] = "infer",
+        root: str = None,
+        method: str = "tdsga",
+    ):
         super().__init__(model=model, hierarchy_tree=hierarchy_tree)
         self.root = root
         self.method = method
@@ -88,18 +91,18 @@ class HierarchicalTopDown(HierarchicalBottomUp):
         """
         self._check_is_dict_of_dataframes_with_str_key(X)
         if self.root is None:
-            if self.hierarchy_tree == 'infer':
+            if self.hierarchy_tree == "infer":
                 self.root = list(X.keys())[0]
             else:
                 self.root = self._extract_root_from_hierarchy_tree()
-        if self.hierarchy_tree == 'infer':
+        if self.hierarchy_tree == "infer":
             self._infer_hierarchy_tree(X)
         self._initialize_models(X)
         for key, time_series in X.items():
             self.models_[key].fit(time_series)
-        if self.method == 'tdsga':
+        if self.method == "tdsga":
             self._compute_proportions_sga_method(X)
-        elif self.method == 'tdsgf':
+        elif self.method == "tdsgf":
             self._compute_proportions_sgf_method(X)
         return self
 
@@ -129,7 +132,7 @@ class HierarchicalTopDown(HierarchicalBottomUp):
     def _compute_children_proportions_sgf_method(self, parent, X):
         for child in self.hierarchy_tree[parent]:
             try:
-                self.proportions[child] = (mean(X[child])/mean(X[parent])).values[0]
+                self.proportions[child] = (mean(X[child]) / mean(X[parent])).values[0]
             except ZeroDivisionError:
                 self.proportions[child] = 0
             if not self._is_a_leaf(child):
@@ -156,7 +159,7 @@ class HierarchicalTopDown(HierarchicalBottomUp):
 
     def _predict_fitted_time_series(self) -> Dict[str, pd.DataFrame]:
         top_down_dictionary = {}
-        if self.method == 'tdfp':
+        if self.method == "tdfp":
             self._predict_fitted_time_series_fp(top_down_dictionary)
         else:
             top_down_dictionary.update({self.root: self.models_[self.root].predict()})
@@ -165,48 +168,82 @@ class HierarchicalTopDown(HierarchicalBottomUp):
 
     def _top_down_children_predict_computation(self, top_down_dictionary, parent_key):
         for child in list(self.hierarchy_tree[parent_key]):
-            top_down_dictionary[child] = top_down_dictionary[parent_key] * self.proportions[child]
+            top_down_dictionary[child] = (
+                top_down_dictionary[parent_key] * self.proportions[child]
+            )
             if not self._is_a_leaf(child):
                 self._top_down_children_predict_computation(top_down_dictionary, child)
 
-    def _predict_fitted_time_series_fp(self, top_down_dictionary) -> Dict[str, pd.DataFrame]:
-        basic_predictions = {key: model.predict() for key, model in self.models_.items()}
-        self.proportions[self.root] = pd.Series([1.0 for i in range(self.model.horizon)], index=basic_predictions[self.root].columns)
+    def _predict_fitted_time_series_fp(
+        self, top_down_dictionary
+    ) -> Dict[str, pd.DataFrame]:
+        basic_predictions = {
+            key: model.predict() for key, model in self.models_.items()
+        }
+        self.proportions[self.root] = pd.Series(
+            [1.0 for i in range(self.model.horizon)],
+            index=basic_predictions[self.root].columns,
+        )
         self._compute_children_proportions_fp_method(basic_predictions, self.root)
-        self._top_down_fp_children_predict_computation(top_down_dictionary, basic_predictions)
+        self._top_down_fp_children_predict_computation(
+            top_down_dictionary, basic_predictions
+        )
         return top_down_dictionary
 
     def _compute_children_proportions_fp_method(self, prediction, parent_key):
         for child in self.hierarchy_tree[parent_key]:
-            self.proportions[child] = self.proportions[parent_key] * self._compute_parent_child_proportion_fp_method(parent_key, child, prediction)
+            self.proportions[child] = self.proportions[
+                parent_key
+            ] * self._compute_parent_child_proportion_fp_method(
+                parent_key, child, prediction
+            )
             if not self._is_a_leaf(child):
                 self._compute_children_proportions_fp_method(prediction, child)
 
-    def _compute_parent_child_proportion_fp_method(self, parent_key, child_key, base_predictions):
+    def _compute_parent_child_proportion_fp_method(
+        self, parent_key, child_key, base_predictions
+    ):
         try:
-            return (mean(base_predictions[child_key])/mean(base_predictions[parent_key])).values
+            return (
+                mean(base_predictions[child_key]) / mean(base_predictions[parent_key])
+            ).values
         except ZeroDivisionError:
             return 0
 
-    def _top_down_fp_children_predict_computation(self, top_down_dictionary, prediction):
+    def _top_down_fp_children_predict_computation(
+        self, top_down_dictionary, prediction
+    ):
         for key in prediction.keys():
-            top_down_dictionary[key] = prediction[self.root] * self.proportions[key].values
+            top_down_dictionary[key] = (
+                prediction[self.root] * self.proportions[key].values
+            )
 
     def _predict_new_time_series(self, X: pd.DataFrame) -> Dict[str, pd.DataFrame]:
         new_time_series_dictionary = {}
-        if self.method == 'tdfp':
+        if self.method == "tdfp":
             self._predict_new_time_series_fp(new_time_series_dictionary, X)
         else:
-            new_time_series_dictionary.update({self.root: self.models_[self.root].predict(X[self.root])})
-            self._top_down_children_predict_computation(new_time_series_dictionary, self.root)
+            new_time_series_dictionary.update(
+                {self.root: self.models_[self.root].predict(X[self.root])}
+            )
+            self._top_down_children_predict_computation(
+                new_time_series_dictionary, self.root
+            )
         return new_time_series_dictionary
-    
-    def _predict_new_time_series_fp(self, top_down_dictionary, X) -> Dict[str, pd.DataFrame]:
-        basic_predictions = {key: self.models_[key].predict(timeseries) for key, timeseries in X.items()}
+
+    def _predict_new_time_series_fp(
+        self, top_down_dictionary, X
+    ) -> Dict[str, pd.DataFrame]:
+        basic_predictions = {
+            key: self.models_[key].predict(timeseries) for key, timeseries in X.items()
+        }
         proportion_length = self.model.horizon
-        self.proportions[self.root] = pd.Series([1.0 for i in range(proportion_length)], index=basic_predictions[self.root].columns)
+        self.proportions[self.root] = pd.Series(
+            [1.0 for i in range(proportion_length)],
+            index=basic_predictions[self.root].columns,
+        )
         self._compute_children_proportions_fp_method(basic_predictions, self.root)
-        self._top_down_fp_children_predict_computation(top_down_dictionary, basic_predictions)
+        self._top_down_fp_children_predict_computation(
+            top_down_dictionary, basic_predictions
+        )
         return top_down_dictionary
-
-

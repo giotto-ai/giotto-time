@@ -17,6 +17,7 @@ from gtime.utils.fixtures import (
 )
 from gtime.utils.hypothesis.time_indexes import giotto_time_series, period_indexes
 
+
 @st.composite
 def n_time_series_with_same_index(
     draw, min_length: int = 5, min_n: int = 1, max_n: int = 5,
@@ -39,9 +40,7 @@ def n_time_series_with_same_index(
 
 
 @st.composite
-def tree_construction(
-        draw, dictionary
-):
+def tree_construction(draw, dictionary):
     tree_nodes = list(dictionary.keys())
     tree = nx.DiGraph()
     n = len(tree_nodes)
@@ -61,21 +60,28 @@ def hierarchical_bottom_up_model(draw, time_series_forecasting_model1_no_cache):
     tree = draw(tree_construction(dataframes))
     return HierarchicalBottomUp(time_series_forecasting_model1_no_cache, tree)
 
+
 @fixture(scope="function")
 def hierarchical_basic_bottom_up_model(time_series_forecasting_model1_no_cache):
-    return HierarchicalBottomUp(time_series_forecasting_model1_no_cache, 'infer')
+    return HierarchicalBottomUp(time_series_forecasting_model1_no_cache, "infer")
 
 
 class TestHierarchicalBottomUp:
     def test_basic_constructor(self, time_series_forecasting_model1_no_cache):
-        HierarchicalBottomUp(model=time_series_forecasting_model1_no_cache, hierarchy_tree='infer')
+        HierarchicalBottomUp(
+            model=time_series_forecasting_model1_no_cache, hierarchy_tree="infer"
+        )
 
     @given(dataframes=n_time_series_with_same_index(min_n=5))
-    def test_fit_predict_basic_bottom_up_on_different_data(self, dataframes, hierarchical_basic_bottom_up_model):
+    def test_fit_predict_basic_bottom_up_on_different_data(
+        self, dataframes, hierarchical_basic_bottom_up_model
+    ):
         hierarchical_basic_bottom_up_model.fit(dataframes).predict(dataframes)
 
     @given(dataframes=n_time_series_with_same_index(min_n=5))
-    def test_fit_predict_basic_bottom_up(self, dataframes, hierarchical_basic_bottom_up_model):
+    def test_fit_predict_basic_bottom_up(
+        self, dataframes, hierarchical_basic_bottom_up_model
+    ):
         hierarchical_basic_bottom_up_model.fit(dataframes).predict()
 
     @given(dataframes=n_time_series_with_same_index())
@@ -84,8 +90,12 @@ class TestHierarchicalBottomUp:
         HierarchicalBottomUp(time_series_forecasting_model1_no_cache, tree)
 
     @given(data=st.data(), dataframes=n_time_series_with_same_index(min_n=5))
-    def test_fit_predict_bottom_up(self, data, dataframes, time_series_forecasting_model1_no_cache):
-        model = data.draw(hierarchical_bottom_up_model(time_series_forecasting_model1_no_cache))
+    def test_fit_predict_bottom_up(
+        self, data, dataframes, time_series_forecasting_model1_no_cache
+    ):
+        model = data.draw(
+            hierarchical_bottom_up_model(time_series_forecasting_model1_no_cache)
+        )
         prediction = model.fit(dataframes).predict()
         for key in dataframes.keys():
             if key not in prediction.keys():
@@ -93,7 +103,7 @@ class TestHierarchicalBottomUp:
 
     @given(dataframes=n_time_series_with_same_index(min_n=5))
     def test_fit_predict_on_subset_of_time_series(
-            self, dataframes, hierarchical_basic_bottom_up_model
+        self, dataframes, hierarchical_basic_bottom_up_model
     ):
         key = np.random.choice(list(dataframes.keys()), 1)[0]
         hierarchical_basic_bottom_up_model.fit(dataframes)
@@ -104,12 +114,16 @@ class TestHierarchicalBottomUp:
             hierarchical_basic_bottom_up_model.predict()
 
     @given(dataframes=n_time_series_with_same_index())
-    def test_error_with_bad_predict_key(self, dataframes, hierarchical_basic_bottom_up_model):
+    def test_error_with_bad_predict_key(
+        self, dataframes, hierarchical_basic_bottom_up_model
+    ):
         correct_key = np.random.choice(list(dataframes.keys()), 1)[0]
         bad_key = "".join(dataframes.keys()) + "bad_key"
         hierarchical_basic_bottom_up_model.fit(dataframes)
         with pytest.raises(KeyError):
-            hierarchical_basic_bottom_up_model.predict({bad_key: dataframes[correct_key]})
+            hierarchical_basic_bottom_up_model.predict(
+                {bad_key: dataframes[correct_key]}
+            )
 
     @given(time_series=giotto_time_series(min_length=5))
     def test_error_fit_dataframe(self, time_series, hierarchical_basic_bottom_up_model):
@@ -117,7 +131,9 @@ class TestHierarchicalBottomUp:
             hierarchical_basic_bottom_up_model.fit(time_series)
 
     @given(time_series=giotto_time_series(min_length=5))
-    def test_error_fit_key_not_string(self, time_series, hierarchical_basic_bottom_up_model):
+    def test_error_fit_key_not_string(
+        self, time_series, hierarchical_basic_bottom_up_model
+    ):
         with pytest.raises(ValueError):
             hierarchical_basic_bottom_up_model.fit({1: time_series})
 

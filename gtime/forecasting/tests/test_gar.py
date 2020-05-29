@@ -282,10 +282,10 @@ class TestMultiFeatureGAR:
         target_to_feature_dict = data.draw(
             str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
-        multi_feature_gar = MultiFeatureGAR(estimator)
-        multi_feature_gar.fit(
-            X_train, y_train, target_to_features_dict=target_to_feature_dict
+        multi_feature_gar = MultiFeatureGAR(
+            estimator, target_to_features_dict=target_to_feature_dict
         )
+        multi_feature_gar.fit(X_train, y_train)
 
     @given(
         data=data(),
@@ -302,10 +302,36 @@ class TestMultiFeatureGAR:
         target_to_feature_dict = data.draw(
             str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
-        multi_feature_gar = MultiFeatureGAR(estimator)
-        multi_feature_gar.fit(
-            X_train, y_train, target_to_features_dict=target_to_feature_dict
+        multi_feature_gar = MultiFeatureGAR(
+            estimator, target_to_features_dict=target_to_feature_dict
         )
+        multi_feature_gar.fit(X_train, y_train)
+        for i, estimator_ in enumerate(multi_feature_gar.estimators_):
+            expected_n_features = len(target_to_feature_dict[y.columns[i]])
+            assert len(estimator_.coef_) == expected_n_features
+
+    @given(
+        data=data(),
+        X_y=X_y_matrices(
+            horizon=4,
+            df_transformer=df_transformer,
+            min_length=10,
+            allow_nan_infinity=False,
+        ),
+    )
+    def test_fit_target_to_feature_dict_set_after_consistent(
+        self, data, X_y, estimator
+    ):
+        X, y = X_y
+        X_train, y_train, X_test, y_test = FeatureSplitter().transform(X, y)
+        target_to_feature_dict = data.draw(
+            str_target_to_feature_dicts(targets=y.columns, features=X.columns)
+        )
+        multi_feature_gar = MultiFeatureGAR(
+            estimator, target_to_features_dict=target_to_feature_dict
+        )
+        multi_feature_gar.target_to_features_dict = target_to_feature_dict
+        multi_feature_gar.fit(X_train, y_train)
         for i, estimator_ in enumerate(multi_feature_gar.estimators_):
             expected_n_features = len(target_to_feature_dict[y.columns[i]])
             assert len(estimator_.coef_) == expected_n_features
@@ -326,9 +352,28 @@ class TestMultiFeatureGAR:
             str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
         multi_feature_gar = MultiFeatureGAR(estimator)
-        multi_feature_gar.fit(
-            X_train, y_train, target_to_features_dict=target_to_feature_dict
+        multi_feature_gar.target_to_features_dict = target_to_feature_dict
+        multi_feature_gar.fit(X_train, y_train)
+        multi_feature_gar.predict(X_test)
+
+    @given(
+        data=data(),
+        X_y=X_y_matrices(
+            horizon=4,
+            df_transformer=df_transformer,
+            min_length=10,
+            allow_nan_infinity=False,
+        ),
+    )
+    def test_predict_target_to_feature_dict_explainable(self, data, X_y, estimator):
+        X, y = X_y
+        X_train, y_train, X_test, y_test = FeatureSplitter().transform(X, y)
+        target_to_feature_dict = data.draw(
+            str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
+        multi_feature_gar = MultiFeatureGAR(estimator, explainer_type="shap")
+        multi_feature_gar.target_to_features_dict = target_to_feature_dict
+        multi_feature_gar.fit(X_train, y_train)
         multi_feature_gar.predict(X_test)
 
     @given(
@@ -348,10 +393,10 @@ class TestMultiFeatureGAR:
         target_to_feature_dict = data.draw(
             str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
-        multi_feature_gar = MultiFeatureGAR(estimator)
-        multi_feature_gar.fit(
-            X_train, y_train, target_to_features_dict=target_to_feature_dict
+        multi_feature_gar = MultiFeatureGAR(
+            estimator, target_to_features_dict=target_to_feature_dict
         )
+        multi_feature_gar.fit(X_train, y_train)
         X_test = X_test.iloc[:, :2]
         with pytest.raises(ValueError):
             multi_feature_gar.predict(X_test)

@@ -47,15 +47,15 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
 
     """
 
-    def __init__(self, estimator: RegressorMixin):
-        super().__init__(estimator=estimator, n_jobs=1)
-
-    def fit(
+    def __init__(
         self,
-        X: np.ndarray,
-        y: np.ndarray,
+        estimator: RegressorMixin,
         target_to_features_dict: Dict[int, List[int]] = None,
     ):
+        super().__init__(estimator=estimator, n_jobs=1)
+        self.target_to_features_dict = target_to_features_dict
+
+    def fit(self, X: np.ndarray, y: np.ndarray, **kwargs):
         """Fit the model.
 
         Train the models, one for each target variable in y.
@@ -66,9 +66,6 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
             The data.
         y : np.ndarray, shape (n_samples, horizon), required.
             The matrix containing the target variables.
-        target_to_features_dict: Dict[int, List[int]], optional, (default=``None``)
-            dictionary that assign to each target column the feature columns to be used for training.
-            If None, all the features are used for each target.
 
         Returns
         -------
@@ -76,6 +73,9 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
 
 
         """
+        target_to_features_dict = kwargs.get(
+            "target_to_features_dict", self.target_to_features_dict
+        )
         if target_to_features_dict is None:
             super().fit(X, y)
             self.target_to_features_dict_ = None
