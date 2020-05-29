@@ -73,7 +73,9 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
 
 
         """
-        target_to_features_dict = kwargs.get('target_to_features_dict', self.target_to_features_dict)
+        target_to_features_dict = kwargs.get(
+            "target_to_features_dict", self.target_to_features_dict
+        )
         if target_to_features_dict is None:
             super().fit(X, y)
             self.target_to_features_dict_ = None
@@ -85,9 +87,7 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
             raise ValueError("y must have at least two dimensions")
 
         self.estimators_ = [
-            _fit_estimator(
-                self.estimator, X[:, target_to_features_dict[i]], y[:, i]
-            )
+            _fit_estimator(self.estimator, X[:, target_to_features_dict[i]], y[:, i])
             for i in range(y.shape[1])
         ]
         self.target_to_features_dict_ = target_to_features_dict

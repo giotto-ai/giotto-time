@@ -332,7 +332,11 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor, _ExplanationsMixin):
             numeric_target_to_features_dict = self._feature_name_to_index(
                 self.target_to_features_dict, X.columns, y.columns
             )
-            return super().fit(X.values, y.values, target_to_features_dict=numeric_target_to_features_dict)
+            return super().fit(
+                X.values,
+                y.values,
+                target_to_features_dict=numeric_target_to_features_dict,
+            )
         else:
             return super().fit(X.values, y.values)
 
@@ -359,11 +363,15 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor, _ExplanationsMixin):
         if self.explainer_type is not None:
             if self.target_to_features_dict_ is None:
                 self.explanations_ = self._explanations_as_dataframe(
-                    index=y_p_df.index, y_columns=self.y_columns_, X_columns=list(X.columns)
+                    index=y_p_df.index,
+                    y_columns=self.y_columns_,
+                    X_columns=list(X.columns),
                 )
             else:
                 self.explanations_ = self._explanations_as_dataframe(
-                    index=y_p_df.index, y_columns=self.y_columns_, X_columns=self.target_to_features_dict
+                    index=y_p_df.index,
+                    y_columns=self.y_columns_,
+                    X_columns=self.target_to_features_dict,
                 )
         return y_p_df
 

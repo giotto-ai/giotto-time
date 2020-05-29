@@ -371,11 +371,10 @@ class TestMultiFeatureGAR:
         target_to_feature_dict = data.draw(
             str_target_to_feature_dicts(targets=y.columns, features=X.columns)
         )
-        multi_feature_gar = MultiFeatureGAR(estimator, explainer_type='shap')
+        multi_feature_gar = MultiFeatureGAR(estimator, explainer_type="shap")
         multi_feature_gar.target_to_features_dict = target_to_feature_dict
         multi_feature_gar.fit(X_train, y_train)
         multi_feature_gar.predict(X_test)
-
 
     @given(
         data=data(),

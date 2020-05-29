@@ -83,9 +83,9 @@ def smape(
 
 
 def non_zero_smape(
-        y_true: Union[pd.DataFrame, List, np.ndarray],
-        y_pred: Union[pd.DataFrame, List, np.ndarray],
-        raise_error: bool = False
+    y_true: Union[pd.DataFrame, List, np.ndarray],
+    y_pred: Union[pd.DataFrame, List, np.ndarray],
+    raise_error: bool = False,
 ) -> float:
     """Compute the 'Symmetric Mean Absolute Percentage Error' (SMAPE) between two
     vectors without considering the 0 in the true values. Documentation
@@ -98,6 +98,8 @@ def non_zero_smape(
 
     y_pred : array-like, shape (length, 1), required
         The second vector.
+
+    raise_error: bool, optional, default=``False``
 
     Returns
     -------
@@ -120,7 +122,7 @@ def non_zero_smape(
     y_true = y_true[y_true != 0]
     if len(y_pred) == 0:
         if raise_error:
-            raise ValueError('y_true is only compose by 0')
+            raise ValueError("y_true is only compose by 0")
         else:
             return np.NaN
 

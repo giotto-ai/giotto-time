@@ -3,6 +3,7 @@ The :mod:`gtime.metrics` module contains a collection of different metrics.
 """
 
 from .metrics import (
+    non_zero_smape,
     smape,
     max_error,
     mse,
@@ -16,6 +17,7 @@ from .metrics import (
 )
 
 __all__ = [
+    "non_zero_smape",
     "smape",
     "max_error",
     "mse",

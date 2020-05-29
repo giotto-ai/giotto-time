@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from scipy.stats import gmean
-from hypothesis import given
+from hypothesis import given, assume
 from hypothesis.extra.numpy import arrays
 from hypothesis.strategies import floats
 
@@ -17,7 +17,109 @@ from gtime.metrics import (
     rmse,
     rmsle,
     gmae,
+    non_zero_smape,
 )
+
+
+class TestNonZeroSmape:
+    def _correct_non_zero_smape(self, y_true, y_pred):
+        y_pred = y_pred[y_true != 0]
+        y_true = y_true[y_true != 0]
+
+        non_normalized_smape = sum(
+            np.abs(y_pred - y_true) / (np.abs(y_pred) + np.abs(y_true))
+        )
+        non_normalized_smape_filled = np.nan_to_num(non_normalized_smape, nan=0)
+        error = (2 / len(y_pred)) * non_normalized_smape_filled
+        return error
+
+    def test_wrong_vector_length(self):
+        y_true = np.random.random(5)
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            non_zero_smape(y_true, y_pred)
+
+    def test_nan_values(self):
+        y_true = np.array([np.nan, 1, 2, 3])
+        y_pred = np.random.random(4)
+
+        with pytest.raises(ValueError):
+            non_zero_smape(y_true, y_pred)
+
+    def test_infinite_values(self):
+        y_true = np.random.random(4)
+        y_pred = np.array([0, np.inf, 2, 3])
+
+        with pytest.raises(ValueError):
+            non_zero_smape(y_true, y_pred)
+
+    def test_correct_smape_array(self):
+        y_true = np.array([0, 1, 2, 3, 4, 5])
+        y_pred = np.array([3, 2, 4, 3, 5, 7])
+
+        error = non_zero_smape(y_true, y_pred)
+        expected_error = (1 / 3 + 2 / 6 + 0 + 1 / 9 + 2 / 12) * (2 / 5)
+
+        assert expected_error == error
+
+    def test_correct_smape_dataframe(self):
+        y_true = pd.DataFrame([0, 1, 2, 3, 4, 5])
+        y_pred = pd.DataFrame([3, 2, 4, 3, 5, 7])
+
+        error = non_zero_smape(y_true, y_pred)
+        expected_error = (1 / 3 + 2 / 6 + 0 + 1 / 9 + 2 / 12) * (2 / 5)
+
+        assert expected_error == error
+
+    def test_correct_smape_list(self):
+        y_true = [0, 1, 2, 3, 4, 5]
+        y_pred = [3, 2, 4, 3, 5, 7]
+
+        error = non_zero_smape(y_true, y_pred)
+        expected_error = (1 / 3 + 2 / 6 + 0 + 1 / 9 + 2 / 12) * (2 / 5)
+
+        assert expected_error == error
+
+    def test_smape_is_symmetric(self):
+        y_true = np.random.random(10)
+        y_pred = np.random.random(10)
+
+        first_error = non_zero_smape(y_true, y_pred)
+        second_error = non_zero_smape(y_pred, y_true)
+
+        assert first_error == second_error
+
+    @given(
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+    )
+    def test_between_zero_and_one(self, y_true, y_pred):
+        assume(not all(y_true == 0))
+        error = non_zero_smape(y_true, y_pred)
+
+        assert error >= 0
+        assert error <= 2
+
+    @given(
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+        arrays(float, shape=30, elements=floats(allow_nan=False, allow_infinity=False)),
+    )
+    def test_smape_random_arrays(self, y_true, y_pred):
+        assume(not all(y_true == 0))
+        error = non_zero_smape(y_true, y_pred)
+        expected_error = self._correct_non_zero_smape(y_true, y_pred)
+
+        assert expected_error == error
+
+    def test_smape_raise_error(self):
+        y_true = [0, 0, 0, 0, 0, 0]
+        y_pred = [3, 2, 4, 3, 5, 7]
+
+        with pytest.raises(ValueError):
+            non_zero_smape(y_true, y_pred, raise_error=True)
+
+        assert np.isnan(non_zero_smape(y_true, y_pred, raise_error=False))
 
 
 class TestSmape:

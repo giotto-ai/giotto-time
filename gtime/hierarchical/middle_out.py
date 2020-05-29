@@ -7,7 +7,6 @@ from gtime.hierarchical import HierarchicalBottomUp
 from sklearn.utils.validation import check_is_fitted
 
 
-
 class HierarchicalMiddleOut(HierarchicalTopDown, HierarchicalBottomUp):
     """ Hierarchical model with prediction following the Top-Down procedure.
            It computes the forecast of the root and finds, with different methods the proportion between
@@ -77,12 +76,18 @@ class HierarchicalMiddleOut(HierarchicalTopDown, HierarchicalBottomUp):
  2000-01-01 00:00:18 -0.456526  0.432652  0.122335
  2000-01-01 00:00:19  0.448537  0.209102  0.130292
     """
-    def __init__(self, model: BaseEstimator,
-                 hierarchy_tree: Union[str, nx.DiGraph] = "infer",
-                 root: str = None,
-                 method: str = 'tdsga',
-                 level: int = 1):
-        super().__init__(model=model, hierarchy_tree=hierarchy_tree, root=root, method=method)
+
+    def __init__(
+        self,
+        model: BaseEstimator,
+        hierarchy_tree: Union[str, nx.DiGraph] = "infer",
+        root: str = None,
+        method: str = "tdsga",
+        level: int = 1,
+    ):
+        super().__init__(
+            model=model, hierarchy_tree=hierarchy_tree, root=root, method=method
+        )
         self.level = level
         self.proportions = {}
 
@@ -103,7 +108,7 @@ class HierarchicalMiddleOut(HierarchicalTopDown, HierarchicalBottomUp):
 
         super().fit(X, y)
         self._find_levels()
-        if self.level>0:
+        if self.level > 0:
             self._sub_trees_dictionary_construction()
         return self
 
@@ -114,12 +119,12 @@ class HierarchicalMiddleOut(HierarchicalTopDown, HierarchicalBottomUp):
 
     def _add_nodes_to_level_nodes_dictionary(self, parent_key, parent_level):
         for child in self.hierarchy_tree[parent_key]:
-            if parent_level+1 in self.level_nodes.keys():
-                self.level_nodes[parent_level+1].append(child)
+            if parent_level + 1 in self.level_nodes.keys():
+                self.level_nodes[parent_level + 1].append(child)
             else:
-                self.level_nodes[parent_level+1] = [child]
+                self.level_nodes[parent_level + 1] = [child]
             if not self._is_a_leaf(child):
-                self._add_nodes_to_level_nodes_dictionary(child, parent_level+1)
+                self._add_nodes_to_level_nodes_dictionary(child, parent_level + 1)
         return
 
     def _sub_trees_dictionary_construction(self):
@@ -166,7 +171,9 @@ class HierarchicalMiddleOut(HierarchicalTopDown, HierarchicalBottomUp):
         if self.level == 0:
             prediction_dictionary = super()._predict_fitted_time_series()
         elif self.level == max(list(self.level_nodes.keys())):
-            prediction_dictionary = HierarchicalBottomUp._predict_fitted_time_series(self)
+            prediction_dictionary = HierarchicalBottomUp._predict_fitted_time_series(
+                self
+            )
         else:
             self._predict_time_series_top_down(prediction_dictionary)
             self._predict_fitted_time_series_bottom_up(prediction_dictionary)
@@ -174,8 +181,12 @@ class HierarchicalMiddleOut(HierarchicalTopDown, HierarchicalBottomUp):
 
     def _predict_time_series_top_down(self, dictionary, X=None):
         for key in self.level_nodes[self.level]:
-            submodel = HierarchicalTopDown(model=self.model, hierarchy_tree=self.sub_trees_dictionary[key],
-                                           root=key, method=self.method)
+            submodel = HierarchicalTopDown(
+                model=self.model,
+                hierarchy_tree=self.sub_trees_dictionary[key],
+                root=key,
+                method=self.method,
+            )
             submodel.models_ = self._extract_fitted_models(key)
             submodel.proportions = self._extract_proportions(key)
             dictionary.update(submodel.predict(X))
@@ -202,9 +213,13 @@ class HierarchicalMiddleOut(HierarchicalTopDown, HierarchicalBottomUp):
     def _predict_new_time_series(self, X: pd.DataFrame) -> Dict[str, pd.DataFrame]:
         new_time_series_dictionary = {}
         if self.level == 0:
-            new_time_series_dictionary = HierarchicalTopDown._predict_new_time_series(self, X)
+            new_time_series_dictionary = HierarchicalTopDown._predict_new_time_series(
+                self, X
+            )
         elif self.level == max(list(self.level_nodes.keys())):
-            new_time_series_dictionary = HierarchicalBottomUp._predict_new_time_series(self, X)
+            new_time_series_dictionary = HierarchicalBottomUp._predict_new_time_series(
+                self, X
+            )
         else:
             self._predict_time_series_top_down(new_time_series_dictionary, X)
             self._predict_new_time_series_bottom_up(new_time_series_dictionary, X)
@@ -213,7 +228,3 @@ class HierarchicalMiddleOut(HierarchicalTopDown, HierarchicalBottomUp):
     def _predict_new_time_series_bottom_up(self, dictionary, X):
         for key, timeseries in X.items():
             self._bottom_up_addiction_to_dictionary(key, dictionary, timeseries)
-
-
-
-
