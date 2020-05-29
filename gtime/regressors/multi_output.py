@@ -66,9 +66,6 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
             The data.
         y : np.ndarray, shape (n_samples, horizon), required.
             The matrix containing the target variables.
-        target_to_features_dict: Dict[int, List[int]], optional, (default=``None``)
-            dictionary that assign to each target column the feature columns to be used for training.
-            If None, all the features are used for each target.
 
         Returns
         -------

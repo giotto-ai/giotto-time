@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Dict, List, Optional, Union
 
 import numpy as np
@@ -328,9 +329,11 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor, _ExplanationsMixin):
         self.X_columns_ = X.columns
         self.y_columns_ = y.columns
         if self.target_to_features_dict is not None:
+            self.original_target_to_features_dict_ = deepcopy(self.target_to_features_dict)
             self.target_to_features_dict = self._feature_name_to_index(
                 self.target_to_features_dict, X.columns, y.columns
             )
+
         return super().fit(X.values, y.values)
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -354,14 +357,14 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor, _ExplanationsMixin):
         y_p_df = pd.DataFrame(data=y_p, columns=self.y_columns_, index=X.index)
 
         if self.explainer_type is not None:
-            X_columns = (
-                list(X.columns)
-                if self.target_to_features_dict_ is None
-                else self.target_to_features_dict_
-            )
-            self.explanations_ = self._explanations_as_dataframe(
-                index=y_p_df.index, y_columns=self.y_columns_, X_columns=X_columns
-            )
+            if self.target_to_features_dict_ is None:
+                self.explanations_ = self._explanations_as_dataframe(
+                    index=y_p_df.index, y_columns=self.y_columns_, X_columns=list(X.columns)
+                )
+            else:
+                self.explanations_ = self._explanations_as_dataframe(
+                    index=y_p_df.index, y_columns=self.y_columns_, X_columns=self.original_target_to_features_dict_
+                )
         return y_p_df
 
     @staticmethod
