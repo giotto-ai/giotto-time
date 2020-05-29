@@ -253,11 +253,11 @@ class GrangerCausality(BaseEstimator):
         shifts = data.copy()
         x_columns, y_columns = [], []
         for i in range(1, self.max_shift + 1):
-            shifts[f"x_shift_{i}"] = data[self.x_col].shift(i)
-            shifts[f"y_shift_{i-1}"] = data[self.target_col].shift(i)
+            shifts[f"x_shift_{i}"] = data[self.target_col].shift(i)
+            shifts[f"y_shift_{i-1}"] = data[self.x_col].shift(i)
             x_columns.append(f"x_shift_{i}")
             y_columns.append(f"y_shift_{i-1}")
-        shifts.drop([self.x_col, self.target_col], axis="columns", inplace=True)
+        shifts.drop([self.target_col, self.x_col], axis="columns", inplace=True)
         shifts = shifts.dropna()
 
         data_single = shifts[x_columns].copy()
