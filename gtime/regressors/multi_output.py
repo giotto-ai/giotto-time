@@ -73,7 +73,8 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
 
 
         """
-        if self.target_to_features_dict is None:
+        target_to_features_dict = kwargs.get('target_to_features_dict', self.target_to_features_dict)
+        if target_to_features_dict is None:
             super().fit(X, y)
             self.target_to_features_dict_ = None
             return self
@@ -85,11 +86,11 @@ class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
 
         self.estimators_ = [
             _fit_estimator(
-                self.estimator, X[:, self.target_to_features_dict[i]], y[:, i]
+                self.estimator, X[:, target_to_features_dict[i]], y[:, i]
             )
             for i in range(y.shape[1])
         ]
-        self.target_to_features_dict_ = self.target_to_features_dict
+        self.target_to_features_dict_ = target_to_features_dict
         self.expected_X_shape_ = X.shape[1]
         return self
 

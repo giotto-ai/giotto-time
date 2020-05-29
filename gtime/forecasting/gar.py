@@ -329,12 +329,12 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor, _ExplanationsMixin):
         self.X_columns_ = X.columns
         self.y_columns_ = y.columns
         if self.target_to_features_dict is not None:
-            self.original_target_to_features_dict_ = deepcopy(self.target_to_features_dict)
-            self.target_to_features_dict = self._feature_name_to_index(
+            numeric_target_to_features_dict = self._feature_name_to_index(
                 self.target_to_features_dict, X.columns, y.columns
             )
-
-        return super().fit(X.values, y.values)
+            return super().fit(X.values, y.values, target_to_features_dict=numeric_target_to_features_dict)
+        else:
+            return super().fit(X.values, y.values)
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         """For each row in ``X``, make a prediction for each fitted model, from 1 to
@@ -363,7 +363,7 @@ class MultiFeatureGAR(MultiFeatureMultiOutputRegressor, _ExplanationsMixin):
                 )
             else:
                 self.explanations_ = self._explanations_as_dataframe(
-                    index=y_p_df.index, y_columns=self.y_columns_, X_columns=self.original_target_to_features_dict_
+                    index=y_p_df.index, y_columns=self.y_columns_, X_columns=self.target_to_features_dict
                 )
         return y_p_df
 
