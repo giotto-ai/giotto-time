@@ -13,10 +13,10 @@ from gtime.causality import GrangerCausality
 @pytest.mark.parametrize(
     "test_input, expected",
     [
-        (["ssr_f"], 0.93058225),
-        (["ssr_chi2"], 0.92597228),
-        (["likelihood_chi2"], 0.92651128),
-        (["zero_f"], 0.93058225),
+        (["ssr_f"], 0.8420421667509344),
+        (["ssr_chi2"], 0.8327660223526767),
+        (["likelihood_chi2"], 0.8341270186135072),
+        (["zero_f"], 0.8420421667508992),
     ],
 )
 def test_granger_pvalues_ssr_f(test_input, expected):
