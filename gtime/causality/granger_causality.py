@@ -103,13 +103,13 @@ def _likelihood_chi2(params_dict):
         params_dict["data_joint"],
         params_dict["dof_joint"],
     )
-    max_shift, x_col = params_dict["max_shift"], params_dict["x_col"]
+    max_shift, target_col = params_dict["max_shift"], params_dict["target_col"]
 
     linreg_single_loglikelihood = _loglikelihood(
-        y_pred=y_pred_single, y_true=data[x_col].loc[data_single.index]
+        y_pred=y_pred_single, y_true=data[target_col].loc[data_single.index]
     )
     linreg_joint_loglikelihood = _loglikelihood(
-        y_pred=y_pred_joint, y_true=data[x_col].loc[data_joint.index]
+        y_pred=y_pred_joint, y_true=data[target_col].loc[data_joint.index]
     )
 
     likelihood_ratio = -2 * (linreg_single_loglikelihood - linreg_joint_loglikelihood)
@@ -132,11 +132,11 @@ def _zero_f(params_dict):
         params_dict["data"],
         params_dict["y_pred_joint"],
     )
-    linreg_joint_residues, dof_joint, max_shift, x_col = (
+    linreg_joint_residues, dof_joint, max_shift, target_col = (
         params_dict["linreg_joint_residues"],
         params_dict["dof_joint"],
         params_dict["max_shift"],
-        params_dict["x_col"],
+        params_dict["target_col"],
     )
 
     constraint_matrix = np.column_stack(
@@ -146,7 +146,7 @@ def _zero_f(params_dict):
             np.zeros((max_shift, 1)),
         )
     )
-    y_true = data[x_col].loc[data_joint.index].values
+    y_true = data[target_col].loc[data_joint.index].values
     value_restriction = np.zeros(len(constraint_matrix))
 
     # Parameters of the fitted linear regression model
@@ -265,23 +265,20 @@ class GrangerCausality(BaseEstimator):
 
         linreg_single = LinearRegression()
         linreg_joint = LinearRegression()
-        linreg_single.fit(data_single, data[self.x_col].loc[data_single.index])
-        linreg_joint.fit(data_joint, data[self.x_col].loc[data_joint.index])
-        if "likelihood_chi2" in self.statistics or "zero_f" in self.statistics:
-            y_pred_single = linreg_single.predict(data_single)
-            y_pred_joint = linreg_joint.predict(data_joint)
-        else:
-            y_pred_single = None
-            y_pred_joint = None
+        y_pred_single = linreg_single.fit(
+            data_single, data[self.target_col].loc[data_single.index]
+        ).predict(data_single)
+        y_pred_joint = linreg_joint.fit(
+            data_joint, data[self.target_col].loc[data_joint.index]
+        ).predict(data_joint)
 
-        # dof_single = float(data_single.shape[0] - data_single.shape[1])
+        dof_single = float(data_single.shape[0] - data_single.shape[1])
         dof_joint = float(data_joint.shape[0] - data_joint.shape[1]) - 1
 
         linreg_single_residues = linreg_single._residues
         linreg_joint_residues = linreg_joint._residues
 
         self.results_ = []
-
         stat_test_input = {
             "linreg_single_residues": linreg_single_residues,
             "linreg_joint_residues": linreg_joint_residues,
@@ -291,7 +288,7 @@ class GrangerCausality(BaseEstimator):
             "y_pred_single": y_pred_single,
             "y_pred_joint": y_pred_joint,
             "data": data,
-            "x_col": self.x_col,
+            "target_col": self.target_col,
             "data_joint": data_joint,
             "linreg_joint": linreg_joint,
         }
