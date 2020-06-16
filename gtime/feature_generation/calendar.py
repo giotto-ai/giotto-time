@@ -22,7 +22,7 @@ def _check_index(time_series: pd.DataFrame) -> None:
             "meaningful results."
         )
 
-    if not isinstance(time_series.index, pd.PeriodIndex):
+    if not isinstance(time_series.index, (pd.PeriodIndex, pd.DatetimeIndex)):
         raise ValueError(
             "The input time series should have a index of type "
             f"PeriodIndex, got {type(time_series.index)} instead."
@@ -100,6 +100,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
         end_date: str = "01/01/2020",
         kernel: Union[List, np.ndarray] = None,
         reindex_method: str = "pad",
+        freq: str = None,
     ):
         super().__init__()
         self.region = region
@@ -107,6 +108,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
         self.start_date = start_date
         self.end_date = end_date
         self.reindex_method = reindex_method
+        self.freq = freq
 
         if kernel is None or len(kernel) == 0 or not np.isfinite(kernel).all():
             raise ValueError(
@@ -114,18 +116,6 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
                 f"and should only contains finite values, got {kernel} instead."
             )
         self.kernel = kernel
-
-    def get_feature_names(self):
-        """Return feature names for output features.
-
-        Returns
-        -------
-        output_feature_names : ndarray, shape (n_output_features,)
-            Array of feature names.
-
-        """
-
-        return [self.__class__.__name__]
 
     def fit(self, X: pd.DataFrame, y=None):
         """Fit the estimator. Just used to be compatible with the sklearn API.
@@ -180,6 +170,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
         events = self._get_holiday_events(workalendar_country)
         if self.kernel is not None:
             events = self._apply_kernel(events)
+        events.columns = self._get_events_column_names(time_series)
 
         aligned_events = self._align_event_indices(time_series, events)
 
@@ -187,8 +178,8 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
 
     def _initialize_start_end_date(self, X: pd.DataFrame):
         if X is not None:
-            self.start_ = X.index.values[0]
-            self.end_ = X.index.values[-1]
+            self.start_ = X.index[0]
+            self.end_ = X.index[-1]
         else:
             self.start_ = pd.Timestamp(self.start_date)
             self.end_ = pd.Timestamp(self.end_date)
@@ -264,18 +255,29 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
     def _align_event_indices(self, ts, events):
         if ts is not None:
             X = ts.copy()
-            new_x_line = pd.DataFrame(
-                columns=X.columns, index=pd.PeriodIndex([X.index[-1] + 1])
-            )
+            if isinstance(ts.index, pd.PeriodIndex):
+                new_x_line = pd.DataFrame(
+                    columns=X.columns, index=pd.PeriodIndex([X.index[-1] + 1])
+                )
+            else:
+                if self.freq is None:
+                    raise ValueError('You must specify the frequency in the constructor. Now it is None.')
+                new_x_line = pd.DataFrame(
+                    columns=X.columns, index=pd.DatetimeIndex([X.index[-1] + pd.Timedelta(1, unit=self.freq)])
+                )
             X_to_cut = pd.concat([X, new_x_line], axis=0)
-            bins = pd.cut(events.index, X_to_cut.index.to_timestamp())
+            if isinstance(X_to_cut.index, pd.PeriodIndex):
+                bins = pd.cut(events.index, X_to_cut.index.to_timestamp())
+            else:
+                bins = pd.cut(events.index, X_to_cut.index)
 
             grouped_events = events.groupby(bins).mean().ffill()
 
             grouped_events.index = pd.to_datetime(
                 grouped_events.index.map(lambda row_index: row_index.left)
             )
-            X.index = X.index.to_timestamp()
+            if isinstance(X.index, pd.PeriodIndex):
+                X.index = X.index.to_timestamp()
 
             # events_renamed = pd.merge(X, grouped_events, left_index=True, right_index=True, how="inner")
 
@@ -287,3 +289,6 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
             events_renamed = events[self.start_ : self.end_]
 
         return events_renamed
+
+    def _get_events_column_names(self, time_series: pd.DataFrame) -> List[str]:
+        return time_series.columns[:1]
