@@ -222,7 +222,10 @@ class _ShapExplainer(_RegressorExplainer):
         """
         check_is_fitted(self)
 
-        self.shap_values_ = self.explainer_.shap_values(X)
+        try:
+            self.shap_values_ = self.explainer_.shap_values(X, check_additivity=False)
+        except TypeError:
+            self.shap_values_ = self.explainer_.shap_values(X)
         predictions = self._compute_predictions_from_shap_values(self.shap_values_)
         self.explanations_ = self._reformat_shap_values(self.shap_values_)
         return predictions
