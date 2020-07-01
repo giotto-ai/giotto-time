@@ -167,6 +167,228 @@ class MovingAverage(BaseEstimator, TransformerMixin, FeatureMixin):
         return time_series_mvg_avg
 
 
+class MovingMedian(BaseEstimator, TransformerMixin, FeatureMixin):
+    """For each row in ``time_series``, compute the moving median of the previous
+    ``window_size`` rows. If there are not enough rows, the value is ``Nan``.
+
+    Parameters
+    ----------
+    window_size : int, optional, default: ``1``
+        The number of previous points on which to compute the moving median.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from gtime.feature_extraction import MovingMedian
+    >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
+    >>> mv_median = MovingMedian(window_size=2)
+    >>> mv_median.fit_transform(ts)
+       0__MovingMedian
+    0               NaN
+    1               0.5
+    2               1.5
+    3               2.5
+    4               3.5
+    5               4.5
+
+    """
+
+    def __init__(self, window_size: int = 1):
+        super().__init__()
+        self.window_size = window_size
+
+    def fit(self, X, y=None):
+        """Fit the estimator.
+
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+
+        """
+        self.columns_ = X.columns.values
+        return self
+
+    @add_class_name
+    def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
+        """Compute the moving median, for every row of ``time_series``, of the previous
+        ``window_size`` elements.
+
+        Parameters
+        ----------
+        time_series : pd.DataFrame, shape (n_samples, 1), required
+            The DataFrame on which to compute the rolling moving median
+
+        Returns
+        -------
+        time_series_t : pd.DataFrame, shape (n_samples, 1)
+            A DataFrame, with the same length as ``time_series``, containing the rolling
+            moving median for each element.
+
+        """
+        check_is_fitted(self)
+
+        time_series_mvg_median = time_series.rolling(self.window_size).median()
+        return time_series_mvg_median
+
+
+class Max(BaseEstimator, TransformerMixin, FeatureMixin):
+    """For each row in ``time_series``, compute the moving max of the previous
+    ``window_size`` rows. If there are not enough rows, the value is ``Nan``.
+
+    Parameters
+    ----------
+    window_size : int, optional, default: ``1``
+        The number of previous points on which to compute the moving max.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from gtime.feature_extraction import Max
+    >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
+    >>> mv_max = Max(window_size=2)
+    >>> mv_max.fit_transform(ts)
+       0__MovingMax
+    0               NaN
+    1               0.5
+    2               1.5
+    3               2.5
+    4               3.5
+    5               4.5
+
+    """
+
+    def __init__(self, window_size: int = 1):
+        super().__init__()
+        self.window_size = window_size
+
+    def fit(self, X, y=None):
+        """Fit the estimator.
+
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+
+        """
+        self.columns_ = X.columns.values
+        return self
+
+    @add_class_name
+    def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
+        """Compute the moving max, for every row of ``time_series``, of the previous
+        ``window_size`` elements.
+
+        Parameters
+        ----------
+        time_series : pd.DataFrame, shape (n_samples, 1), required
+            The DataFrame on which to compute the rolling moving max
+
+        Returns
+        -------
+        time_series_t : pd.DataFrame, shape (n_samples, 1)
+            A DataFrame, with the same length as ``time_series``, containing the rolling
+            moving max for each element.
+
+        """
+        check_is_fitted(self)
+
+        time_series_max = time_series.rolling(self.window_size).max()
+        return time_series_max
+
+
+class Min(BaseEstimator, TransformerMixin, FeatureMixin):
+    """For each row in ``time_series``, compute the moving min of the previous
+    ``window_size`` rows. If there are not enough rows, the value is ``Nan``.
+
+    Parameters
+    ----------
+    window_size : int, optional, default: ``1``
+        The number of previous points on which to compute the moving average.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from gtime.feature_extraction import MovingMin
+    >>> ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
+    >>> mv_min = MovingMin(window_size=2)
+    >>> mv_min.fit_transform(ts)
+       0__MovingMin
+    0               NaN
+    1               0.5
+    2               1.5
+    3               2.5
+    4               3.5
+    5               4.5
+
+    """
+
+    def __init__(self, window_size: int = 1):
+        super().__init__()
+        self.window_size = window_size
+
+    def fit(self, X, y=None):
+        """Fit the estimator.
+
+        Parameters
+        ----------
+        X : pd.DataFrame, shape (n_samples, n_features)
+            Input data.
+
+        y : None
+            There is no need of a target in a transformer, yet the pipeline API
+            requires this parameter.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+
+        """
+        self.columns_ = X.columns.values
+        return self
+
+    @add_class_name
+    def transform(self, time_series: pd.DataFrame) -> pd.DataFrame:
+        """Compute the moving min, for every row of ``time_series``, of the previous
+        ``window_size`` elements.
+
+        Parameters
+        ----------
+        time_series : pd.DataFrame, shape (n_samples, 1), required
+            The DataFrame on which to compute the rolling moving min
+
+        Returns
+        -------
+        time_series_t : pd.DataFrame, shape (n_samples, 1)
+            A DataFrame, with the same length as ``time_series``, containing the rolling
+            moving min for each element.
+
+        """
+        check_is_fitted(self)
+
+        time_series_mvg_min = time_series.rolling(self.window_size).min()
+        return time_series_mvg_min
+
+
 class MovingCustomFunction(BaseEstimator, TransformerMixin, FeatureMixin):
     """For each row in ``time_series``, compute the moving custom function of the
     previous ``window_size`` rows. If there are not enough rows, the value is ``Nan``.

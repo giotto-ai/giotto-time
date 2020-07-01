@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
+from gtime.feature_extraction.standard import MovingMedian, Min, Max
+
 if pd.__version__ >= "1.0.0":
     import pandas._testing as testing
 else:
@@ -132,6 +134,195 @@ class TestMovingAverage:
         expected_df_ma = self._correct_ma(df, window_size)
 
         testing.assert_frame_equal(expected_df_ma, df_ma)
+
+
+class TestMovingMedian:
+    def _correct_mm(self, df: pd.DataFrame, window_size: int) -> pd.DataFrame:
+        return (
+            df.rolling(window_size)
+            .median()
+            .add_suffix("__" + MovingMedian().__class__.__name__)
+        )
+
+    def test_invalid_window_size(self):
+        window_size = -1
+        df = pd.DataFrame.from_dict({"x0": [0, 1, 2, 3, 4, 5]})
+
+        mm_feature = MovingMedian(window_size=window_size)
+
+        with pytest.raises(ValueError):
+            mm_feature.fit_transform(df)
+
+    def test_positive_window_size(self):
+        window_size = 2
+        df = pd.DataFrame.from_dict({"x": [0, 1, 2, 3, 4, 5]})
+
+        mm_feature = MovingMedian(window_size=window_size)
+        df_mm = mm_feature.fit_transform(df)
+        output_name = "x__" + mm_feature.__class__.__name__
+        expected_df_mm = pd.DataFrame.from_dict(
+            {output_name: [np.nan, 0.5, 1.5, 2.5, 3.5, 4.5]}
+        )
+
+        testing.assert_frame_equal(expected_df_mm, df_mm, check_names=False)
+
+    def test_multi_columns_window_size(self):
+        window_size = 2
+        df = pd.DataFrame.from_dict(
+            {"x0": [0, 1, 2, 3, 4, 5], "x1": [7, 8, 9, 10, 11, 12]}
+        )
+
+        mm_feature = MovingMedian(window_size=window_size)
+        feature_name = mm_feature.__class__.__name__
+
+        df_mm = mm_feature.fit_transform(df)
+        expected_df_mm = pd.DataFrame(
+            {
+                f"x0__{feature_name}": [np.nan, 0.5, 1.5, 2.5, 3.5, 4.5],
+                f"x1__{feature_name}": [np.nan, 7.5, 8.5, 9.5, 10.5, 11.5],
+            }
+        )
+
+        testing.assert_frame_equal(expected_df_mm, df_mm, check_names=False)
+
+    @given(
+        giotto_time_series(
+            start_date=pd.Timestamp(2000, 1, 1), end_date=pd.Timestamp(2010, 1, 1)
+        ),
+        st.integers(0, 100),
+    )
+    def test_random_ts_and_window_size(self, df: pd.DataFrame, window_size: int):
+        mm_feature = MovingMedian(window_size=window_size)
+        df_mm = mm_feature.fit_transform(df)
+        expected_df_mm = self._correct_mm(df, window_size)
+
+        testing.assert_frame_equal(expected_df_mm, df_mm)
+
+
+class TestMax:
+    def _correct_max(self, df: pd.DataFrame, window_size: int) -> pd.DataFrame:
+        return (
+            df.rolling(window_size)
+                .max()
+                .add_suffix("__" + Max().__class__.__name__)
+        )
+
+    def test_invalid_window_size(self):
+        window_size = -1
+        df = pd.DataFrame.from_dict({"x0": [0, 1, 2, 3, 4, 5]})
+
+        max_feature = Max(window_size=window_size)
+
+        with pytest.raises(ValueError):
+            max_feature.fit_transform(df)
+
+    def test_positive_window_size(self):
+        window_size = 2
+        df = pd.DataFrame.from_dict({"x": [0, 1, 2, 3, 4, 5]})
+
+        max_feature = Max(window_size=window_size)
+        df_max = max_feature.fit_transform(df)
+        output_name = "x__" + max_feature.__class__.__name__
+        expected_df_max = pd.DataFrame.from_dict(
+            {output_name: [np.nan, 1.0, 2.0, 3.0, 4.0, 5.0]}
+        )
+
+        testing.assert_frame_equal(expected_df_max, df_max, check_names=False)
+
+    def test_multi_columns_window_size(self):
+        window_size = 2
+        df = pd.DataFrame.from_dict(
+            {"x0": [0, 1, 2, 3, 4, 5], "x1": [7, 8, 9, 10, 11, 12]}
+        )
+
+        max_feature = Max(window_size=window_size)
+        feature_name = max_feature.__class__.__name__
+
+        df_max = max_feature.fit_transform(df)
+        expected_df_max = pd.DataFrame(
+            {
+                f"x0__{feature_name}": [np.nan, 1.0, 2.0, 3.0, 4.0, 5.0],
+                f"x1__{feature_name}": [np.nan, 8.0, 9.0, 10.0, 11.0, 12.0],
+            }
+        )
+
+        testing.assert_frame_equal(expected_df_max, df_max, check_names=False)
+
+    @given(
+        giotto_time_series(
+            start_date=pd.Timestamp(2000, 1, 1), end_date=pd.Timestamp(2010, 1, 1)
+        ),
+        st.integers(0, 100),
+    )
+    def test_random_ts_and_window_size(self, df: pd.DataFrame, window_size: int):
+        max_feature = Max(window_size=window_size)
+        df_max = max_feature.fit_transform(df)
+        expected_df_max = self._correct_max(df, window_size)
+
+        testing.assert_frame_equal(expected_df_max, df_max)
+
+
+class TestMin:
+    def _correct_min(self, df: pd.DataFrame, window_size: int) -> pd.DataFrame:
+        return (
+            df.rolling(window_size)
+                .min()
+                .add_suffix("__" + Min().__class__.__name__)
+        )
+
+    def test_invalid_window_size(self):
+        window_size = -1
+        df = pd.DataFrame.from_dict({"x0": [0, 1, 2, 3, 4, 5]})
+
+        min_feature = Min(window_size=window_size)
+
+        with pytest.raises(ValueError):
+            min_feature.fit_transform(df)
+
+    def test_positive_window_size(self):
+        window_size = 2
+        df = pd.DataFrame.from_dict({"x": [0, 1, 2, 3, 4, 5]})
+
+        min_feature = Min(window_size=window_size)
+        df_min = min_feature.fit_transform(df)
+        output_name = "x__" + min_feature.__class__.__name__
+        expected_df_mm = pd.DataFrame.from_dict(
+            {output_name: [np.nan, 0.0, 1.0, 2.0, 3.0, 4.0]}
+        )
+
+        testing.assert_frame_equal(expected_df_mm, df_min, check_names=False)
+
+    def test_multi_columns_window_size(self):
+        window_size = 2
+        df = pd.DataFrame.from_dict(
+            {"x0": [0, 1, 2, 3, 4, 5], "x1": [7, 8, 9, 10, 11, 12]}
+        )
+
+        min_feature = Min(window_size=window_size)
+        feature_name = min_feature.__class__.__name__
+
+        df_min = min_feature.fit_transform(df)
+        expected_df_mm = pd.DataFrame(
+            {
+                f"x0__{feature_name}": [np.nan, 0.0, 1.0, 2.0, 3.0, 4.0],
+                f"x1__{feature_name}": [np.nan, 7.0, 8.0, 9.0, 10.0, 11.0],
+            }
+        )
+
+        testing.assert_frame_equal(expected_df_mm, df_min, check_names=False)
+
+    @given(
+        giotto_time_series(
+            start_date=pd.Timestamp(2000, 1, 1), end_date=pd.Timestamp(2010, 1, 1)
+        ),
+        st.integers(0, 100),
+    )
+    def test_random_ts_and_window_size(self, df: pd.DataFrame, window_size: int):
+        min_feature = Min(window_size=window_size)
+        df_min = min_feature.fit_transform(df)
+        expected_df_mm = self._correct_min(df, window_size)
+
+        testing.assert_frame_equal(expected_df_mm, df_min)
 
 
 class TestExogenous:

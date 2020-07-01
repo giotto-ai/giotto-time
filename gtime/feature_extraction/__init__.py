@@ -7,6 +7,9 @@ from gtime.feature_generation.calendar import Calendar
 from .standard import (
     Shift,
     MovingAverage,
+    MovingMedian,
+    Max,
+    Min,
     MovingCustomFunction,
     Polynomial,
     Exogenous,
@@ -19,6 +22,9 @@ from .trend import Detrender
 __all__ = [
     "Shift",
     "MovingAverage",
+    "MovingMedian",
+    "Max",
+    "Min",
     "MovingCustomFunction",
     "Polynomial",
     "Exogenous",

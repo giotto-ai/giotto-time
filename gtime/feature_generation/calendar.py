@@ -261,9 +261,14 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
                 )
             else:
                 if self.freq is None:
-                    raise ValueError('You must specify the frequency in the constructor. Now it is None.')
+                    raise ValueError(
+                        "You must specify the frequency in the constructor. Now it is None."
+                    )
                 new_x_line = pd.DataFrame(
-                    columns=X.columns, index=pd.DatetimeIndex([X.index[-1] + pd.Timedelta(1, unit=self.freq)])
+                    columns=X.columns,
+                    index=pd.DatetimeIndex(
+                        [X.index[-1] + pd.Timedelta(1, unit=self.freq)]
+                    ),
                 )
             X_to_cut = pd.concat([X, new_x_line], axis=0)
             if isinstance(X_to_cut.index, pd.PeriodIndex):
