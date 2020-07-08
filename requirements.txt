@@ -1,5 +1,5 @@
 pandas>=0.25.3
-workalendar>=7.1.1
+fbprophet>=0.6
 scipy>=0.17.0
 scikit-learn>=0.22.0
 matplotlib>=3.1.0

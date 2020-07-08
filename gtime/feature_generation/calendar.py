@@ -1,7 +1,7 @@
 import importlib
 from datetime import datetime
 
-import workalendar
+from fbprophet.make_holidays import make_holidays_df
 from typing import Optional, Union, List
 
 import numpy as np
@@ -32,21 +32,10 @@ def _check_index(time_series: pd.DataFrame) -> None:
 class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
     """Create a feature based on the national holidays of a specific country.
 
-    The interface for this is based on the one of 'workalendar'. To see which regions
-    and countries are available, check the 'workalendar'
-    `documentation <https://peopledoc.github.io/workalendar/>`_.
-
     Parameters
     ----------
-    region : str, optional, default: ``'america'``
-        The region in which the ``country`` is located.
-
     country : str, optional, default: ``'Brazil'``
-        The name of the country from which to retrieve the holidays. The country must be
-        located in the given ``region``. For certain countries workalendar provides
-        additional 'subregions'. In order to use them instead of the whole country,
-        just use the name of the subregion instead of the country name (e.g. 'Vaud'
-        instead of 'Switzerland' for the canton of Vaud which is a part of Switzerland).
+        The name of the country from which to retrieve the holidays.
 
     start_date : str, optional, default: ``'01/01/2019'``
         The date starting from which to retrieve the holidays.
@@ -76,7 +65,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
     >>> from gtime.feature_extraction import Calendar
     >>> X = pd.DataFrame(range(0, 10), index=pd.period_range(start='2019-04-18',
     ...                  end='2019-04-27', freq='d'))
-    >>> cal_feature = Calendar(region="europe", country="Italy", kernel=[2, 1])
+    >>> cal_feature = Calendar(country="Italy", kernel=[2, 1])
     >>> cal_feature.fit_transform(X)
                 status__Calendar
     2019-04-18               0.0
@@ -94,7 +83,6 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
 
     def __init__(
         self,
-        region: str = "america",
         country: str = "Brazil",
         start_date: str = "01/01/2018",
         end_date: str = "01/01/2020",
@@ -103,7 +91,6 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
         freq: str = None,
     ):
         super().__init__()
-        self.region = region
         self.country = country
         self.start_date = start_date
         self.end_date = end_date
@@ -164,10 +151,7 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
 
         self._initialize_start_end_date(time_series)
 
-        workalendar_region = importlib.import_module(f".{self.region}", "workalendar")
-        workalendar_country = getattr(workalendar_region, self.country)()
-
-        events = self._get_holiday_events(workalendar_country)
+        events = self._get_holiday_events()
         if self.kernel is not None:
             events = self._apply_kernel(events)
         events.columns = self._get_events_column_names(time_series)
@@ -201,16 +185,16 @@ class Calendar(BaseEstimator, TransformerMixin, FeatureMixin):
             day=slacked_end_date_.day,
         )
 
-    def _get_holiday_events(self, country_mod):
+    def _get_holiday_events(self):
         index = pd.date_range(
             start=self.slacked_start_date_, end=self.slacked_end_date_, freq="D"
         )
         years = index.year.unique()
         events = pd.DataFrame()
         for year in years:
-            events = events.append(country_mod.holidays(year))
+            events = events.append(make_holidays_df([year], self.country))
 
-        events = events.rename(columns={0: "date", 1: "events"})
+        events = events.rename(columns={"ds": "date", "holiday": "events"})
         events["date"] = pd.to_datetime(events["date"])
         events["status"] = 1
         events = events.set_index("date")

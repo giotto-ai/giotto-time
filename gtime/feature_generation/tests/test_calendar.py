@@ -12,7 +12,6 @@ def test_empty_and_non_finite_kernel_error():
         Calendar(
             start_date="ignored",
             end_date="ignored",
-            region="america",
             country="Brazil",
             kernel=np.array([]),
         )
@@ -21,7 +20,6 @@ def test_empty_and_non_finite_kernel_error():
         Calendar(
             start_date="ignored",
             end_date="ignored",
-            region="america",
             country="Brazil",
             kernel=np.array([np.nan, 1]),
         )
@@ -38,7 +36,6 @@ def test_unevenly_spaced_time_series():
     cal_feature = Calendar(
         start_date="ignored",
         end_date="ignored",
-        region="america",
         country="Brazil",
         kernel=np.array([0, 1]),
     )
@@ -53,7 +50,6 @@ def test_correct_index_random_ts(ts):
     cal_feature = Calendar(
         start_date="ignored",
         end_date="ignored",
-        region="america",
         country="Brazil",
         kernel=np.array([1, 2]),
     )
