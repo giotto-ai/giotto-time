@@ -37,7 +37,7 @@ def test_polynomial_detrend():
         columns=[f"0__{feature_name}"],
         index=time_index,
     )
-    pd.testing.assert_frame_equal(ts_t, expected_ts)
+    pd.testing.assert_frame_equal(ts_t, expected_ts, check_less_precise=3)
 
 
 def test_exponential_detrend():

@@ -255,7 +255,7 @@ class TestHierarchicalTopDown:
         with pytest.raises(sklearn.exceptions.NotFittedError):
             hierarchical_basic_top_down_model.predict()
 
-    @given(dataframes=n_time_series_with_same_index())
+    @given(dataframes=n_time_series_with_same_index(min_n=5))
     def test_error_with_bad_predict_key(
         self, dataframes, hierarchical_basic_top_down_model
     ):

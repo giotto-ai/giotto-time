@@ -1,7 +1,8 @@
 import hypothesis.strategies as st
 import numpy as np
+import pandas as pd
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis.strategies import floats, sampled_from, data, lists, text
 from lime.explanation import Explanation
 from shap.explainers.explainer import Explainer
@@ -130,6 +131,7 @@ class TestAllExplainers:
             ]
         )
 
+    @settings(deadline=pd.Timedelta(milliseconds=5000), max_examples=7)
     @pytest.mark.parametrize(
         "explainer", lazy_fixtures([lime_explainer, shap_explainer])
     )
@@ -153,6 +155,7 @@ class TestAllExplainers:
 
 
 class TestLime:
+    @settings(deadline=pd.Timedelta(milliseconds=10000), max_examples=7)
     @given(regressor=models(), X_y=numpy_X_y_matrices(min_value=-100, max_value=100))
     def test_predict(self, lime_explainer, regressor, X_y):
         X, y = X_y

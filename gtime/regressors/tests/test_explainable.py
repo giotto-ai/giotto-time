@@ -1,7 +1,7 @@
 from typing import List
 
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from sklearn import clone
 from sklearn.base import BaseEstimator
 from sklearn.cluster import DBSCAN, KMeans, SpectralClustering
@@ -85,6 +85,7 @@ class TestExplainableRegressor:
             estimator_fit_attributes, cloned_estimator_fit_attributes
         )
 
+    @settings(deadline=pd.Timedelta(milliseconds=5000), max_examples=7)
     @pytest.mark.parametrize("explainer_type", ["lime", "shap"])
     @given(
         estimator=regressors(), X_y=numpy_X_y_matrices(min_value=-100, max_value=100)
