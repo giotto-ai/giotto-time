@@ -1,7 +1,5 @@
-import importlib
 from datetime import datetime
 
-from fbprophet.make_holidays import make_holidays_df
 from typing import Optional, Union, List
 
 import numpy as np
@@ -10,6 +8,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from gtime.base import FeatureMixin, add_class_name
+from gtime.external.make_holidays import make_holidays_df
 
 
 def _check_index(time_series: pd.DataFrame) -> None:
