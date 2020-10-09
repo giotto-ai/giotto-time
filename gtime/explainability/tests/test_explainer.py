@@ -5,7 +5,7 @@ import pytest
 from hypothesis import given, settings
 from hypothesis.strategies import floats, sampled_from, data, lists, text
 from lime.explanation import Explanation
-from shap.explainers.explainer import Explainer
+from shap.explainers._explainer import Explainer
 from sklearn.ensemble import (
     GradientBoostingRegressor,
     RandomForestRegressor,

@@ -3,14 +3,11 @@ from typing import Dict, List
 import numpy as np
 from sklearn.base import RegressorMixin
 from sklearn.multioutput import (
-    MultiOutputRegressor,
     _MultiOutputEstimator,
     _fit_estimator,
 )
 from sklearn.utils import check_X_y, check_array
 from sklearn.utils.validation import check_is_fitted
-
-from gtime.explainability.explainer import Explainer, _LimeExplainer, _ShapExplainer
 
 
 class MultiFeatureMultiOutputRegressor(RegressorMixin, _MultiOutputEstimator):
