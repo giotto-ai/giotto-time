@@ -5,7 +5,7 @@ import numpy as np
 import shap
 from lime import lime_tabular
 from lime.explanation import Explanation
-from shap.explainers.explainer import Explainer
+#from shap.explainers._explainer import Explainer
 from sklearn.base import RegressorMixin
 from sklearn.utils.validation import check_is_fitted
 
@@ -42,7 +42,7 @@ class _LimeExplainer(_RegressorExplainer):
     Examples
     --------
     >>> import numpy as np
-    >>> from gtime.explainability import _LimeExplainer
+    >>> from gtime.explainability.explainer import _LimeExplainer
     >>> from sklearn.ensemble import RandomForestRegressor
     >>> X = np.random.random((30, 5))
     >>> y = np.random.random(30)
@@ -155,7 +155,7 @@ class _ShapExplainer(_RegressorExplainer):
     Examples
     --------
     >>> import numpy as np
-    >>> from gtime.explainability import _ShapExplainer
+    >>> from gtime.explainability.explainer import _ShapExplainer
     >>> from sklearn.ensemble import RandomForestRegressor
     >>> X = np.random.random((30, 5))
     >>> y = np.random.random(30)
@@ -235,7 +235,7 @@ class _ShapExplainer(_RegressorExplainer):
 
     def _infer_explainer(
         self, model: RegressorMixin, X: np.ndarray, feature_names: List[str]
-    ) -> Explainer:
+    ):
         for explainer in self.allowed_explainer:
             try:
                 return explainer(model=model, data=X, feature_names=feature_names)
