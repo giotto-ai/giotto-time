@@ -5,7 +5,7 @@ import numpy as np
 import shap
 from lime import lime_tabular
 from lime.explanation import Explanation
-#from shap.explainers._explainer import Explainer
+from shap.explainers._explainer import Explainer
 from sklearn.base import RegressorMixin
 from sklearn.utils.validation import check_is_fitted
 
