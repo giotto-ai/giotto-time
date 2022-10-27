@@ -1,6 +1,0 @@
-steps:
-- bash: |
-    pip install dist/*.whl
-  displayName: 'Install the wheels'
-
-

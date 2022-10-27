@@ -109,6 +109,8 @@ class SeasonalNaive(TimeSeriesForecastingModel):
         features = [
             ("s1", Shift(0), make_column_selector()),
         ]
+        self.seasonal_length = seasonal_length
+        self.horizon = horizon
         super().__init__(
             features=features,
             horizon=horizon,

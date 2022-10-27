@@ -10,13 +10,13 @@ from gtime.causality.tests.common import make_df_from_expected_shifts
 
 
 def test_linear_coefficient():
-    expected_shifts = [randint(2, 9) * 2 for _ in range(3)]
+    expected_shifts = [randint(2, 6) * 2 for _ in range(3)]
 
     df = make_df_from_expected_shifts(expected_shifts)
-    slc = ShiftedLinearCoefficient(target_col="A", max_shift=20)
+    slc = ShiftedLinearCoefficient(target_col="A", max_shift=12)
     slc.fit(df)
 
-    shifts = slc.best_shifts_["A"][1:].values
+    shifts = slc.best_shifts_["A"][4:].values
     np.testing.assert_array_equal(shifts, expected_shifts)
 
 
@@ -36,10 +36,10 @@ def test_linear_bootstrap_p_values():
     # This test and the next one just test if the p_values on the diagonal are equal
     # to 0. Is hard to implement other unittest, since the bootstrapping always
     # gives different result. However, other properties could be tested
-    expected_shifts = [randint(2, 9) * 2 for _ in range(3)]
+    expected_shifts = [randint(2, 4) * 2 for _ in range(3)]
     df = make_df_from_expected_shifts(expected_shifts)
     shifted_test = ShiftedLinearCoefficient(
-        target_col="A", max_shift=5, bootstrap_iterations=500,
+        target_col="A", max_shift=8, bootstrap_iterations=500,
     )
     shifted_test.fit(df)
 
@@ -49,10 +49,10 @@ def test_linear_bootstrap_p_values():
 
 
 def test_linear_permutation_p_values():
-    expected_shifts = [randint(2, 9) * 2 for _ in range(3)]
+    expected_shifts = [randint(2, 4) * 2 for _ in range(3)]
     df = make_df_from_expected_shifts(expected_shifts)
     shifted_test = ShiftedLinearCoefficient(
-        target_col="A", max_shift=5, permutation_iterations=50,
+        target_col="A", max_shift=8, permutation_iterations=50,
     )
     shifted_test.fit(df)
 

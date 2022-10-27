@@ -124,10 +124,11 @@ class CausalityMixin:
 
             rhos.append(stats.pearsonr(samples[x], samples[y])[0])
         rhos = pd.DataFrame(rhos)
-        percentile = stats.percentileofscore(rhos, 0) / 100
-        p_value = 2 * (percentile if percentile < 0.5 else 1 - percentile)
+        percentiles = stats.percentileofscore(rhos, 0) / 100
+        # print("percentile: ", percentiles)
+        p_values = [2*percentile if percentile < 0.5 else 1 - percentile for percentile in percentiles]
 
-        return p_value
+        return p_values
 
     def _create_pivot_tables(self, best_shifts):
         pivot_best_shifts = pd.pivot_table(

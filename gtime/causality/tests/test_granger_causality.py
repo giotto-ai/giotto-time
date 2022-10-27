@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 import pandas as pd
 
+
 if pd.__version__ >= "1.0.0":
     import pandas._testing as testing
 else:
@@ -31,6 +32,5 @@ def test_granger_pvalues_ssr_f(test_input, expected):
     )
 
     p_value = granger.values[1]
-
     # Not exactly equal but up test to 7 digits
     np.testing.assert_almost_equal(p_value, expected, decimal=7)

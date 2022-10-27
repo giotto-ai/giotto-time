@@ -105,14 +105,16 @@ class ShiftedLinearCoefficient(BaseEstimator, TransformerMixin, CausalityMixin):
 
     def _get_max_coeff_shift(self, data: pd.DataFrame, x, y):
         shifts = pd.DataFrame()
-
         shifts[x] = data[x]
         shifts[y] = data[y]
-
+        # print("shifts:", shifts)
+        # print("data:", data)
         for shift in range(self.min_shift, self.max_shift + 1):
+            # print("data", shift, ":", data[x].shift(shift))
             shifts[shift] = data[x].shift(shift)
 
         shifts = shifts.dropna()
+
         lf = LinearRegression().fit(
             shifts[range(self.min_shift, self.max_shift + 1)].values, shifts[y].values
         )

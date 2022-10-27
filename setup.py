@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-"""Toolbox for Machine Learning using Topological Data Analysis."""
+"""Toolbox for Time Series Analysis."""
 
 import os
 import codecs
@@ -41,8 +41,9 @@ CLASSIFIERS = [
     "Operating System :: POSIX",
     "Operating System :: Unix",
     "Operating System :: MacOS",
-    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
 ]
 KEYWORDS = (
     "machine learning time series data analysis " + "topology, persistence diagrams"
