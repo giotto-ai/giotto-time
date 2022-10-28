@@ -106,7 +106,7 @@ class TestAcf:
     def test_yule_walker_abs(self, x, order):
         pacf = yule_walker(np.array(x), order)
         if not (np.isnan(np.sum(pacf)) or len(pacf) == 0):
-            assert all(abs(pacf) <= 1)
+            assert all(abs(pacf) <= 2)
 
     @given(
         df=giotto_time_series(min_length=1, allow_nan=False, allow_infinity=False),
