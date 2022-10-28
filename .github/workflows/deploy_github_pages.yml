@@ -29,13 +29,13 @@ jobs:
         git fetch
         git checkout gh-pages
         git checkout master
-        cd doc
+        cd docs
         make html
     - name: push to gh-pages
       run: |
         git symbolic-ref HEAD refs/heads/gh-pages
         git reset --mixed gh-pages
         git add --all
-        git add -f doc/build
+        git add -f docs/build
         git commit -m "push sphinx build"
         git push origin gh-pages
