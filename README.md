@@ -8,18 +8,18 @@
 # giotto-time
 
 giotto-time is a machine learning based time series forecasting toolbox in Python.
-It is part of the `Giotto <https://github.com/giotto-ai>`_ collection of open-source projects and aims to provide
+It is part of the [Giotto](https://github.com/giotto-ai) collection of open-source projects and aims to provide
 feature extraction, analysis, causality testing and forecasting models based on
-`scikit-learn <https://scikit-learn.org/stable/>`_ API.
+[scikit-learn](https://scikit-learn.org/stable/) API.
 
-##License
+## License
 
-giotto-time is distributed under the AGPLv3 `license <https://github.com/giotto-ai/giotto-time/blob/master/LICENSE>`_.
+giotto-time is distributed under the AGPLv3 [license](https://github.com/giotto-ai/giotto-time/blob/master/LICENSE).
 If you need a different distribution license, please contact the L2F team at business@l2f.ch.
 
 ## Documentation
 
-- API reference (stable release): https://docs-time.giotto.ai
+- API reference (stable release): https://giotto-ai.github.io/giotto-time/
 
 ## Getting started
 
@@ -48,34 +48,34 @@ pip install -e ".[tests, doc]"
 ## Example
 
 ```python
-    from gtime import *
-    from gtime.feature_extraction import *
-    import pandas as pd
-    import numpy as np
-    from sklearn.linear_model import LinearRegression
+from gtime import *
+from gtime.feature_extraction import *
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
 
-    # Create random DataFrame with DatetimeIndex
-    X_dt = pd.DataFrame(np.random.randint(4, size=(20)),
-                        index=pd.date_range("2019-12-20", "2020-01-08"),
-                        columns=['time_series'])
+# Create random DataFrame with DatetimeIndex
+X_dt = pd.DataFrame(np.random.randint(4, size=(20)),
+                    index=pd.date_range("2019-12-20", "2020-01-08"),
+                    columns=['time_series'])
 
-    # Convert the DatetimeIndex to PeriodIndex and create y matrix
-    X = preprocessing.TimeSeriesPreparation().transform(X_dt)
-    y = model_selection.horizon_shift(X, horizon=2)
+# Convert the DatetimeIndex to PeriodIndex and create y matrix
+X = preprocessing.TimeSeriesPreparation().transform(X_dt)
+y = model_selection.horizon_shift(X, horizon=2)
 
-    # Create some features
-    cal = feature_generation.Calendar(region="europe", country="Switzerland", kernel=np.array([1, 2]))
-    X_f = compose.FeatureCreation(
-        [('s_2', Shift(2), ['time_series']),
-         ('ma_3', MovingAverage(window_size=3), ['time_series']),
-         ('cal', cal, ['time_series'])]).fit_transform(X)
+# Create some features
+cal = feature_generation.Calendar(region="europe", country="Switzerland", kernel=np.array([1, 2]))
+X_f = compose.FeatureCreation(
+    [('s_2', Shift(2), ['time_series']),
+     ('ma_3', MovingAverage(window_size=3), ['time_series']),
+     ('cal', cal, ['time_series'])]).fit_transform(X)
 
-    # Train/test split
-    X_train, y_train, X_test, y_test = model_selection.FeatureSplitter().transform(X_f, y)
+# Train/test split
+X_train, y_train, X_test, y_test = model_selection.FeatureSplitter().transform(X_f, y)
 
-    # Try sklearn's MultiOutputRegressor as time-series forecasting model
-    gar = forecasting.GAR(LinearRegression())
-    gar.fit(X_train, y_train).predict(X_test)
+# Try sklearn's MultiOutputRegressor as time-series forecasting model
+gar = forecasting.GAR(LinearRegression())
+gar.fit(X_train, y_train).predict(X_test)
 
 ```
 
@@ -84,8 +84,8 @@ pip install -e ".[tests, doc]"
 
 We welcome new contributors of all experience levels. The Giotto
 community goals are to be helpful, welcoming, and effective. To learn more about
-making a contribution to giotto-time, please see the `CONTRIBUTING.rst
-<https://github.com/giotto-ai/giotto-time/blob/master/CONTRIBUTING.rst>`_ file.
+making a contribution to giotto-time, please see the [CONTRIBUTING.rst](https://github.com/giotto-ai/giotto-time/blob/master/CONTRIBUTING.rst) 
+file.
 
 ## Links
 
