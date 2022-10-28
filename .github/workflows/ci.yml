@@ -42,7 +42,7 @@ jobs:
         }
     - name: Test with pytest
       run: |
-        pytest –maxfail=5
+        pytest --maxfail=5
     - name: Integration tests
       run: |
         set -e
