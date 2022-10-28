@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Regressors &mdash; giotto-time 0.2.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Time Series Models" href="time_series_models.html" />
+    <link rel="prev" title="Preprocessing" href="preprocessing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> giotto-time
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="causality.html">Causality Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compose.html">Compose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_extraction.html">Feature Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_generation.html">Feature Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forecasting.html">Forecasting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_selection.html">Model Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Regressors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.regressors.ExplainableRegressor"><code class="docutils literal notranslate"><span class="pre">ExplainableRegressor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.regressors.ExplainableRegressor.fit"><code class="docutils literal notranslate"><span class="pre">ExplainableRegressor.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.regressors.ExplainableRegressor.predict"><code class="docutils literal notranslate"><span class="pre">ExplainableRegressor.predict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.regressors.LinearRegressor"><code class="docutils literal notranslate"><span class="pre">LinearRegressor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.regressors.LinearRegressor.fit"><code class="docutils literal notranslate"><span class="pre">LinearRegressor.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.regressors.LinearRegressor.predict"><code class="docutils literal notranslate"><span class="pre">LinearRegressor.predict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.regressors.MultiFeatureMultiOutputRegressor"><code class="docutils literal notranslate"><span class="pre">MultiFeatureMultiOutputRegressor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.regressors.MultiFeatureMultiOutputRegressor.fit"><code class="docutils literal notranslate"><span class="pre">MultiFeatureMultiOutputRegressor.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.regressors.MultiFeatureMultiOutputRegressor.predict"><code class="docutils literal notranslate"><span class="pre">MultiFeatureMultiOutputRegressor.predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="time_series_models.html">Time Series Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">giotto-time</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">API reference</a> &raquo;</li>
+      <li>Regressors</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/regressors.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gtime.regressors">
+<span id="regressors"></span><h1>Regressors<a class="headerlink" href="#module-gtime.regressors" title="Permalink to this heading"></a></h1>
+<p>The <a class="reference internal" href="#module-gtime.regressors" title="gtime.regressors"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gtime.regressors</span></code></a> module contains regression models.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.regressors.ExplainableRegressor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.regressors.</span></span><span class="sig-name descname"><span class="pre">ExplainableRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RegressorMixin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explainer_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.regressors.ExplainableRegressor" title="Permalink to this definition"></a></dt>
+<dd><p>Wraps the most commons scikit-learn regressor to offer a nice to use interface to fit/predict
+models and at the same time to explain the predictions.</p>
+<p>Since it follows the fit/predict interface of scikit-learn model it is compatible with
+scikit-learn pipelines, etc..</p>
+<p>2 explainers are available: LIME and SHAP</p>
+<p>You can get the explanation by accessing to <cite>regressor.explainer_.explanations_</cite> after
+the predict function,</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>estimator: RegressorMixin, required</dt><dd><p>the scikit-learn model</p>
+</dd>
+<dt>explainer_type: str, required</dt><dd><p>‘lime’ or ‘shap’</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.regressors</span> <span class="kn">import</span> <span class="n">ExplainableRegressor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span><span class="mi">20</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">20</span><span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="mi">20</span><span class="p">:]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">random_forest</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">explainable_regressor</span> <span class="o">=</span> <span class="n">ExplainableRegressor</span><span class="p">(</span><span class="n">random_forest</span><span class="p">,</span> <span class="s1">&#39;shap&#39;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">explainable_regressor</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">feature_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">explainable_regressor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="go">array([0.41323105, 0.40386639, 0.46462663, 0.3795568 , 0.57571486,</span>
+<span class="go">       0.37079003, 0.54756082, 0.35160197, 0.30881165, 0.48201442])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">explainable_regressor</span><span class="o">.</span><span class="n">explainer_</span><span class="o">.</span><span class="n">explanations_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">{&#39;a&#39;: -0.019896434698603117, &#39;b&#39;: 0.029814649814215954, &#39;c&#39;: 0.02447547087613202, &#39;d&#39;: 0.021313815648682066, &#39;e&#39;: -0.10778800140251406}</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.regressors.ExplainableRegressor.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.regressors.ExplainableRegressor.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit function that calls the fit on the estimator and on the explainer.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X: np.ndarray, required</dt><dd><p>train matrix</p>
+</dd>
+<dt>y: np.ndarray, required</dt><dd><p>train true values</p>
+</dd>
+<dt>feature_names: List[str], optional, (default=`None`)</dt><dd><p>the name of the feature column of X</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<p>Fitted <cite>ExplainableRegressor</cite></p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.regressors.ExplainableRegressor.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.regressors.ExplainableRegressor.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Predict function that call the predict function of the explainer.</p>
+<p>You can access to the explanation of the predictions via
+<cite>regressor.explainer_.explanations_</cite> attribute</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X: np.ndarray, required</dt><dd><p>test matrix</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+<p>predictions: np.ndarray</p>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.regressors.LinearRegressor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.regressors.</span></span><span class="sig-name descname"><span class="pre">LinearRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss=&lt;function</span> <span class="pre">mean_squared_error&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.regressors.LinearRegressor" title="Permalink to this definition"></a></dt>
+<dd><p>Implementation of a LinearRegressor that takes a custom loss function.</p>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>loss<span class="classifier">Callable, optional, default: <code class="docutils literal notranslate"><span class="pre">mean_squared_error</span></code></span></dt><dd><p>The loss function to use when fitting the model. The loss function must accept
+y_true, y_pred and return a single real number.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Examples<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.regressors.linear_regressor</span> <span class="kn">import</span> <span class="n">LinearRegressor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.metrics</span> <span class="kn">import</span> <span class="n">max_error</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lr</span> <span class="o">=</span> <span class="n">LinearRegressor</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">max_error</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="mi">90</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span><span class="mi">90</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">90</span><span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="mi">90</span><span class="p">:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">11</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lr</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="go">array([0.62987155, 0.46971378, 0.50421395, 0.5543149 , 0.50848151,</span>
+<span class="go">       0.54768797, 0.50968854, 0.50500384, 0.58069366, 0.54912972])</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.regressors.LinearRegressor.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#gtime.regressors.LinearRegressor" title="gtime.regressors.linear_regressor.LinearRegressor"><span class="pre">LinearRegressor</span></a></span></span><a class="headerlink" href="#gtime.regressors.LinearRegressor.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the linear model on <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> on the given loss function.To do the
+minimization, the <code class="docutils literal notranslate"><span class="pre">scipy.optimize.minimize</span></code> function is used. To have more
+details and check which kind of options are available, please refer to the scipy
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html">documentation</a>.</p>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features), required</span></dt><dd><p>The X matrix used as features in the fitting procedure.</p>
+</dd>
+<dt>y<span class="classifier">pd.DataFrame, shape (n_samples, 1), required</span></dt><dd><p>The y matrix to use as target values in the fitting procedure.</p>
+</dd>
+<dt>kwargs: dict, optional.</dt><dd><p>Optional arguments to pass to the <code class="docutils literal notranslate"><span class="pre">minimize</span></code> function of scipy.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self: LinearRegressor</dt><dd><p>The fitted model.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.regressors.LinearRegressor.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.regressors.LinearRegressor.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Predict the y values associated to the features <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features), required</span></dt><dd><p>The features used to predict.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>predictions<span class="classifier">pd.DataFrame, shape (n_samples, 1)</span></dt><dd><p>The predictions of the model</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.regressors.MultiFeatureMultiOutputRegressor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.regressors.</span></span><span class="sig-name descname"><span class="pre">MultiFeatureMultiOutputRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RegressorMixin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_to_features_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.regressors.MultiFeatureMultiOutputRegressor" title="Permalink to this definition"></a></dt>
+<dd><p>Multi target regression with option to choose the features for each target.</p>
+<p>This strategy consists of fitting one regressor per target. It is built over
+sklearn.multioutput.MultiOutputRegressor. Compared to this, it allows to choose
+different features for each regressor.</p>
+<section id="id10">
+<h2>Parameters<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>estimator: RegressorMixin, required</dt><dd><p>An estimator object implementing fit and predict.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h2>Examples<a class="headerlink" href="#id11" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.regressors</span> <span class="kn">import</span> <span class="n">MultiFeatureMultiOutputRegressor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span><span class="mi">20</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">20</span><span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="mi">20</span><span class="p">:]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">random_forest</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regressor</span> <span class="o">=</span> <span class="n">MultiFeatureMultiOutputRegressor</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">random_forest</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">target_to_features_dict</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="mi">2</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regressor</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">target_to_features_dict</span><span class="o">=</span><span class="n">target_to_features_dict</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">predictions</span> <span class="o">=</span> <span class="n">regressor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">predictions</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(10, 3)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.regressors.MultiFeatureMultiOutputRegressor.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.regressors.MultiFeatureMultiOutputRegressor.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the model.</p>
+<p>Train the models, one for each target variable in y.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">np.ndarray, shape (n_samples, n_features), required.</span></dt><dd><p>The data.</p>
+</dd>
+<dt>y<span class="classifier">np.ndarray, shape (n_samples, horizon), required.</span></dt><dd><p>The matrix containing the target variables.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Permalink to this heading"></a></h3>
+<p>self : object</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.regressors.MultiFeatureMultiOutputRegressor.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#gtime.regressors.MultiFeatureMultiOutputRegressor.predict" title="Permalink to this definition"></a></dt>
+<dd><p>For each row in <code class="docutils literal notranslate"><span class="pre">X</span></code>, make a prediction for each fitted model</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">np.ndarray, shape (n_samples, n_features), required</span></dt><dd><p>The data.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>predictions<span class="classifier">np.ndarray, shape (n_samples, horizon)</span></dt><dd><p>The predictions</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="preprocessing.html" class="btn btn-neutral float-left" title="Preprocessing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="time_series_models.html" class="btn btn-neutral float-right" title="Time Series Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, L2F.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forecasting &mdash; giotto-time 0.2.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Metrics" href="metrics.html" />
+    <link rel="prev" title="Feature Generation" href="feature_generation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> giotto-time
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="causality.html">Causality Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compose.html">Compose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_extraction.html">Feature Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_generation.html">Feature Generation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Forecasting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.forecasting.AverageForecaster"><code class="docutils literal notranslate"><span class="pre">AverageForecaster</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.AverageForecaster.fit"><code class="docutils literal notranslate"><span class="pre">AverageForecaster.fit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.forecasting.DriftForecaster"><code class="docutils literal notranslate"><span class="pre">DriftForecaster</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.DriftForecaster.fit"><code class="docutils literal notranslate"><span class="pre">DriftForecaster.fit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.forecasting.GAR"><code class="docutils literal notranslate"><span class="pre">GAR</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.GAR.fit"><code class="docutils literal notranslate"><span class="pre">GAR.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.GAR.predict"><code class="docutils literal notranslate"><span class="pre">GAR.predict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.forecasting.GARFF"><code class="docutils literal notranslate"><span class="pre">GARFF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.GARFF.fit"><code class="docutils literal notranslate"><span class="pre">GARFF.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.GARFF.predict"><code class="docutils literal notranslate"><span class="pre">GARFF.predict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.forecasting.HedgeForecaster"><code class="docutils literal notranslate"><span class="pre">HedgeForecaster</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.HedgeForecaster.fit"><code class="docutils literal notranslate"><span class="pre">HedgeForecaster.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.HedgeForecaster.fit_predict"><code class="docutils literal notranslate"><span class="pre">HedgeForecaster.fit_predict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.forecasting.MultiFeatureGAR"><code class="docutils literal notranslate"><span class="pre">MultiFeatureGAR</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.MultiFeatureGAR.fit"><code class="docutils literal notranslate"><span class="pre">MultiFeatureGAR.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.MultiFeatureGAR.predict"><code class="docutils literal notranslate"><span class="pre">MultiFeatureGAR.predict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.forecasting.MultiFeatureMultiOutputRegressor"><code class="docutils literal notranslate"><span class="pre">MultiFeatureMultiOutputRegressor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.MultiFeatureMultiOutputRegressor.fit"><code class="docutils literal notranslate"><span class="pre">MultiFeatureMultiOutputRegressor.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.MultiFeatureMultiOutputRegressor.predict"><code class="docutils literal notranslate"><span class="pre">MultiFeatureMultiOutputRegressor.predict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.forecasting.NaiveForecaster"><code class="docutils literal notranslate"><span class="pre">NaiveForecaster</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.forecasting.SeasonalNaiveForecaster"><code class="docutils literal notranslate"><span class="pre">SeasonalNaiveForecaster</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.SeasonalNaiveForecaster.fit"><code class="docutils literal notranslate"><span class="pre">SeasonalNaiveForecaster.fit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.forecasting.TrendForecaster"><code class="docutils literal notranslate"><span class="pre">TrendForecaster</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.TrendForecaster.fit"><code class="docutils literal notranslate"><span class="pre">TrendForecaster.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.forecasting.TrendForecaster.predict"><code class="docutils literal notranslate"><span class="pre">TrendForecaster.predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_selection.html">Model Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="regressors.html">Regressors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="time_series_models.html">Time Series Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">giotto-time</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">API reference</a> &raquo;</li>
+      <li>Forecasting</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/forecasting.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gtime.forecasting">
+<span id="forecasting"></span><h1>Forecasting<a class="headerlink" href="#module-gtime.forecasting" title="Permalink to this heading"></a></h1>
+<p>The <a class="reference internal" href="#module-gtime.forecasting" title="gtime.forecasting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gtime.forecasting</span></code></a> module contains a collection of machine learning models,
+for dealing with time series data.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.forecasting.AverageForecaster">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.forecasting.</span></span><span class="sig-name descname"><span class="pre">AverageForecaster</span></span><a class="headerlink" href="#gtime.forecasting.AverageForecaster" title="Permalink to this definition"></a></dt>
+<dd><p>Predicts all future data points as an average of all train items and all test items prior to is</p>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.model_selection</span> <span class="kn">import</span> <span class="n">horizon_shift</span><span class="p">,</span> <span class="n">FeatureSplitter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.forecasting</span> <span class="kn">import</span> <span class="n">AverageForecaster</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2011-01-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2012-01-01&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">horizon_shift</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">horizon</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">FeatureSplitter</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">AverageForecaster</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="go">                 y_1       y_2       y_3       y_4       y_5</span>
+<span class="go">2011-12-28  0.510285  0.510285  0.510285  0.510285  0.510285</span>
+<span class="go">2011-12-29  0.511362  0.511362  0.511362  0.511362  0.511362</span>
+<span class="go">2011-12-30  0.511445  0.511445  0.511445  0.511445  0.511445</span>
+<span class="go">2011-12-31  0.512714  0.512714  0.512714  0.512714  0.512714</span>
+<span class="go">2012-01-01  0.513053  0.513053  0.513053  0.513053  0.513053</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.AverageForecaster.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.AverageForecaster.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Stores average of all train data points</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
+<p>X : pd.DataFrame, shape (n_samples, n_features), train sample, required for compatibility, not used for a naive model.</p>
+<dl class="simple">
+<dt>y<span class="classifier">None</span></dt><dd><p>Used to store the predict feature names and prediction horizon.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">SeasonalNaiveForecaster</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.forecasting.DriftForecaster">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.forecasting.</span></span><span class="sig-name descname"><span class="pre">DriftForecaster</span></span><a class="headerlink" href="#gtime.forecasting.DriftForecaster" title="Permalink to this definition"></a></dt>
+<dd><p>Simple drift model, calculates drift as the difference between the first and the last elements of the train series, divided by the number of periods.</p>
+<section id="id1">
+<h2>Examples<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.model_selection</span> <span class="kn">import</span> <span class="n">horizon_shift</span><span class="p">,</span> <span class="n">FeatureSplitter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.forecasting</span> <span class="kn">import</span> <span class="n">DriftForecaster</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2011-01-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2012-01-01&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">horizon_shift</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">horizon</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">FeatureSplitter</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">DriftForecaster</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="go">                 y_1       y_2       y_3       y_4       y_5</span>
+<span class="go">2011-12-28  0.143006  0.142682  0.142359  0.142035  0.141712</span>
+<span class="go">2011-12-29  0.901308  0.900985  0.900661  0.900338  0.900015</span>
+<span class="go">2011-12-30  0.541559  0.541236  0.540912  0.540589  0.540265</span>
+<span class="go">2011-12-31  0.974740  0.974417  0.974093  0.973770  0.973446</span>
+<span class="go">2012-01-01  0.636604  0.636281  0.635957  0.635634  0.635311</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.DriftForecaster.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.DriftForecaster.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates and stores the drift as a difference between the first and the last observations of the train set divided by number of observations.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<p>X : pd.DataFrame, shape (n_samples, n_features), train sample.</p>
+<dl class="simple">
+<dt>y<span class="classifier">pd.DataFrame</span></dt><dd><p>Used to store the predict feature names and prediction horizon.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">DriftForecaster</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.forecasting.GAR">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.forecasting.</span></span><span class="sig-name descname"><span class="pre">GAR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explainer_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.GAR" title="Permalink to this definition"></a></dt>
+<dd><p>Generalized Auto Regression model.</p>
+<p>This model is a wrapper of <code class="docutils literal notranslate"><span class="pre">sklearn.multioutput.MultiOutputRegressor</span></code> but returns
+a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>.</p>
+<p>Fit one model for each target variable contained in the <code class="docutils literal notranslate"><span class="pre">y</span></code> matrix.</p>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>estimator<span class="classifier">estimator object, required</span></dt><dd><p>The model used to make the predictions step by step. Regressor object such as
+derived from <code class="docutils literal notranslate"><span class="pre">RegressorMixin</span></code>.</p>
+</dd>
+<dt>n_jobs<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>The number of jobs to use for the parallelization.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Examples<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.forecasting</span> <span class="kn">import</span> <span class="n">GAR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2020-01-30&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span> <span class="mi">5</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">time_index</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;y_1&quot;</span><span class="p">,</span> <span class="s2">&quot;y_2&quot;</span><span class="p">,</span> <span class="s2">&quot;y_3&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">time_index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">y_columns</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span><span class="mi">20</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">20</span><span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="mi">20</span><span class="p">:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">random_forest</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gar</span> <span class="o">=</span> <span class="n">GAR</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">random_forest</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gar</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">predictions</span> <span class="o">=</span> <span class="n">gar</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">predictions</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(10, 3)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.GAR.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.GAR.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the model.</p>
+<p>Train the models, one for each target variable in y.</p>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features), required.</span></dt><dd><p>The data.</p>
+</dd>
+<dt>y<span class="classifier">pd.DataFrame, shape (n_samples, horizon), required.</span></dt><dd><p>The matrix containing the target variables.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
+<p>self : object</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.GAR.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.forecasting.GAR.predict" title="Permalink to this definition"></a></dt>
+<dd><p>For each row in <code class="docutils literal notranslate"><span class="pre">X</span></code>, make a prediction for each fitted model, from 1 to
+<code class="docutils literal notranslate"><span class="pre">horizon</span></code>.</p>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features), required</span></dt><dd><p>The data.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>y_p_df<span class="classifier">pd.DataFrame, shape (n_samples, horizon)</span></dt><dd><p>The predictions, one for each timestep in horizon.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.forecasting.GARFF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.forecasting.</span></span><span class="sig-name descname"><span class="pre">GARFF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explainer_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.GARFF" title="Permalink to this definition"></a></dt>
+<dd><p>Generalized Auto Regression model with feedforward training. This model is a
+wrapper of <code class="docutils literal notranslate"><span class="pre">sklearn.multioutput.RegressorChain</span></code> but returns  a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>.</p>
+<p>Fit one model for each target variable contained in the <code class="docutils literal notranslate"><span class="pre">y</span></code> matrix, also using the
+predictions of the previous model.</p>
+<section id="id10">
+<h2>Parameters<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>estimator<span class="classifier">estimator object, required</span></dt><dd><p>The model used to make the predictions step by step. Regressor object such as
+derived from <code class="docutils literal notranslate"><span class="pre">RegressorMixin</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h2>Examples<a class="headerlink" href="#id11" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.forecasting</span> <span class="kn">import</span> <span class="n">GARFF</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2020-01-30&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span> <span class="mi">5</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">time_index</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;y_1&quot;</span><span class="p">,</span> <span class="s2">&quot;y_2&quot;</span><span class="p">,</span> <span class="s2">&quot;y_3&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">time_index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">y_columns</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span><span class="mi">20</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">20</span><span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="mi">20</span><span class="p">:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">random_forest</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">garff</span> <span class="o">=</span> <span class="n">GARFF</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">random_forest</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">garff</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">predictions</span> <span class="o">=</span> <span class="n">garff</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">predictions</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(10, 3)</span>
+</pre></div>
+</div>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">sklearn.multioutput.RegressorChain</span></code> order, cv and random_state parameters were
+set to None due to target order importance in a time-series forecasting context.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.GARFF.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.GARFF.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the models, one for each time step. Each model is trained on the initial
+set of features and on the true values of the previous steps.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features), required</span></dt><dd><p>The data.</p>
+</dd>
+<dt>y<span class="classifier">pd.DataFrame, shape (n_samples, horizon), required</span></dt><dd><p>The matrix containing the target variables.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>The fitted object.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.GARFF.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.forecasting.GARFF.predict" title="Permalink to this definition"></a></dt>
+<dd><p>For each row in <code class="docutils literal notranslate"><span class="pre">X</span></code>, make a prediction for each fitted model, from 1 to
+<code class="docutils literal notranslate"><span class="pre">horizon</span></code>.</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>The data.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>y_p_df<span class="classifier">pd.DataFrame, shape (n_samples, horizon)</span></dt><dd><p>The predictions, one for each timestep in horizon.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.forecasting.HedgeForecaster">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.forecasting.</span></span><span class="sig-name descname"><span class="pre">HedgeForecaster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">learning_rate:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss:</span> <span class="pre">callable</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">l1&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.HedgeForecaster" title="Permalink to this definition"></a></dt>
+<dd><p>Regressor model using Hedge algorithm.</p>
+<p>This algorithm is based on a multiplicative weight update method to create a dynamic combination of regressive
+models. In theory, there is no common training phase on data, only the loss is necessary to update the model.</p>
+<section id="id16">
+<h2>Parameters<a class="headerlink" href="#id16" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>learning_rate<span class="classifier">float, (default=0.001)</span></dt><dd><p>The factor to use for the weight update.</p>
+</dd>
+<dt>loss<span class="classifier">callable, optional (default=`gtime.forecasting.online.l1`)</span></dt><dd><p>Loss function use to compute loss matrix.</p>
+</dd>
+<dt>random_state<span class="classifier">int, RandomState instance or None, optional (default=None)</span></dt><dd><p>Controls both the randomness of the bootstrapping of the samples used
+when building trees (if <code class="docutils literal notranslate"><span class="pre">bootstrap=True</span></code>) and the sampling of the
+features to consider when looking for the best split at each node
+(if <code class="docutils literal notranslate"><span class="pre">max_features</span> <span class="pre">&lt;</span> <span class="pre">n_features</span></code>).
+# TODO: write glossary
+See <span class="xref std std-term">Glossary</span> for details.</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt><a href="#id45"><span class="problematic" id="id46">loss_matrix_</span></a><span class="classifier">array, (n_samples, n_experts)</span></dt><dd><p>Loss matrix between X and y.</p>
+</dd>
+<dt><a href="#id47"><span class="problematic" id="id48">total_loss_</span></a><span class="classifier">int or float,</span></dt><dd><p>Sum of losses based on Hedge algorithm decisions.</p>
+</dd>
+<dt><a href="#id49"><span class="problematic" id="id50">weights_</span></a><span class="classifier">array, (n_experts)</span></dt><dd><p>Last weight of each expert.</p>
+</dd>
+<dt><a href="#id51"><span class="problematic" id="id52">decisions_</span></a><span class="classifier">array, (n_samples)</span></dt><dd><p>Indices of chosen expert depending on weights.</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h2>Examples<a class="headerlink" href="#id17" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.forecasting.online</span> <span class="kn">import</span> <span class="n">HedgeForecaster</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2020-01-20&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">time_index</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">time_index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y_1&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hr</span> <span class="o">=</span> <span class="n">HedgeForecaster</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hr</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="go">            0</span>
+<span class="go">2020-01-01  2</span>
+<span class="go">2020-01-02  0</span>
+<span class="go">2020-01-03  3</span>
+<span class="go">2020-01-04  3</span>
+<span class="go">2020-01-05  2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimator weights: </span><span class="si">{</span><span class="n">hr</span><span class="o">.</span><span class="n">weights_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">Estimator weights: [0.97713925 0.97723619 0.97980439]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Decisions: </span><span class="si">{</span><span class="n">hr</span><span class="o">.</span><span class="n">decisions_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">Decisions: [1 2 2 1 0 0 0 2 1 2 0 2 2 0 0 0 0 1 1 0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total loss: </span><span class="si">{</span><span class="n">hr</span><span class="o">.</span><span class="n">total_loss_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">Total loss: 30</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.HedgeForecaster.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.HedgeForecaster.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the model to data, compute weights and decisions iteratively.</p>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">array-like, shape (n_samples, n_features)</span></dt><dd><p>Data.</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Permalink to this heading"></a></h3>
+<p>self : object</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.HedgeForecaster.fit_predict">
+<span class="sig-name descname"><span class="pre">fit_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.HedgeForecaster.fit_predict" title="Permalink to this definition"></a></dt>
+<dd><p>Fit and predict variable using Hedge algorithm.</p>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">(sparse) array-like, shape (n_samples, n_features)</span></dt><dd><p>Data.</p>
+</dd>
+<dt>y<span class="classifier">(sparse) array-like, shape (n_samples, n_outputs)</span></dt><dd><p>Predictions.</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h3>Returns<a class="headerlink" href="#id21" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>predictions<span class="classifier">pd.DataFrame</span></dt><dd><p>Predictions.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.forecasting.MultiFeatureGAR">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.forecasting.</span></span><span class="sig-name descname"><span class="pre">MultiFeatureGAR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RegressorMixin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explainer_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_to_features_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.MultiFeatureGAR" title="Permalink to this definition"></a></dt>
+<dd><p>Generalized Auto Regression model.</p>
+<p>This model is a wrapper of <code class="docutils literal notranslate"><span class="pre">MultiFeatureMultiOutputRegressor</span></code> but returns
+a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>.</p>
+<p>Fit one model for each target variable contained in the <code class="docutils literal notranslate"><span class="pre">y</span></code> matrix. You can select
+the feature columns to use for each model</p>
+<section id="id22">
+<h2>Parameters<a class="headerlink" href="#id22" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>estimator<span class="classifier">estimator object, required</span></dt><dd><p>The model used to make the predictions step by step. Regressor object such as
+derived from <code class="docutils literal notranslate"><span class="pre">RegressorMixin</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h2>Examples<a class="headerlink" href="#id23" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.forecasting</span> <span class="kn">import</span> <span class="n">MultiFeatureGAR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2020-01-30&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c1&#39;</span><span class="p">,</span> <span class="s1">&#39;c2&#39;</span><span class="p">,</span> <span class="s1">&#39;c3&#39;</span><span class="p">,</span> <span class="s1">&#39;c4&#39;</span><span class="p">,</span> <span class="s1">&#39;c5&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span> <span class="mi">5</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">time_index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">X_columns</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;y_1&quot;</span><span class="p">,</span> <span class="s2">&quot;y_2&quot;</span><span class="p">,</span> <span class="s2">&quot;y_3&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">time_index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">y_columns</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span><span class="mi">20</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">20</span><span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="mi">20</span><span class="p">:]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">random_forest</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gar</span> <span class="o">=</span> <span class="n">MultiFeatureGAR</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">random_forest</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">target_to_features_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;y_1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;c1&#39;</span><span class="p">,</span><span class="s1">&#39;c2&#39;</span><span class="p">,</span><span class="s1">&#39;c3&#39;</span><span class="p">],</span> <span class="s1">&#39;y_2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;c1&#39;</span><span class="p">,</span><span class="s1">&#39;c2&#39;</span><span class="p">,</span><span class="s1">&#39;c4&#39;</span><span class="p">],</span> <span class="s1">&#39;y_3&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;c1&#39;</span><span class="p">,</span><span class="s1">&#39;c2&#39;</span><span class="p">,</span><span class="s1">&#39;c5&#39;</span><span class="p">]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gar</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">target_to_features_dict</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">predictions</span> <span class="o">=</span> <span class="n">gar</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">predictions</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(10, 3)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.MultiFeatureGAR.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.MultiFeatureGAR.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the model.</p>
+<p>Train the models, one for each target variable in y.</p>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features), required.</span></dt><dd><p>The data.</p>
+</dd>
+<dt>y<span class="classifier">pd.DataFrame, shape (n_samples, horizon), required.</span></dt><dd><p>The matrix containing the target variables.</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Permalink to this heading"></a></h3>
+<p>self : object</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.MultiFeatureGAR.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.forecasting.MultiFeatureGAR.predict" title="Permalink to this definition"></a></dt>
+<dd><p>For each row in <code class="docutils literal notranslate"><span class="pre">X</span></code>, make a prediction for each fitted model, from 1 to
+<code class="docutils literal notranslate"><span class="pre">horizon</span></code>.</p>
+<section id="id26">
+<h3>Parameters<a class="headerlink" href="#id26" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features), required</span></dt><dd><p>The data.</p>
+</dd>
+</dl>
+</section>
+<section id="id27">
+<h3>Returns<a class="headerlink" href="#id27" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>y_p_df<span class="classifier">pd.DataFrame, shape (n_samples, horizon)</span></dt><dd><p>The predictions, one for each timestep in horizon.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.forecasting.MultiFeatureMultiOutputRegressor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.forecasting.</span></span><span class="sig-name descname"><span class="pre">MultiFeatureMultiOutputRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RegressorMixin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_to_features_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.MultiFeatureMultiOutputRegressor" title="Permalink to this definition"></a></dt>
+<dd><p>Multi target regression with option to choose the features for each target.</p>
+<p>This strategy consists of fitting one regressor per target. It is built over
+sklearn.multioutput.MultiOutputRegressor. Compared to this, it allows to choose
+different features for each regressor.</p>
+<section id="id28">
+<h2>Parameters<a class="headerlink" href="#id28" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>estimator: RegressorMixin, required</dt><dd><p>An estimator object implementing fit and predict.</p>
+</dd>
+</dl>
+</section>
+<section id="id29">
+<h2>Examples<a class="headerlink" href="#id29" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.regressors</span> <span class="kn">import</span> <span class="n">MultiFeatureMultiOutputRegressor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span><span class="mi">20</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">20</span><span class="p">:],</span> <span class="n">y</span><span class="p">[</span><span class="mi">20</span><span class="p">:]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">random_forest</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regressor</span> <span class="o">=</span> <span class="n">MultiFeatureMultiOutputRegressor</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">random_forest</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">target_to_features_dict</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="mi">2</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regressor</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">target_to_features_dict</span><span class="o">=</span><span class="n">target_to_features_dict</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">predictions</span> <span class="o">=</span> <span class="n">regressor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">predictions</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(10, 3)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.MultiFeatureMultiOutputRegressor.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.MultiFeatureMultiOutputRegressor.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the model.</p>
+<p>Train the models, one for each target variable in y.</p>
+<section id="id30">
+<h3>Parameters<a class="headerlink" href="#id30" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">np.ndarray, shape (n_samples, n_features), required.</span></dt><dd><p>The data.</p>
+</dd>
+<dt>y<span class="classifier">np.ndarray, shape (n_samples, horizon), required.</span></dt><dd><p>The matrix containing the target variables.</p>
+</dd>
+</dl>
+</section>
+<section id="id31">
+<h3>Returns<a class="headerlink" href="#id31" title="Permalink to this heading"></a></h3>
+<p>self : object</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.MultiFeatureMultiOutputRegressor.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#gtime.forecasting.MultiFeatureMultiOutputRegressor.predict" title="Permalink to this definition"></a></dt>
+<dd><p>For each row in <code class="docutils literal notranslate"><span class="pre">X</span></code>, make a prediction for each fitted model</p>
+<section id="id32">
+<h3>Parameters<a class="headerlink" href="#id32" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">np.ndarray, shape (n_samples, n_features), required</span></dt><dd><p>The data.</p>
+</dd>
+</dl>
+</section>
+<section id="id33">
+<h3>Returns<a class="headerlink" href="#id33" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>predictions<span class="classifier">np.ndarray, shape (n_samples, horizon)</span></dt><dd><p>The predictions</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.forecasting.NaiveForecaster">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.forecasting.</span></span><span class="sig-name descname"><span class="pre">NaiveForecaster</span></span><a class="headerlink" href="#gtime.forecasting.NaiveForecaster" title="Permalink to this definition"></a></dt>
+<dd><p>Naïve model, all predicted values are equal to the most recent available observation.</p>
+<section id="id34">
+<h2>Examples<a class="headerlink" href="#id34" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.model_selection</span> <span class="kn">import</span> <span class="n">horizon_shift</span><span class="p">,</span> <span class="n">FeatureSplitter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.forecasting</span> <span class="kn">import</span> <span class="n">NaiveForecaster</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2011-01-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2012-01-01&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">horizon_shift</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">horizon</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">FeatureSplitter</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">NaiveForecaster</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="go">                 y_1       y_2       y_3       y_4       y_5</span>
+<span class="go">2011-12-28  0.143006  0.143006  0.143006  0.143006  0.143006</span>
+<span class="go">2011-12-29  0.901308  0.901308  0.901308  0.901308  0.901308</span>
+<span class="go">2011-12-30  0.541559  0.541559  0.541559  0.541559  0.541559</span>
+<span class="go">2011-12-31  0.974740  0.974740  0.974740  0.974740  0.974740</span>
+<span class="go">2012-01-01  0.636604  0.636604  0.636604  0.636604  0.636604</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.forecasting.SeasonalNaiveForecaster">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.forecasting.</span></span><span class="sig-name descname"><span class="pre">SeasonalNaiveForecaster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seasonal_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.SeasonalNaiveForecaster" title="Permalink to this definition"></a></dt>
+<dd><p>Seasonal naïve model. The forecast is expected to follow a seasonal pattern of <code class="docutils literal notranslate"><span class="pre">seasonal_length</span></code> data points, which is determined by the last <code class="docutils literal notranslate"><span class="pre">seasonal_length</span></code> observations of a training dataset available.</p>
+<section id="id35">
+<h2>Parameters<a class="headerlink" href="#id35" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>seasonal_length: int, required</dt><dd><p>Length of a full seasonal cycle in number of periods. Period length is inferred from the training data.</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h2>Examples<a class="headerlink" href="#id36" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.model_selection</span> <span class="kn">import</span> <span class="n">horizon_shift</span><span class="p">,</span> <span class="n">FeatureSplitter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.forecasting</span> <span class="kn">import</span> <span class="n">SeasonalNaiveForecaster</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2011-01-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2012-01-01&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">horizon_shift</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">horizon</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">FeatureSplitter</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">SeasonalNaiveForecaster</span><span class="p">(</span><span class="n">seasonal_length</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="go">                 y_1       y_2       y_3       y_4       y_5</span>
+<span class="go">2011-12-28  0.990472  0.300248  0.782749  0.990472  0.300248</span>
+<span class="go">2011-12-29  0.300248  0.782749  0.990472  0.300248  0.782749</span>
+<span class="go">2011-12-30  0.782749  0.990472  0.300248  0.782749  0.990472</span>
+<span class="go">2011-12-31  0.990472  0.300248  0.782749  0.990472  0.300248</span>
+<span class="go">2012-01-01  0.300248  0.782749  0.990472  0.300248  0.782749</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.SeasonalNaiveForecaster.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.SeasonalNaiveForecaster.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the seasonal pattern from the last <code class="docutils literal notranslate"><span class="pre">self.seasonal_length</span></code> observations</p>
+<section id="id37">
+<h3>Parameters<a class="headerlink" href="#id37" title="Permalink to this heading"></a></h3>
+<p>X : pd.DataFrame, shape (n_samples, n_features), train sample.</p>
+<dl class="simple">
+<dt>y<span class="classifier">None</span></dt><dd><p>Used to store the predict feature names and prediction horizon.</p>
+</dd>
+</dl>
+</section>
+<section id="id38">
+<h3>Returns<a class="headerlink" href="#id38" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">SeasonalNaiveForecaster</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.forecasting.TrendForecaster">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.forecasting.</span></span><span class="sig-name descname"><span class="pre">TrendForecaster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trend:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trend_x0:</span> <span class="pre">~numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss:</span> <span class="pre">~typing.Callable</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">mean_squared_error&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'BFGS'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.forecasting.TrendForecaster" title="Permalink to this definition"></a></dt>
+<dd><p>Trend forecasting model.</p>
+<p>This estimator optimizes a trend function on train data and will forecast using this trend function with optimized
+parameters.</p>
+<section id="id39">
+<h2>Parameters<a class="headerlink" href="#id39" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>trend<span class="classifier"><code class="docutils literal notranslate"><span class="pre">&quot;polynomial&quot;</span></code> | <code class="docutils literal notranslate"><span class="pre">&quot;exponential&quot;</span></code>, required</span></dt><dd><p>The kind of trend removal to apply.</p>
+</dd>
+<dt>trend_x0<span class="classifier">np.array, required</span></dt><dd><p>Initialisation parameters passed to the trend function</p>
+</dd>
+<dt>loss<span class="classifier">Callable, optional, default: <code class="docutils literal notranslate"><span class="pre">mean_squared_error</span></code></span></dt><dd><p>Loss function to minimize.</p>
+</dd>
+<dt>method<span class="classifier">str, optional, default: <code class="docutils literal notranslate"><span class="pre">&quot;BFGS&quot;</span></code></span></dt><dd><p>Loss function optimisation method</p>
+</dd>
+</dl>
+</section>
+<section id="id40">
+<h2>Examples<a class="headerlink" href="#id40" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.model_selection</span> <span class="kn">import</span> <span class="n">horizon_shift</span><span class="p">,</span> <span class="n">FeatureSplitter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.forecasting</span> <span class="kn">import</span> <span class="n">TrendForecaster</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2020-01-10&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">horizon_shift</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">horizon</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">FeatureSplitter</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tf</span> <span class="o">=</span> <span class="n">TrendForecaster</span><span class="p">(</span><span class="n">trend</span><span class="o">=</span><span class="s1">&#39;polynomial&#39;</span><span class="p">,</span> <span class="n">trend_x0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="go">array([[0.39703029],</span>
+<span class="go">       [0.41734957]])</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.TrendForecaster.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#gtime.forecasting.TrendForecaster" title="gtime.forecasting.trend.TrendForecaster"><span class="pre">TrendForecaster</span></a></span></span><a class="headerlink" href="#gtime.forecasting.TrendForecaster.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator.</p>
+<section id="id41">
+<h3>Parameters<a class="headerlink" href="#id41" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features), required</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id42">
+<h3>Returns<a class="headerlink" href="#id42" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.forecasting.TrendForecaster.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.forecasting.TrendForecaster.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Using the fitted polynomial, predict the values starting from <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p>
+<section id="id43">
+<h3>Parameters<a class="headerlink" href="#id43" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X: pd.DataFrame, shape (n_samples, 1), required</dt><dd><p>The time series on which to predict.</p>
+</dd>
+</dl>
+</section>
+<section id="id44">
+<h3>Returns<a class="headerlink" href="#id44" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>predictions<span class="classifier">pd.DataFrame, shape (n_samples, 1)</span></dt><dd><p>The output predictions.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>NotFittedError</dt><dd><p>Raised if the model is not fitted yet.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="feature_generation.html" class="btn btn-neutral float-left" title="Feature Generation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="metrics.html" class="btn btn-neutral float-right" title="Metrics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, L2F.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

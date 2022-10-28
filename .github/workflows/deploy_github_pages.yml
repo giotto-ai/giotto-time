@@ -19,9 +19,9 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f doc-requirements.txt ]; then pip install -r doc-requirements.txt; fi
-    - name: Install sphinx
+    - name: Install giotto-time
       run: |
-        pip install sphinx
+        pip install -e .
     - name: Git checkout and build sphinx docs
       run: |
         git config --global user.name "github-pages[bot]"

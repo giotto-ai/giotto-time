@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time Series Models &mdash; giotto-time 0.2.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Regressors" href="regressors.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> giotto-time
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="causality.html">Causality Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compose.html">Compose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_extraction.html">Feature Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_generation.html">Feature Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forecasting.html">Forecasting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_selection.html">Model Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="regressors.html">Regressors</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Time Series Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.time_series_models.AR"><code class="docutils literal notranslate"><span class="pre">AR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.time_series_models.Average"><code class="docutils literal notranslate"><span class="pre">Average</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.time_series_models.CVPipeline"><code class="docutils literal notranslate"><span class="pre">CVPipeline</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.time_series_models.CVPipeline.fit"><code class="docutils literal notranslate"><span class="pre">CVPipeline.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.time_series_models.CVPipeline.predict"><code class="docutils literal notranslate"><span class="pre">CVPipeline.predict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.time_series_models.Drift"><code class="docutils literal notranslate"><span class="pre">Drift</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.time_series_models.Naive"><code class="docutils literal notranslate"><span class="pre">Naive</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.time_series_models.SeasonalNaive"><code class="docutils literal notranslate"><span class="pre">SeasonalNaive</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.time_series_models.TimeSeriesForecastingModel"><code class="docutils literal notranslate"><span class="pre">TimeSeriesForecastingModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.time_series_models.TimeSeriesForecastingModel.fit"><code class="docutils literal notranslate"><span class="pre">TimeSeriesForecastingModel.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.time_series_models.TimeSeriesForecastingModel.predict"><code class="docutils literal notranslate"><span class="pre">TimeSeriesForecastingModel.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.time_series_models.TimeSeriesForecastingModel.score"><code class="docutils literal notranslate"><span class="pre">TimeSeriesForecastingModel.score()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.time_series_models.TimeSeriesForecastingModel.set_model"><code class="docutils literal notranslate"><span class="pre">TimeSeriesForecastingModel.set_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.time_series_models.TimeSeriesForecastingModel.set_params"><code class="docutils literal notranslate"><span class="pre">TimeSeriesForecastingModel.set_params()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">giotto-time</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">API reference</a> &raquo;</li>
+      <li>Time Series Models</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/time_series_models.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gtime.time_series_models">
+<span id="time-series-models"></span><h1>Time Series Models<a class="headerlink" href="#module-gtime.time_series_models" title="Permalink to this heading"></a></h1>
+<p>The <a class="reference internal" href="#module-gtime.time_series_models" title="gtime.time_series_models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gtime.time_series_models</span></code></a> module contains time series models.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.time_series_models.AR">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.time_series_models.</span></span><span class="sig-name descname"><span class="pre">AR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explainer_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.time_series_models.AR" title="Permalink to this definition"></a></dt>
+<dd><p>Standard AR model for time series</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>p: int, required</dt><dd><p>p parameter in AR</p>
+</dd>
+<dt>horizon: int, required</dt><dd><p>how many steps to predict in the future</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas._testing</span> <span class="k">as</span> <span class="nn">testing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.time_series_models</span> <span class="kn">import</span> <span class="n">AR</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">testing</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">testing</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">testing</span><span class="o">.</span><span class="n">makeTimeDataFrame</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ar</span> <span class="o">=</span> <span class="n">AR</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">horizon</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="s1">&#39;A&#39;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ar</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ar</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">                          y_1       y_2       y_3</span>
+<span class="go">2000-01-01 00:00:17  0.037228  0.163446 -0.237299</span>
+<span class="go">2000-01-01 00:00:18 -0.139627 -0.018082  0.063273</span>
+<span class="go">2000-01-01 00:00:19 -0.107707  0.052031 -0.105526</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.time_series_models.Average">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.time_series_models.</span></span><span class="sig-name descname"><span class="pre">Average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horizon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.time_series_models.Average" title="Permalink to this definition"></a></dt>
+<dd><p>Average model pipeline, no feature creation and <code class="docutils literal notranslate"><span class="pre">AverageModel()</span></code> as a model</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
+<p>horizon: int - prediction horizon, in time series periods</p>
+</section>
+<section id="id2">
+<h2>Examples<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.time_series_models</span> <span class="kn">import</span> <span class="n">Average</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2011-01-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2012-01-01&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Average</span><span class="p">(</span><span class="n">horizon</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">                 y_1       y_2       y_3       y_4       y_5</span>
+<span class="go">2011-12-28  0.558475  0.558475  0.558475  0.558475  0.558475</span>
+<span class="go">2011-12-29  0.556379  0.556379  0.556379  0.556379  0.556379</span>
+<span class="go">2011-12-30  0.543946  0.543946  0.543946  0.543946  0.543946</span>
+<span class="go">2011-12-31  0.581512  0.581512  0.581512  0.581512  0.581512</span>
+<span class="go">2012-01-01  0.569221  0.569221  0.569221  0.569221  0.569221</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.time_series_models.CVPipeline">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.time_series_models.</span></span><span class="sig-name descname"><span class="pre">CVPipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">models_sets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_splits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.time_series_models.CVPipeline" title="Permalink to this definition"></a></dt>
+<dd><p>Cross-validation for models of <code class="docutils literal notranslate"><span class="pre">time_series_models</span></code> classes</p>
+<section id="id3">
+<h2>Parameters<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h2>
+<p>models_sets: Dict, a dictionary with models as keys and model parameter grid dictionaries as values
+n_splits: int, number of intervals for cross-validation
+blocking: bool, whether to perform a basic time series split or a blocking one
+metrics: Dict, a dictionary with metric names as keys and metric functions as values
+selection: Callable, a function to select the best model given score table</p>
+</section>
+<section id="id4">
+<h2>Examples<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.preprocessing</span> <span class="kn">import</span> <span class="n">TimeSeriesPreparation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.time_series_models</span> <span class="kn">import</span> <span class="n">CVPipeline</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.metrics</span> <span class="kn">import</span> <span class="n">rmse</span><span class="p">,</span> <span class="n">mape</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.time_series_models</span> <span class="kn">import</span> <span class="n">Naive</span><span class="p">,</span> <span class="n">AR</span><span class="p">,</span> <span class="n">TimeSeriesForecastingModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.forecasting</span> <span class="kn">import</span> <span class="n">NaiveForecaster</span><span class="p">,</span> <span class="n">DriftForecaster</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">MovingAverage</span><span class="p">,</span> <span class="n">Polynomial</span><span class="p">,</span> <span class="n">Shift</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">ParameterGrid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s2">&quot;2011-01-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2012-01-01&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;time_series&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shift_feature</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="n">Shift</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="p">[</span><span class="s1">&#39;time_series&#39;</span><span class="p">])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ma_feature</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;ma10&#39;</span><span class="p">,</span> <span class="n">MovingAverage</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="p">[</span><span class="s1">&#39;time_series&#39;</span><span class="p">])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scoring</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;RMSE&#39;</span><span class="p">:</span> <span class="n">rmse</span><span class="p">,</span> <span class="s1">&#39;MAPE&#39;</span><span class="p">:</span> <span class="n">mape</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">models</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="n">TimeSeriesForecastingModel</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;features&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">shift_feature</span><span class="p">,</span> <span class="n">ma_feature</span><span class="p">],</span>
+<span class="gp">... </span>                                 <span class="s1">&#39;horizon&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+<span class="gp">... </span>                                 <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">NaiveForecaster</span><span class="p">(),</span> <span class="n">DriftForecaster</span><span class="p">()]},</span>
+<span class="gp">... </span>    <span class="n">Naive</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;horizon&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">]},</span>
+<span class="gp">... </span>    <span class="n">AR</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;horizon&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+<span class="gp">... </span>         <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]}</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">CVPipeline</span><span class="p">(</span><span class="n">models_sets</span><span class="o">=</span><span class="n">models</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">scoring</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">                 y_1       y_2       y_3       y_4       y_5</span>
+<span class="go">2011-12-28  0.025198  0.005753  0.041398  0.008531 -0.053772</span>
+<span class="go">2011-12-29  0.024587  0.004619 -0.021253 -0.086931 -0.012732</span>
+<span class="go">2011-12-30  0.000045  0.011903 -0.055153  0.007690  0.151219</span>
+<span class="go">2011-12-31  0.025556  0.006280  0.071624  0.054207 -0.073940</span>
+<span class="go">2012-01-01 -0.017229  0.018712 -0.000043  0.199268  0.219392</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.time_series_models.CVPipeline.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'best'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.time_series_models.CVPipeline.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Performs cross-validation, selecting the best model from <code class="docutils literal notranslate"><span class="pre">self.model_list</span></code> according to <code class="docutils literal notranslate"><span class="pre">self.selection</span></code>
+and refits all the models on all available data.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
+<p>X: pd.DataFrame, input time series
+y: pd.DataFrame, left for compatibility, not used
+refit: Union[str, List], models to refit on whole train data, <code class="docutils literal notranslate"><span class="pre">all</span></code>, <code class="docutils literal notranslate"><span class="pre">best</span></code> or a list of model keys</p>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<p>self: CVPipeline</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.time_series_models.CVPipeline.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.time_series_models.CVPipeline.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Predicting with selected <code class="docutils literal notranslate"><span class="pre">self.best_model_</span></code></p>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X: pd.DataFrame, optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></dt><dd><p>time series to predict, optional. If not present, it predicts
+on the time series given as input in <code class="docutils literal notranslate"><span class="pre">self.fit()</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
+<p>predictions: pd.DataFrame</p>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.time_series_models.Drift">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.time_series_models.</span></span><span class="sig-name descname"><span class="pre">Drift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horizon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.time_series_models.Drift" title="Permalink to this definition"></a></dt>
+<dd><p>Simple drift model pipeline, no feature creation and <code class="docutils literal notranslate"><span class="pre">DriftModel()</span></code> as a model</p>
+<section id="id8">
+<h2>Parameters<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h2>
+<p>horizon: int - prediction horizon, in time series periods</p>
+</section>
+<section id="id9">
+<h2>Examples<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.time_series_models</span> <span class="kn">import</span> <span class="n">Drift</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2011-01-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2012-01-01&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Drift</span><span class="p">(</span><span class="n">horizon</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>y_1       y_2       y_3       y_4       y_5</p>
+</div></blockquote>
+<p>2011-12-28  0.903984  0.902982  0.901980  0.900978  0.899976
+2011-12-29  0.543806  0.542804  0.541802  0.540800  0.539798
+2011-12-30  0.456911  0.455910  0.454908  0.453906  0.452904
+2011-12-31  0.882041  0.881040  0.880038  0.879036  0.878034
+2012-01-01  0.458604  0.457602  0.456600  0.455598  0.454596</p>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.time_series_models.Naive">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.time_series_models.</span></span><span class="sig-name descname"><span class="pre">Naive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horizon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.time_series_models.Naive" title="Permalink to this definition"></a></dt>
+<dd><p>Naive model pipeline, no feature creation and <code class="docutils literal notranslate"><span class="pre">NaiveModel()</span></code> as a model</p>
+<section id="id10">
+<h2>Parameters<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h2>
+<p>horizon: int - prediction horizon, in time series periods</p>
+</section>
+<section id="id11">
+<h2>Examples<a class="headerlink" href="#id11" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.time_series_models</span> <span class="kn">import</span> <span class="n">Naive</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2011-01-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2012-01-01&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Naive</span><span class="p">(</span><span class="n">horizon</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">                 y_1       y_2       y_3       y_4</span>
+<span class="go">2011-12-29  0.543806  0.543806  0.543806  0.543806</span>
+<span class="go">2011-12-30  0.456911  0.456911  0.456911  0.456911</span>
+<span class="go">2011-12-31  0.882041  0.882041  0.882041  0.882041</span>
+<span class="go">2012-01-01  0.458604  0.458604  0.458604  0.458604</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.time_series_models.SeasonalNaive">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.time_series_models.</span></span><span class="sig-name descname"><span class="pre">SeasonalNaive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horizon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seasonal_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.time_series_models.SeasonalNaive" title="Permalink to this definition"></a></dt>
+<dd><p>Seasonal naive model pipeline, no feature creation and <code class="docutils literal notranslate"><span class="pre">SeasonalNaiveModel()</span></code> as a model</p>
+<section id="id12">
+<h2>Parameters<a class="headerlink" href="#id12" title="Permalink to this heading"></a></h2>
+<p>horizon: int - prediction horizon, in time series periods
+seasonal_length: int - full season cycle length, in time series periods</p>
+</section>
+<section id="id13">
+<h2>Examples<a class="headerlink" href="#id13" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.time_series_models</span> <span class="kn">import</span> <span class="n">SeasonalNaive</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2011-01-01&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2012-01-01&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">index</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">SeasonalNaive</span><span class="p">(</span><span class="n">horizon</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">seasonal_length</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>y_1       y_2       y_3       y_4       y_5</p>
+</div></blockquote>
+<p>2011-12-28  0.392676  0.956406  0.187131  0.128861  0.392676
+2011-12-29  0.956406  0.187131  0.128861  0.392676  0.956406
+2011-12-30  0.187131  0.128861  0.392676  0.956406  0.187131
+2011-12-31  0.128861  0.392676  0.956406  0.187131  0.128861
+2012-01-01  0.392676  0.956406  0.187131  0.128861  0.392676</p>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.time_series_models.TimeSeriesForecastingModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.time_series_models.</span></span><span class="sig-name descname"><span class="pre">TimeSeriesForecastingModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RegressorMixin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.time_series_models.TimeSeriesForecastingModel" title="Permalink to this definition"></a></dt>
+<dd><p>Base class for a generic time series forecasting model.</p>
+<p>Internally this class follows our approach for time series forecasting:
+- feature creation
+- train and test split
+- forecasting model training
+- prediction</p>
+<section id="id14">
+<h2>Parameters<a class="headerlink" href="#id14" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>features<span class="classifier">List[Tuple]], required</span></dt><dd><p>input of class FeatureCreation, which inherits from
+<code class="docutils literal notranslate"><span class="pre">sklearn.compose.ColumnTransformer</span></code>. It is
+used internally to instantiate FeatureCreation</p>
+</dd>
+<dt>horizon<span class="classifier">Union[int, List[int], required</span></dt><dd><p>how many steps to predict in the future</p>
+</dd>
+<dt>model: RegressorMixin, required</dt><dd><p>forecasting model used for predictions</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h2>Examples<a class="headerlink" href="#id15" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas._testing</span> <span class="k">as</span> <span class="nn">testing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">Shift</span><span class="p">,</span> <span class="n">MovingAverage</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.forecasting</span> <span class="kn">import</span> <span class="n">GAR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.time_series_models</span> <span class="kn">import</span> <span class="n">TimeSeriesForecastingModel</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">testing</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">testing</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">testing</span><span class="o">.</span><span class="n">makeTimeDataFrame</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">features</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;s1&#39;</span><span class="p">,</span> <span class="n">Shift</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]),</span> <span class="p">(</span><span class="s1">&#39;ma3&#39;</span><span class="p">,</span> <span class="n">MovingAverage</span><span class="p">(</span><span class="n">window_size</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lr</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time_series_pipeline</span> <span class="o">=</span> <span class="n">TimeSeriesForecastingModel</span><span class="p">(</span><span class="n">features</span><span class="o">=</span><span class="n">features</span><span class="p">,</span> <span class="n">horizon</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">GAR</span><span class="p">(</span><span class="n">lr</span><span class="p">))</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time_series_pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time_series_pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="go">                          y_1       y_2       y_3</span>
+<span class="go">2000-01-01 00:00:17  0.574204 -0.147355  0.449696</span>
+<span class="go">2000-01-01 00:00:18  0.034620  0.308283 -0.113223</span>
+<span class="go">2000-01-01 00:00:19  0.801922  0.178843  0.518739</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.time_series_models.TimeSeriesForecastingModel.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.time_series_models.TimeSeriesForecastingModel.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit function for a time series forecasting model.</p>
+<p>It does the following:
+- creates the X and y feature matrices
+- splits them into train and test
+- train the forecasting model on the train</p>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>X<span class="classifier">pd.DataFrame, required</span></dt><dd><p>input time series</p>
+</dd>
+<dt>y<span class="classifier">pd.DataFrame, optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>added for compatibility reasons with <code class="docutils literal notranslate"><span class="pre">sklearn.compose.ColumnTransformer</span></code></p>
+</dd>
+<dt>only_model: bool, optional, default: <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>if True only th model part is run, not the feature part. It is useful if the feature computation is expensive.</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h3>Returns<a class="headerlink" href="#id17" title="Permalink to this heading"></a></h3>
+<p>self</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.time_series_models.TimeSeriesForecastingModel.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.time_series_models.TimeSeriesForecastingModel.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Predict</p>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>X<span class="classifier">pd.DataFrame, optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>time series to predict, optional. If not present, it predicts
+on the time series given as input in <code class="docutils literal notranslate"><span class="pre">self.fit()</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Permalink to this heading"></a></h3>
+<p>predictions: pd.DataFrame</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.time_series_models.TimeSeriesForecastingModel.score">
+<span class="sig-name descname"><span class="pre">score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.time_series_models.TimeSeriesForecastingModel.score" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a pd.DataFrame of train and test scores of all metrics provided</p>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Permalink to this heading"></a></h3>
+<p>X: pd.DataFrame, test data, if None <a href="#id24"><span class="problematic" id="id25">self.X_test_</span></a> is used
+y: pd.DataFrame, true y values, if None <a href="#id26"><span class="problematic" id="id27">self.y_test_</span></a> is used
+metrics: Dict, a dictionary of metric names and callables, default is <code class="docutils literal notranslate"><span class="pre">rmse</span></code></p>
+</section>
+<section id="id21">
+<h3>Returns<a class="headerlink" href="#id21" title="Permalink to this heading"></a></h3>
+<p>score: pd.DataFrame</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.time_series_models.TimeSeriesForecastingModel.set_model">
+<span class="sig-name descname"><span class="pre">set_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseEstimator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.time_series_models.TimeSeriesForecastingModel.set_model" title="Permalink to this definition"></a></dt>
+<dd><p>Changes the model in the pipeline</p>
+<section id="id22">
+<h3>Parameters<a class="headerlink" href="#id22" title="Permalink to this heading"></a></h3>
+<p>model: BaseEstimator, should be compatible with the features</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.time_series_models.TimeSeriesForecastingModel.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.time_series_models.TimeSeriesForecastingModel.set_params" title="Permalink to this definition"></a></dt>
+<dd><p>Sets model parameters</p>
+<section id="id23">
+<h3>Parameters<a class="headerlink" href="#id23" title="Permalink to this heading"></a></h3>
+<p>params: Dict or name=value pair, parameters</p>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="regressors.html" class="btn btn-neutral float-left" title="Regressors" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, L2F.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

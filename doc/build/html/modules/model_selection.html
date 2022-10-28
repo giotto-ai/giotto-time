@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model Selection &mdash; giotto-time 0.2.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Preprocessing" href="preprocessing.html" />
+    <link rel="prev" title="Metrics" href="metrics.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> giotto-time
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="causality.html">Causality Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compose.html">Compose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_extraction.html">Feature Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_generation.html">Feature Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forecasting.html">Forecasting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Model Selection</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.model_selection.FeatureSplitter"><code class="docutils literal notranslate"><span class="pre">FeatureSplitter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.model_selection.FeatureSplitter.transform"><code class="docutils literal notranslate"><span class="pre">FeatureSplitter.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.model_selection.blocking_time_series_split"><code class="docutils literal notranslate"><span class="pre">blocking_time_series_split()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.model_selection.horizon_shift"><code class="docutils literal notranslate"><span class="pre">horizon_shift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.model_selection.time_series_split"><code class="docutils literal notranslate"><span class="pre">time_series_split()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="regressors.html">Regressors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="time_series_models.html">Time Series Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">giotto-time</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">API reference</a> &raquo;</li>
+      <li>Model Selection</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/model_selection.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gtime.model_selection">
+<span id="model-selection"></span><h1>Model Selection<a class="headerlink" href="#module-gtime.model_selection" title="Permalink to this heading"></a></h1>
+<p>The <a class="reference internal" href="#module-gtime.model_selection" title="gtime.model_selection"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gtime.model_selection</span></code></a> module deals with model selection.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.model_selection.FeatureSplitter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.model_selection.</span></span><span class="sig-name descname"><span class="pre">FeatureSplitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drop_na_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'any'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.model_selection.FeatureSplitter" title="Permalink to this definition"></a></dt>
+<dd><p>Splits the feature matrices X and y in X_train, y_train, X_test, y_test.</p>
+<p>X and y are the feature matrices obtained from the FeatureCreation class.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>drop_na_mode<span class="classifier">str, optional, default: <code class="docutils literal notranslate"><span class="pre">'any'</span></code></span></dt><dd><p>How to drop the Nan contained in the <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> matrices. Only ‘any’ is
+supported for the moment.</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.model_selection</span> <span class="kn">import</span> <span class="n">FeatureSplitter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">&quot;feature_0&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span>
+<span class="gp">... </span>                            <span class="s2">&quot;feature_1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span>
+<span class="gp">... </span>                                           <span class="mf">4.5</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">,</span> <span class="p">]</span>
+<span class="gp">... </span>                           <span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">&quot;y_0&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span>
+<span class="gp">... </span>                            <span class="s2">&quot;y_1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span>
+<span class="gp">... </span>                            <span class="s2">&quot;y_2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span>
+<span class="gp">... </span>                           <span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_splitter</span> <span class="o">=</span> <span class="n">FeatureSplitter</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">feature_splitter</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span>
+<span class="go">   feature_0  feature_1</span>
+<span class="go">2        1.0        0.5</span>
+<span class="go">3        2.0        1.5</span>
+<span class="go">4        3.0        2.5</span>
+<span class="go">5        4.0        3.5</span>
+<span class="go">6        5.0        4.5</span>
+<span class="go">7        6.0        5.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_train</span>
+<span class="go">   y_0  y_1  y_2</span>
+<span class="go">2    2  3.0  4.0</span>
+<span class="go">3    3  4.0  5.0</span>
+<span class="go">4    4  5.0  6.0</span>
+<span class="go">5    5  6.0  7.0</span>
+<span class="go">6    6  7.0  8.0</span>
+<span class="go">7    7  8.0  9.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_test</span>
+<span class="go">   feature_0  feature_1</span>
+<span class="go">8        7.0        6.5</span>
+<span class="go">9        8.0        7.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_test</span>
+<span class="go">   y_0  y_1  y_2</span>
+<span class="go">8    8  9.0  NaN</span>
+<span class="go">9    9  NaN  NaN</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.model_selection.FeatureSplitter.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X:</span> <span class="pre">~pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y:</span> <span class="pre">~pandas.core.frame.DataFrame)</span> <span class="pre">-&gt;</span> <span class="pre">(&lt;class</span> <span class="pre">'pandas.core.frame.DataFrame'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'pandas.core.frame.DataFrame'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'pandas.core.frame.DataFrame'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'pandas.core.frame.DataFrame'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.model_selection.FeatureSplitter.transform" title="Permalink to this definition"></a></dt>
+<dd><p>Split the feature matrices X and y in X_train, y_train, X_test, y_test.</p>
+<p><code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> are the feature matrices obtained from the FeatureCreation
+class.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features), required</span></dt><dd><p>The feature matrix.</p>
+</dd>
+<dt>y<span class="classifier">pd.DataFrame, shape (n_samples, horizon), required</span></dt><dd><p>The y matrix.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X_train, y_train, X_test, y_test<span class="classifier">Tuple[pd.DataFrame, pd.DataFrame,</span></dt><dd><p>pd.DataFrame, pd.DataFrame]
+The X and y, split between train and test.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gtime.model_selection.blocking_time_series_split">
+<span class="sig-prename descclassname"><span class="pre">gtime.model_selection.</span></span><span class="sig-name descname"><span class="pre">blocking_time_series_split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_splits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'index'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.model_selection.blocking_time_series_split" title="Permalink to this definition"></a></dt>
+<dd><p>Time Series cross-validator</p>
+<p>Blocking Time Series Split works by adding margin after each split. 
+The margin is between the folds used at each iteration in order to prevent the model 
+from memorizing patterns from an iteration to the next.</p>
+<p>If the data is not a timeries then the split is based on the number of samples.
+If the data has a time index and split_on ‘time’ then divide the time series based on time.</p>
+<section id="id2">
+<h2>Parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h2>
+<p>time_series : pandas DataFrame, shape (n_samples, n_features), required</p>
+<p>n_splits : int, default = 4, required
+The number of splits/folds on the dataset</p>
+<p>split_on : ‘index’, default = ‘index’. Optional - ‘time’ 
+If the parameter is ‘time’ then dataframe index must be DatetimeIndex or PeriodIndex or TimedeltaIndex. 
+The dataset will be split based on time</p>
+</section>
+<section id="yields">
+<h2>Yields<a class="headerlink" href="#yields" title="Permalink to this heading"></a></h2>
+<p>fold : RangeIndex indexes of folds, or 
+time_fold : DateTimeIndex of folds if split_on ‘time’</p>
+</section>
+<section id="id3">
+<h2>Examples<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h2>
+<p>Example 1)
+&gt;&gt;&gt; date_rng = pd.date_range(start=’1/1/2018’, end=’1/08/2018’, freq=’D’)
+&gt;&gt;&gt; time_series = pd.DataFrame(date_rng, columns=[‘date’])
+&gt;&gt;&gt; time_series.set_index(‘date’, inplace=True)
+&gt;&gt;&gt; time_series[‘data’] = np.random.randint(0,100,size=(len(date_rng)))
+&gt;&gt;&gt; for fold in (time_series_split(time_series, n_splits=4, split_on=’time’)):
+…      print(fold)
+DatetimeIndex([‘2018-01-01’, ‘2018-01-02’], dtype=’datetime64[ns]’, name=’date’, freq=None)
+DatetimeIndex([‘2018-01-03’, ‘2018-01-04’], dtype=’datetime64[ns]’, name=’date’, freq=None)
+DatetimeIndex([‘2018-01-05’, ‘2018-01-06’], dtype=’datetime64[ns]’, name=’date’, freq=None)
+DatetimeIndex([‘2018-01-07’, ‘2018-01-08’], dtype=’datetime64[ns]’, name=’date’, freq=None)</p>
+<p>Example 2)
+&gt;&gt;&gt; df = pd.DataFrame(np.random.randint(0,100,size=(16, 4)), columns=list(‘ABCD’))
+&gt;&gt;&gt; for fold in (time_series_split(df, n_splits=4, split_on=’index’)):
+…      print(fold)
+RangeIndex(start=0, stop=4, step=1)
+RangeIndex(start=4, stop=8, step=1)
+RangeIndex(start=8, stop=12, step=1)
+RangeIndex(start=12, stop=16, step=1)</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gtime.model_selection.horizon_shift">
+<span class="sig-prename descclassname"><span class="pre">gtime.model_selection.</span></span><span class="sig-name descname"><span class="pre">horizon_shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.model_selection.horizon_shift" title="Permalink to this definition"></a></dt>
+<dd><p>Perform a shift of the original <code class="docutils literal notranslate"><span class="pre">time_series</span></code> for each time step between 1 and
+<code class="docutils literal notranslate"><span class="pre">horizon</span></code>.</p>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, n_features), required</span></dt><dd><p>The list of <code class="docutils literal notranslate"><span class="pre">TimeSeriesFeature</span></code> from which to compute the feature_extraction.</p>
+</dd>
+<dt>horizon<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">5</span></code></span></dt><dd><p>It represents how much into the future is necessary to predict. This corresponds
+to the number of shifts that are going to be performed on y.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Returns<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>y<span class="classifier">pd.DataFrame, shape (n_samples, horizon)</span></dt><dd><p>The shifted time series.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h2>Examples<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.model_selection</span> <span class="kn">import</span> <span class="n">horizon_shift</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2020-01-05&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">horizon_shift</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">horizon</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">            y_1  y_2</span>
+<span class="go">2020-01-01  1.0  2.0</span>
+<span class="go">2020-01-02  2.0  3.0</span>
+<span class="go">2020-01-03  3.0  4.0</span>
+<span class="go">2020-01-04  4.0  NaN</span>
+<span class="go">2020-01-05  NaN  NaN</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">horizon_shift</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">horizon</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="go">            y_2</span>
+<span class="go">2020-01-01  2.0</span>
+<span class="go">2020-01-02  3.0</span>
+<span class="go">2020-01-03  4.0</span>
+<span class="go">2020-01-04  NaN</span>
+<span class="go">2020-01-05  NaN</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gtime.model_selection.time_series_split">
+<span class="sig-prename descclassname"><span class="pre">gtime.model_selection.</span></span><span class="sig-name descname"><span class="pre">time_series_split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_splits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'index'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.model_selection.time_series_split" title="Permalink to this definition"></a></dt>
+<dd><p>Time Series cross-validator</p>
+<p>time_series_split provides indices to split time series data samples
+that are observed at fixed time intervals, in the data sets.
+In each split, subsequent indices must be higher than before, and thus shuffling
+in cross validator is inappropriate. Split the input dataframe into n_splits.</p>
+<p>If the data is not a timeries then the split is based on the number of samples.
+If the data has a time index and split_on ‘time’ then divide the time series based on time.</p>
+<section id="id7">
+<h2>Parameters<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h2>
+<p>time_series : pandas DataFrame, shape (n_samples, n_features), required</p>
+<p>n_splits : int, default = 4, required
+The number of splits/folds on the dataset</p>
+<p>split_on : ‘index’, default = ‘index’. Optional - ‘time’ 
+If the parameter is ‘time’ then dataframe index must be DatetimeIndex or PeriodIndex or TimedeltaIndex. 
+The dataset will be split based on time</p>
+</section>
+<section id="id8">
+<h2>Yields<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h2>
+<p>fold : RangeIndex indexes of folds, or 
+time_fold : DateTimeIndex of folds if split_on ‘time’</p>
+</section>
+<section id="id9">
+<h2>Examples<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h2>
+<p>Example 1)
+&gt;&gt;&gt; date_rng = pd.date_range(start=’1/1/2018’, end=’1/08/2018’, freq=’D’)
+&gt;&gt;&gt; time_series = pd.DataFrame(date_rng, columns=[‘date’])
+&gt;&gt;&gt; time_series.set_index(‘date’, inplace=True)
+&gt;&gt;&gt; time_series[‘data’] = np.random.randint(0,100,size=(len(date_rng)))
+&gt;&gt;&gt; for fold in (time_series_split(time_series, n_splits=4, split_on=’time’)):
+…      print(fold)
+DatetimeIndex([‘2018-01-01’, ‘2018-01-02’], dtype=’datetime64[ns]’, name=’date’, freq=None)
+DatetimeIndex([‘2018-01-01’, ‘2018-01-02’, ‘2018-01-03’, ‘2018-01-04’],</p>
+<blockquote>
+<div><p>dtype=’datetime64[ns]’, name=’date’, freq=None)</p>
+</div></blockquote>
+<dl class="simple">
+<dt>DatetimeIndex([‘2018-01-01’, ‘2018-01-02’, ‘2018-01-03’, ‘2018-01-04’,</dt><dd><dl class="simple">
+<dt>‘2018-01-05’, ‘2018-01-06’],</dt><dd><p>dtype=’datetime64[ns]’, name=’date’, freq=None)</p>
+</dd>
+</dl>
+</dd>
+<dt>DatetimeIndex([‘2018-01-01’, ‘2018-01-02’, ‘2018-01-03’, ‘2018-01-04’,</dt><dd><dl class="simple">
+<dt>‘2018-01-05’, ‘2018-01-06’, ‘2018-01-07’, ‘2018-01-08’],</dt><dd><p>dtype=’datetime64[ns]’, name=’date’, freq=None)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Example 2)
+&gt;&gt;&gt; df = pd.DataFrame(np.random.randint(0,100,size=(16, 4)), columns=list(‘ABCD’))
+&gt;&gt;&gt; for fold in (time_series_split(df, n_splits=4, split_on=’index’)):
+…      print(fold)
+RangeIndex(start=0, stop=4, step=1)
+RangeIndex(start=0, stop=8, step=1)
+RangeIndex(start=0, stop=12, step=1)
+RangeIndex(start=0, stop=16, step=1)</p>
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="metrics.html" class="btn btn-neutral float-left" title="Metrics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="preprocessing.html" class="btn btn-neutral float-right" title="Preprocessing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, L2F.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

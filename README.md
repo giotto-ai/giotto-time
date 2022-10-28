@@ -1,80 +1,53 @@
-.. image:: https://www.giotto.ai/static/vector/logo-time.svg
-   :width: 500
 
-|Version| |Azure-build| |PyPI download month| |Codecov| |PyPI pyversions| |Slack-join| |Black|
+[![Deploy to gh-pages](https://github.com/giotto-ai/giotto-time/actions/workflows/deploy_github_pages.yml/badge.svg)](https://github.com/giotto-ai/giotto-time/actions/workflows/deploy_github_pages.yml)
+[![Upload Python Package](https://github.com/giotto-ai/giotto-time/actions/workflows/build_and_publish.yml/badge.svg)](https://github.com/giotto-ai/giotto-time/actions/workflows/build_and_publish.yml)
+[![CI](https://github.com/giotto-ai/giotto-time/actions/workflows/ci.yml/badge.svg)](https://github.com/giotto-ai/giotto-time/actions/workflows/ci.yml)
+[![PyPI version](https://badge.fury.io/py/giotto-time.svg)](https://badge.fury.io/py/giotto-time)
+[![Slack-join](https://img.shields.io/badge/Slack-Join-blue)](https://slack.giotto.ai/)
 
-.. |Version| image:: https://badge.fury.io/py/giotto-time.svg
-   :target: https://pypi.python.org/pypi/giotto-time/
-
-.. |Azure-build| image:: https://dev.azure.com/maintainers/Giotto/_apis/build/status/giotto-ai.giotto-time?branchName=master
-   :target: https://dev.azure.com/maintainers/Giotto/_build/latest?definitionId=4&branchName=master
-
-.. |PyPI download month| image:: https://img.shields.io/pypi/dm/giotto-time.svg
-   :target: https://pypi.python.org/pypi/giotto-time/
-
-.. |Codecov| image:: https://codecov.io/gh/giotto-ai/giotto-time/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/giotto-ai/giotto-time
-
-.. |PyPI pyversions| image:: https://img.shields.io/pypi/pyversions/giotto-time.svg
-   :target: https://pypi.python.org/pypi/giotto-time/
-
-.. |Slack-join| image:: https://img.shields.io/badge/Slack-Join-blue
-   :target: https://slack.giotto.ai/
-
-.. |Black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-   :target: https://github.com/ambv/black
-
-giotto-time
-===========
+# giotto-time
 
 giotto-time is a machine learning based time series forecasting toolbox in Python.
 It is part of the `Giotto <https://github.com/giotto-ai>`_ collection of open-source projects and aims to provide
 feature extraction, analysis, causality testing and forecasting models based on
 `scikit-learn <https://scikit-learn.org/stable/>`_ API.
 
-License
--------
+##License
 
 giotto-time is distributed under the AGPLv3 `license <https://github.com/giotto-ai/giotto-time/blob/master/LICENSE>`_.
 If you need a different distribution license, please contact the L2F team at business@l2f.ch.
 
-Documentation
--------------
+## Documentation
 
 - API reference (stable release): https://docs-time.giotto.ai
 
-Getting started
----------------
+## Getting started
 
 Get started with giotto-time by following the installation steps below.
 Simple tutorials and real-world use cases can be found in example folder as notebooks.
 
-Installation
-------------
+## Installation
 
-User installation
-~~~~~~~~~~~~~~~~~
+### User installation
 
-Run this command in your favourite python environment  ::
+Run this command in your favourite python environment
+```
+pip install giotto-time
+```
 
-    pip install giotto-time
-
-Developer installation
-~~~~~~~~~~~~~~~~~~~~~~
+### Developer installation
 
 Get the latest state of the source code with the command
 
-.. code-block:: bash
+```
+git clone https://github.com/giotto-ai/giotto-time.git
+cd giotto-time
+pip install -e ".[tests, doc]"
+```
 
-    git clone https://github.com/giotto-ai/giotto-time.git
-    cd giotto-time
-    pip install -e ".[tests, doc]"
+## Example
 
-Example
--------
-
-.. code-block:: python
-
+```python
     from gtime import *
     from gtime.feature_extraction import *
     import pandas as pd
@@ -104,33 +77,26 @@ Example
     gar = forecasting.GAR(LinearRegression())
     gar.fit(X_train, y_train).predict(X_test)
 
-Changelog
----------
+```
 
-See the `RELEASE.rst <https://github.com/giotto-ai/giotto-time/blob/master/RELEASE.rst>`__ file
-for a history of notable changes to giotto-time.
 
-Contributing
-------------
+## Contributing
 
 We welcome new contributors of all experience levels. The Giotto
 community goals are to be helpful, welcoming, and effective. To learn more about
 making a contribution to giotto-time, please see the `CONTRIBUTING.rst
 <https://github.com/giotto-ai/giotto-time/blob/master/CONTRIBUTING.rst>`_ file.
 
-Links
------
+## Links
 
 - Official source code repo: https://github.com/giotto-ai/giotto-time
 - Download releases: https://pypi.org/project/giotto-time/
 - Issue tracker: https://github.com/giotto-ai/giotto-time/issues
 
-Community
----------
+## Community
 
 Giotto Slack workspace: https://slack.giotto.ai/
 
-Contacts
---------
+## Contacts
 
 maintainers@giotto.ai

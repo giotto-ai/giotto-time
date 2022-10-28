@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Causality Tests &mdash; giotto-time 0.2.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Compose" href="compose.html" />
+    <link rel="prev" title="API reference" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> giotto-time
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Causality Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.causality.GrangerCausality"><code class="docutils literal notranslate"><span class="pre">GrangerCausality</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.causality.GrangerCausality.fit"><code class="docutils literal notranslate"><span class="pre">GrangerCausality.fit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.causality.ShiftedLinearCoefficient"><code class="docutils literal notranslate"><span class="pre">ShiftedLinearCoefficient</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.causality.ShiftedLinearCoefficient.fit"><code class="docutils literal notranslate"><span class="pre">ShiftedLinearCoefficient.fit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.causality.ShiftedPearsonCorrelation"><code class="docutils literal notranslate"><span class="pre">ShiftedPearsonCorrelation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.causality.ShiftedPearsonCorrelation.fit"><code class="docutils literal notranslate"><span class="pre">ShiftedPearsonCorrelation.fit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compose.html">Compose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_extraction.html">Feature Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_generation.html">Feature Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forecasting.html">Forecasting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_selection.html">Model Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="regressors.html">Regressors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="time_series_models.html">Time Series Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">giotto-time</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">API reference</a> &raquo;</li>
+      <li>Causality Tests</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/causality.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gtime.causality">
+<span id="causality-tests"></span><h1>Causality Tests<a class="headerlink" href="#module-gtime.causality" title="Permalink to this heading"></a></h1>
+<p>The <a class="reference internal" href="#module-gtime.causality" title="gtime.causality"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gtime.causality</span></code></a> module deals with the causality tests for time
+series data.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.causality.GrangerCausality">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.causality.</span></span><span class="sig-name descname"><span class="pre">GrangerCausality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">statistics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['ssr_f']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.causality.GrangerCausality" title="Permalink to this definition"></a></dt>
+<dd><p>Class to check for Granger causality between two time series, i.e. 
+to check if a time series X causes Y: X-&gt;Y.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>target_col<span class="classifier">str</span></dt><dd><p>The column to use as the reference, i.e. the time series Y</p>
+</dd>
+<dt>x_col<span class="classifier">str</span></dt><dd><p>The column to test for Granger causality, i.e. the time 
+series X.</p>
+</dd>
+<dt>max_shift<span class="classifier">int, optional, default: 10</span></dt><dd><p>The maximal number of shifts to check for Granger causality.</p>
+</dd>
+<dt>statistics<span class="classifier">list, optional, default: [‘ssr_f’]</span></dt><dd><p>The statistical test(s) to perform for Granger causality. A list with elements
+from the set: ‘ssr_f’ (sum squared residuals with F-test), ‘ssr_chi2’ (sum squared 
+residuals with chi square test), ‘likelihood_chi2’ (likelihood ratio test with 
+chi square distribution), ‘zero_F’ (F-test that all lag coefficients of 
+the time series X are zero).</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt><a href="#id10"><span class="problematic" id="id11">results_</span></a><span class="classifier">list</span></dt><dd><p>A list of pandas dataframes with the results for all the listed tests in ‘statistics’.</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.causality.granger_causality</span> <span class="kn">import</span> <span class="n">GrangerCausality</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas.util.testing</span> <span class="k">as</span> <span class="nn">testing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">testing</span><span class="o">.</span><span class="n">makeTimeDataFrame</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="n">nper</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gc</span> <span class="o">=</span> <span class="n">GrangerCausality</span><span class="p">(</span><span class="n">target_col</span><span class="o">=</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">x_col</span><span class="o">=</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">max_shift</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">statistics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ssr_f&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gc</span><span class="o">.</span><span class="n">results_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">                    ssr F-test</span>
+<span class="go">F-value               0.372640</span>
+<span class="go">p-value               0.958527</span>
+<span class="go">degrees of freedom  969.000000</span>
+<span class="go">number of shifts     10.000000</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.causality.GrangerCausality.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.causality.GrangerCausality.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Create a dataframe with the results of the Granger causality test with the specified
+statistical test(s).</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>data<span class="classifier">pd.DataFrame, shape (n_samples, n_time_series), required</span></dt><dd><p>The dataframe containing the time series.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns the instance itself.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.causality.ShiftedLinearCoefficient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.causality.</span></span><span class="sig-name descname"><span class="pre">ShiftedLinearCoefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_shift</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_shift</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropna</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permutation_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.causality.ShiftedLinearCoefficient" title="Permalink to this definition"></a></dt>
+<dd><p>Test the shifted linear fit coefficients between two or more time series.</p>
+<section id="id2">
+<h2>Parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>min_shift<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">1</span></code></span></dt><dd><p>The minimum number of shifts to check for.</p>
+</dd>
+<dt>max_shift<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">10</span></code></span></dt><dd><p>The maximum number of shifts to check for.</p>
+</dd>
+<dt>target_col<span class="classifier">str, optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>The column to use as the a reference (i.e., the column which is not
+shifted).</p>
+</dd>
+<dt>dropna<span class="classifier">bool, optional, default: <code class="docutils literal notranslate"><span class="pre">False</span></code></span></dt><dd><p>Determines if the Nan values created by shifting are retained or dropped.</p>
+</dd>
+<dt>bootstrap_iterations<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>If not None, compute the p_values of the test, by performing bootstrapping of
+the original data (sampling with replacement).</p>
+</dd>
+<dt>permutation_iterations<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>If not None, compute the p_values of the test, by performing permutations of
+the original data.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h2>Examples<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.causality.linear_coefficient</span> <span class="kn">import</span> <span class="n">ShiftedLinearCoefficient</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas.util.testing</span> <span class="k">as</span> <span class="nn">testing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">testing</span><span class="o">.</span><span class="n">makeTimeDataFrame</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slc</span> <span class="o">=</span> <span class="n">ShiftedLinearCoefficient</span><span class="p">(</span><span class="n">target_col</span><span class="o">=</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slc</span><span class="o">.</span><span class="n">best_shifts_</span>
+<span class="go">y  A  B  C  D</span>
+<span class="go">x</span>
+<span class="go">A  3  6  8  5</span>
+<span class="go">B  9  9  4  1</span>
+<span class="go">C  8  2  4  9</span>
+<span class="go">D  3  9  4  3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slc</span><span class="o">.</span><span class="n">max_corrs_</span>
+<span class="go">y         A         B         C         D</span>
+<span class="go">x</span>
+<span class="go">A  0.460236  0.420005  0.339370  0.267143</span>
+<span class="go">B  0.177856  0.300350  0.367150  0.550490</span>
+<span class="go">C  0.484860  0.263036  0.456046  0.251342</span>
+<span class="go">D  0.580068  0.344688  0.253626  0.256220</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.causality.ShiftedLinearCoefficient.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#gtime.causality.ShiftedLinearCoefficient" title="gtime.causality.linear_coefficient.ShiftedLinearCoefficient"><span class="pre">ShiftedLinearCoefficient</span></a></span></span><a class="headerlink" href="#gtime.causality.ShiftedLinearCoefficient.fit" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Create the DataFrame of shifts of each time series which maximize the shifted</dt><dd><p>linear fit coefficients.</p>
+</dd>
+</dl>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>data<span class="classifier">pd.DataFrame, shape (n_samples, n_time_series), required</span></dt><dd><p>The DataFrame containing the time-series on which to compute the shifted
+linear fit coefficients.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
+<p>self : <code class="docutils literal notranslate"><span class="pre">ShiftedLinearCoefficient</span></code></p>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.causality.ShiftedPearsonCorrelation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.causality.</span></span><span class="sig-name descname"><span class="pre">ShiftedPearsonCorrelation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_shift</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_shift</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropna</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permutation_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.causality.ShiftedPearsonCorrelation" title="Permalink to this definition"></a></dt>
+<dd><p>Class responsible for assessing the shifted Pearson correlations (PPMCC) between
+two or more series. For more info about the test, click
+<a class="reference external" href="https://statistics.laerd.com/statistical-guides/pearson-correlation-coefficient-statistical-guide.php">here</a>.</p>
+<section id="id6">
+<h2>Parameters<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>min_shift<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">1</span></code></span></dt><dd><p>The minimum number of shifts to check for.</p>
+</dd>
+<dt>max_shift<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">10</span></code></span></dt><dd><p>The maximum number of shifts to check for.</p>
+</dd>
+<dt>target_col<span class="classifier">str, optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>The column to use as the a reference (i.e., the columns which is not
+shifted).</p>
+</dd>
+<dt>dropna<span class="classifier">bool, optional, default: <code class="docutils literal notranslate"><span class="pre">False</span></code></span></dt><dd><p>Determines if the Nan values created by shifting are retained or dropped.</p>
+</dd>
+<dt>bootstrap_iterations<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>If not None, compute the p_values of the test, by performing bootstrapping of
+the original data (sampling with replacement).</p>
+</dd>
+<dt>permutation_iterations<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>If not None, compute the p_values of the test, by performing permutations of
+the original data.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h2>Examples<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.causality.pearson_correlation</span> <span class="kn">import</span> <span class="n">ShiftedPearsonCorrelation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas.util.testing</span> <span class="k">as</span> <span class="nn">testing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">testing</span><span class="o">.</span><span class="n">makeTimeDataFrame</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spc</span> <span class="o">=</span> <span class="n">ShiftedPearsonCorrelation</span><span class="p">(</span><span class="n">target_col</span><span class="o">=</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spc</span><span class="o">.</span><span class="n">best_shifts_</span>
+<span class="go">y  A  B  C  D</span>
+<span class="go">x</span>
+<span class="go">A  8  9  6  5</span>
+<span class="go">B  7  4  4  6</span>
+<span class="go">C  3  4  9  9</span>
+<span class="go">D  7  1  9  1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spc</span><span class="o">.</span><span class="n">max_corrs_</span>
+<span class="go">y         A         B         C         D</span>
+<span class="go">x</span>
+<span class="go">A  0.383800  0.260627  0.343628  0.360151</span>
+<span class="go">B  0.311608  0.307203  0.255969  0.298523</span>
+<span class="go">C  0.373613  0.267335  0.211913  0.140034</span>
+<span class="go">D  0.496535  0.204770  0.402473  0.310065</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.causality.ShiftedPearsonCorrelation.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#gtime.causality.ShiftedPearsonCorrelation" title="gtime.causality.pearson_correlation.ShiftedPearsonCorrelation"><span class="pre">ShiftedPearsonCorrelation</span></a></span></span><a class="headerlink" href="#gtime.causality.ShiftedPearsonCorrelation.fit" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Create the dataframe of shifts of each time series which maximize the</dt><dd><p>Pearson correlation (PPMCC).</p>
+</dd>
+</dl>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>data<span class="classifier">pd.DataFrame, shape (n_samples, n_time_series), required</span></dt><dd><p>The DataFrame containing the time series on which to compute the shifted
+correlations.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
+<p>self : <code class="docutils literal notranslate"><span class="pre">ShiftedPearsonCorrelation</span></code></p>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="API reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="compose.html" class="btn btn-neutral float-right" title="Compose" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, L2F.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feature Extraction &mdash; giotto-time 0.2.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Feature Generation" href="feature_generation.html" />
+    <link rel="prev" title="Compose" href="compose.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> giotto-time
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="causality.html">Causality Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compose.html">Compose</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Feature Extraction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_extraction.Calendar"><code class="docutils literal notranslate"><span class="pre">Calendar</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Calendar.fit"><code class="docutils literal notranslate"><span class="pre">Calendar.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Calendar.transform"><code class="docutils literal notranslate"><span class="pre">Calendar.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_extraction.CrestFactorDetrending"><code class="docutils literal notranslate"><span class="pre">CrestFactorDetrending</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.CrestFactorDetrending.transform"><code class="docutils literal notranslate"><span class="pre">CrestFactorDetrending.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_extraction.CustomFeature"><code class="docutils literal notranslate"><span class="pre">CustomFeature</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.CustomFeature.fit"><code class="docutils literal notranslate"><span class="pre">CustomFeature.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.CustomFeature.transform"><code class="docutils literal notranslate"><span class="pre">CustomFeature.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_extraction.Detrender"><code class="docutils literal notranslate"><span class="pre">Detrender</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Detrender.fit"><code class="docutils literal notranslate"><span class="pre">Detrender.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Detrender.transform"><code class="docutils literal notranslate"><span class="pre">Detrender.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_extraction.Exogenous"><code class="docutils literal notranslate"><span class="pre">Exogenous</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Exogenous.fit"><code class="docutils literal notranslate"><span class="pre">Exogenous.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Exogenous.transform"><code class="docutils literal notranslate"><span class="pre">Exogenous.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_extraction.Max"><code class="docutils literal notranslate"><span class="pre">Max</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Max.fit"><code class="docutils literal notranslate"><span class="pre">Max.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Max.transform"><code class="docutils literal notranslate"><span class="pre">Max.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_extraction.Min"><code class="docutils literal notranslate"><span class="pre">Min</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Min.fit"><code class="docutils literal notranslate"><span class="pre">Min.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Min.transform"><code class="docutils literal notranslate"><span class="pre">Min.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_extraction.MovingAverage"><code class="docutils literal notranslate"><span class="pre">MovingAverage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.MovingAverage.fit"><code class="docutils literal notranslate"><span class="pre">MovingAverage.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.MovingAverage.transform"><code class="docutils literal notranslate"><span class="pre">MovingAverage.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_extraction.MovingCustomFunction"><code class="docutils literal notranslate"><span class="pre">MovingCustomFunction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.MovingCustomFunction.fit"><code class="docutils literal notranslate"><span class="pre">MovingCustomFunction.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.MovingCustomFunction.transform"><code class="docutils literal notranslate"><span class="pre">MovingCustomFunction.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_extraction.MovingMedian"><code class="docutils literal notranslate"><span class="pre">MovingMedian</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.MovingMedian.fit"><code class="docutils literal notranslate"><span class="pre">MovingMedian.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.MovingMedian.transform"><code class="docutils literal notranslate"><span class="pre">MovingMedian.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_extraction.Polynomial"><code class="docutils literal notranslate"><span class="pre">Polynomial</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Polynomial.fit"><code class="docutils literal notranslate"><span class="pre">Polynomial.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Polynomial.transform"><code class="docutils literal notranslate"><span class="pre">Polynomial.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_extraction.Shift"><code class="docutils literal notranslate"><span class="pre">Shift</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Shift.fit"><code class="docutils literal notranslate"><span class="pre">Shift.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.Shift.transform"><code class="docutils literal notranslate"><span class="pre">Shift.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_extraction.SortedDensity"><code class="docutils literal notranslate"><span class="pre">SortedDensity</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_extraction.SortedDensity.transform"><code class="docutils literal notranslate"><span class="pre">SortedDensity.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="feature_generation.html">Feature Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forecasting.html">Forecasting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_selection.html">Model Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="regressors.html">Regressors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="time_series_models.html">Time Series Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">giotto-time</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">API reference</a> &raquo;</li>
+      <li>Feature Extraction</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/feature_extraction.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gtime.feature_extraction">
+<span id="feature-extraction"></span><h1>Feature Extraction<a class="headerlink" href="#module-gtime.feature_extraction" title="Permalink to this heading"></a></h1>
+<p>The <a class="reference internal" href="#module-gtime.feature_extraction" title="gtime.feature_extraction"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gtime.feature_extraction</span></code></a> module deals with the creation of features
+starting from a time series.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Calendar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">Calendar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">country</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Brazil'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'01/01/2018'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'01/01/2020'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reindex_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'pad'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.Calendar" title="Permalink to this definition"></a></dt>
+<dd><p>Create a feature based on the national holidays of a specific country.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>country<span class="classifier">str, optional, default: <code class="docutils literal notranslate"><span class="pre">'Brazil'</span></code></span></dt><dd><p>The name of the country from which to retrieve the holidays.</p>
+</dd>
+<dt>start_date<span class="classifier">str, optional, default: <code class="docutils literal notranslate"><span class="pre">'01/01/2019'</span></code></span></dt><dd><p>The date starting from which to retrieve the holidays.</p>
+</dd>
+<dt>end_date<span class="classifier">str, optional, default: <code class="docutils literal notranslate"><span class="pre">'01/01/2020'</span></code></span></dt><dd><p>The date until which to retrieve the holidays.</p>
+</dd>
+<dt>kernel<span class="classifier">array-like, optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>The kernel to use when creating the feature. The holiday feature is created by
+taking the dot product between the kernel and the column which contains a 1 if
+the corresponding day is a holiday and a 0 if the day is not a holiday. The
+rolling window has the same size as the kernel and the calculated value of the
+dot product is divided by the number of holidays in the window to get the value
+of the holiday feature.</p>
+</dd>
+<dt>reindex_method<span class="classifier">str, optional, default: <code class="docutils literal notranslate"><span class="pre">pad</span></code></span></dt><dd><p>Used only if X is passed in the <code class="docutils literal notranslate"><span class="pre">transform</span></code> method. It is used as the method
+with which to reindex the holiday events with the index of X. This method
+should be compatible with the reindex methods provided by pandas. Please refer
+to the pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.reindex.html">documentation</a>
+for further details.</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">Calendar</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2019-04-18&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                 <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2019-04-27&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cal_feature</span> <span class="o">=</span> <span class="n">Calendar</span><span class="p">(</span><span class="n">country</span><span class="o">=</span><span class="s2">&quot;Italy&quot;</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cal_feature</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="go">            status__Calendar</span>
+<span class="go">2019-04-18               0.0</span>
+<span class="go">2019-04-19               0.0</span>
+<span class="go">2019-04-20               0.0</span>
+<span class="go">2019-04-21               1.0</span>
+<span class="go">2019-04-22               2.0</span>
+<span class="go">2019-04-23               0.0</span>
+<span class="go">2019-04-24               1.0</span>
+<span class="go">2019-04-25               2.0</span>
+<span class="go">2019-04-26               0.0</span>
+<span class="go">2019-04-27               0.0</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Calendar.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.Calendar.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator. Just used to be compatible with the sklearn API.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Calendar.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_extraction.Calendar.transform" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a DataFrame containing the events associated to the holidays of the
+selected <code class="docutils literal notranslate"><span class="pre">country</span></code>.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>If provided, both <code class="docutils literal notranslate"><span class="pre">start_date</span></code> and <code class="docutils literal notranslate"><span class="pre">end_date</span></code> are going to be
+overwritten with the start and end date of the index of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>.
+Also, if provided the output DataFrame is going to be re-indexed with the
+index of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, using the chosen <code class="docutils literal notranslate"><span class="pre">reindex_method</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>events<span class="classifier">pd.DataFrame, shape (length, 1)</span></dt><dd><p>A DataFrame containing the events.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_extraction.CrestFactorDetrending">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">CrestFactorDetrending</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_causal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.CrestFactorDetrending" title="Permalink to this definition"></a></dt>
+<dd><p>Crest factor detrending model.
+This class removes the trend from the data by using the crest factor definition.
+Each sample is normalize by its weighted surrounding.
+Generalized detrending is defined in (eq. 1) of: H. P. Tukuljac, V. Pulkki,
+H. Gamper, K. Godin, I. J. Tashev and N. Raghuvanshi, “A Sparsity Measure for Echo
+Density Growth in General Environments,” ICASSP 2019 - 2019 IEEE International
+Conference on Acoustics, Speech and Signal Processing (ICASSP), Brighton, United
+Kingdom, 2019, pp. 1-5.
+Parameters
+———-
+window_size : int, optional, default: <code class="docutils literal notranslate"><span class="pre">1</span></code></p>
+<blockquote>
+<div><p>The number of previous points on which to compute the crest factor detrending.</p>
+</div></blockquote>
+<dl>
+<dt>is_causal<span class="classifier">bool, optional, default: <code class="docutils literal notranslate"><span class="pre">True</span></code></span></dt><dd><p>Whether the current sample is computed based only on the past or also on the future.</p>
+</dd>
+</dl>
+<p>Examples
+&gt;&gt;&gt; import pandas as pd
+&gt;&gt;&gt; from CrestFactorDetrending import CrestFactorDetrending
+&gt;&gt;&gt; ts = pd.DataFrame([0, 1, 2, 3, 4, 5])
+&gt;&gt;&gt; gnrl_dtr = CrestFactorDetrending(window_size=2)
+&gt;&gt;&gt; gnrl_dtr.fit_transform(ts)</p>
+<blockquote>
+<div><p>0__CrestFactorDetrending</p>
+</div></blockquote>
+<p>0                       NaN
+1                  1.000000
+2                  0.800000
+3                  0.692308
+4                  0.640000
+5                  0.609756
+——–</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.CrestFactorDetrending.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_extraction.CrestFactorDetrending.transform" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>For every row of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, compute the moving crest factor detrending function of the</dt><dd><p>previous <code class="docutils literal notranslate"><span class="pre">window_size</span></code> elements.</p>
+</dd>
+</dl>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), required</span></dt><dd><p>The DataFrame on which to compute the rolling moving custom function.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Returns<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>time_series_t<span class="classifier">pd.DataFrame, shape (n_samples, 1)</span></dt><dd><p>A DataFrame, with the same length as <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, containing the rolling
+moving custom function for each element.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_extraction.CustomFeature">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">CustomFeature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.CustomFeature" title="Permalink to this definition"></a></dt>
+<dd><p>Constructs a transformer from an arbitrary callable.
+This transformer is a wrapper of <code class="docutils literal notranslate"><span class="pre">sklearn.preprocessing.FunctionTransformer</span></code> but returns a <code class="docutils literal notranslate"><span class="pre">pd.Dataframe</span></code>.</p>
+<section id="id6">
+<h2>Parameters<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>func<span class="classifier">Callable, required.</span></dt><dd><p>The function to use to generate a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> containing the feature.</p>
+</dd>
+<dt>kwargs<span class="classifier"><code class="docutils literal notranslate"><span class="pre">object</span></code>, optional.</span></dt><dd><p>Optional arguments to pass to the transform method.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h2>Examples<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">CustomFeature</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">custom_function</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">power</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">X</span><span class="o">**</span><span class="n">power</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">custom_feature</span> <span class="o">=</span> <span class="n">CustomFeature</span><span class="p">(</span><span class="n">custom_function</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">custom_feature</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="go">   0__CustomFeature</span>
+<span class="go">0                 0</span>
+<span class="go">1                 1</span>
+<span class="go">2                 8</span>
+<span class="go">3                27</span>
+<span class="go">4                64</span>
+<span class="go">5               125</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.CustomFeature.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#gtime.feature_extraction.CustomFeature" title="gtime.feature_extraction.standard.CustomFeature"><span class="pre">CustomFeature</span></a></span></span><a class="headerlink" href="#gtime.feature_extraction.CustomFeature.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator.</p>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API requires
+this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.CustomFeature.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_extraction.CustomFeature.transform" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>, given <code class="docutils literal notranslate"><span class="pre">time_series</span></code> as input to the
+<code class="docutils literal notranslate"><span class="pre">func</span></code>, as well as other optional arguments.</p>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>The DataFrame on which to apply the the custom function.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X_t_df<span class="classifier">pd.DataFrame, shape (length, 1)</span></dt><dd><p>A DataFrame containing the generated feature.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Detrender">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">Detrender</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trend:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trend_x0:</span> <span class="pre">~numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss:</span> <span class="pre">~typing.Callable</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">mean_squared_error&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'BFGS'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.Detrender" title="Permalink to this definition"></a></dt>
+<dd><p>Apply a de-trend transformation to a time series.</p>
+<p>The purpose of the class is to fit a model, define through the <cite>trend</cite> parameter, in
+order to find a trend in the time series. Then, the trend can be removed by removing
+the predictions of the fitted model.</p>
+<section id="id12">
+<h2>Parameters<a class="headerlink" href="#id12" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>trend<span class="classifier"><code class="docutils literal notranslate"><span class="pre">'polynomial'</span></code> | <code class="docutils literal notranslate"><span class="pre">'exponential'</span></code>, required</span></dt><dd><p>The kind of trend removal to apply.</p>
+</dd>
+<dt>trend_x0<span class="classifier">np.array, required</span></dt><dd><p>Initialisation parameters passed to the trend function. This is used to select
+a starting point in order to minimize the <cite>loss</cite> function.</p>
+</dd>
+<dt>loss<span class="classifier">Callable, optional, default: <code class="docutils literal notranslate"><span class="pre">mean_squared_error</span></code></span></dt><dd><p>The loss function to minimize.</p>
+</dd>
+<dt>method<span class="classifier">string, optional, default: <code class="docutils literal notranslate"><span class="pre">&quot;BFGS&quot;</span></code></span></dt><dd><p>Loss function optimisation method.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h2>Examples<a class="headerlink" href="#id13" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">Detrender</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">detrender</span> <span class="o">=</span> <span class="n">Detrender</span><span class="p">(</span><span class="n">trend</span><span class="o">=</span><span class="s1">&#39;polynomial&#39;</span><span class="p">,</span> <span class="n">trend_x0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2020-01-10&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">time_index</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">detrender</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="go">            0__Detrender</span>
+<span class="go">2020-01-01  9.180937e-07</span>
+<span class="go">2020-01-02  8.020709e-07</span>
+<span class="go">2020-01-03  6.860481e-07</span>
+<span class="go">2020-01-04  5.700253e-07</span>
+<span class="go">2020-01-05  4.540024e-07</span>
+<span class="go">2020-01-06  3.379796e-07</span>
+<span class="go">2020-01-07  2.219568e-07</span>
+<span class="go">2020-01-08  1.059340e-07</span>
+<span class="go">2020-01-09 -1.008878e-08</span>
+<span class="go">2020-01-10 -1.261116e-07</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Detrender.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#gtime.feature_extraction.Detrender" title="gtime.feature_extraction.trend.Detrender"><span class="pre">Detrender</span></a></span></span><a class="headerlink" href="#gtime.feature_extraction.Detrender.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator.</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Detrender.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_extraction.Detrender.transform" title="Permalink to this definition"></a></dt>
+<dd><p>Transform the <code class="docutils literal notranslate"><span class="pre">time_series</span></code> by removing the trend.</p>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series: pd.DataFrame, shape (n_samples, 1), required</dt><dd><p>The time series to transform.</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h3>Returns<a class="headerlink" href="#id17" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series_t<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>The transformed time series, without the trend.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Exogenous">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">Exogenous</span></span><a class="headerlink" href="#gtime.feature_extraction.Exogenous" title="Permalink to this definition"></a></dt>
+<dd><p>Reindex <code class="docutils literal notranslate"><span class="pre">exogenous_time_series</span></code> with the index of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>. To check the
+documentation of <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame.reindex</span></code> and to see which type of
+<code class="docutils literal notranslate"><span class="pre">method</span></code> are available, please refer to the pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.reindex.html">documentation</a>.</p>
+<section id="id19">
+<h2>Examples<a class="headerlink" href="#id19" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">Exogenous</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;exogenous&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">]},</span>  <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exog</span> <span class="o">=</span> <span class="n">Exogenous</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exog</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="go">    exogenous__Exogenous</span>
+<span class="go">3                    10</span>
+<span class="go">4                     8</span>
+<span class="go">5                     1</span>
+<span class="go">6                     3</span>
+<span class="go">7                     2</span>
+<span class="go">8                     7</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Exogenous.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.Exogenous.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator.</p>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h3>Returns<a class="headerlink" href="#id21" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Exogenous.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_extraction.Exogenous.transform" title="Permalink to this definition"></a></dt>
+<dd><p>It returns the input time series adding the class name to it</p>
+<section id="id22">
+<h3>Parameters<a class="headerlink" href="#id22" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, n_features), required</span></dt><dd><p>The input DataFrame.</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h3>Returns<a class="headerlink" href="#id23" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series_t<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>The original <code class="docutils literal notranslate"><span class="pre">exogenous_time_series</span></code>, adding the class name to it</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Max">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">Max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.Max" title="Permalink to this definition"></a></dt>
+<dd><p>For each row in <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, compute the moving max of the previous
+<code class="docutils literal notranslate"><span class="pre">window_size</span></code> rows. If there are not enough rows, the value is <code class="docutils literal notranslate"><span class="pre">Nan</span></code>.</p>
+<section id="id24">
+<h2>Parameters<a class="headerlink" href="#id24" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>window_size<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">1</span></code></span></dt><dd><p>The number of previous points on which to compute the moving max.</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h2>Examples<a class="headerlink" href="#id25" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">Max</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mv_max</span> <span class="o">=</span> <span class="n">Max</span><span class="p">(</span><span class="n">window_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mv_max</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="go">   0__MovingMax</span>
+<span class="go">0               NaN</span>
+<span class="go">1               0.5</span>
+<span class="go">2               1.5</span>
+<span class="go">3               2.5</span>
+<span class="go">4               3.5</span>
+<span class="go">5               4.5</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Max.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.Max.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator.</p>
+<section id="id26">
+<h3>Parameters<a class="headerlink" href="#id26" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id27">
+<h3>Returns<a class="headerlink" href="#id27" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Max.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_extraction.Max.transform" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the moving max, for every row of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, of the previous
+<code class="docutils literal notranslate"><span class="pre">window_size</span></code> elements.</p>
+<section id="id28">
+<h3>Parameters<a class="headerlink" href="#id28" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), required</span></dt><dd><p>The DataFrame on which to compute the rolling moving max</p>
+</dd>
+</dl>
+</section>
+<section id="id29">
+<h3>Returns<a class="headerlink" href="#id29" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series_t<span class="classifier">pd.DataFrame, shape (n_samples, 1)</span></dt><dd><p>A DataFrame, with the same length as <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, containing the rolling
+moving max for each element.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Min">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">Min</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.Min" title="Permalink to this definition"></a></dt>
+<dd><p>For each row in <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, compute the moving min of the previous
+<code class="docutils literal notranslate"><span class="pre">window_size</span></code> rows. If there are not enough rows, the value is <code class="docutils literal notranslate"><span class="pre">Nan</span></code>.</p>
+<section id="id30">
+<h2>Parameters<a class="headerlink" href="#id30" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>window_size<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">1</span></code></span></dt><dd><p>The number of previous points on which to compute the moving average.</p>
+</dd>
+</dl>
+</section>
+<section id="id31">
+<h2>Examples<a class="headerlink" href="#id31" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">MovingMin</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mv_min</span> <span class="o">=</span> <span class="n">MovingMin</span><span class="p">(</span><span class="n">window_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mv_min</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="go">   0__MovingMin</span>
+<span class="go">0               NaN</span>
+<span class="go">1               0.5</span>
+<span class="go">2               1.5</span>
+<span class="go">3               2.5</span>
+<span class="go">4               3.5</span>
+<span class="go">5               4.5</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Min.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.Min.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator.</p>
+<section id="id32">
+<h3>Parameters<a class="headerlink" href="#id32" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id33">
+<h3>Returns<a class="headerlink" href="#id33" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Min.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_extraction.Min.transform" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the moving min, for every row of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, of the previous
+<code class="docutils literal notranslate"><span class="pre">window_size</span></code> elements.</p>
+<section id="id34">
+<h3>Parameters<a class="headerlink" href="#id34" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), required</span></dt><dd><p>The DataFrame on which to compute the rolling moving min</p>
+</dd>
+</dl>
+</section>
+<section id="id35">
+<h3>Returns<a class="headerlink" href="#id35" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series_t<span class="classifier">pd.DataFrame, shape (n_samples, 1)</span></dt><dd><p>A DataFrame, with the same length as <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, containing the rolling
+moving min for each element.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_extraction.MovingAverage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">MovingAverage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.MovingAverage" title="Permalink to this definition"></a></dt>
+<dd><p>For each row in <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, compute the moving average of the previous
+<code class="docutils literal notranslate"><span class="pre">window_size</span></code> rows. If there are not enough rows, the value is <code class="docutils literal notranslate"><span class="pre">Nan</span></code>.</p>
+<section id="id36">
+<h2>Parameters<a class="headerlink" href="#id36" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>window_size<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">1</span></code></span></dt><dd><p>The number of previous points on which to compute the moving average.</p>
+</dd>
+</dl>
+</section>
+<section id="id37">
+<h2>Examples<a class="headerlink" href="#id37" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">MovingAverage</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mv_avg</span> <span class="o">=</span> <span class="n">MovingAverage</span><span class="p">(</span><span class="n">window_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mv_avg</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="go">   0__MovingAverage</span>
+<span class="go">0               NaN</span>
+<span class="go">1               0.5</span>
+<span class="go">2               1.5</span>
+<span class="go">3               2.5</span>
+<span class="go">4               3.5</span>
+<span class="go">5               4.5</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.MovingAverage.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.MovingAverage.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator.</p>
+<section id="id38">
+<h3>Parameters<a class="headerlink" href="#id38" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id39">
+<h3>Returns<a class="headerlink" href="#id39" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.MovingAverage.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_extraction.MovingAverage.transform" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the moving average, for every row of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, of the previous
+<code class="docutils literal notranslate"><span class="pre">window_size</span></code> elements.</p>
+<section id="id40">
+<h3>Parameters<a class="headerlink" href="#id40" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), required</span></dt><dd><p>The DataFrame on which to compute the rolling moving average</p>
+</dd>
+</dl>
+</section>
+<section id="id41">
+<h3>Returns<a class="headerlink" href="#id41" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series_t<span class="classifier">pd.DataFrame, shape (n_samples, 1)</span></dt><dd><p>A DataFrame, with the same length as <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, containing the rolling
+moving average for each element.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_extraction.MovingCustomFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">MovingCustomFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">custom_feature_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.MovingCustomFunction" title="Permalink to this definition"></a></dt>
+<dd><p>For each row in <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, compute the moving custom function of the
+previous <code class="docutils literal notranslate"><span class="pre">window_size</span></code> rows. If there are not enough rows, the value is <code class="docutils literal notranslate"><span class="pre">Nan</span></code>.</p>
+<section id="id42">
+<h2>Parameters<a class="headerlink" href="#id42" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>custom_feature_function<span class="classifier">Callable, required.</span></dt><dd><p>The function to use to generate a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> containing the feature.</p>
+</dd>
+<dt>window_size<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">1</span></code></span></dt><dd><p>The number of previous points on which to compute the custom function.</p>
+</dd>
+<dt>raw<span class="classifier">bool, optional, default: <code class="docutils literal notranslate"><span class="pre">True</span></code></span></dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">False</span></code> : passes each row or column as a Series to the function.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code> : the passed function will receive ndarray objects</p></li>
+</ul>
+<dl class="simple">
+<dt>instead.</dt><dd><p>If you are just applying a NumPy reduction function this will achieve much
+better performance. Credits: <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.core.window.Rolling.apply.html">https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.core.window.Rolling.apply.html</a></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="id43">
+<h2>Examples<a class="headerlink" href="#id43" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">MovingCustomFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mv_custom</span> <span class="o">=</span> <span class="n">MovingCustomFunction</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mv_custom</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="go">   0__MovingCustomFunction</span>
+<span class="go">0                      NaN</span>
+<span class="go">1                      1.0</span>
+<span class="go">2                      2.0</span>
+<span class="go">3                      3.0</span>
+<span class="go">4                      4.0</span>
+<span class="go">5                      5.0</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.MovingCustomFunction.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.MovingCustomFunction.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator.</p>
+<section id="id44">
+<h3>Parameters<a class="headerlink" href="#id44" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id45">
+<h3>Returns<a class="headerlink" href="#id45" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.MovingCustomFunction.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_extraction.MovingCustomFunction.transform" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>For every row of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, compute the moving custom function of the</dt><dd><p>previous <code class="docutils literal notranslate"><span class="pre">window_size</span></code> elements.</p>
+</dd>
+</dl>
+<section id="id46">
+<h3>Parameters<a class="headerlink" href="#id46" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), required</span></dt><dd><p>The DataFrame on which to compute the rolling moving custom function.</p>
+</dd>
+</dl>
+</section>
+<section id="id47">
+<h3>Returns<a class="headerlink" href="#id47" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series_t<span class="classifier">pd.DataFrame, shape (n_samples, 1)</span></dt><dd><p>A DataFrame, with the same length as <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, containing the rolling
+moving custom function for each element.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_extraction.MovingMedian">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">MovingMedian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.MovingMedian" title="Permalink to this definition"></a></dt>
+<dd><p>For each row in <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, compute the moving median of the previous
+<code class="docutils literal notranslate"><span class="pre">window_size</span></code> rows. If there are not enough rows, the value is <code class="docutils literal notranslate"><span class="pre">Nan</span></code>.</p>
+<section id="id48">
+<h2>Parameters<a class="headerlink" href="#id48" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>window_size<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">1</span></code></span></dt><dd><p>The number of previous points on which to compute the moving median.</p>
+</dd>
+</dl>
+</section>
+<section id="id49">
+<h2>Examples<a class="headerlink" href="#id49" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">MovingMedian</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mv_median</span> <span class="o">=</span> <span class="n">MovingMedian</span><span class="p">(</span><span class="n">window_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mv_median</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="go">   0__MovingMedian</span>
+<span class="go">0               NaN</span>
+<span class="go">1               0.5</span>
+<span class="go">2               1.5</span>
+<span class="go">3               2.5</span>
+<span class="go">4               3.5</span>
+<span class="go">5               4.5</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.MovingMedian.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.MovingMedian.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator.</p>
+<section id="id50">
+<h3>Parameters<a class="headerlink" href="#id50" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id51">
+<h3>Returns<a class="headerlink" href="#id51" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.MovingMedian.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_extraction.MovingMedian.transform" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the moving median, for every row of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, of the previous
+<code class="docutils literal notranslate"><span class="pre">window_size</span></code> elements.</p>
+<section id="id52">
+<h3>Parameters<a class="headerlink" href="#id52" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), required</span></dt><dd><p>The DataFrame on which to compute the rolling moving median</p>
+</dd>
+</dl>
+</section>
+<section id="id53">
+<h3>Returns<a class="headerlink" href="#id53" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series_t<span class="classifier">pd.DataFrame, shape (n_samples, 1)</span></dt><dd><p>A DataFrame, with the same length as <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, containing the rolling
+moving median for each element.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Polynomial">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">Polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.Polynomial" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the polynomial feature_extraction, of a degree equal to the input
+<code class="docutils literal notranslate"><span class="pre">degree</span></code>.
+Wrapper of <code class="docutils literal notranslate"><span class="pre">sklearn.preprocessing.PolynomialFeatures</span></code> but returns a
+<code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>.</p>
+<section id="id54">
+<h2>Parameters<a class="headerlink" href="#id54" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>degree<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">2</span></code></span></dt><dd><p>The degree of the polynomial feature_extraction.</p>
+</dd>
+</dl>
+</section>
+<section id="id55">
+<h2>Examples<a class="headerlink" href="#id55" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">Polynomial</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pol</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pol</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="go">   0__Polynomial  1__Polynomial  2__Polynomial  3__Polynomial</span>
+<span class="go">0            1.0            0.0            0.0            0.0</span>
+<span class="go">1            1.0            1.0            1.0            1.0</span>
+<span class="go">2            1.0            2.0            4.0            8.0</span>
+<span class="go">3            1.0            3.0            9.0           27.0</span>
+<span class="go">4            1.0            4.0           16.0           64.0</span>
+<span class="go">5            1.0            5.0           25.0          125.0</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Polynomial.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.Polynomial.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator.</p>
+<section id="id56">
+<h3>Parameters<a class="headerlink" href="#id56" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id57">
+<h3>Returns<a class="headerlink" href="#id57" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Polynomial.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_extraction.Polynomial.transform" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the polynomial feature_extraction of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, up to a degree
+equal to <code class="docutils literal notranslate"><span class="pre">degree</span></code>.</p>
+<section id="id58">
+<h3>Parameters<a class="headerlink" href="#id58" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), required</span></dt><dd><p>The input DataFrame. Used only for its index.</p>
+</dd>
+</dl>
+</section>
+<section id="id59">
+<h3>Returns<a class="headerlink" href="#id59" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series_t<span class="classifier">pd.DataFrame, shape (n_samples, 1)</span></dt><dd><p>The computed polynomial feature_extraction.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Shift">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">Shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shift</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.Shift" title="Permalink to this definition"></a></dt>
+<dd><p>Perform a shift of a DataFrame of size equal to <code class="docutils literal notranslate"><span class="pre">shift</span></code>.</p>
+<section id="id60">
+<h2>Parameters<a class="headerlink" href="#id60" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>shift<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">1</span></code></span></dt><dd><p>How much to shift.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">shift</span></code> parameter can also accept negative values. However, this should be
+used carefully, since if the resulting feature is used for training or testing it
+might generate a leak from the feature.</p>
+</section>
+<section id="id61">
+<h2>Examples<a class="headerlink" href="#id61" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">Shift</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shift</span> <span class="o">=</span> <span class="n">Shift</span><span class="p">(</span><span class="n">shift</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shift</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="go">   0__Shift</span>
+<span class="go">0       NaN</span>
+<span class="go">1       NaN</span>
+<span class="go">2       NaN</span>
+<span class="go">3       0.0</span>
+<span class="go">4       1.0</span>
+<span class="go">5       2.0</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Shift.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.Shift.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator.</p>
+<section id="id62">
+<h3>Parameters<a class="headerlink" href="#id62" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id63">
+<h3>Returns<a class="headerlink" href="#id63" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.Shift.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_extraction.Shift.transform" title="Permalink to this definition"></a></dt>
+<dd><p>Create a shifted version of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>.</p>
+<section id="id64">
+<h3>Parameters<a class="headerlink" href="#id64" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), required</span></dt><dd><p>The DataFrame to shift.</p>
+</dd>
+</dl>
+</section>
+<section id="id65">
+<h3>Returns<a class="headerlink" href="#id65" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series_t<span class="classifier">pd.DataFrame, shape (n_samples, 1)</span></dt><dd><p>The shifted version of the original <code class="docutils literal notranslate"><span class="pre">time_series</span></code>.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_extraction.SortedDensity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">SortedDensity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_causal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_extraction.SortedDensity" title="Permalink to this definition"></a></dt>
+<dd><p>For each row in <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, compute the sorted density function of the
+previous <code class="docutils literal notranslate"><span class="pre">window_size</span></code> rows. If there are not enough rows, the value is <code class="docutils literal notranslate"><span class="pre">Nan</span></code>.
+Sorted density measured is defined in (eq. 1) of: H. P. Tukuljac, V. Pulkki,
+H. Gamper, K. Godin, I. J. Tashev and N. Raghuvanshi, “A Sparsity Measure for Echo
+Density Growth in General Environments,” ICASSP 2019 - 2019 IEEE International
+Conference on Acoustics, Speech and Signal Processing (ICASSP), Brighton, United
+Kingdom, 2019, pp. 1-5.
+Parameters
+———-
+window_size : int, optional, default: <code class="docutils literal notranslate"><span class="pre">1</span></code></p>
+<blockquote>
+<div><p>The number of previous points on which to compute the sorted density.</p>
+</div></blockquote>
+<dl>
+<dt>is_causal<span class="classifier">bool, optional, default: <code class="docutils literal notranslate"><span class="pre">True</span></code></span></dt><dd><p>Whether the current sample is computed based only on the past or also on the future.</p>
+</dd>
+</dl>
+<section id="id66">
+<h2>Examples<a class="headerlink" href="#id66" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">SortedDensity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mv_avg</span> <span class="o">=</span> <span class="n">SortedDensity</span><span class="p">(</span><span class="n">window_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mv_avg</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="go">   0__SortedDensity</span>
+<span class="go">0                      NaN</span>
+<span class="go">1                 0.500000</span>
+<span class="go">2                 0.666667</span>
+<span class="go">3                 0.700000</span>
+<span class="go">4                 0.714286</span>
+<span class="go">5                 0.722222</span>
+<span class="go">--------</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_extraction.SortedDensity.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_extraction.SortedDensity.transform" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>For every row of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, compute the moving sorted density function of the</dt><dd><p>previous <code class="docutils literal notranslate"><span class="pre">window_size</span></code> elements.</p>
+</dd>
+</dl>
+<section id="id67">
+<h3>Parameters<a class="headerlink" href="#id67" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), required</span></dt><dd><p>The DataFrame on which to compute the rolling moving custom function.</p>
+</dd>
+</dl>
+</section>
+<section id="id68">
+<h3>Returns<a class="headerlink" href="#id68" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>time_series_t<span class="classifier">pd.DataFrame, shape (n_samples, 1)</span></dt><dd><p>A DataFrame, with the same length as <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, containing the rolling
+moving custom function for each element.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="compose.html" class="btn btn-neutral float-left" title="Compose" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="feature_generation.html" class="btn btn-neutral float-right" title="Feature Generation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, L2F.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

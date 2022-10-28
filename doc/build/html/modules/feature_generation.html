@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feature Generation &mdash; giotto-time 0.2.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Forecasting" href="forecasting.html" />
+    <link rel="prev" title="Feature Extraction" href="feature_extraction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> giotto-time
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="causality.html">Causality Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compose.html">Compose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_extraction.html">Feature Extraction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Feature Generation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_generation.Calendar"><code class="docutils literal notranslate"><span class="pre">Calendar</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_generation.Calendar.fit"><code class="docutils literal notranslate"><span class="pre">Calendar.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_generation.Calendar.transform"><code class="docutils literal notranslate"><span class="pre">Calendar.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_generation.Constant"><code class="docutils literal notranslate"><span class="pre">Constant</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_generation.Constant.fit"><code class="docutils literal notranslate"><span class="pre">Constant.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_generation.Constant.get_feature_names"><code class="docutils literal notranslate"><span class="pre">Constant.get_feature_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_generation.Constant.transform"><code class="docutils literal notranslate"><span class="pre">Constant.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gtime.feature_generation.PeriodicSeasonal"><code class="docutils literal notranslate"><span class="pre">PeriodicSeasonal</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_generation.PeriodicSeasonal.fit"><code class="docutils literal notranslate"><span class="pre">PeriodicSeasonal.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gtime.feature_generation.PeriodicSeasonal.transform"><code class="docutils literal notranslate"><span class="pre">PeriodicSeasonal.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="forecasting.html">Forecasting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_selection.html">Model Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="regressors.html">Regressors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="time_series_models.html">Time Series Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">giotto-time</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">API reference</a> &raquo;</li>
+      <li>Feature Generation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/feature_generation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gtime.feature_generation">
+<span id="feature-generation"></span><h1>Feature Generation<a class="headerlink" href="#module-gtime.feature_generation" title="Permalink to this heading"></a></h1>
+<p>The <a class="reference internal" href="#module-gtime.feature_generation" title="gtime.feature_generation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gtime.feature_generation</span></code></a> module deals with the creation of features that do
+not depend on the input data, but just on its index.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_generation.Calendar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_generation.</span></span><span class="sig-name descname"><span class="pre">Calendar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">country</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Brazil'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'01/01/2018'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'01/01/2020'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reindex_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'pad'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_generation.Calendar" title="Permalink to this definition"></a></dt>
+<dd><p>Create a feature based on the national holidays of a specific country.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>country<span class="classifier">str, optional, default: <code class="docutils literal notranslate"><span class="pre">'Brazil'</span></code></span></dt><dd><p>The name of the country from which to retrieve the holidays.</p>
+</dd>
+<dt>start_date<span class="classifier">str, optional, default: <code class="docutils literal notranslate"><span class="pre">'01/01/2019'</span></code></span></dt><dd><p>The date starting from which to retrieve the holidays.</p>
+</dd>
+<dt>end_date<span class="classifier">str, optional, default: <code class="docutils literal notranslate"><span class="pre">'01/01/2020'</span></code></span></dt><dd><p>The date until which to retrieve the holidays.</p>
+</dd>
+<dt>kernel<span class="classifier">array-like, optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>The kernel to use when creating the feature. The holiday feature is created by
+taking the dot product between the kernel and the column which contains a 1 if
+the corresponding day is a holiday and a 0 if the day is not a holiday. The
+rolling window has the same size as the kernel and the calculated value of the
+dot product is divided by the number of holidays in the window to get the value
+of the holiday feature.</p>
+</dd>
+<dt>reindex_method<span class="classifier">str, optional, default: <code class="docutils literal notranslate"><span class="pre">pad</span></code></span></dt><dd><p>Used only if X is passed in the <code class="docutils literal notranslate"><span class="pre">transform</span></code> method. It is used as the method
+with which to reindex the holiday events with the index of X. This method
+should be compatible with the reindex methods provided by pandas. Please refer
+to the pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.reindex.html">documentation</a>
+for further details.</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_extraction</span> <span class="kn">import</span> <span class="n">Calendar</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2019-04-18&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                 <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2019-04-27&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cal_feature</span> <span class="o">=</span> <span class="n">Calendar</span><span class="p">(</span><span class="n">country</span><span class="o">=</span><span class="s2">&quot;Italy&quot;</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cal_feature</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="go">            status__Calendar</span>
+<span class="go">2019-04-18               0.0</span>
+<span class="go">2019-04-19               0.0</span>
+<span class="go">2019-04-20               0.0</span>
+<span class="go">2019-04-21               1.0</span>
+<span class="go">2019-04-22               2.0</span>
+<span class="go">2019-04-23               0.0</span>
+<span class="go">2019-04-24               1.0</span>
+<span class="go">2019-04-25               2.0</span>
+<span class="go">2019-04-26               0.0</span>
+<span class="go">2019-04-27               0.0</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_generation.Calendar.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_generation.Calendar.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator. Just used to be compatible with the sklearn API.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">object</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_generation.Calendar.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_generation.Calendar.transform" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a DataFrame containing the events associated to the holidays of the
+selected <code class="docutils literal notranslate"><span class="pre">country</span></code>.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>If provided, both <code class="docutils literal notranslate"><span class="pre">start_date</span></code> and <code class="docutils literal notranslate"><span class="pre">end_date</span></code> are going to be
+overwritten with the start and end date of the index of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>.
+Also, if provided the output DataFrame is going to be re-indexed with the
+index of <code class="docutils literal notranslate"><span class="pre">time_series</span></code>, using the chosen <code class="docutils literal notranslate"><span class="pre">reindex_method</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>events<span class="classifier">pd.DataFrame, shape (length, 1)</span></dt><dd><p>A DataFrame containing the events.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_generation.Constant">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_generation.</span></span><span class="sig-name descname"><span class="pre">Constant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constant</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_generation.Constant" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> with one column, of the same length as the input
+<code class="docutils literal notranslate"><span class="pre">X</span></code> and containing the value <code class="docutils literal notranslate"><span class="pre">constant</span></code> across the whole column.</p>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>constant<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">2</span></code></span></dt><dd><p>The value to use to generate the constant column of the <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>.</p>
+</dd>
+<dt>length<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">50</span></code></span></dt><dd><p>The length of the DataFrame to generate. This is used only if X is not passed in
+the <code class="docutils literal notranslate"><span class="pre">transform</span></code> method, otherwise the length is inferred from it.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Examples<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_generation</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2019-04-18&#39;</span><span class="p">,</span>  <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2019-04-22&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">constant</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">constant</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">constant</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="go">            0__Constant</span>
+<span class="go">2019-04-18          3.0</span>
+<span class="go">2019-04-19          3.0</span>
+<span class="go">2019-04-20          3.0</span>
+<span class="go">2019-04-21          3.0</span>
+<span class="go">2019-04-22          3.0</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_generation.Constant.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#gtime.feature_generation.Constant" title="gtime.feature_generation.external.Constant"><span class="pre">Constant</span></a></span></span><a class="headerlink" href="#gtime.feature_generation.Constant.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator.</p>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features)</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">Constant</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_generation.Constant.get_feature_names">
+<span class="sig-name descname"><span class="pre">get_feature_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_generation.Constant.get_feature_names" title="Permalink to this definition"></a></dt>
+<dd><p>Return feature names for output features.</p>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>output_feature_names<span class="classifier">ndarray, shape (n_output_features,)</span></dt><dd><p>Array of feature names.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_generation.Constant.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_generation.Constant.transform" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> with one column with the same length as
+<code class="docutils literal notranslate"><span class="pre">time_series</span></code> and with the same index, containing a value equal to
+<code class="docutils literal notranslate"><span class="pre">constant</span></code>.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>The input DataFrame. If passed, the output DataFrame is going to have the
+same index as <code class="docutils literal notranslate"><span class="pre">time_series</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>constant_series_renamed<span class="classifier">pd.DataFrame, shape (length, 1)</span></dt><dd><p>A constant series, with the same length of <code class="docutils literal notranslate"><span class="pre">X</span></code> and with the same index.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gtime.feature_generation.PeriodicSeasonal">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gtime.feature_generation.</span></span><span class="sig-name descname"><span class="pre">PeriodicSeasonal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Timedelta</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'365</span> <span class="pre">days'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Timestamp</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DatetimeIndex</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gtime.feature_generation.PeriodicSeasonal" title="Permalink to this definition"></a></dt>
+<dd><p>Create a sinusoid from a given date and with a given period and amplitude.</p>
+<section id="id11">
+<h2>Parameters<a class="headerlink" href="#id11" title="Permalink to this heading"></a></h2>
+<dl>
+<dt>period<span class="classifier">Union[pd.Timedelta, str], optional, default: <code class="docutils literal notranslate"><span class="pre">'365</span> <span class="pre">days'</span></code></span></dt><dd><p>The period of the generated time series.</p>
+</dd>
+<dt>amplitude<span class="classifier">float, optional, default: <code class="docutils literal notranslate"><span class="pre">0.5</span></code></span></dt><dd><p>The amplitude of the time series.</p>
+</dd>
+<dt>start_date<span class="classifier">Union[pd.Timestamp, str], optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>The date from which to start generating the feature. This is used only if X is
+not passed in the <code class="docutils literal notranslate"><span class="pre">transform</span></code> method, otherwise the start date is inferred
+from it.</p>
+</dd>
+<dt>length<span class="classifier">int, optional, default: <code class="docutils literal notranslate"><span class="pre">50</span></code></span></dt><dd><p>The length of the sinusoid. This is used only if X is not passed in the
+<code class="docutils literal notranslate"><span class="pre">transform</span></code> method, otherwise the length is inferred from it.</p>
+</dd>
+<dt>index_period<span class="classifier">Union[DatetimeIndex, int], optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>The period of the index of the output <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>. This is used only if X is
+not passed in the <code class="docutils literal notranslate"><span class="pre">transform</span></code> method, otherwise the index period is taken
+from it.</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h2>Examples<a class="headerlink" href="#id12" title="Permalink to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gtime.feature_generation</span> <span class="kn">import</span> <span class="n">PeriodicSeasonal</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2019-04-18&#39;</span><span class="p">,</span>  <span class="n">end</span><span class="o">=</span><span class="s1">&#39;2019-04-27&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">periodic</span> <span class="o">=</span> <span class="n">PeriodicSeasonal</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">periodic</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="go">            0__PeriodicSeasonal</span>
+<span class="go">2019-04-18             0.000000</span>
+<span class="go">2019-04-19             0.008607</span>
+<span class="go">2019-04-20             0.017211</span>
+<span class="go">2019-04-21             0.025810</span>
+<span class="go">2019-04-22             0.034401</span>
+<span class="go">2019-04-23             0.042982</span>
+<span class="go">2019-04-24             0.051551</span>
+<span class="go">2019-04-25             0.060104</span>
+<span class="go">2019-04-26             0.068639</span>
+<span class="go">2019-04-27             0.077154</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_generation.PeriodicSeasonal.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#gtime.feature_generation.PeriodicSeasonal" title="gtime.feature_generation.external.PeriodicSeasonal"><span class="pre">PeriodicSeasonal</span></a></span></span><a class="headerlink" href="#gtime.feature_generation.PeriodicSeasonal.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the estimator.</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>X<span class="classifier">pd.DataFrame, shape (n_samples, n_features), required</span></dt><dd><p>Input data.</p>
+</dd>
+<dt>y<span class="classifier">None</span></dt><dd><p>There is no need of a target in a transformer, yet the pipeline API
+requires this parameter.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h3>Returns<a class="headerlink" href="#id14" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self<span class="classifier">PeriodicSeasonal</span></dt><dd><p>Returns self.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gtime.feature_generation.PeriodicSeasonal.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#gtime.feature_generation.PeriodicSeasonal.transform" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a sinusoid, with the given <code class="docutils literal notranslate"><span class="pre">period</span></code>, <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> and <code class="docutils literal notranslate"><span class="pre">length</span></code>,
+starting from the selected <code class="docutils literal notranslate"><span class="pre">start_date</span></code>. If <code class="docutils literal notranslate"><span class="pre">time_series</span></code> is not <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+the <code class="docutils literal notranslate"><span class="pre">start_date</span></code> is replaced by the start date of the time series and the
+output sinusoid will have the same index as <code class="docutils literal notranslate"><span class="pre">time_series</span></code>.</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Permalink to this heading"></a></h3>
+<dl>
+<dt>time_series<span class="classifier">pd.DataFrame, shape (n_samples, 1), optional, default: <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>The input DataFrame, If passed, the output DataFrame is going to have the
+same index as <code class="docutils literal notranslate"><span class="pre">time_series</span></code>. If is not passed, then the <code class="docutils literal notranslate"><span class="pre">start_date</span></code> and
+<code class="docutils literal notranslate"><span class="pre">index_period</span></code> must have been passed in the constructor when the object
+was instantiated.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>periodic_feature<span class="classifier">pd.DataFrame, shape (n_samples, 1)</span></dt><dd><p>The DataFrame containing the generated period feature.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>Raised if <code class="docutils literal notranslate"><span class="pre">time_series</span></code> is not passed and the <code class="docutils literal notranslate"><span class="pre">start_date</span></code> or the
+<code class="docutils literal notranslate"><span class="pre">index_period</span></code> are not present.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="feature_extraction.html" class="btn btn-neutral float-left" title="Feature Extraction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="forecasting.html" class="btn btn-neutral float-right" title="Forecasting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, L2F.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
