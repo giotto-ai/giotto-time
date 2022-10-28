@@ -21,9 +21,9 @@ with open("dev-requirements.txt") as f:
 
 DISTNAME = "giotto-time"
 DESCRIPTION = "Toolbox for Time Series analysis and integration with Machine Learning."
-with codecs.open("README.rst", encoding="utf-8-sig") as f:
+with codecs.open("README.md", encoding="utf-8-sig") as f:
     LONG_DESCRIPTION = f.read()
-LONG_DESCRIPTION_TYPE = "text/x-rst"
+LONG_DESCRIPTION_TYPE = "text/markdown"
 MAINTAINER = "Alessio Baccelli"
 MAINTAINER_EMAIL = "maintainers@giotto.ai"
 URL = "https://github.com/giotto-ai/giotto-time"
