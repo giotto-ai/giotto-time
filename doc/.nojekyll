@@ -1,0 +1,49 @@
+# Compiled python modules.
+*.pyc
+*.pyo
+*.pyd
+**/__pycache__
+
+# Setuptools distribution folder.
+/dist/
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
+*.so
+build
+
+# Python jupyter notebooks
+examples/dask-worker-space
+examples/.ipynb_checkpoints
+
+# Data files
+*.pkl
+*.csv
+*.pqt
+data/*
+
+# Output files
+*.out
+
+# External
+**.DS_Store
+.idea/*
+.vscode/*
+*~
+
+# Unit test
+.pytest_cache/
+.hypothesis/
+
+# Pytest output files
+test-output.xml
+
+# Latex
+*.aux
+*.bbl
+*.blg
+*.brf
+*.log
+*.pdf
+*.synctex.gz
+*.toc
