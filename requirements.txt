@@ -6,3 +6,4 @@ lime>=0.2.0.0
 shap>=0.35
 holidays>=0.10.2
 lunarcalendar>=0.0.9
+giotto-tda
