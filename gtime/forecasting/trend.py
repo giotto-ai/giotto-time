@@ -84,7 +84,7 @@ class TrendForecaster(BaseEstimator, RegressorMixin):
                 "The trend '%s' is not supported. Supported "
                 "trends are %s." % (self.trend, list(sorted(TRENDS)))
             )
-
+        print([TRENDS[self.trend](t, 111) for t in range(0, X.shape[0])])
         self.best_trend_params_ = minimize(
             lambda opt: self.loss(
                 X.values, [TRENDS[self.trend](t, opt) for t in range(0, X.shape[0])]

@@ -1,8 +1,0 @@
-steps:
-- script: |
-    pytest --cov gtime --cov-report xml --hypothesis-profile dev
-  displayName: 'Test with pytest'
-  
-- script: |
-    bash <(curl -s https://codecov.io/bash)
-  displayName: 'Upload to codecov.io'

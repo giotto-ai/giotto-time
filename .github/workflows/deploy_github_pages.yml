@@ -1,0 +1,41 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Deploy to gh-pages
+on: [workflow_dispatch]
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f doc-requirements.txt ]; then pip install -r doc-requirements.txt; fi
+    - name: Install sphinx
+      run: |
+        pip install sphinx
+    - name: Git checkout and build sphinx docs
+      run: |
+        git config --global user.name "github-pages[bot]"
+        git config --global user.email "41898281+github-pages[bot]@users.noreply.github.com"
+        git fetch
+        git checkout gh-pages
+        git checkout master
+        cd doc
+        make html
+    - name: push to gh-pages
+      run: |
+        git symbolic-ref HEAD refs/heads/gh-pages
+        git reset --mixed gh-pages
+        git add --all
+        git add -f docs/build
+        git commit -m "push sphinx build"
+        git push origin gh-pages

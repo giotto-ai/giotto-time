@@ -99,7 +99,7 @@ class GAR(MultiOutputRegressor, _ExplanationsMixin):
     def __init__(self, estimator, explainer_type: str = None, n_jobs: int = None):
         self.explainer_type = explainer_type
         estimator = initialize_estimator(estimator, explainer_type)
-        super().__init__(estimator, n_jobs)
+        super().__init__(estimator, n_jobs=n_jobs)
 
     def fit(self, X: pd.DataFrame, y: pd.DataFrame, sample_weight=None, **kwargs):
         """Fit the model.

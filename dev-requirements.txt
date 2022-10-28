@@ -5,3 +5,7 @@ pytest
 pytest-cov
 pytest-xdist
 pytest-lazy-fixture
+flake8
+mypy
+nbconvert
+jupyter

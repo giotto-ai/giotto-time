@@ -5,7 +5,7 @@ import numpy as np
 import shap
 from lime import lime_tabular
 from lime.explanation import Explanation
-from shap.explainers.explainer import Explainer
+from shap.explainers._explainer import Explainer
 from sklearn.base import RegressorMixin
 from sklearn.utils.validation import check_is_fitted
 
@@ -238,9 +238,10 @@ class _ShapExplainer(_RegressorExplainer):
     ) -> Explainer:
         for explainer in self.allowed_explainer:
             try:
-                return explainer(model=model, data=X, feature_names=feature_names)
+                return explainer(model, X, feature_names=feature_names)
             except Exception:
                 pass
+
         raise ValueError(f"Model not available: {type(model)}")
 
     def _compute_predictions_from_shap_values(

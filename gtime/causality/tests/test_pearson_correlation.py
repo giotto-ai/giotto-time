@@ -7,13 +7,13 @@ from gtime.causality.tests.common import make_df_from_expected_shifts
 
 
 def test_pearson_correlation():
-    expected_shifts = [randint(2, 9) * 2 for _ in range(3)]
+    expected_shifts = [randint(2, 6) * 2 for _ in range(3)]
     df = make_df_from_expected_shifts(expected_shifts)
 
-    spc = ShiftedPearsonCorrelation(target_col="A", max_shift=20)
+    spc = ShiftedPearsonCorrelation(target_col="A", max_shift=12)
     spc.fit(df)
 
-    shifts = spc.best_shifts_["A"][1:].values
+    shifts = spc.best_shifts_["A"][4:].values
     np.testing.assert_array_equal(shifts, expected_shifts)
 
 

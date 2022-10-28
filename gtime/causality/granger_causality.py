@@ -275,8 +275,10 @@ class GrangerCausality(BaseEstimator):
         dof_single = float(data_single.shape[0] - data_single.shape[1])
         dof_joint = float(data_joint.shape[0] - data_joint.shape[1]) - 1
 
-        linreg_single_residues = linreg_single._residues
-        linreg_joint_residues = linreg_joint._residues
+        linreg_single_residues = np.sum(
+            (y_pred_single - data[self.target_col].loc[data_single.index])**2)
+        linreg_joint_residues = np.sum(
+            (y_pred_joint - data[self.target_col].loc[data_joint.index])**2)
 
         self.results_ = []
         stat_test_input = {
